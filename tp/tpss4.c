@@ -1,4 +1,4 @@
-
+// 13023: fixed OBS_BEAM_GAIN[][][][] block
 
   strcpy(keyword,"OBS_STP_N"); 
   while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
@@ -225,7 +225,7 @@
         switch (i) {
           case TPSS_PL_KEYWORD_MATCH:    
             printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
-            sscanf(data,"%hd",&(obs[nobs].OBS_BEAM_DELAY[k][p])); 
+            sscanf(data,"%hd",&(obs[nobs].OBS_BEAM_GAIN[k][p][q][r])); 
             printf("...converts to %hd\n",obs[nobs].OBS_BEAM_GAIN[k][p][q][r]); 
             //if (obs[nobs].OBS_BEAM_DELAY[k][p][q][r]>MAX_BEAM_DELAY) {
             // printf("[%d/%d] FATAL: Invalid OBS_BEAM_DELAY[%d]\n",MT_TPSS,getpid(),k); 

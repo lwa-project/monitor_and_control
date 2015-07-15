@@ -1232,10 +1232,25 @@ int me_sc_MakeASM( struct ssmif_struct s, struct sc_struct *sc ) {
   for ( i=0; i<s.nARB; i++ ) {
     for ( c=0; c<s.nARBCH; c++ ) {
       m = s.iARBAnt[i][c]-1; /* this is the ANT that this ARX channel is associated with */ 
-      k = s.iAntStd[m]-1;    /* this is the STD that this ARX channel is associated with */
-      sc->Stand[k].Ant[s.iAntOrie[m]].ARX.i = i;  
-      sc->Stand[k].Ant[s.iAntOrie[m]].ARX.c = c;     
-      sc->Stand[k].Ant[s.iAntOrie[m]].ARX.iStat = s.eARBStat[i][c];
+
+      if (m>=0) { /* will not be true if this ARX channel has not been associated with an antenna */
+
+        k = s.iAntStd[m]-1;    /* this is the STD that this ARX channel is associated with */
+
+        //printf("%d %d %d %d m=%d k=%d\n",i,c,s.nARB,s.nARBCH,m,k);
+        // --- below (new SSMIF) did crash:
+        // 32 7 33 16 m=515 k=257
+        // 32 8 33 16 m=-1 k=-1072249702
+        // --- below (old SSMIF) did not crash:
+        // 32 7 33 16 m=515 k=257
+        // 32 8 33 16 m=-1 k=-1
+
+        sc->Stand[k].Ant[s.iAntOrie[m]].ARX.i = i;  
+        sc->Stand[k].Ant[s.iAntOrie[m]].ARX.c = c;     
+        sc->Stand[k].Ant[s.iAntOrie[m]].ARX.iStat = s.eARBStat[i][c];
+
+        } /* if (m>=0) */
+
       } /* for c */ 
     } /* for i */
 
@@ -1350,6 +1365,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// Jan 23, 2013: Fixed index overrun in me_sc_MakeASM( ) (see lwa1 staff exploder emails)
 // Apr 12, 2012: Modified dpoavail() error codes to facilitate change in tpss
 // Feb 16, 2012: Added SPC command
 //               Added SESSION_SPC keyword to ssf_ and osf_ structs

@@ -1,4 +1,4 @@
-// me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Sep 29
+// me_inproc.c: S.W. Ellingson, Virginia Tech, 2013 Jan 28
 // ---
 // COMPILE: gcc -o me_inproc me_inproc.c -I../common -lm
 // ---
@@ -21,12 +21,17 @@
 //     be commanded 
 // See end of this file for history.
 
-#include <math.h>        /* needed for me_getaltaz.c (at least) */
+#include <math.h>        /* needed for me_getaltaz.c + others */
 #include <dirent.h>      /* this is listing files in a directory */
 
 #include "me.h"
 #include "me_getaltaz.c"   /* me_getaltaz(): astro coordinate routine */
 #include "me_point_corr.c" /* me_point_corr(): pointing correction for DRX beamforming */
+
+#include "me_findsol.c" /* me_findsol(): gives position of Sun in RA,Dec */
+
+#include "me_findjov.c" /* me_findjov(): gives position of Jupiter in RA,Dec */
+/* NOTE: the above also pulls in four additional files "ephem_*" */
 
 #define ME_INPROC_DATA_LEN 256   /* size of the "data" string associated with each */
                                  /* command in the command script */
@@ -38,12 +43,123 @@ struct cs_command {        /* one command in the command script */
   };
 
 /*************************************************************/
+/*** me_medfg() **********************************************/
+/*************************************************************/
+/* parses "beam" (custom beam delays), makes dfile, sends to scheduler */
+/* NOTE: This is used for custom beams in STEPPED mode -- otherwise, see me_beamspec() */
+int me_medfg( struct beam_struct beam,
+              char *dfile, /* needs to end in ".df" */
+              FILE *fpl ) {
+
+  unsigned short int d[2*LWA_MAX_NSTD];
+  int i;
+  FILE *fp;
+  char cmd[256]; 
+  char df_file[256];
+
+  union {
+    unsigned short int i;
+    char b[2];
+    } i2u;
+  char bb;
+
+  /* convert to big-endian while packing into d[] */
+  for (i=0; i<2*LWA_MAX_NSTD; i++) {
+      i2u.i = beam.OBS_BEAM_DELAY[i]; 
+      bb=i2u.b[0]; i2u.b[0]=i2u.b[1]; i2u.b[1]=bb;
+      d[i] = i2u.i;  
+      //printf("%hu\n",d[i]);
+      } /* for i */
+
+  /* save the delay file */
+  sprintf(df_file,"me_inproc_bm/%s",dfile);
+  fp = fopen(df_file,"wb");
+  if (!fp) {
+    printf("FATAL: In me_medfg() of me_inproc(), unable to open '%s' for output.\n",df_file);
+    fprintf(fp,"FATAL: In me_medfg() of me_inproc(), unable to open '%s' for output.\n",df_file);
+    return;
+   }  
+  fwrite( d, sizeof(d[0]), sizeof(d)/sizeof(d[0]), fp );
+  fclose(fp);
+
+  /* Transfer the file */
+  sprintf(cmd, "scp %s %s:%s/dfiles/.",df_file,LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
+  fprintf(fpl,"me_medfg(): system('%s')\n",cmd);
+  //printf("'%s'\n",cmd);
+  system(cmd);
+
+  return 0;
+  }
+
+/*************************************************************/
+/*** me_megfg() **********************************************/
+/*************************************************************/
+/* parses "beam" (custom beam gains), makes gfile, sends to scheduler */
+/* NOTE: This is used for custom beams in STEPPED mode */
+int me_megfg( struct beam_struct beam,
+              char *gfile, /* needs to end in ".df" */
+              FILE *fpl ) {
+
+  signed short int g[LWA_MAX_NSTD][2][2]; /* matches up with signed short int beam.OBS_BEAM_GAIN[LWA_MAX_NSTD][2][2]; */
+  int i,j,k;
+  FILE *fp;
+  char cmd[256]; 
+  char gf_file[256];
+
+  union {
+    signed short int i;
+    char b[2];
+    } i2s;
+  char bb;
+
+  /* zero out input matrix */
+  for (i=0; i<LWA_MAX_NSTD; i++) {
+    g[i][0][0] = 0;
+    g[i][0][1] = 0;
+    g[i][1][0] = 0;
+    g[i][1][1] = 0;
+    }
+
+  /* pack g[][][] while converting to big-endian */
+  for (i=0; i<LWA_MAX_NSTD; i++) {
+    for (j=0; j<2; j++) {
+      for (k=0; k<2; k++) {
+        i2s.i = beam.OBS_BEAM_GAIN[i][j][k]; 
+        bb=i2s.b[0]; i2s.b[0]=i2s.b[1]; i2s.b[1]=bb;
+        g[i][j][k] = i2s.i;  
+        }
+      }
+    //printf("%hd %hd %hd %hd\n",g[i][0][0],g[i][0][1],g[i][1][0],g[i][1][1]);
+    }
+
+  /* save the gain file */
+  sprintf(gf_file,"me_inproc_bm/%s",gfile);
+  fp = fopen(gf_file,"wb");
+  if (!fp) {
+    printf("FATAL: In me_megfg() of me_inproc(), unable to open '%s' for output.\n",gf_file);
+    fprintf(fp,"FATAL: In me_megfg() of me_inproc(), unable to open '%s' for output.\n",gf_file);
+    return;
+   }  
+  fwrite( g, sizeof(g[0][0][0]), sizeof(g)/sizeof(g[0][0][0]), fp );
+  fclose(fp);
+
+  /* Transfer the file */
+  sprintf(cmd, "scp %s %s:%s/gfiles/.",gf_file,LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
+  fprintf(fpl,"me_megfg(): system('%s')\n",cmd);
+  //printf("'%s'\n",cmd);
+  system(cmd);
+
+  return 0;
+  }
+
+/*************************************************************/
 /*** me_beamspec() *******************************************/
 /*************************************************************/
 /* Reads the command script (.cs) file. */
 /* Makes a list of beam delay & gain files needed by BAM commands */
 /* The list is fed to a separate utility which generates the spec files */
 /* The spec files are then transferred to Scheduler */
+/* NOTE: This is NOT used for custom beams in STEPPED mode -- see me_me?fg() */
 
 int me_beamspec( char *cs_filename, 
                  FILE *fpl ) {
@@ -57,6 +173,7 @@ int me_beamspec( char *cs_filename,
   float fmhz, alt, az;
   char gfname[1024];  
   char cmd[256]; 
+  int m=0; /* using to count number of beams that will be processed */
 
   sprintf(bm_filename,"sinbox/bm.dat");
 
@@ -83,16 +200,23 @@ int me_beamspec( char *cs_filename,
     if (action.len>0) fread( data, action.len, 1, fp );
 
     if ((action.sid==LWA_SID_DP_) && (action.cid==LWA_CMD_BAM)) {
-      //fprintf(fpo,"'%s'\n",data);
-      //'1 740_766_2071.df 111226_XY.gf 0'
-      //'1 740_766_2072.df 111226_XY.gf 0'
-      sscanf(data,"%d %3f_%3f_%4f.df %s %d",&arg1,&fmhz,&alt,&az,gfname,&arg4);
-      fmhz /= 10;
-      alt /= 10;
-      az /= 10;
-      fprintf(fpo,"%4.1f %5.1f\n",alt,az);
-      fprintf(fpl,"%4.1f %5.1f\n",alt,az);
-      }
+
+      if (data[2]!=99) { /* ASCII 99 ("c") denotes custom beams -- those are already dealt with */
+        m++;
+         
+        //fprintf(fpo,"'%s'\n",data);
+        //'1 740_766_2071.df 111226_XY.gf 0'
+        //'1 740_766_2072.df 111226_XY.gf 0'
+        sscanf(data,"%d %3f_%3f_%4f.df %s %d",&arg1,&fmhz,&alt,&az,gfname,&arg4);
+        fmhz /= 10;
+        alt /= 10;
+        az /= 10;
+        fprintf(fpo,"%4.1f %5.1f\n",alt,az);
+        fprintf(fpl,"%4.1f %5.1f\n",alt,az);
+
+        } /* if (data[3]!="c") */
+
+      } /* if ((action.sid==LWA_SID_DP_) && (action.cid==LWA_CMD_BAM)) */
 
     } /* while ( fread( */
 
@@ -100,20 +224,24 @@ int me_beamspec( char *cs_filename,
   fclose(fp);  /* .cs */
   fclose(fpo); /* .bm */
 
-  /* clean out the me_inproc_bm directory */
-  sprintf(cmd,"rm -rf me_inproc_bm/*");
-  system(cmd);
+  if (m>0) { /* could be zero if all beams were "custom" beams */
 
-  /* Call mefsdfg to generate the files */ 
-  fprintf(fpl,"me_beamspec(): system('./mefsdfg state me_inproc_bm %4.1f 2 sinbox/bm.dat')\n",fmhz);
-  sprintf(cmd,"./mefsdfg state me_inproc_bm %4.1f 2 sinbox/bm.dat",fmhz);
-  system(cmd);
+    /* clean out the me_inproc_bm directory */
+    sprintf(cmd,"rm -rf me_inproc_bm/*");
+    system(cmd);
 
-  /* Transfer the files */
-  sprintf(cmd, "scp me_inproc_bm/* %s:%s/dfiles/.",LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
-  fprintf(fpl,"me_beamspec(): system('%s')\n",cmd);
-  //printf("'%s'\n",cmd);
-  system(cmd);
+    /* Call mefsdfg to generate the files */ 
+    fprintf(fpl,"me_beamspec(): system('./mefsdfg state me_inproc_bm %4.1f 2 sinbox/bm.dat')\n",fmhz);
+    sprintf(cmd,"./mefsdfg state me_inproc_bm %4.1f 2 sinbox/bm.dat",fmhz);
+    system(cmd);
+
+    /* Transfer the files */
+    sprintf(cmd, "scp me_inproc_bm/* %s:%s/dfiles/.",LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
+    fprintf(fpl,"me_beamspec(): system('%s')\n",cmd);
+    //printf("'%s'\n",cmd);
+    system(cmd);
+
+    } /* if (m>0) */
 
   return err;
   } /* me_beamspec() */
@@ -406,12 +534,9 @@ int main ( int narg, char *argv[] ) {
           fprintf(fpl,"  osf.OBS_MODE = %hu ('%s')\n",osf.OBS_MODE,ssc);
           switch (osf.OBS_MODE) {
             case LWA_OM_TRK_RADEC:
+            case LWA_OM_TRK_SOL:   
+            case LWA_OM_TRK_JOV:   
               eD=0;
-              break;
-            case LWA_OM_TRK_SOL:   /* not implemented */
-            case LWA_OM_TRK_JOV:   /* not implemented */
-              fprintf(fpl,"Encountered an unimplemented OBS_MODE; zapping command script:\n");
-              eD=-1;  
               break;
             case LWA_OM_STEPPED:   
             case LWA_OM_TBW:      
@@ -724,6 +849,8 @@ int main ( int narg, char *argv[] ) {
                 break; /* LWA_OM_TBN */ 
 
               case LWA_OM_TRK_RADEC:
+              case LWA_OM_TRK_SOL:
+              case LWA_OM_TRK_JOV:
 
                 /* DRX trigger time is in units of "subslots" (1/100ths of a second) */
                 t0 = dp_cmd_mpm % 1000; /* number of ms beyond a second boundary */
@@ -797,6 +924,13 @@ int main ( int narg, char *argv[] ) {
                 while ( LWA_timediff( tv2, tv ) > 0 ) {
 
                   LWA_timeval(&tv,&mjd,&mpm); /* get current MJD/MPM */
+
+                  /* if this is TRK_SOL or TRK_JOV, we need to get RA and DEC first */
+                  switch (osf.OBS_MODE) {
+                    case LWA_OM_TRK_SOL: me_findsol( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC) ); break;  
+                    case LWA_OM_TRK_JOV: me_findjov( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC) ); break;
+                    default: break;
+                    }
 
                   /* get updated alt/az */
                   me_getaltaz( osf.OBS_RA, 
@@ -973,24 +1107,48 @@ int main ( int narg, char *argv[] ) {
               me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
               ncs++;
 
-              /* Getting alt, az for beam pointing: */
-              if (osf.OBS_STP_RADEC) { /* osfs.OBS_STP_C1,C2 represent RA/DEC */
-                  me_getaltaz( osfs.OBS_STP_C1, 
-                               osfs.OBS_STP_C2, 
-                               mjd, mpm, 
-                               s.fGeoN, s.fGeoE, 
-                               &last, &alt, &az ); /* alt and az are in degrees */  
-                } else {
-                  az  = osfs.OBS_STP_C1;
-                  alt = osfs.OBS_STP_C2;
-                } /* if (osf.OBS_STP_RADEC) */
-              me_point_corr( s.fPCAxisTh, s.fPCAxisPh, s.fPCRot, &alt, &az ); /* pointing correction */
+              /* working out dfile and gfile for BAM command.  Two possibilities: */
+              if ( osfs.OBS_STP_B!=LWA_BT_SPEC_DELAYS_GAINS) { 
 
-              /* Figure out what dfile to use (construct filename) */
-              sprintf(dfile,"740_%03.0lf_%04.0lf.df",alt*10,az*10); 
+                /* --- SIMPLE beamforming: -----------------------------------------------------*/
 
-              /* Figure out what gfile to use (construct filename) */
-              sprintf(gfile,"default.gf"); 
+                /* Getting alt, az for beam pointing: */
+                if (osf.OBS_STP_RADEC) { /* osfs.OBS_STP_C1,C2 represent RA/DEC */
+                    me_getaltaz( osfs.OBS_STP_C1, 
+                                 osfs.OBS_STP_C2, 
+                                 mjd, mpm, 
+                                 s.fGeoN, s.fGeoE, 
+                                 &last, &alt, &az ); /* alt and az are in degrees */  
+                  } else {
+                    az  = osfs.OBS_STP_C1;
+                    alt = osfs.OBS_STP_C2;
+                  } /* if (osf.OBS_STP_RADEC) */
+                me_point_corr( s.fPCAxisTh, s.fPCAxisPh, s.fPCRot, &alt, &az ); /* pointing correction */
+
+                /* Figure out what dfile to use (construct filename) */
+                sprintf(dfile,"740_%03.0lf_%04.0lf.df",alt*10,az*10); 
+ 
+                /* Figure out what gfile to use (construct filename) */
+                sprintf(gfile,"default.gf"); 
+
+                } else { 
+
+                /* --- SPEC_DELAYS_GAINS beamforming: ---------------------------------------*/
+
+                //printf("FATAL: Shouldn't be here!"); return;
+
+                /* come up with unique root filename for delay and gain files */ 
+                /* These start with "c" to denote "custom" -- this keeps me_beamspec() from getting confused */
+                sprintf(dfile,"c%s_%04u_%04u_%04d.df",osf.PROJECT_ID,osf.SESSION_ID,osf.OBS_ID,m);
+                sprintf(gfile,"c%s_%04u_%04u_%04d.gf",osf.PROJECT_ID,osf.SESSION_ID,osf.OBS_ID,m);
+
+                /* read custom delays and gains */
+                fread(&beam,sizeof(struct beam_struct),1,fpo);
+
+                me_medfg(beam,dfile,fpl); /* make delay file and deliver to sch */
+                me_megfg(beam,gfile,fpl); /* make gain file and deliver to sch */
+
+                } /* if ( osfs.OBS_STP_B!=LWA_BT_SPEC_DELAYS_GAINS) {} else {} */
 
               /* so here's the BAM command: */
               cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
@@ -1013,26 +1171,7 @@ int main ( int narg, char *argv[] ) {
               /*=== END: STEPPED-mode processing  added 120929 ==============================================*/
               } /* if (eD==0) */
 
-            if ( osfs.OBS_STP_B==LWA_BT_SPEC_DELAYS_GAINS) {
-
-              fread(&beam,sizeof(struct beam_struct),1,fpo);
-              //for (p=1;p<=2*LWA_MAX_NSTD;p++) {
-              //  beam.OBS_BEAM_DELAY[p-1] = obs[n].OBS_BEAM_DELAY[m][p]; 
-              //  }
-              //for (p=1;p<=260;p++) {
-              //  for (q=1;q<=2;q++) {
-              //    for (r=1;r<=2;r++) {
-              //      beam.OBS_BEAM_GAIN[p-1][q-1][r-1] = obs[n].OBS_BEAM_GAIN[m][p][q][r]; 
-              //      }
-              //    }
-              //  }
-
-              if (eD==0) {
-                /* process */
-                } /* if (eD==0) */
-
-              } /* if ( osfs.OBS_STP_B==LWA_BT_SPEC_DELAYS_GAINS) */
-
+            /* reading marker at end of data that should have been read to this point */
             fread(&u4,sizeof(u4),1,fpo);
             //u4 = 4294967294; fwrite(&u4, sizeof(u4),1,fp); /* = $2^{32}-2$. */
             if ( u4 != 4294967294 ) {
@@ -1182,6 +1321,10 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: S.W. Ellingson, Virginia Tech, 2013 Jan 28
+//   .1 Implementing custom beam delays and gains
+// me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07
+//   .1 Implementing TRK_SOL and TRK_JOV
 // me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Sep 29
 //   .1 Partial implementation of STEPPED mode
 //      Scrambled times over 20 ms spread for DRX and BAM at start of obs or step

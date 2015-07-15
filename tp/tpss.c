@@ -1,4 +1,4 @@
-// tpss.c: S.W. Ellingson, Virginia Tech, 2012 Sep 29
+// tpss.c: S.W. Ellingson, Virginia Tech, 2013 Jan 28
 // ---
 // COMPILE: gcc -o tpss tpss.c -I../common
 // ---
@@ -35,7 +35,7 @@
 #define MAX_NUMBER_OF_OBSERVATIONS 150
 #define MAX_MJD_SCHEDULE_AHEAD 30   /* max number of days in the future allowed to schedule */
 #define MAX_STP_N 1024              /* max number of steps in a stepped-mode observation */
-#define MAX_BEAM_DELAY 1023         /* max value that OBS_BEAM_DELAY[][] can have */
+#define MAX_BEAM_DELAY 65535         /* max value that OBS_BEAM_DELAY[][] can have */
 #define TBW_INVERSE_DUTY_CYCLE 5000 /* assumed ratio of TBW read-out time to TBW acquisition time */
 #define MIN_OBS_STEP_LENGTH 5       /* minimum number of milliseconds in an observation step */
 
@@ -158,7 +158,7 @@ int main ( int narg, char *argv[] ) {
   int nobs=0; /* number of observations defined */
 
   long int mjd, mpm;
-  char mode_string[10];
+  char mode_string[256];
 
   int n,m,p,q,r;
 
@@ -864,6 +864,12 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpss.c: S.W. Ellingson, Virginia Tech, 2013 Jan 28
+//   .1 Redimensioned mode_string[] to 256 (from 10) to fix overrun problem
+// tpss.c: S.W. Ellingson, Virginia Tech, 2013 Jan 23
+//   .1 Changed MAX_BEAM_DELAY 
+// tpss.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07
+//   .1: Upgrading to accomodate TRK_SOL and TRK_JOV (no actual changes were required)
 // tpss.c: S.W. Ellingson, Virginia Tech, 2012 Sep 29
 //   .1: Upgrading to accomodate STEPPED mode
 // tpss.c: S.W. Ellingson, Virginia Tech, 2012 Apr 12
