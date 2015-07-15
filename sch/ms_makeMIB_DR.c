@@ -1,4 +1,4 @@
-// ms_makeMIB_DR.c: S.W. Ellingson, Virginia Tech, 2010 Jun 07
+// ms_makeMIB_DR.c: S.W. Ellingson, Virginia Tech, 2013 Jul 18
 // ---
 // COMPILE: gcc -o ms_makeMIB_DR ms_makeMIB_DR.c
 // ---
@@ -237,6 +237,7 @@ main ( int narg, char *argv[] ) {
   for ( i=0; i<nMaxDRSUCount; i++) {
     fprintf(fp,"V 12.3.%d	DRSU-INFO-%d 		UNK 	a88 	a88\n",i+1,i+1);
     }
+  fprintf(fp,"V 12.4 		DRSU-BARCODE		UNK	a1024	a1024\n");
 
   close(fp);
   } /* main() */
@@ -244,6 +245,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_makeMIB_DR.c: S.W. Ellingson, Virginia Tech, 2013 Jul 18
+//   .1: Added 12.4 (DRSU-BARCODE)
 // ms_makeMIB_DR.c: S.W. Ellingson, Virginia Tech, 2010 Jun 07
 //   .1: Initial version, using ms_makeMIB_ASP.c as a starting point
 // ms_makeMIB_ASP.c: S.W. Ellingson, Virginia Tech, 2009 Aug 14

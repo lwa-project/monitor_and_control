@@ -412,6 +412,11 @@ int me_action(
   int err;
   long int reference = 0;
 
+  char cmd[ME_MAX_COMMAND_LINE_LENGTH];
+
+  char sid_macro[12];
+  char barcode[1024];
+
   /* search through sessions currently in the "READY" or "OBSERVING" state */
   i=0;
   bDone=0;
@@ -483,14 +488,46 @@ int me_action(
                 case LWA_CMD_OBS:
                   (sq->iCurrentObs[i])++;
                   sq->oc[i] = ME_OC_OK;
-                  sprintf(sq->ocs[i],"");
-                  sprintf(sq->sTag[i],"");
+                  sprintf(sq->ocs[i],"UNK");
+                  //sprintf(sq->sTag[i],"UNK"); /* Overwrites actual recording of this value! */
+
+                  /* ask the DR about the barcode of the DRSU it is currently using. (result goes to MIB, checked on OBE) */
+                  sprintf(sid_macro,"DR%d", sq->ssf[i].SESSION_DRX_BEAM );
+                  err = mesi( NULL, sid_macro, "RPT", "DRSU-BARCODE", "today", "asap", &reference );
+
+                  /* save ASP MIB as it exists at start of observation */
+                  sprintf(cmd, "scp %s:%s/ASP.pag sinbox/%s_%04u_ASP_begin.pag",
+                          LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
+                  system(cmd);
+                  sprintf(cmd, "scp %s:%s/ASP.dir sinbox/%s_%04u_ASP_begin.dir",
+                          LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
+                  system(cmd);
+
                   break;
                 case LWA_CMD_OBE:
+
+                  /* ask the DR about the barcode of the DRSU it is currently using. (should be current in MIB; was requested on OBS) */
+                  sprintf(sid_macro,"DR%d", sq->ssf[i].SESSION_DRX_BEAM );
+                  err = memdre( sid_macro, "DRSU-BARCODE", barcode, &tv );
+
+                  ///* ask DR about the size of the recorded file (and associated metadata) */
+                  //err = mesi( NULL, sid /* FIXME */, LWA_CID_RPT, "DIRECTORY-COUNT", "today", "asap", &reference );
+                  ///* wait 3 seconds for response to come in */
+
+                  /* save ASP MIB as it exists at end of observation */
+                  sprintf(cmd, "scp %s:%s/ASP.pag sinbox/%s_%04u_ASP_end.pag",
+                          LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
+                  system(cmd);
+                  sprintf(cmd, "scp %s:%s/ASP.dir sinbox/%s_%04u_ASP_end.dir",
+                          LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
+                  system(cmd);
+
+                  /* write the metadata file */
                   sprintf(filename,"sinbox/%s_%04u_metadata.txt",sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
                   fp = fopen(filename,"a"); /* note we are appending */
-                  fprintf(fp,"%4d %16s %2d %s\n",sq->iCurrentObs[i],sq->sTag[i],sq->oc[i],sq->ocs[i]);
+                  fprintf(fp,"%4d [%s] [%s] %2d [%s]\n",sq->iCurrentObs[i],sq->sTag[i],barcode,sq->oc[i],sq->ocs[i]);
                   fclose(fp);
+
                   break;
                 default:
                   sprintf(msg,"me_action(): I don't recognize cid=%d ('%s')",action.cid,LWA_cmd2str(action.cid));
@@ -561,10 +598,21 @@ int me_action(
                 me_log( fpl, ME_LOG_SCOPE_SESSION, ME_LOG_TYPE_SCH_CMD, longmsg, sq, i );
                 printf("[%d/%d] %s\n",ME_ME_C,getpid(), longmsg );
                 eErr = ME_ACTION_ERR_MESI_FAILED;  
+
+                /* 121204 Kludge to prevent MCS/Exec shutdown when MCS/Sch says "Insufficient advance notice" */
+                if (err==8) {
+                  err=MESI_ERR_OK;
+                  sprintf(longmsg,"121204 kludge: downgrading above from FATAL to WARNING");
+                  bDone = 0;
+                  me_log( fpl, ME_LOG_SCOPE_SESSION, ME_LOG_TYPE_SCH_CMD, longmsg, sq, i );
+                  printf("[%d/%d] %s\n",ME_ME_C,getpid(), longmsg );
+                  }
+
               } else {
                 sprintf(longmsg,"me_action(): above cmd accepted; ref=%ld",reference);
                 me_log( fpl, ME_LOG_SCOPE_SESSION, ME_LOG_TYPE_INFO, longmsg, sq, i );
-                if (action.cid==LWA_CMD_REC) { sprintf(sq->sTag[i],"%06ld_%09ld",mjd,reference); }
+                if (action.cid==LWA_CMD_REC) { sprintf(sq->sTag[i],"%06ld_%09ld",mjd,reference); } 
+                if (action.cid==LWA_CMD_SPC) { sprintf(sq->sTag[i],"%06ld_%09ld",mjd,reference); }
               }
 
             } /* if (bGo && (!nFlg_NoSch)) */

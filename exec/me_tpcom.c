@@ -1,4 +1,4 @@
-// me_tpcom.c: S.W. Ellingson, Virginia Tech, 2011 Mar 27
+// me_tpcom.c: S.W. Ellingson, Virginia Tech, 2013 Jul 18
 // ---
 // COMPILE: gcc -o me_tpcom me_tpcom.c -I../common
 // ---
@@ -74,6 +74,7 @@ int tp_xfer( char *mepath,   /* relative path for file on MCS/Exec */
 
   return eErr;
   } /* tp_xfer() */
+
 
 /*******************************************************************/
 /*** main() ********************************************************/
@@ -237,6 +238,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_tpcom.c: S.W. Ellingson, Virginia Tech, 2013 Jul 18
+//   .1: Now adding ASP MIB to output tarball at end of session
 // me_tpcom.c: S.W. Ellingson, Virginia Tech, 2011 Mar 11
 //   .1: Initial version
 
