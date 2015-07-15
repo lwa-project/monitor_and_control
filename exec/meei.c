@@ -1,4 +1,4 @@
-// meei.c: S.W. Ellingson, Virginia Tech, 2011 March 09
+// meei.c: S.W. Ellingson, Virginia Tech, 2014 Feb 10
 // ---
 // REQUIRES: 
 //   me.h
@@ -17,9 +17,10 @@
 #define MEEI_ERR_CONNECT     2 /* couldn't do TCP/IP connection */
 #define MEEI_ERR_REFUSED     3 /* me_exec refused the command */
 
-int meei( char *cmd ) { 
+int meei( char *cmd, char *args ) { 
   // Returns an error code; see MEEI_ERR_* #defines, above
   // commands:  "SHT" (orderly shutdown of executive) 
+  // commands:  "STP" (terminates an observing session) 
 
   /*=================*/
   /*=== Variables ===*/
@@ -35,20 +36,28 @@ int meei( char *cmd ) {
   ///* sometimes first call to gettimeofday() returns something bogus, so let's get that out of the way */
   //gettimeofday( &tv, NULL ); 
   
+  /* initialize c.args[] to be an empty string */
+  sprintf(c.args,'\0');
+
   c.cmd = ME_CMD_NUL;
   if (strlen(cmd)<3) {
     printf("[%d/%d] FATAL: command '%s' not recognized\n",ME_MEEI,getpid(),cmd);
     eResult += MEEI_ERR_INVALID_CMD;
     return eResult;    
     }
-  if (strncmp(cmd,"SHT",3)==0) { c.cmd = ME_CMD_SHT; }
+  if (strncmp(cmd,"SHT",3)==0) { 
+    c.cmd = ME_CMD_SHT; 
+    }
+  if (strncmp(cmd,"STP",3)==0) { 
+    c.cmd = ME_CMD_STP; 
+    sprintf(c.args,"%s",args);
+    }
 
   if (c.cmd<=ME_CMD_NUL) {
     printf("[%d/%d] FATAL: command '%s' not recognized\n",ME_MEEI,getpid(),cmd);
     eResult += MEEI_ERR_INVALID_CMD;
     return eResult;  
     }
-
 
   /* create socket */
   sockfd = socket(
@@ -81,6 +90,8 @@ int meei( char *cmd ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// meei.c: S.W. Ellingson, Virginia Tech, 2014 Feb 10
+//   .1: adding STP command
 // meei.c: S.W. Ellingson, Virginia Tech, 2011 March 09
 //   .1: initial version, using "mesi.c" as a starting point
 // mesi.c: S.W. Ellingson, Virginia Tech, 2011 Feb 10

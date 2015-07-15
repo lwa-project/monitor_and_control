@@ -1,9 +1,17 @@
-// meeix.c: S.W. Ellingson, Virginia Tech, 2011 March 09
+// meeix.c: S.W. Ellingson, Virginia Tech, 2014 Feb 10
 // ---
 // COMPILE: gcc -o meeix meeix.c
 // ---
-// COMMAND LINE: meeix <cmd>
-//   <cmd>: command to send: one of "SHT" (orderly shutdown of executive)        
+// COMMAND LINE: meeix <cmd> <args>
+//   <cmd>: command to send: one of:
+//     "SHT" (orderly shutdown of executive)   
+//     "STP" (stop -- terminate a observing session after submission)    
+//  <args>: a string surrounded by double quotes 
+//     (for STP:) <PROJECT_ID> <SESSION_ID>
+// ---
+// EXAMPLES:
+// $ ./meeix SHT
+// $ ./meeix STP "LE002001 2"
 // ---
 // REQUIRES: 
 //   me.h
@@ -20,7 +28,10 @@
 int main ( int narg, char *argv[] ) {
 
   char cmd[4];
+  char args[ME_MAX_COMMAND_LINE_LENGTH];
   int eResult;
+
+  sprintf(args,"\0");
 
   /* processing command line arguments */
 
@@ -31,9 +42,20 @@ int main ( int narg, char *argv[] ) {
       return;
     } 
 
-  //printf("[%d/%d] cmd = '%s'\n",ME_MESIX,getpid(),cmd);
+  if (strncmp(cmd,"STP",3)==0) { 
+    /* get subsequent arguments */
+    if (narg>2) { 
+        //sscanf(argv[2],"%s",args);
+        memcpy(args,argv[2],strlen(argv[2])+1);
+      } else {
+        printf("[%d/%d] FATAL: args for 'STP' command not provided\n",ME_MEEIX,getpid());
+        return;
+      } 
+    }
 
-  eResult = meei(cmd);
+  //printf("[%d/%d] cmd = '%s' args = '%s'\n",ME_MESIX,getpid(),cmd,args);
+
+  eResult = meei(cmd,args);
   printf("[%d/%d] meei() returned code %d\n",ME_MESIX,getpid(),eResult);
   
   return 0;
@@ -42,6 +64,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// meeix.c: S.W. Ellingson, Virginia Tech, 2014 Feb 10
+//   .1: adding "STP" command
 // meeix.c: S.W. Ellingson, Virginia Tech, 2011 March 09
 //   .1: initial version, using mesix.c as a starting point
 // mesix.c: S.W. Ellingson, Virginia Tech, 2010 Oct 15

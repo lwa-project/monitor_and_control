@@ -440,7 +440,7 @@ int me_action(
         //printf("\n *** action.bASAP=%d, action.sid=%d, action.cid=%d, action.len=%d, data=<%s> \n\n",action.bASAP, action.sid, action.cid, action.len, data );
         (sq->ncr[i])++; /* keeping track of how many commands we've read */
   
-        /* check to see if this is something we need to now */
+        /* check to see if this is something we need to know */
         bActNow = 0;
         if (action.bASAP) { 
             bActNow=1; 
@@ -985,3 +985,102 @@ int me_make_gf( struct ssmif_struct s
 
   return;
   } /* me_gf() */
+
+
+/*******************************************************/
+/*** me_stp() ******************************************/
+/*******************************************************/
+/* responding to a "STP" command sent via meei(x): Terminate an observing session */
+
+int me_stp( 
+  struct me_session_queue_struct *sq,
+  FILE* fpl, /* for logging */
+  char *args
+  ) {
+
+  char sProjectID[ME_MAX_PROJECT_ID_LENGTH];
+  int iSessionID;
+
+  int i,ii;
+  int b1,b2;
+ 
+  struct me_session_queue_struct *sq_ptr=NULL; /* for logging */
+  int err = ME_CMD_NUL; /* this value used to acknowledge command */
+
+  char sid_macro[12];
+  char barcode[1024];
+  struct timeval tv;
+  char filename[ME_FILENAME_MAX_LENGTH];
+  FILE *fp;
+
+  /* get project ID and session ID */
+  sscanf(args,"%s %d",sProjectID,&iSessionID);
+
+  /* search for it in the session queue */
+  ii = -1; /* this will become the index into the session queue if we find the session */
+  for ( i=0; i<=sq->N; i++ ) {
+    b1 = (strncmp(sq->ssf[i].PROJECT_ID,sProjectID,strlen(sProjectID))==0);
+    b2 = (sq->ssf[i].SESSION_ID)==iSessionID; 
+    if ( b1 && b2 ) { ii = i; } /* found it! remember index */
+    }
+
+  if (ii>=0) { /* found it */
+
+    /* what to do about it depends on it's current state: */
+    switch(sq->eState[ii]) {
+      case MESQ_STATE_NOT_USED:
+        me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_stp(): MESQ_STATE_NOT_USED; nothing to do (shouldn't be here)", sq_ptr, 0 );
+        break;
+      case MESQ_STATE_AWAITING_INPROCESSING:
+        me_initialize_session_queue_entry(sq,ii); 
+        me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_stp(): Killed session while MESQ_STATE_AWAITING_INPROCESSING", sq_ptr, 0 );
+        break;
+      case MESQ_STATE_INPROCESSING:
+        me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_stp(): Failed because state is MESQ_STATE_INPROCESSING; try again later", sq_ptr, 0 );
+        err = ME_CMD_ERR;
+        break;
+      case MESQ_STATE_READY:
+      case MESQ_STATE_OBSERVING:
+
+        sq->eState[ii] = MESQ_STATE_AWAITING_OUTPROCESSING;
+        sq->bOutProcessReqd = 1;                            /* signal that at least one session is in this state */ 
+        me_log( fpl, ME_LOG_SCOPE_SESSION, ME_LOG_TYPE_INFO, "me_sdp(): session ended", sq, ii );
+
+        sq->oc[ii] += ME_OC_MEEI_STP; 
+        sprintf(sq->ocs[ii],"Rcvd STP from meei");
+
+        /* ask the DR about the barcode of the DRSU it is currently using. (should be current in MIB; was requested on OBS) */
+        sprintf(sid_macro,"DR%d", sq->ssf[ii].SESSION_DRX_BEAM );
+        err = memdre( sid_macro, "DRSU-BARCODE", barcode, &tv );
+
+        /* write the metadata file */
+        sprintf(filename,"sinbox/%s_%04u_metadata.txt",sq->ssf[ii].PROJECT_ID,sq->ssf[ii].SESSION_ID);
+        fp = fopen(filename,"a"); /* note we are appending */
+        fprintf(fp,"%4d [%s] [%s] %2d [%s]\n",sq->iCurrentObs[ii],sq->sTag[ii],barcode,sq->oc[ii],sq->ocs[ii]);
+        fclose(fp);
+
+        /* check through queue to see how to set bReady flag on exit */
+        sq->bReady = 0;
+        for ( i=0; i<=(sq->N); i++ ) {
+          if ((sq->eState[i])==MESQ_STATE_READY    ) { sq->bReady = 1; }
+          if ((sq->eState[i])==MESQ_STATE_OBSERVING) { sq->bReady = 1; }
+          }
+
+        break;
+      case MESQ_STATE_AWAITING_OUTPROCESSING:
+        me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_stp(): Failed because state is MESQ_STATE_AWAITING_OUTPROCESSING", sq_ptr, 0 );
+        err = ME_CMD_ERR;
+        break;       
+      default:
+        me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_stp() doesn't understand this eState (shouldn't be here)", sq_ptr, 0 );
+        err = ME_CMD_ERR;
+        break;
+      } /* switch() */ 
+
+    } else {
+      me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_stp(): Did not find indicated session", sq_ptr, 0 );
+      err = ME_CMD_ERR;
+    }
+
+  return err;
+  } /* me_stp() */

@@ -91,8 +91,10 @@ void me_sc_init( struct sc_struct *sc ) {
 #define ME_CMD_ERR -1 /* this returned by me_exec if command not understood */
 #define ME_CMD_NUL 0  /* null (invalid command) */
 #define ME_CMD_SHT 1  /* shutdown command */
+#define ME_CMD_STP 2  /* stop command -- terminates a session after it's been submitted */
 struct me_cmd_struct {
-  int cmd; /* one of ME_CMD_* */
+  int cmd;                               /* one of ME_CMD_* */
+  char args[ME_MAX_COMMAND_LINE_LENGTH]; /* depends on cmd */
   };
 
 /************************************************/
@@ -123,6 +125,7 @@ struct me_outproc_manifest_struct {
 /* these are defined values for .oc: */
 #define ME_OC_OK       0 /* concluded successfully with no issues to report */
 #define ME_OC_RCVD_ESF 1 /* received a *commanded* (from me_inproc) "end session -- failed" */
+#define ME_OC_MEEI_STP 2 /* session terminated as a result of a "STP" command received from meei() */
 
 struct me_session_queue_struct {
   int N;               /* highest index containing an valid observation */
@@ -251,7 +254,7 @@ int me_bSubsystemAlive( char *ss ) {
   //printf("[%d/%d] val='%s', mjd1='%ld', mpm1='%ld'\n",ME_ME_H,getpid(),val,mjd1,mpm1);
 
   /* SUMMARY should be "NORMAL"... */
-  if ( (strncmp(val,"NORMAL",6)!=0) || (strncmp(val," NORMAL",7)!=0) ) {
+  if (strncmp(val,"NORMAL",6)!=0) {
     //printf("[%d/%d] SUMMARY is now '%s'\n",val),ME_ME_H,getpid(),val);
     eResult += ME_BSA_SUMMARY_NOT_NORMAL;
     }

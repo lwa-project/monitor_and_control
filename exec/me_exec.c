@@ -1,4 +1,4 @@
-// me_exec.c: S.W. Ellingson, Virginia Tech, 2011 Dec 12
+// me_exec.c: S.W. Ellingson, Virginia Tech, 2014 Feb 10
 // ---
 // COMPILE: gcc -o me_exec me_exec.c -I../common
 // ---
@@ -148,7 +148,7 @@ int main ( int narg, char *argv[] ) {
 
   /* Initialize the station configuration structure */
   me_sc_init( &sc );              
-
+ 
   /* assemble information about analog signal path & status */
   iErr = me_sc_MakeASM( s, &sc ); 
   if (iErr>0) {
@@ -355,6 +355,11 @@ int main ( int narg, char *argv[] ) {
           c.cmd=ME_CMD_NUL; /* this value used to acknowledge command */
           eQuit=1; 
           break;
+        case ME_CMD_STP:
+          sprintf(msg,"Received ME_CMD_STP; c.args='%s'",c.args);
+          me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 );
+          c.cmd = me_stp( &sq, fpl, c.args ); /* process the STP command */
+          break;
         default:         
           sprintf(msg,"Received unrecognized command code %d",c.cmd);
           me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 ); 
@@ -545,6 +550,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_exec.c: S.W. Ellingson, Virginia Tech, 2014 Feb 10
+//   .1: Adding meeix "STP" command -- allows termination of an observing session after submission
 // me_exec.c: S.W. Ellingson, Virginia Tech, 2012 Mar 01
 //   .1: Adding periodic polling of subsystems
 // me_exec.c: S.W. Ellingson, Virginia Tech, 2011 Dec 12
