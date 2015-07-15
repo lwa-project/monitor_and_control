@@ -1,4 +1,4 @@
-// me_point_corr.c: S.W. Ellingson, Virginia Tech, 2012 Sep 28
+// me_point_corr.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07
 // ---
 // COMPILE: intended to be called from another program which it is compiled into
 // ---
@@ -53,9 +53,15 @@ void me_point_corr(
   *az  = 90.0 - (atan2(by,bx)/MPC_DTR);
   *alt = 90.0 - (acos(bz)    /MPC_DTR); 
 
+  /* make sure az is in range 0--> 360 */
+  while ((*az)>=360.0) { (*az)-=360.0; } 
+  while ((*az)<   0.0) { (*az)+=360.0; } 
+
   return;
   } /* me_point_corr */
 
+// me_point_corr.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07
+// -- making sure azimuth is in range [0,360] on exit
 // me_point_corr.c: S.W. Ellingson, Virginia Tech, 2012 Sep 28
 // -- fixes bug in calculation of bx,by discovered by J. Dowell (eml. c. Sep 28, 2012)
 // me_point_corr.c: S.W. Ellingson, Virginia Tech, 2012 Jul 03

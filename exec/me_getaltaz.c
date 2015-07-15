@@ -1,4 +1,4 @@
-// me_getaltaz.c: S.W. Ellingson, Virginia Tech, 2012 Jan 21
+// me_getaltaz.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07
 // ---
 // COMPILE: intended to be called from another program which it is compiled into
 // ---
@@ -69,6 +69,10 @@ void me_getaltaz(
   *az  = acos( ( cos(lat*DTR)*sin(dec*DTR) - sin(lat*DTR)*cos(dec*DTR)*cos(HA)) / cos(*alt*DTR) )/DTR;
   if (HA<PI) { *az = 360.0 - *az; }
 
+  /* make sure az is in range 0--> 360 */
+  while ((*az)>=360.0) { (*az)-=360.0; } 
+  while ((*az)<   0.0) { (*az)+=360.0; } 
+
   //AZ/ALT from RA/DEC
   //-- sin ALT = sin LAT sin DEC + cos LAT cos DEC cos H 
   //-- cos AZ = ( cos LAT sin DEC - sin LAT cos DEC cos H ) / cos ALT
@@ -81,6 +85,8 @@ void me_getaltaz(
   return;
   } /* me_getaltaz */
 
+// me_getaltaz.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07
+// -- Making sure azimuth is in range [0,360]
 // me_getaltaz.c: S.W. Ellingson, Virginia Tech, 2012 Jan 21
 //   -- corrections to algorithm 
 // me_getaltaz.c: S.W. Ellingson, Virginia Tech, 2011 May 05

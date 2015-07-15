@@ -1,4 +1,4 @@
-// tpms.c: S.W. Ellingson, Virginia Tech, 2012 September 29
+// tpms.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07
 // ---
 // COMPILE: gcc -o tpms tpms.c -I../common
 // ---
@@ -21,6 +21,14 @@
 //                <arg6> FREQ1 [tuning word].  DEFAULT is  832697741 (37.999999997 MHz)
 //                <arg7> FREQ2 [tuning word].  DEFAULT is 1621569285 (73.999999990 MHz)
 //                <arg8> BW [filter code].  DEFAULT is 7.
+//     TRK_SOL:   <arg3> OBS_DUR [ms], integer.  DEFAULT is 10000.
+//                <arg4> FREQ1 [tuning word].  DEFAULT is  832697741 (37.999999997 MHz)
+//                <arg5> FREQ2 [tuning word].  DEFAULT is 1621569285 (73.999999990 MHz)
+//                <arg6> BW [filter code].  DEFAULT is 7.
+//     TRK_JOV:   <arg3> OBS_DUR [ms], integer.  DEFAULT is 10000.
+//                <arg4> FREQ1 [tuning word].  DEFAULT is  832697741 (37.999999997 MHz)
+//                <arg5> FREQ2 [tuning word].  DEFAULT is 1621569285 (73.999999990 MHz)
+//                <arg6> BW [filter code].  DEFAULT is 7.
 //     TBN:       <arg3> OBS_DUR [ms], integer.  DEFAULT is 10000.
 //                <arg4> FREQ1 [tuning word].  DEFAULT is 832697741 (37.999999997 MHz)
 //                (OBS_BW is assumed to be 7 (100 kSPS) 
@@ -81,6 +89,8 @@ int main ( int narg, char *argv[] ) {
       switch (eMode) { /* not all modes are yet implemented */
         case LWA_OM_STEPPED: break;
         case LWA_OM_TRK_RADEC: break;
+        case LWA_OM_TRK_SOL: break;
+        case LWA_OM_TRK_JOV: break;
         case LWA_OM_TBN: break;
         case LWA_OM_TBW: break;
         case LWA_OM_DIAG1: break;
@@ -111,6 +121,16 @@ int main ( int narg, char *argv[] ) {
       printf("[%d/%d] INPUT: iFreq2=%ld\n",MT_TPMS,getpid(),iFreq2);
       printf("[%d/%d] INPUT: iBW=%d\n",MT_TPMS,getpid(),iBW);
       break;
+    case LWA_OM_TRK_SOL:
+    case LWA_OM_TRK_JOV:
+      iDur=10000;        if (narg>=4) sscanf(argv[3],"%ld",&iDur);
+      iFreq =832697741;  if (narg>=5) sscanf(argv[5],"%ld",&iFreq); 
+      iFreq2=1621569285; if (narg>=6) sscanf(argv[6],"%ld",&iFreq2);
+      iBW=7;             if (narg>=7) sscanf(argv[7],"%d",&iBW);
+      printf("[%d/%d] INPUT: iDur=%ld [ms]\n",MT_TPMS,getpid(),iDur);
+      printf("[%d/%d] INPUT: iFreq =%ld\n",MT_TPMS,getpid(),iFreq);
+      printf("[%d/%d] INPUT: iFreq2=%ld\n",MT_TPMS,getpid(),iFreq2);
+      printf("[%d/%d] INPUT: iBW=%d\n",MT_TPMS,getpid(),iBW);
     case LWA_OM_TBN:
       iDur=10000;      if (narg>=4) sscanf(argv[3],"%ld",&iDur);   
       iFreq=832697741; if (narg>=5) sscanf(argv[4],"%ld",&iFreq); 
@@ -238,6 +258,16 @@ int main ( int narg, char *argv[] ) {
       fprintf(fp,"OBS_BW         %d\n",iBW);
       //fprintf(fp,"OBS_BW+        19.6 MSPS\n");
       break; 
+    case LWA_OM_TRK_SOL:
+    case LWA_OM_TRK_JOV:
+      fprintf(fp,"OBS_B          SIMPLE\n");
+      fprintf(fp,"OBS_FREQ1      %ld\n",iFreq);
+      //fprintf(fp,"OBS_FREQ1+     19.999999955 MHz\n");
+      fprintf(fp,"OBS_FREQ2      %ld\n",iFreq2);
+      //fprintf(fp,"OBS_FREQ2+     19.999999955 MHz\n");     
+      fprintf(fp,"OBS_BW         %d\n",iBW);
+      //fprintf(fp,"OBS_BW+        19.6 MSPS\n");
+      break; 
     case LWA_OM_STEPPED:
       fprintf(fp,"OBS_BW           %d\n",iBW);
       fprintf(fp,"OBS_STP_N        1\n",fRA);
@@ -264,6 +294,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpms.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07
+//   .1: Adding TRK_SOL and TRK_JOV
 // tpms.c: S.W. Ellingson, Virginia Tech, 2012 September 29
 //   .1: Adding STEPPED mode
 // tpms.c: S.W. Ellingson, Virginia Tech, 2011 December 22

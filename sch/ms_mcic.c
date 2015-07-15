@@ -1,4 +1,4 @@
-// ms_mcic.c: S.W. Ellingson, Virginia Tech, 2012 Apr 12
+// ms_mcic.c: S.W. Ellingson, Virginia Tech, 2012 Jul 06
 // ---
 // COMPILE: gcc -o ms_mcic -I/usr/include/gdbm ms_mcic.c -lgdbm_compat -lgdbm
 // In Ubuntu, needed to install package libgdbm-dev
@@ -30,20 +30,20 @@
 
 #include <sys/msg.h>
 
-//#include "LWA_MCS.h" 
+#include <errno.h> /* for logging */
+
 #include "mcs.h"
 
 #define MY_NAME "ms_mcic (v.20101113.1)"
 #define ME "6" 
 
 /* Things that should eventually be obtained from a .h file */
-#define B         8192            /* [bytes] Max message size */
+//#define B         8192            /* [bytes] Max message size */
+#define B         16384            /* [bytes] Max message size */
 #define R_SUMMARY_STRING_LENGTH 8
-
 
 #define LWA_PTQ_MAX_DATA_FIELD_LENGTH 256 
 /* This is used to avoid copying mammoth DATA fields to the pending task queue */
-
 
 #include "ms_mcic_mib.c" /* this must follow all other macro defines; */
                          /* especially those for MY_NAME and ME */
@@ -137,6 +137,10 @@ main ( int narg, char *argv[] ) {
   FILE *fp;
 
   int bErr=0;
+
+  FILE *fpe; /* 120706 used for recvfrom() output logging */
+  char fpe_filename[256];
+  int last_errno;
 
   /*======================================*/
   /*=== Initialize: Command line stuff ===*/
@@ -294,6 +298,22 @@ main ( int narg, char *argv[] ) {
   for ( i=0; i < LWA_PTQ_SIZE; i++ ) ptq_ref[i] = 0;
   ptq_ptr = 0;
 
+
+  /*======================================================*/
+  /*=== Initialize: Set up recvfrom() logging ============*/
+  /*======================================================*/
+
+  sprintf(fpe_filename,"ms_mcic_%03d.log",sid);
+  fpe = fopen(fpe_filename,"w");
+  //fprintf(fpe,"%5d EAGAIN\n",EAGAIN);
+  //fprintf(fpe,"%5d EWOULDBLOCK\n",EWOULDBLOCK);
+  //fprintf(fpe,"%5d EBADF\n",EBADF);
+  //fprintf(fpe,"%5d EFAULT\n",EFAULT);
+  //fprintf(fpe,"%5d EINTR\n",EINTR);
+  //fprintf(fpe,"%5d EINVAL\n",EINVAL);
+  //fprintf(fpe,"%5d ENOMEM\n",ENOMEM);
+  //fprintf(fpe,"%5d ENOTCONN\n",ENOTCONN);
+  //fprintf(fpe,"%5d ENOTSOCK\n",ENOTSOCK);
 
   /*======================================================*/
   /*=== MAIN LOOP ========================================*/
@@ -513,52 +533,22 @@ main ( int narg, char *argv[] ) {
                        (struct sockaddr *) &addressr,   /* A null pointer, or points to a sockaddr structure in which the sending address */
                                                         /* is to be stored. The length and format of the address depend on the address family of the socket. */
                        &len                             /* Specifies the length of the sockaddr structure pointed to by the address argument */
-                      );  
+                      );
+    last_errno = errno;  
     /* http://www.opengroup.org/onlinepubs/007908799/xns/recvfrom.html */
     //printf("[%s/%d] subsystem says <%s>\n",ME,getpid(),message_string);
-
     //printf("[%s/%d] Mark 3\n",ME,getpid());
     
+    /* logging */
+    if (! ((eResult==-1) && (errno==EAGAIN)) ) {
+      fprintf(fpe,"%5d %5d |%46s|\n",eResult,last_errno,message_string); 
+      fflush(fpe);
+      }
+
     /* If we received something from a subsystem, act on it and tell ms_exec */
     if (eResult>0) {
 
       /* Parse message into fields */
-
-      /* OLD code for parsing ("upgraded" Jun 17, 2010) */
-      //sscanf( message_string,
-      //         "%3s%3s%3s%9ld%4d%6ld%9ld %1s%7s",
-      //         dest, /* %3s DESTINATION */
-      //         sids, /* %3s SOURCE */
-      //         cids,  /* %3s TYPE */
-      //        &ref, /* %9ld REFERENCE */
-      //        &len,  /* %4d data length */ 
-      //        &mjd,  /* %6ld MJD */
-      //        &mpm,  /* %9ld MPM */
-      //         r_response, /* %1s R-RESPONSE */
-      //         r_summary  /* %7s R-SUMMARY */
-      //         );
-
-      /* OLD code for parsing ("upgraded" May 3, 2011) */
-      //char sref[10];
-      //char slen[5];
-      //char smjd[7];
-      //char smpm[10];
-      //sscanf( message_string,
-      //         "%3c%3c%3c%9c%4c%6c%9c %1c%7s",
-      //         dest, /* %3s DESTINATION */
-      //         sids, /* %3s SOURCE */
-      //         cids,  /* %3s TYPE */
-      //         sref, /* %9ld REFERENCE */
-      //         slen,  /* %4d data length */
-      //         smjd,  /* %6ld MJD */
-      //         smpm,  /* %9ld MPM */
-      //         r_response, /* %1s R-RESPONSE */
-      //         r_summary  /* %7s R-SUMMARY */
-      //         );
-      // sscanf(sref,"%ld",&ref);
-      // sscanf(slen,"%d",&len);
-      // sscanf(smjd,"%ld",&mjd);
-      // sscanf(smpm,"%ld",&mpm);
 
        { /* BEGIN parsing block */
        char sref[10];
@@ -635,7 +625,6 @@ main ( int narg, char *argv[] ) {
 
          } 
 
-
        //printf("[%s/%d] Sending mq_msg.ref = %ld\n",ME,getpid(),mq_msg.ref); 
        //printf("[%s/%d] Sending mq_msg.datalen = %d\n",ME,getpid(),mq_msg.datalen);
        //printf("[%s/%d] Sending mq_msg.cid = %d\n",ME,getpid(),mq_msg.cid);
@@ -668,12 +657,6 @@ main ( int narg, char *argv[] ) {
             (mq_msg.cid==LWA_CMD_RPT) && 
             (!LWA_isMCSRSVD(cmdata)) &&
             (mq_msg.bAccept!=LWA_MSELOG_TP_FAIL_REJD) ) {
-
-         ///* Making hex representation: */
-         //mq_msg.datalen = len-8;                             /* fix this (assumed it was a string, above) */  
-         //i = mq_msg.datalen; if ( (2*i) > 32 ) { i=16; }      
-         //LWA_raw2hex( data, hex, i );         
-         //memcpy( mq_msg.data, hex, (2*i)+1 );    
 
          /* Displaying as "@" followed by the number of bytes */
          sprintf(mq_msg.data,"@%d",len-8);
@@ -744,6 +727,9 @@ main ( int narg, char *argv[] ) {
   close(sfdr);
   close(sfdt); 
 
+  /* close down log */
+  fclose(fpe);
+
   printf("[%s/%d] exit(EXIT_SUCCESS)\n",ME,getpid());
   exit(EXIT_SUCCESS);
   } /* main() */
@@ -752,6 +738,9 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mcic.c: S.W. Ellingson, Virginia Tech, 2012 Jul 06
+//   .1: Cleaning up; removing old (commented-out) code
+//       Adding logging to monitor recvfrom() output
 // ms_mcic.c: S.W. Ellingson, Virginia Tech, 2012 Apr 12
 //   .1: Fixed minor bug in which .gf would be reported missing when .df was missing
 // ms_mcic.c: S.W. Ellingson, Virginia Tech, 2010 May 03
