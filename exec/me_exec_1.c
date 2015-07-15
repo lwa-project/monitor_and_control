@@ -861,6 +861,79 @@ int me_init_sdm( struct ssmif_struct s,
   } /* me_init_sdm() */
 
 
+/*******************************************************************/
+/*** me_make_gf() *************************************************/
+/*******************************************************************/
+/* construct default beam "gains" file (default.gf) from state/default.gft, masking out bad dipoles */
 
+int me_make_gf( struct ssmif_struct s
+              ) {
 
+  int stdmask[ME_MAX_NSTD];
+  int stdmask_count=0;
+  int i;
 
+  FILE *fpi;
+  float gi[2][2];
+
+  FILE *fpo;
+
+  char cmd[256];
+
+  /* Make a list of stands to "mask" (mark out of service) */
+  for ( i=0; i<ME_MAX_NSTD; i++ ) {
+    printf("me_make_gf(): i=%d ",i);
+    stdmask[i]=0;
+    if (i>=s.nStd) {
+        /* there are not this many stands, so leave marked out */
+        printf("i>=s.nStd\n");
+      } else {
+        /* should be within range of stands specified by s.nStd */
+        /* note: iAntStat[1..520(nominally)]; i.e., is not zero-based */
+        //printf("iAntStat[%3d]=%d, iAntStat[%3d]=%d, ",2*i+1,s.iAntStat[2*i+0], 
+        //                                              2*i+2,s.iAntStat[2*i+1]);
+        if ( (s.iAntStat[2*i+0]>2) && (s.iAntStat[2*i+1]>2) ) {
+          stdmask[i]=1;
+          }
+        printf("stdmask[%d]=%d\n",i,stdmask[i]);
+      } /* if (i>=s.nStd) */
+    } /* for ( i=0 */
+  
+  /* Report findings */
+  stdmask_count = 0;
+  printf("me_make_gf(): Stands marked out:");
+  for ( i=0; i<s.nStd; i++ ) {  
+    if (!stdmask[i]) {
+      printf(" %d",i+1);
+      stdmask_count++;
+      }
+    }
+  printf("\n");
+  printf("me_make_gf(): %d of %d stands marked out\n",stdmask_count,s.nStd);
+
+  /* Read in lines from state/default.gft, write out masked lines to state/default_m.gft */
+  fpi = fopen("state/default.gft","r");
+  if (!fpi) {
+    printf("me_exec_1 / me_make_gf(): FATAL: Unable to open 'state/default.gft' for input.\n");
+    return;
+    }
+  fpo = fopen("state/default_m.gft","w");
+  i=0;
+  while ( fscanf(fpi,"%f %f %f %f",&gi[0][0],&gi[0][1],&gi[1][0],&gi[1][1]) >0) {
+    //printf("me_make_gf(): i=%d %4.2f %4.2f %4.2f %4.2f\n",i,gi[0][0],gi[0][1],gi[1][0],gi[1][1]);
+    fprintf(fpo,"%7.3f %7.3f %7.3f %7.3f\n",gi[0][0]*stdmask[i],gi[0][1]*stdmask[i],gi[1][0]*stdmask[i],gi[1][1]*stdmask[i]);
+    i++;
+    }
+  fclose(fpi); 
+  fclose(fpo);
+
+  /* Call megfg to convert state/default_m.gft to state/default.gf */
+  sprintf(cmd,"./megfg state/default_m.gft state/default.gf");
+  system(cmd);
+
+  /* cp state/default.gf to ../sch/gfiles/. */
+  sprintf(cmd, "scp state/default.gf %s:%s/gfiles/.",LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
+  system(cmd);
+
+  return;
+  } /* me_gf() */

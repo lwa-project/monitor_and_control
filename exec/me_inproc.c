@@ -1,4 +1,4 @@
-// me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Jan 24
+// me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Jul 02
 // ---
 // COMPILE: gcc -o me_inproc me_inproc.c -I../common -lm
 // ---
@@ -25,7 +25,8 @@
 #include <dirent.h>      /* this is listing files in a directory */
 
 #include "me.h"
-#include "me_getaltaz.c" /* astro coordinate routine */
+#include "me_getaltaz.c"   /* me_getaltaz(): astro coordinate routine */
+#include "me_point_corr.c" /* me_point_corr(): pointing correction for DRX beamforming */
 
 #define ME_INPROC_DATA_LEN 256   /* size of the "data" string associated with each */
                                  /* command in the command script */
@@ -730,7 +731,6 @@ int main ( int narg, char *argv[] ) {
                 t0 = dp_cmd_mpm % 1000; /* number of ms beyond a second boundary */
                 t0 /= 10; if (t0>99) t0=99; /* now in subslots */
                 
-
                 //printf("debug: s.settings.drx_gain=%hd\n",s.settings.drx_gain);
                 //printf("debug: osf2.OBS_DRX_GAIN=%hd\n",osf2.OBS_DRX_GAIN);
 
@@ -738,9 +738,10 @@ int main ( int narg, char *argv[] ) {
                 //if (osf2.OBS_DRX_GAIN==-1) { osf2.OBS_DRX_GAIN = s.settings.drx_gain; }
                 ///* if SSMIF also leaves this up to MCS, then choose DRX GAIN = 7 */ 
                 //if (osf2.OBS_DRX_GAIN==-1) { osf2.OBS_DRX_GAIN = 7; }
-                
-                //osf2.OBS_DRX_GAIN = 4; /* FIXME */
+                //osf2.OBS_DRX_GAIN = 6; /* FIXME */
+                 
                 if (osf2.OBS_DRX_GAIN<1) { osf2.OBS_DRX_GAIN = 6; }
+
 
                 //printf("debug: osf2.OBS_DRX_GAIN=%hd\n",osf2.OBS_DRX_GAIN);
 
@@ -798,7 +799,15 @@ int main ( int narg, char *argv[] ) {
                 while ( LWA_timediff( tv2, tv ) > 0 ) {
 
                   LWA_timeval(&tv,&mjd,&mpm); /* get current MJD/MPM */
-                  me_getaltaz( osf.OBS_RA, osf.OBS_DEC, mjd, mpm, s.fGeoN, s.fGeoE, &last, &alt, &az ); /* get updated alt/az */
+
+                  /* get updated alt/az */
+                  me_getaltaz( osf.OBS_RA, 
+                               osf.OBS_DEC, 
+                               mjd, mpm, 
+                               s.fGeoN, s.fGeoE, 
+                               &last, &alt, &az ); /* alt and az are in degrees */                    
+                  /* pointing correction */
+                  me_point_corr( s.fPCAxisTh, s.fPCAxisPh, s.fPCRot, &alt, &az );                    
 
                   //printf("alt=%f last_alt=%f %f | az=%f last_az=%f %f\n",alt,last_alt,angle_sep(alt,last_alt,360.0),az,last_az,angle_sep(alt,last_alt,360.0));
                   if ( (angle_sep(alt,last_alt,360.0)>=LWA_RES_DEG) || (angle_sep(az,last_az,360.0)>=LWA_RES_DEG) || bFirst ) {
@@ -814,8 +823,9 @@ int main ( int narg, char *argv[] ) {
                     //sprintf(dfile,"dfile.df"); 
 
                     /* Figure out what gfile to use (construct filename) */
-                    sprintf(gfile,"111226_XY.gf"); /* FIXME */
                     //sprintf(gfile,"gfile.gf"); 
+                    //sprintf(gfile,"111226_XY.gf"); 
+                    sprintf(gfile,"default.gf"); /* FIXME */
 
                     sprintf( cs[ncs].data, "%hd %s %s %ld",
                                     osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
@@ -1084,6 +1094,12 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Jul 05
+//   .1 Changed gain file included in BAM commands from "111226_XY.gf" to "default.gf"
+//      (This is the "masked" gain file in which SSMIF-indicated bad stands are zeroed)
+// me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Jul 02
+//   .1 Implemented DRX beam pointing correction
+// me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Jan 24
 // me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Feb 16
 //   .1 Added support for SESSION_SPC keyword
 // me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Jan 24

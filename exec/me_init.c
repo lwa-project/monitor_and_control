@@ -1,4 +1,4 @@
-// me_init.c: S.W. Ellingson, Virginia Tech, 2011 Mar 25
+// me_init.c: S.W. Ellingson, Virginia Tech, 2012 Jul 05
 // ---
 // COMPILE: gcc -o me_init me_init.c -I../common
 // ---
@@ -113,27 +113,43 @@ main ( int narg, char *argv[] ) {
   //printf("'%s'\n",cmd);
   system(cmd);
 
+  // Code in this block was replaced with code from next block on 120705
+  ///*==================================================*/
+  ///*=== Copying default.gf from TP to Exec and Sch ===*/
+  ///*==================================================*/
+  //printf("[%d/%d] Copying default.gf from TP...\n",ME_INIT,getpid());
+  //me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: Copying default.gf from TP...", sq_ptr, 0 );
+  //sprintf(cmd, "scp %s:%s/default.gf state/.",LWA_TP_SCP_ADDR,LWA_TP_SCP_DIR);
+  ////printf("'%s'\n",cmd);
+  //system(cmd);
+  //if (stat("state/default.gf",&statbuf)!=0) { /* it's missing, transfer failed (perhaps file was missing on TP) */
+  //  printf("[%d/%d] me_init: FATAL: transfer of 'default.gf' from TP failed.\n",ME_INIT,getpid());
+  //  me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: FATAL: transfer of 'default.gf' from TP failed.", sq_ptr, 0 );
+  //  fclose(fpl);
+  //  return;
+  //  }
+  ///* now move this on to scheduler */
+  //if (!bFlg_NoSch) {
+  //  printf("[%d/%d] Copying default.gf to Scheduler...\n",ME_INIT,getpid());
+  //  me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: Copying default.gf to Scheduler...", sq_ptr, 0 );
+  //  sprintf(cmd, "scp state/default.gf %s:%s/gfiles/.",LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
+  //  //printf("'%s'\n",cmd);
+  //  system(cmd);
+  //  }
+
   /*==================================================*/
-  /*=== Copying default.gf from TP to Exec and Sch ===*/
+  /*=== Copying default.gft from TP to Exec ==========*/
   /*==================================================*/
-  printf("[%d/%d] Copying default.gf from TP...\n",ME_INIT,getpid());
-  me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: Copying default.gf from TP...", sq_ptr, 0 );
-  sprintf(cmd, "scp %s:%s/default.gf state/.",LWA_TP_SCP_ADDR,LWA_TP_SCP_DIR);
+  printf("[%d/%d] Copying default.gft from TP...\n",ME_INIT,getpid());
+  me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: Copying default.gft from TP...", sq_ptr, 0 );
+  sprintf(cmd, "scp %s:%s/default.gft state/.",LWA_TP_SCP_ADDR,LWA_TP_SCP_DIR);
   //printf("'%s'\n",cmd);
   system(cmd);
-  if (stat("state/default.gf",&statbuf)!=0) { /* it's missing, transfer failed (perhaps file was missing on TP) */
-    printf("[%d/%d] me_init: FATAL: transfer of 'default.gf' from TP failed.\n",ME_INIT,getpid());
-    me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: FATAL: transfer of 'default.gf' from TP failed.", sq_ptr, 0 );
+  if (stat("state/default.gft",&statbuf)!=0) { /* it's missing, transfer failed (perhaps file was missing on TP) */
+    printf("[%d/%d] me_init: FATAL: transfer of 'default.gft' from TP failed.\n",ME_INIT,getpid());
+    me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: FATAL: transfer of 'default.gft' from TP failed.", sq_ptr, 0 );
     fclose(fpl);
     return;
-    }
-  /* now move this on to scheduler */
-  if (!bFlg_NoSch) {
-    printf("[%d/%d] Copying default.gf to Scheduler...\n",ME_INIT,getpid());
-    me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: Copying default.gf to Scheduler...", sq_ptr, 0 );
-    sprintf(cmd, "scp state/default.gf %s:%s/gfiles/.",LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
-    //printf("'%s'\n",cmd);
-    system(cmd);
     }
 
   /*==========================*/
@@ -313,6 +329,10 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_init.c: S.W. Ellingson, Virginia Tech, 2012 Jul 05
+//   .1 Previously, default.gf  was copied from tp/mbox to exec/state and sch/gfiles
+//      Now,        default.gft is  copied from tp/mbox to exec/state (only)
+//      (me_exec modifies this file, compiles it to a .gf, and sends it to sch/gfiles)
 // me_init.c: S.W. Ellingson, Virginia Tech, 2011 Mar 25
 //   .1 Added command line parameter directing "Scheduler-less" operation
 // me_init.c: S.W. Ellingson, Virginia Tech, 2011 Mar 17

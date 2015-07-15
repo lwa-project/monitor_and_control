@@ -169,6 +169,9 @@ int main ( int narg, char *argv[] ) {
     }
   me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_sc_MakeDSM() completed", sq_ptr, 0 );
 
+  /* construct default beam "gains" file (default.gf) from state/default.gft, masking out bad dipoles */
+  me_make_gf( s );
+
   /***************************************/
   /*** Setting up SDM-related things *****/
   /***************************************/
