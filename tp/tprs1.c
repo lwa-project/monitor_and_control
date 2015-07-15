@@ -302,6 +302,7 @@
   /* reading N_FEE */
   sprintf(keyword,"N_FEE"); s.nFEE = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+  printf("<%s>\n",data);
   switch (i) {
     case MERS_PL_KEYWORD_MATCH: 
       sscanf(data,"%d",&(s.nFEE));     
@@ -2044,6 +2045,58 @@
     return;
     } 
   printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.eCRA); 
+
+  /* reading PC_AXIS_TH */
+  sprintf(keyword,"PC_AXIS_TH"); s.fPCAxisTh = 0.0;
+  while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+  switch (i) {
+    case MERS_PL_KEYWORD_MATCH: 
+      sscanf(data,"%f",&(s.fPCAxisTh));     
+      strcpy(data,"");  
+      break;
+    case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+    case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+    case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+    }        
+  printf("[%d/%d] %s=%f\n",MT_TPRS,getpid(),keyword,s.fPCAxisTh); 
+
+  /* reading PC_AXIS_PH */
+  sprintf(keyword,"PC_AXIS_PH"); s.fPCAxisPh = 0.0;
+  while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+  switch (i) {
+    case MERS_PL_KEYWORD_MATCH: 
+      sscanf(data,"%f",&(s.fPCAxisPh));     
+      strcpy(data,"");  
+      break;
+    case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+    case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+    case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+    }       
+  //if ((s.fPCAxisPh<0.0) || (s.fPCZenithTh>180.0)) {
+  //  printf("[%d/%d] FATAL: %s=%f is invalid\n",MT_TPRS,getpid(),keyword,s.fPCZenithTh);
+  //  return;
+  //  }  
+  printf("[%d/%d] %s=%f\n",MT_TPRS,getpid(),keyword,s.fPCAxisPh); 
+
+  /* reading PC_ROT */
+  sprintf(keyword,"PC_ROT"); s.fPCRot = 0.0;
+  while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+  switch (i) {
+    case MERS_PL_KEYWORD_MATCH: 
+      sscanf(data,"%f",&(s.fPCRot));     
+      strcpy(data,"");  
+      break;
+    case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+    case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+    case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+    }       
+  //if ((s.fPCZenithPh<0.0) || (s.fPCZenithPh>=360.0)) {
+  //  printf("[%d/%d] FATAL: %s=%f is invalid\n",MT_TPRS,getpid(),keyword,s.fPCZenithPh);
+  //  return;
+  //  }  
+  printf("[%d/%d] %s=%f\n",MT_TPRS,getpid(),keyword,s.fPCRot); 
+
+//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   /* reading MRP_ASP */
   sprintf(keyword,"MRP_ASP"); s.settings.mrp_asp = 0;

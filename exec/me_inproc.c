@@ -823,9 +823,8 @@ int main ( int narg, char *argv[] ) {
                     //sprintf(dfile,"dfile.df"); 
 
                     /* Figure out what gfile to use (construct filename) */
+                    sprintf(gfile,"111226_XY.gf"); /* FIXME */
                     //sprintf(gfile,"gfile.gf"); 
-                    //sprintf(gfile,"111226_XY.gf"); 
-                    sprintf(gfile,"default.gf"); /* FIXME */
 
                     sprintf( cs[ncs].data, "%hd %s %s %ld",
                                     osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
@@ -1094,9 +1093,6 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
-// me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Jul 05
-//   .1 Changed gain file included in BAM commands from "111226_XY.gf" to "default.gf"
-//      (This is the "masked" gain file in which SSMIF-indicated bad stands are zeroed)
 // me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Jul 02
 //   .1 Implemented DRX beam pointing correction
 // me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Jan 24

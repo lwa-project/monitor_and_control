@@ -44,7 +44,7 @@ me_tpcom: me_tpcom.c me.h ../common/mcs.h
 	gcc -o me_tpcom me_tpcom.c -I../common
 	cp me_tpcom ../../exec/.
 
-me_inproc: me_inproc.c me_getaltaz.c me.h ../common/mcs.h
+me_inproc: me_inproc.c me_getaltaz.c me_point_corr.c me.h ../common/mcs.h
 	gcc -o me_inproc me_inproc.c -I../common -lm
 	cp me_inproc ../../exec/.
 
@@ -55,6 +55,10 @@ mefsdfg: mefsdfg.c me.h ../common/mcs.h
 me_getaltazx: me_getaltazx.c me_getaltaz.c me.h ../common/mcs.h
 	gcc -o me_getaltazx me_getaltazx.c -I../common -lm
 	cp me_getaltazx ../../exec/.
+
+me_point_corr_x: me_point_corr_x.c me_point_corr.c me.h ../common/mcs.h
+	gcc -o me_point_corr_x me_point_corr_x.c -I../common -lm
+	cp me_point_corr_x ../../exec/.
 
 install:
 	cp *.sh ../../exec/.

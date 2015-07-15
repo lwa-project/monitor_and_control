@@ -878,7 +878,7 @@ struct me_action_struct {  /* atomic unit of action as me_exec executes session 
 /*** moved here from me.h *************/
 /**************************************/
 
-#define ME_SSMIF_FORMAT_VERSION 5
+#define ME_SSMIF_FORMAT_VERSION 7
 
 #define ME_MAX_NSTD 260
 #define ME_MAX_NFEE 260
@@ -1016,6 +1016,9 @@ struct ssmif_struct {
   int    ePwrSS[ME_MAX_RACK][ME_MAX_NPWRPORT]; /* PWR_SS[][], converted to a LWA_SID_ value */
   char   sPwrName[ME_MAX_RACK][ME_MAX_NPWRPORT][ME_MAX_SSNAME_LENGTH+1]; /* PWR_NAME[][] */
   int    eCRA;                /* MCS_CRA */
+  float  fPCAxisTh; /* PC_AXIS_TH */
+  float  fPCAxisPh; /* PC_AXIS_PH */
+  float  fPCRot;    /* PC_ROT */
   struct station_settings_struct settings; /* these are the statically-defined versions of these things */
   };
 
