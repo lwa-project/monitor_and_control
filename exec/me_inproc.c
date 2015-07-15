@@ -308,16 +308,27 @@ int me_bdm_setup( char *OBS_BDM,
     i++; /* so, first stand read is considered stand 1, next is 2, etc. */
     //printf("me_bdm_setup(): std %d in: %4.2f %4.2f %4.2f %4.2f\n",i,g[0][0],g[0][1],g[1][0],g[1][1]);
 
+    //norm = g[0][0]*g[0][0] + g[0][1]*g[0][1] + g[1][0]*g[1][0] + g[1][1]*g[1][1];
+    //if (norm>(1.0e-3)) { /* otherwise, assume the stand has been marked out and should remain zeroed. */
+    //  g[0][0]=0.0; g[0][1]=0.0; g[1][0]=0.0; g[1][1]=0.0;
+    //  //if (pol[0]=='X') { g[0][0] = gb; } else { g[0][1] = gb; } // replaced 140324
+    //  if (pol[0]=='X') { g[0][0] = gb; } else { g[1][0] = gb; }
+    //  if (i==std) { 
+    //    //if (pol[0]=='X') { g[1][0] = gd; } else { g[1][1] = gd; } // replaced 140324
+    //    if (pol[0]=='X') { g[0][1] = gd; } else { g[1][1] = gd; }
+    //    }
+    //  } /* if norm */
+
+    // 140325: replaced above block with this:
     norm = g[0][0]*g[0][0] + g[0][1]*g[0][1] + g[1][0]*g[1][0] + g[1][1]*g[1][1];
-    if (norm>(1.0e-3)) { /* otherwise, assume the stand has been marked out and should remain zeroed. */
-      g[0][0]=0.0; g[0][1]=0.0; g[1][0]=0.0; g[1][1]=0.0;
-      //if (pol[0]=='X') { g[0][0] = gb; } else { g[0][1] = gb; } // replaced 140324
-      if (pol[0]=='X') { g[0][0] = gb; } else { g[1][0] = gb; }
-      if (i==std) { 
-        //if (pol[0]=='X') { g[1][0] = gd; } else { g[1][1] = gd; } // replaced 140324
+    g[0][0]=0.0; g[0][1]=0.0; g[1][0]=0.0; g[1][1]=0.0;
+    if (i==std) { 
         if (pol[0]=='X') { g[0][1] = gd; } else { g[1][1] = gd; }
-        }
-      } /* if norm */
+      } else {
+        if (norm>(1.0e-4)) { /* otherwise, assume the stand has been marked out and should remain zeroed. */
+          if (pol[0]=='X') { g[0][0] = gb; } else { g[1][0] = gb; }
+          }
+      }
 
     fprintf(fpo,"%7.3f %7.3f %7.3f %7.3f\n",g[0][0],g[0][1],g[1][0],g[1][1]);
     } /* while (fscanf */
@@ -1455,6 +1466,9 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: S.W. Ellingson, Virginia Tech, 2014 Mar 25
+//   .1 In me_bdm_setup(), requested dipole overrides bad stand mask.
+//   .2 In me_bdm_setup(), requested dipole is not included in beam. 
 // me_inproc.c: S.W. Ellingson, Virginia Tech, 2014 Mar 24
 //   .1 In me_bdm_setup(), transposed gain matrix; looks like I had it wrong before.
 //   .2 Fix for "less than 8-char project ID" issue (trimming spaces prior to forming filenames)
