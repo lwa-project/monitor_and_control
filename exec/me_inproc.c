@@ -1,4 +1,4 @@
-// me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Jul 02
+// me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Sep 29
 // ---
 // COMPILE: gcc -o me_inproc me_inproc.c -I../common -lm
 // ---
@@ -410,13 +410,11 @@ int main ( int narg, char *argv[] ) {
               break;
             case LWA_OM_TRK_SOL:   /* not implemented */
             case LWA_OM_TRK_JOV:   /* not implemented */
-            case LWA_OM_STEPPED:   /* not implemented */
               fprintf(fpl,"Encountered an unimplemented OBS_MODE; zapping command script:\n");
               eD=-1;  
               break;
+            case LWA_OM_STEPPED:   
             case LWA_OM_TBW:      
-              eD=0;
-              break;
             case LWA_OM_TBN:      
               eD=0;  
               break;
@@ -706,8 +704,8 @@ int main ( int narg, char *argv[] ) {
                 ///* deal with user requests to use SSMIF-specified defaults */ 
                 //if (osf2.OBS_TBN_GAIN==-1) { osf2.OBS_TBN_GAIN = s.settings.tbn_gain; }
                 ///* if SSMIF also leaves it up MCS, set this to 20 */ 
-                //if (osf2.OBS_TBN_GAIN==-1) { osf2.OBS_TBN_GAIN = 20; }
-                osf2.OBS_TBN_GAIN = 20; /* FIXME */
+                if (osf2.OBS_TBN_GAIN==-1) { osf2.OBS_TBN_GAIN = 20; }
+                //osf2.OBS_TBN_GAIN = 20; /* FIXME */
 
                 /* construct the command */ 
                 LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
@@ -768,7 +766,7 @@ int main ( int narg, char *argv[] ) {
                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                 ncs++;
 
-                LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
+                LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 ); /* staggering send times for DP commands by 10 ms */
                 cs[ncs].action.bASAP = 0;                   
                 cs[ncs].action.sid = LWA_SID_DP_;  
                 cs[ncs].action.cid = LWA_CMD_DRX; 
@@ -823,8 +821,9 @@ int main ( int narg, char *argv[] ) {
                     //sprintf(dfile,"dfile.df"); 
 
                     /* Figure out what gfile to use (construct filename) */
-                    sprintf(gfile,"111226_XY.gf"); /* FIXME */
                     //sprintf(gfile,"gfile.gf"); 
+                    //sprintf(gfile,"111226_XY.gf"); 
+                    sprintf(gfile,"default.gf"); /* FIXME */
 
                     sprintf( cs[ncs].data, "%hd %s %s %ld",
                                     osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
@@ -834,7 +833,7 @@ int main ( int narg, char *argv[] ) {
 
                     /* Must be sent in first 80% of slot N-2 */
                     cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2;
-                    cs[ncs].action.tv.tv_usec = 0; 
+                    cs[ncs].action.tv.tv_usec = 20000; /* staggering send times for DP commands by 10 ms */
                     cs[ncs].action.bASAP = 0;                   
                     cs[ncs].action.sid = LWA_SID_DP_;  
                     cs[ncs].action.cid = LWA_CMD_BAM; 
@@ -852,6 +851,10 @@ int main ( int narg, char *argv[] ) {
                   } /* while ( LWA_timediff( tv2, tv ) > 0 )  */
 
                 break; /* LWA_OM_TRK_RADEC */ 
+
+              case LWA_OM_STEPPED:
+                /* this is done in a separate pass */
+                break;
 
               default:
                 printf(     "[%d/%d] FATAL: During DP setup, osf.OBS_MODE=%d not recognized\n",ME_INPROC,getpid(),osf.OBS_MODE);
@@ -907,9 +910,17 @@ int main ( int narg, char *argv[] ) {
           /*-------------------------------------------------*/
           /*--- fast forward to stepped observations part ---*/
           /*-------------------------------------------------*/
-          m = fread( &osf, sizeof(struct osf_struct), 1, fpo );
+          m = fread( &osf, sizeof(struct osf_struct), 1, fpo ); /* this also reloads osf.* */
 
-          /* If a STEPPED observation, we have a set of { osfs_struct, beam }'s for each step */
+          /* If this is a STEPPED-mode observation, deal with DRX gain setting */  
+          if ( (osf.OBS_MODE==LWA_OM_STEPPED) && (eD==0) ) {               
+            if (osf2.OBS_DRX_GAIN<1) { osf2.OBS_DRX_GAIN = 6; }
+            } /* if (eD==0) */
+
+          /* initialize tv to observation start time */
+          LWA_time2tv( &tv, osf.OBS_START_MJD, osf.OBS_START_MPM ); 
+
+          /* If this is a STEPPED-mode observation, we have a set of { osfs_struct, beam }'s for each step */
           for ( m=1; m<=osf.OBS_STP_N; m++ ) {
 
             fread(&osfs,sizeof(struct osfs_struct),1,fpo);
@@ -921,7 +932,85 @@ int main ( int narg, char *argv[] ) {
             //osfs.OBS_STP_B     = obs[n].OBS_STP_B[m];
 
             if (eD==0) {
-              /* process */
+              /*=== BEGIN: STEPPED-mode processing added 120929 ==============================================*/
+
+              /* Need to figure out what DP subslot this corresponds to */
+              LWA_timeval( &tv, &mjd, &mpm ); /* get MJD and MPM for start of this step */
+              t0 = mpm % 1000;                /* number of ms beyond a second boundary */
+              t0 /= 10; if (t0>99) t0=99;     /* now in subslots */                  
+          
+              /* here's the DRX command setting FREQ1: */
+              cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
+              cs[ncs].action.tv.tv_usec = 0; 
+              cs[ncs].action.bASAP = 0;                   
+              cs[ncs].action.sid = LWA_SID_DP_;  
+              cs[ncs].action.cid = LWA_CMD_DRX; 
+              sprintf( cs[ncs].data, "%hd 1 %8.0f %hu %hd %ld",
+                              osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                  //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
+                                    (4.563480616e-02)*(osfs.OBS_STP_FREQ1), /* center freq in Hz */
+                                          osf.OBS_BW,                  /* 1-7 */
+                                              osf2.OBS_DRX_GAIN,       /* 0-12 */
+                                                  t0);                 // subslot 0..99 (uint8 sub_slot)
+              cs[ncs].action.len = strlen(cs[ncs].data)+1; 
+              me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+              ncs++;
+
+              /* here's the DRX command setting FREQ2: */
+              cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
+              cs[ncs].action.tv.tv_usec = 10000;         /* staggering send times for DP commands by 10 ms */
+              cs[ncs].action.bASAP = 0;                   
+              cs[ncs].action.sid = LWA_SID_DP_;  
+              cs[ncs].action.cid = LWA_CMD_DRX; 
+              sprintf( cs[ncs].data, "%hd 2 %8.0f %hu %hd %ld",
+                              osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                  //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
+                                    (4.563480616e-02)*(osfs.OBS_STP_FREQ2), /* center freq in Hz */
+                                          osf.OBS_BW,                  /* 1-7 */
+                                              osf2.OBS_DRX_GAIN,       /* 0-12 */
+                                                  t0);                 // subslot 0..99 (uint8 sub_slot)
+              cs[ncs].action.len = strlen(cs[ncs].data)+1;
+              me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+              ncs++;
+
+              /* Getting alt, az for beam pointing: */
+              if (osf.OBS_STP_RADEC) { /* osfs.OBS_STP_C1,C2 represent RA/DEC */
+                  me_getaltaz( osfs.OBS_STP_C1, 
+                               osfs.OBS_STP_C2, 
+                               mjd, mpm, 
+                               s.fGeoN, s.fGeoE, 
+                               &last, &alt, &az ); /* alt and az are in degrees */  
+                } else {
+                  az  = osfs.OBS_STP_C1;
+                  alt = osfs.OBS_STP_C2;
+                } /* if (osf.OBS_STP_RADEC) */
+              me_point_corr( s.fPCAxisTh, s.fPCAxisPh, s.fPCRot, &alt, &az ); /* pointing correction */
+
+              /* Figure out what dfile to use (construct filename) */
+              sprintf(dfile,"740_%03.0lf_%04.0lf.df",alt*10,az*10); 
+
+              /* Figure out what gfile to use (construct filename) */
+              sprintf(gfile,"default.gf"); 
+
+              /* so here's the BAM command: */
+              cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
+              cs[ncs].action.tv.tv_usec = 20000;         /* staggering send times for DP commands by 10 ms */
+              cs[ncs].action.bASAP = 0;                   
+              cs[ncs].action.sid = LWA_SID_DP_;  
+              cs[ncs].action.cid = LWA_CMD_BAM; 
+              sprintf( cs[ncs].data, "%hd %s %s %ld",
+                                      osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                          dfile,
+                                             gfile,
+                                                t0);
+              cs[ncs].action.len = strlen(cs[ncs].data)+1;
+              me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+              ncs++;
+
+              /* determine the absolute start time for NEXT step */
+              LWA_timeadd( &tv, osfs.OBS_STP_T );   
+
+              /*=== END: STEPPED-mode processing  added 120929 ==============================================*/
               } /* if (eD==0) */
 
             if ( osfs.OBS_STP_B==LWA_BT_SPEC_DELAYS_GAINS) {
@@ -1093,6 +1182,12 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Sep 29
+//   .1 Partial implementation of STEPPED mode
+//      Scrambled times over 20 ms spread for DRX and BAM at start of obs or step
+// me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Jul 05
+//   .1 Changed gain file included in BAM commands from "111226_XY.gf" to "default.gf"
+//      (This is the "masked" gain file in which SSMIF-indicated bad stands are zeroed)
 // me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Jul 02
 //   .1 Implemented DRX beam pointing correction
 // me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Jan 24

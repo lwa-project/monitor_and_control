@@ -1,4 +1,4 @@
-// tpms.c: S.W. Ellingson, Virginia Tech, 2011 December 22
+// tpms.c: S.W. Ellingson, Virginia Tech, 2012 September 29
 // ---
 // COMPILE: gcc -o tpms tpms.c -I../common
 // ---
@@ -7,6 +7,14 @@
 //   <dt> is integer number of seconds from current time at which to initiate session;
 //     will round up to the nearest whole second
 //   <arg3>, <arg4>, etc. depend on <mode>.  Here they are:
+//     STEPPED:   OBS_STP_N is set to 1
+//                OBS_STP_RADEC is set to 0 (meaning pointing is specified as az/el)
+//                <arg3> OBS_STP_C1[1] [deg].  DEFAULT is 180.0 (=azumith)
+//                <arg4> OBS_STP_C2[1] [deg].  DEFAULT is  83.3 (=altitude)
+//                <arg5> OBS_STP_T[1] [ms], integer.  DEFAULT is 10000.
+//                <arg6> OBS_STP_FREQ1[1] [tuning word].  DEFAULT is  832697741 (37.999999997 MHz)
+//                <arg7> OBS_STP_FREQ2[2] [tuning word].  DEFAULT is 1621569285 (73.999999990 MHz)
+//                <arg8> BW [filter code].  DEFAULT is 7.
 //     TRK_RADEC: <arg3> OBS_DUR [ms], integer.  DEFAULT is 10000.
 //                <arg4> RA [deg].  DEFAULT is 5.6
 //                <arg5> DEC [h].  DEFAULT is +22.0
@@ -50,6 +58,8 @@ int main ( int narg, char *argv[] ) {
   long int iFreq2=0;
   float fRA;
   float fDEC;
+  float fAz;
+  float fEl;
   int iBW;
 
   FILE *fp;
@@ -69,6 +79,7 @@ int main ( int narg, char *argv[] ) {
         return;
         }
       switch (eMode) { /* not all modes are yet implemented */
+        case LWA_OM_STEPPED: break;
         case LWA_OM_TRK_RADEC: break;
         case LWA_OM_TBN: break;
         case LWA_OM_TBW: break;
@@ -111,6 +122,20 @@ int main ( int narg, char *argv[] ) {
       printf("[%d/%d] INPUT: iDur=%ld\n",MT_TPMS,getpid(),iDur);
       break;
     case LWA_OM_DIAG1:
+      break;
+    case LWA_OM_STEPPED:
+      fAz=180.0;         if (narg>=4) sscanf(argv[3],"%f",&fAz);
+      fEl= 83.3;         if (narg>=5) sscanf(argv[4],"%f",&fEl);
+      iDur=10000;        if (narg>=6) sscanf(argv[5],"%ld",&iDur);
+      iFreq =832697741;  if (narg>=7) sscanf(argv[6],"%ld",&iFreq); 
+      iFreq2=1621569285; if (narg>=8) sscanf(argv[7],"%ld",&iFreq2);
+      iBW=7;             if (narg>=9) sscanf(argv[8],"%d",&iBW);
+      printf("[%d/%d] INPUT: fAz = %6.3f [deg]\n",MT_TPMS,getpid(),fAz);
+      printf("[%d/%d] INPUT: fEl = %6.3f [h]\n",MT_TPMS,getpid(),fEl);
+      printf("[%d/%d] INPUT: iDur=%ld [ms]\n",MT_TPMS,getpid(),iDur);
+      printf("[%d/%d] INPUT: iFreq =%ld\n",MT_TPMS,getpid(),iFreq);
+      printf("[%d/%d] INPUT: iFreq2=%ld\n",MT_TPMS,getpid(),iFreq2);
+      printf("[%d/%d] INPUT: iBW=%d\n",MT_TPMS,getpid(),iBW);
       break;
     default: 
       printf("[%d/%d] FATAL: Mode supported but not implemented(?)\n",MT_TPSS,getpid()); 
@@ -163,6 +188,16 @@ int main ( int narg, char *argv[] ) {
   fprintf(fp,"SESSION_REMPI  (none)\n");
   fprintf(fp,"SESSION_REMPO  (none)\n");
 
+  /* Specifying beam 1 for modes other than TBN or TBW */
+  switch (eMode) {
+    case LWA_OM_TBN:
+    case LWA_OM_TBW:
+      break;
+    default:
+      fprintf(fp,"SESSION_DRX_BEAM  1\n");
+      break;
+    }
+
   /* write preface of observation section */
   fprintf(fp,"\n");
   fprintf(fp,"OBS_ID         1\n");
@@ -175,7 +210,7 @@ int main ( int narg, char *argv[] ) {
   fprintf(fp,"OBS_START      %s\n",sPrettyTime);
 
   /* OBS_DUR */
-  fprintf(fp,"OBS_DUR        %ld\n",iDur);
+  if (eMode!=LWA_OM_STEPPED) { fprintf(fp,"OBS_DUR        %ld\n",iDur); }
   //fprintf(fp,"OBS_DUR+       00:00:10.000\n"); 
 
   /* OBS_MODE */
@@ -203,6 +238,17 @@ int main ( int narg, char *argv[] ) {
       fprintf(fp,"OBS_BW         %d\n",iBW);
       //fprintf(fp,"OBS_BW+        19.6 MSPS\n");
       break; 
+    case LWA_OM_STEPPED:
+      fprintf(fp,"OBS_BW           %d\n",iBW);
+      fprintf(fp,"OBS_STP_N        1\n",fRA);
+      fprintf(fp,"OBS_STP_RADEC    0\n",fRA);
+      fprintf(fp,"OBS_STP_C1[1]    %6.3f\n",fAz);
+      fprintf(fp,"OBS_STP_C2[1]    %6.3f\n",fEl);
+      fprintf(fp,"OBS_STP_T[1]     %ld\n",iDur);
+      fprintf(fp,"OBS_STP_FREQ1[1] %ld\n",iFreq);
+      fprintf(fp,"OBS_STP_FREQ2[1] %ld\n",iFreq2);   
+      fprintf(fp,"OBS_STP_B[1]     SIMPLE\n"); 
+      break; 
     default:
       printf("[%d/%d] FATAL: Mode supported but not implemented(?)\n",MT_TPSS,getpid()); 
       return; 
@@ -218,6 +264,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpms.c: S.W. Ellingson, Virginia Tech, 2012 September 29
+//   .1: Adding STEPPED mode
 // tpms.c: S.W. Ellingson, Virginia Tech, 2011 December 22
 //   .1: Adding TBW mode
 // tpms.c: S.W. Ellingson, Virginia Tech, 2011 December 19

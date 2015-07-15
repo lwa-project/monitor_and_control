@@ -1,4 +1,4 @@
-// tpss.c: S.W. Ellingson, Virginia Tech, 2012 Apr 12
+// tpss.c: S.W. Ellingson, Virginia Tech, 2012 Sep 29
 // ---
 // COMPILE: gcc -o tpss tpss.c -I../common
 // ---
@@ -307,6 +307,14 @@ int main ( int narg, char *argv[] ) {
   /* Close input SDF */
   fclose(fpsdf);
 
+  /* For STEPPED-mode observations, we need to compute obs[].OBS_DUR */
+  for (n=1;n<=nobs;n++) {
+    if (obs[n].OBS_MODE==LWA_OM_STEPPED) { 
+      obs[n].OBS_DUR = 0;
+      for ( i=1; i<=obs[n].OBS_STP_N; i++ ) { obs[n].OBS_DUR += obs[n].OBS_STP_T[i]; }          
+      }  
+    }
+
   printf("[%d/%d] Phase 1: OK\n",MT_TPSS,getpid());
 
   if (max_phase<2) return;
@@ -321,9 +329,8 @@ int main ( int narg, char *argv[] ) {
 
   for (n=1;n<=nobs;n++) {
     if ( (obs[n].OBS_DUR==0) && ( ! ( (obs[n].OBS_MODE==LWA_OM_TBW)     || 
-                                      (obs[n].OBS_MODE==LWA_OM_STEPPED) ||
                                       (obs[n].OBS_MODE==LWA_OM_DIAG1)     ) ) )  {
-      printf("[%d/%d] FATAL: obs[%d].OBS_DUR==0 for a mode other than TBW, STEPPED, or DIAG\n",MT_TPSS,getpid(),n);
+      printf("[%d/%d] FATAL: obs[%d].OBS_DUR==0 for a mode other than TBW or DIAG\n",MT_TPSS,getpid(),n);
       return;
       }
     if ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) && (obs[n].OBS_RA<0) ) {
@@ -423,14 +430,8 @@ int main ( int narg, char *argv[] ) {
   printf("[%d/%d] Session start will be MJD=%ld MPM=%ld\n",MT_TPSS,getpid(),SESSION_START_MJD,SESSION_START_MPM);
 
   /* t1 = (start time of last observation) + (duration of last observation) + (guard time) */  
-  LWA_time2tv( &t1, obs[nobs].OBS_START_MJD, obs[nobs].OBS_START_MPM ); 
-  if (obs[nobs].OBS_MODE==LWA_OM_STEPPED) {
-      ds = 0;
-      for ( i=1; i<=obs[nobs].OBS_STP_N; i++ ) { ds += obs[nobs].OBS_STP_T[i]; }
-      LWA_timeadd( &t1, ds                ); 
-    } else {
-      LWA_timeadd( &t1, obs[nobs].OBS_DUR );                            
-    }  
+  LWA_time2tv( &t1, obs[nobs].OBS_START_MJD, obs[nobs].OBS_START_MPM );  
+  LWA_timeadd( &t1, obs[nobs].OBS_DUR );   
   LWA_timeadd( &t1, LWA_SESS_GUARD_TIME_MS );   
   printf("[%d/%d] Time allocated for session closeout is %d [ms]\n",MT_TPSS,getpid(),LWA_SESS_GUARD_TIME_MS);  
 
@@ -863,6 +864,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpss.c: S.W. Ellingson, Virginia Tech, 2012 Sep 29
+//   .1: Upgrading to accomodate STEPPED mode
 // tpss.c: S.W. Ellingson, Virginia Tech, 2012 Apr 12
 //   .1: Rejects DRX-mode sessions when SESSION_DRX_BEAM is not specified in SDF
 //   .2: Rejects sessions which already appear in manifest or which conflict in time

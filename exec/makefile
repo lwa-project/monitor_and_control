@@ -2,7 +2,7 @@
 # ../common  (MCS-wide header files; specifically mcs.h)
 # ../../exec (executables copied to here)
 
-all: mesix meosx memdrex mecfg medfg megfg me_exec meeix me_init me_tpcom me_inproc mefsdfg me_getaltazx
+all: mesix meosx memdrex mecfg medfg megfg me_exec meeix me_init me_tpcom me_inproc mefsdfg me_getaltazx me_point_corr_x
 
 mesix: mesix.c mesi.c me.h ../common/mcs.h
 	gcc -o mesix mesix.c -I../common
@@ -64,5 +64,5 @@ install:
 	cp *.sh ../../exec/.
 
 clean:
-	rm mesix meosx memdrex mecfg medfg megfg me_exec meeix me_init me_tpcom me_inproc mefsdfg me_getaltazx
+	rm mesix meosx memdrex mecfg medfg megfg me_exec meeix me_init me_tpcom me_inproc mefsdfg me_getaltazx me_point_corr_x
 

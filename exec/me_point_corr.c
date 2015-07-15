@@ -1,4 +1,4 @@
-// me_point_corr.c: S.W. Ellingson, Virginia Tech, 2012 Jul 03
+// me_point_corr.c: S.W. Ellingson, Virginia Tech, 2012 Sep 28
 // ---
 // COMPILE: intended to be called from another program which it is compiled into
 // ---
@@ -41,13 +41,13 @@ void me_point_corr(
   /* rotate "c" around axis "u", yielding unit vector "b" */
   /* [1] http://en.wikipedia.org/wiki/Rotation_matrix (see "Rotation matrix from axis to angle") */
   /* [2] http://inside.mines.edu/~gmurray/ArbitraryAxisRotation/ (see Section 5.2) */
-  bx = (ux*ux+(1+ux*ux)*ct)*cx + (ux*uy*(1-ct)-uz*st)*cy + (ux*uz*(1-ct)+uy*st)*cz;
-  by = (ux*uy*(1-ct)+uz*st)*cx + (uy*uy+(1-uy*uy)*ct)*cy + (ux*uz*(1-ct)-ux*st)*cz;
+  bx = (ux*ux+(1-ux*ux)*ct)*cx + (ux*uy*(1-ct)-uz*st)*cy + (ux*uz*(1-ct)+uy*st)*cz;
+  by = (ux*uy*(1-ct)+uz*st)*cx + (uy*uy+(1-uy*uy)*ct)*cy + (uy*uz*(1-ct)-ux*st)*cz;
   bz = (ux*uz*(1-ct)-uy*st)*cx + (uy*uz*(1-ct)+ux*st)*cy + (uz*uz+(1-uz*uz)*ct)*cz;
 
   /* check b */
-  printf("me_point_corr(): (bx,by,bz) = (%lf,%lf,%lf)\n",bx,by,bz);
-  printf("me_point_corr(): (Magnitude of b)^2 is %lf\n",bx*bx+by*by+bz*bz);
+  //printf("me_point_corr(): (bx,by,bz) = (%lf,%lf,%lf)\n",bx,by,bz);
+  //printf("me_point_corr(): (Magnitude of b)^2 is %lf\n",bx*bx+by*by+bz*bz);
 
   /* convert b back to alt, az */
   *az  = 90.0 - (atan2(by,bx)/MPC_DTR);
@@ -56,5 +56,7 @@ void me_point_corr(
   return;
   } /* me_point_corr */
 
+// me_point_corr.c: S.W. Ellingson, Virginia Tech, 2012 Sep 28
+// -- fixes bug in calculation of bx,by discovered by J. Dowell (eml. c. Sep 28, 2012)
 // me_point_corr.c: S.W. Ellingson, Virginia Tech, 2012 Jul 03
 // -- initial version
