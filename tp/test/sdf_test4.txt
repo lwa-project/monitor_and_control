@@ -1,0 +1,45 @@
+PI_ID          1
+PI_NAME        Ellingson, Steven
+
+PROJECT_ID     TPSS0004
+PROJECT_TITLE  Project Title
+PROJECT_REMPI  Project REMPI
+PROJECT_REMPO  Project REMPO
+
+SESSION_ID     1
+SESSION_TITLE  tpss SDF test #4
+SESSION_REMPI  Test SDF consisting of a stepped-mode observation, Z=0, then Z=10deg to S
+SESSION_REMPO  Session REMPO
+
+OBS_ID         1
+OBS_TITLE      Observation 1 Title
+OBS_TARGET     Observation 1 Target
+OBS_REMPI      Observation 1 REMPI
+OBS_REMPO      Observation 1 REMPO
+OBS_START_MJD  55616
+OBS_START_MPM  0
+OBS_START      UTC 2011 Feb 24 00:00:00.000 
+OBS_DUR+       (OBS_DUR not set, but duration will be 20 ms) 
+OBS_MODE       STEPPED
+OBS_BW         7
+OBS_BW+        19.6 MSPS (but not exactly sure what bandwidth this will be) 
+OBS_STP_N      2
+OBS_STP_RADEC  0     
+
+OBS_STP_C1[1]  180.0 
+OBS_STP_C2[1]   90.0 
+OBS_STP_T[1]   10    
+OBS_STP_FREQ1[1]   438261968
+OBS_STP_FREQ1+[1] 19.999999955 MHz
+OBS_STP_FREQ2[1]  1928352663
+OBS_STP_FREQ2+[1] 87.999999977 MHz
+OBS_STP_B[1]   SIMPLE
+
+OBS_STP_C1[2]  180.0 
+OBS_STP_C2[2]   80.0 
+OBS_STP_T[2]   10    
+OBS_STP_FREQ1[2]   438261968
+OBS_STP_FREQ1+[2] 19.999999955 MHz
+OBS_STP_FREQ2[2]  1928352663
+OBS_STP_FREQ2+[2] 87.999999977 MHz
+OBS_STP_B[2]   SIMPLE

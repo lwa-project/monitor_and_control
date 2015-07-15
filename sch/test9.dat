@@ -1,0 +1,16 @@
+mibinit SHL 127.0.0.1 1738 1739
+mcic    SHL
+mibinit ASP 127.0.0.1 1740 1741
+mcic    ASP
+mibinit DP_ 127.0.0.1 1742 1743
+mcic    DP_
+mibinit DR1 127.0.0.1 1744 1745
+mcic    DR1
+mibinit DR2 127.0.0.1 1746 1747
+mcic    DR2
+mibinit DR3 127.0.0.1 1748 1749
+mcic    DR3
+mibinit DR4 127.0.0.1 1750 1751
+mcic    DR4
+mibinit DR5 127.0.0.1 1752 1753
+mcic    DR5
