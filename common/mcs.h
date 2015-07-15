@@ -749,6 +749,7 @@ int LWA_dpoavail(
 
   fgets(line,256,fp);
   while (!feof(fp)) {
+
     sscanf(line,"%ld %ld %d %ld %d %s %s",&mjd,&mpm,&dpox,&durx,&cra,project_id,session_id);
     //printf("LWA_dpoavail: %ld %ld %d %ld %d <%s> <%s>\n",mjd,mpm,dpox,durx,cra,project_id,session_id);
 
@@ -772,7 +773,6 @@ int LWA_dpoavail(
   fclose(fp); 
 
   if (dpos[dpo-1]<1) {
-    fclose(fp);
     sprintf(msg,"UNAVAILABLE (status = %d)",dpos[dpo-1]);
     return 0; /* not available because this output has status <1 */
     }
@@ -828,6 +828,7 @@ struct osf_struct {
   unsigned long int  OBS_START_MPM;
   unsigned long int  OBS_DUR;
   unsigned short int OBS_MODE;
+  char               OBS_BDM[32];  /* added 140310 */
   float              OBS_RA;
   float              OBS_DEC;
   unsigned short int OBS_B;
@@ -1365,6 +1366,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// Mar 10, 2014: Added BDM command; added OBS_BDM keyword to osf_ struct
 // Jan 23, 2013: Fixed index overrun in me_sc_MakeASM( ) (see lwa1 staff exploder emails)
 // Apr 12, 2012: Modified dpoavail() error codes to facilitate change in tpss
 // Feb 16, 2012: Added SPC command

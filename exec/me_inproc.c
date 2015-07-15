@@ -1,4 +1,4 @@
-// me_inproc.c: S.W. Ellingson, Virginia Tech, 2013 Jan 28
+// me_inproc.c: S.W. Ellingson, Virginia Tech, 2014 Mar 10
 // ---
 // COMPILE: gcc -o me_inproc me_inproc.c -I../common -lm
 // ---
@@ -97,7 +97,7 @@ int me_medfg( struct beam_struct beam,
 /* parses "beam" (custom beam gains), makes gfile, sends to scheduler */
 /* NOTE: This is used for custom beams in STEPPED mode */
 int me_megfg( struct beam_struct beam,
-              char *gfile, /* needs to end in ".df" */
+              char *gfile, /* needs to end in ".gf" */
               FILE *fpl ) {
 
   signed short int g[LWA_MAX_NSTD][2][2]; /* matches up with signed short int beam.OBS_BEAM_GAIN[LWA_MAX_NSTD][2][2]; */
@@ -245,6 +245,100 @@ int me_beamspec( char *cs_filename,
 
   return err;
   } /* me_beamspec() */
+
+
+/*************************************************************/
+/*** me_bdm_setup() ******************************************/
+/*************************************************************/
+/* Set up observation in "OBS_BDM" mode.  This means: */
+/* Parsing the arguments, constructing the appropriate gain file for BAM commands, and saving it */
+
+int me_bdm_setup( char *OBS_BDM, 
+                  FILE *fpl,
+                  char *gfile    /* input: unique filename including ".gf" extension */
+                ) {
+
+  int err = 0;
+
+  int   std;
+  float gb;
+  float gd;
+  char  pol[2];
+
+  FILE *fpi;
+  FILE *fpo;
+
+  int i;
+  float g[2][2];
+  float norm;
+
+  char cmd[256];
+
+  fprintf(fpl,"me_bdm_setup(): OBS_BDM keyword detected:\n");
+
+  pol[0] = '\0'; pol[1] = '\0';
+  sscanf(OBS_BDM,"%d %f %f %1c",&std,&gb,&gd,pol);
+  fprintf(fpl,"  parameters: std=%d, gb=%f, gd=%f, pol='%s'\n",std,gb,gd,pol);
+
+  /* error checking */
+  if ( (std<1) || (std>ME_MAX_NSTD) ) { 
+    fprintf(fpl,"  FATAL: std out of range\n");
+    err = 1; 
+    }
+  if (!( (pol[0]=='X') || (pol[0]=='Y') )) {
+    fprintf(fpl,"  FATAL: pol is not 'X' or 'Y'\n");
+    err = 2; 
+    }
+  if (err>0) { 
+    fprintf(fpl,"  Aborting OBS_BDM setup.  Obs will run normally (as beam-beam)\n");
+    return err; 
+    }
+
+  /* Read in lines from state/default_m.gft (was created by me_make_gf() during exec startup), *\
+  /* Then write out modified lines to me_inproc_bm/temp.gft */
+  fpi = fopen("state/default_m.gft","r");
+  if (!fpi) {
+    printf("me_inproc.c / me_bdm_setup(): FATAL: Unable to open 'state/default_m.gft' for input.\n");
+    return;
+    }
+  fpo = fopen("me_inproc_bm/temp.gft","w");
+
+  i=0; /* counting stands */
+  while ( fscanf(fpi,"%f %f %f %f",&g[0][0],&g[0][1],&g[1][0],&g[1][1]) >0) {
+    i++; /* so, first stand read is considered stand 1, next is 2, etc. */
+    //printf("me_bdm_setup(): std %d in: %4.2f %4.2f %4.2f %4.2f\n",i,g[0][0],g[0][1],g[1][0],g[1][1]);
+
+    norm = g[0][0]*g[0][0] + g[0][1]*g[0][1] + g[1][0]*g[1][0] + g[1][1]*g[1][1];
+    if (norm>(1.0e-3)) { /* otherwise, assume the stand has been marked out and should remain zeroed. */
+      g[0][0]=0.0; g[0][1]=0.0; g[1][0]=0.0; g[1][1]=0.0;
+      if (pol[0]=='X') { g[0][0] = gb; } else { g[0][1] = gb; }
+      if (i==std) { 
+        if (pol[0]=='X') { g[1][0] = gd; } else { g[1][1] = gd; }
+        }
+      } /* if norm */
+
+    fprintf(fpo,"%7.3f %7.3f %7.3f %7.3f\n",g[0][0],g[0][1],g[1][0],g[1][1]);
+    } /* while (fscanf */
+
+  fclose(fpi); 
+  fclose(fpo);
+
+  /* Call megfg to convert ASCII to packed binary form */
+  fprintf(fpl,"  running './megfg me_inproc_bm/temp.gft me_inproc_bm/%s'\n",gfile);
+  sprintf(cmd,"./megfg me_inproc_bm/temp.gft me_inproc_bm/%s",gfile);
+  system(cmd);
+
+  /* copy this file to ../sch/gfiles/. */
+  #ifdef ME_SCP2CP
+      sprintf(cmd, "cp me_inproc_bm/%s %s/gfiles/.",gfile,LWA_SCH_SCP_DIR);
+    #else
+      sprintf(cmd, "scp me_inproc_bm/%s %s:%s/gfiles/.",gfile,LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
+    #endif
+  system(cmd);
+
+  return err;
+  } /* me_bdm_setup() */
+
 
 /*******************************************************************/
 /*** me_inproc_cmd_log() *******************************************/
@@ -519,6 +613,7 @@ int main ( int narg, char *argv[] ) {
           fprintf(fpl,"  osf.OBS_START_MPM = %lu\n",osf.OBS_START_MPM);
           fprintf(fpl,"  osf.OBS_DUR = %lu\n",osf.OBS_DUR);
           LWA_saymode( osf.OBS_MODE, ssc ); fprintf(fpl,"  osf.OBS_MODE  = %hu ('%s')\n",osf.OBS_MODE,ssc);
+          fprintf(fpl,"  osf.OBS_BDM = '%s'\n",osf.OBS_BDM);
           fprintf(fpl,"  osf.OBS_RA = %f\n",osf.OBS_RA);
           fprintf(fpl,"  osf.OBS_DEC = %f\n",osf.OBS_DEC);
           fprintf(fpl,"  osf.OBS_B = %hd\n",osf.OBS_B);
@@ -919,6 +1014,16 @@ int main ( int narg, char *argv[] ) {
                 last_alt = 0.0;
                 last_az = 0.0;
                 bFirst = 1;  
+
+                /* Figure out what gfile to use (construct filename) */
+                //sprintf(gfile,"gfile.gf"); 
+                //sprintf(gfile,"111226_XY.gf"); 
+                sprintf(gfile,"default.gf"); /* this will be overwritten if OBS_BDM keyword is invoked (see below) */
+                /* 140310: Adding support for OBS_BDM keyword */
+                if (strlen(osf.OBS_BDM)>0) {
+                  sprintf(gfile,"c%s_%04u_%04u.gf",osf.PROJECT_ID,osf.SESSION_ID,osf.OBS_ID);
+                  me_bdm_setup( osf.OBS_BDM, fpl, gfile ); 
+                  } 
       
                 /* looping over time */
                 while ( LWA_timediff( tv2, tv ) > 0 ) {
@@ -953,11 +1058,6 @@ int main ( int narg, char *argv[] ) {
                     /* Figure out what dfile to use (construct filename) */
                     sprintf(dfile,"740_%03.0lf_%04.0lf.df",alt*10,az*10); /* FIXME */
                     //sprintf(dfile,"dfile.df"); 
-
-                    /* Figure out what gfile to use (construct filename) */
-                    //sprintf(gfile,"gfile.gf"); 
-                    //sprintf(gfile,"111226_XY.gf"); 
-                    sprintf(gfile,"default.gf"); /* FIXME */
 
                     sprintf( cs[ncs].data, "%hd %s %s %ld",
                                     osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
@@ -1130,6 +1230,10 @@ int main ( int narg, char *argv[] ) {
  
                 /* Figure out what gfile to use (construct filename) */
                 sprintf(gfile,"default.gf"); 
+                if (strlen(osf.OBS_BDM)>0) {
+                  sprintf(gfile,"c%s_%04u_%04u_%04d.gf",osf.PROJECT_ID,osf.SESSION_ID,osf.OBS_ID,m);
+                  me_bdm_setup( osf.OBS_BDM, fpl, gfile ); 
+                  } 
 
                 } else { 
 
@@ -1321,6 +1425,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: S.W. Ellingson, Virginia Tech, 2014 Mar 10
+//   .1 Added support for OBS_BDM keyword
 // me_inproc.c: S.W. Ellingson, Virginia Tech, 2013 Jan 28
 //   .1 Implementing custom beam delays and gains
 // me_inproc.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07

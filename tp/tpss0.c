@@ -54,6 +54,7 @@
     long int OBS_DUR;
     char OBS_DURp[MAX_SDF_NOTE_LENGTH]; /* this is OBS_DUR+ */
     unsigned short int OBS_MODE;
+    char OBS_BDM[32];
     float OBS_RA;
     float OBS_DEC;
     int OBS_B;

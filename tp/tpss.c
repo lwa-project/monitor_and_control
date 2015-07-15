@@ -1,4 +1,4 @@
-// tpss.c: S.W. Ellingson, Virginia Tech, 2013 Jan 28
+// tpss.c: S.W. Ellingson, Virginia Tech, 2014 Mar 10
 // ---
 // COMPILE: gcc -o tpss tpss.c -I../common
 // ---
@@ -449,10 +449,10 @@ int main ( int narg, char *argv[] ) {
 
   /* check defined session against mess.dat */
   if (SESSION_DRX_BEAM>0) {  /* a particular DRX output has been requested */
-
+     
      err = LWA_dpoavail( SESSION_DRX_BEAM, t0, d, mbox, msg );
      printf("[%d/%d] LWA_dpoavail says: %s\n",MT_TPSS,getpid(),msg); 
-     if (err<0) {
+     if (err<=0) {
        printf("[%d/%d] FATAL: SESSION_DRX_BEAM==%hd cannot be accommodated\n",MT_TPSS,getpid(),SESSION_DRX_BEAM);
        return; 
        }
@@ -557,6 +557,7 @@ int main ( int narg, char *argv[] ) {
     fprintf(fp,"OBS_DUR %ld\n",obs[n].OBS_DUR);
     fprintf(fp,"OBS_DUR+ %s\n", obs[n].OBS_DURp);
     LWA_saymode(obs[n].OBS_MODE,msg); fprintf(fp,"OBS_MODE %s\n",msg);
+    fprintf(fp,"OBS_BDM '%s'\n",obs[n].OBS_BDM);
     fprintf(fp,"OBS_RA %f\n", obs[n].OBS_RA);
     fprintf(fp,"OBS_DEC %f\n", obs[n].OBS_DEC);
     fprintf(fp,"OBS_B %d\n", obs[n].OBS_B);
@@ -711,6 +712,7 @@ int main ( int narg, char *argv[] ) {
     osf.OBS_START_MPM = obs[n].OBS_START_MPM;
     osf.OBS_DUR       = obs[n].OBS_DUR;
     osf.OBS_MODE      = obs[n].OBS_MODE;
+    sprintf(osf.OBS_BDM,"%s",obs[n].OBS_BDM);
     osf.OBS_RA        = obs[n].OBS_RA;
     osf.OBS_DEC       = obs[n].OBS_DEC;
     osf.OBS_B         = obs[n].OBS_B;
@@ -864,6 +866,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpss.c: S.W. Ellingson, Virginia Tech, 2014 Mar 10
+//   .1 Added BDM command; added OBS_BDM keyword
 // tpss.c: S.W. Ellingson, Virginia Tech, 2013 Jan 28
 //   .1 Redimensioned mode_string[] to 256 (from 10) to fix overrun problem
 // tpss.c: S.W. Ellingson, Virginia Tech, 2013 Jan 23

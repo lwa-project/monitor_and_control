@@ -1,4 +1,4 @@
-// megfg.c: S.W. Ellingson, Virginia Tech, 2010 Nov 11
+// megfg.c: S.W. Ellingson, Virginia Tech, 2014 Mar 11
 // ---
 // Gains file generator: Converts .gft files to .gf, 
 // suitable for DP "sint16 BEAM_GAIN[260][2][2]" argument
@@ -51,8 +51,8 @@ int main( int narg, char *argv[] ) {
   sscanf(argv[2],"%s",gf_file); 
 
   /* show it */
-  printf("%s: gft_file='%s'\n",ME,gft_file);
-  printf("%s: gf_file ='%s'\n",ME,gf_file);
+  //printf("%s: gft_file='%s'\n",ME,gft_file);
+  //printf("%s: gf_file ='%s'\n",ME,gf_file);
 
   /* zero out input matrix */
   for (i=0; i<MAX_STD; i++) {
@@ -111,6 +111,8 @@ int main( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// megfg.c: S.W. Ellingson, Virginia Tech, 2014 Mar 11
+//   .1: Removed some annoying printf's
 // megfg.c: S.W. Ellingson, Virginia Tech, 2010 Nov 11
 //   .1: Initial version
 

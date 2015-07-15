@@ -161,6 +161,21 @@
     case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
     }
 
+  /* added 140310 */
+  strcpy(keyword,"OBS_BDM"); strcpy(obs[nobs].OBS_BDM,"");
+  while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
+  switch (i) {
+    case TPSS_PL_KEYWORD_MATCH:    
+      printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
+      strcpy(obs[nobs].OBS_BDM,data);
+      printf("...converts to '%s'\n",obs[nobs].OBS_BDM);
+      strcpy(data,"");   
+      break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional keyword */                                                        break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    }
+
   strcpy(keyword,"OBS_RA");  obs[nobs].OBS_RA = -1;
   while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
   switch (i) {
