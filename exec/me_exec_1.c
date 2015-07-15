@@ -496,11 +496,23 @@ int me_action(
                   err = mesi( NULL, sid_macro, "RPT", "DRSU-BARCODE", "today", "asap", &reference );
 
                   /* save ASP MIB as it exists at start of observation */
-                  sprintf(cmd, "scp %s:%s/ASP.pag sinbox/%s_%04u_ASP_begin.pag",
-                          LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
+
+                  #ifdef ME_SCP2CP /*see me.h */
+                      sprintf(cmd, "cp %s/ASP.pag sinbox/%s_%04u_ASP_begin.pag",
+                              LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
+                    #else
+                      sprintf(cmd, "scp %s:%s/ASP.pag sinbox/%s_%04u_ASP_begin.pag",
+                              LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
+                    #endif
                   system(cmd);
-                  sprintf(cmd, "scp %s:%s/ASP.dir sinbox/%s_%04u_ASP_begin.dir",
-                          LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
+
+                  #ifdef ME_SCP2CP /*see me.h */
+                      sprintf(cmd, "cp %s/ASP.dir sinbox/%s_%04u_ASP_begin.dir",
+                              LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
+                    #else
+                      sprintf(cmd, "scp %s:%s/ASP.dir sinbox/%s_%04u_ASP_begin.dir",
+                              LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
+                    #endif
                   system(cmd);
 
                   break;
@@ -515,11 +527,23 @@ int me_action(
                   ///* wait 3 seconds for response to come in */
 
                   /* save ASP MIB as it exists at end of observation */
-                  sprintf(cmd, "scp %s:%s/ASP.pag sinbox/%s_%04u_ASP_end.pag",
-                          LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
+
+                  #ifdef ME_SCP2CP /*see me.h */
+                      sprintf(cmd, "cp %s/ASP.pag sinbox/%s_%04u_ASP_end.pag",
+                              LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
+                    #else
+                      sprintf(cmd, "scp %s:%s/ASP.pag sinbox/%s_%04u_ASP_end.pag",
+                              LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
+                    #endif
                   system(cmd);
-                  sprintf(cmd, "scp %s:%s/ASP.dir sinbox/%s_%04u_ASP_end.dir",
-                          LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
+
+                  #ifdef ME_SCP2CP /*see me.h */
+                      sprintf(cmd, "cp %s/ASP.dir sinbox/%s_%04u_ASP_end.dir",
+                              LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
+                    #else  
+                      sprintf(cmd, "scp %s:%s/ASP.dir sinbox/%s_%04u_ASP_end.dir",
+                              LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
+                    #endif
                   system(cmd);
 
                   /* write the metadata file */
@@ -980,7 +1004,11 @@ int me_make_gf( struct ssmif_struct s
   system(cmd);
 
   /* cp state/default.gf to ../sch/gfiles/. */
-  sprintf(cmd, "scp state/default.gf %s:%s/gfiles/.",LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
+  #ifdef ME_SCP2CP
+      sprintf(cmd, "cp state/default.gf %s/gfiles/.",                     LWA_SCH_SCP_DIR);
+    #else
+      sprintf(cmd, "scp state/default.gf %s:%s/gfiles/.",LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
+    #endif
   system(cmd);
 
   return;

@@ -2,6 +2,13 @@
 #ifndef ME_H  /* this keeps this header from getting rolled in more than once */
 #define ME_H
 
+/*************************************/
+/*** WARNING: COMPILE-TIME OPTION: ***/
+/*************************************/
+/* uncomment the line below if you want to use cp to transfer files */
+/* uncommented by J. Dowell 2014/2/25 */
+#define ME_SCP2CP /* WARNING: assumes tp, exec, and sch are on same machine! */
+
 #include "mcs.h"
 
 #define ME_ACTION_WINDOW 1000 /* number of milliseconds prior to scheduled time */
