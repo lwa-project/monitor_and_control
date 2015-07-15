@@ -1,4 +1,4 @@
-// me_inproc.c: S.W. Ellingson, Virginia Tech, 2014 Mar 10
+// me_inproc.c: S.W. Ellingson, Virginia Tech, 2014 Mar 24
 // ---
 // COMPILE: gcc -o me_inproc me_inproc.c -I../common -lm
 // ---
@@ -311,9 +311,11 @@ int me_bdm_setup( char *OBS_BDM,
     norm = g[0][0]*g[0][0] + g[0][1]*g[0][1] + g[1][0]*g[1][0] + g[1][1]*g[1][1];
     if (norm>(1.0e-3)) { /* otherwise, assume the stand has been marked out and should remain zeroed. */
       g[0][0]=0.0; g[0][1]=0.0; g[1][0]=0.0; g[1][1]=0.0;
-      if (pol[0]=='X') { g[0][0] = gb; } else { g[0][1] = gb; }
+      //if (pol[0]=='X') { g[0][0] = gb; } else { g[0][1] = gb; } // replaced 140324
+      if (pol[0]=='X') { g[0][0] = gb; } else { g[1][0] = gb; }
       if (i==std) { 
-        if (pol[0]=='X') { g[1][0] = gd; } else { g[1][1] = gd; }
+        //if (pol[0]=='X') { g[1][0] = gd; } else { g[1][1] = gd; } // replaced 140324
+        if (pol[0]=='X') { g[0][1] = gd; } else { g[1][1] = gd; }
         }
       } /* if norm */
 
@@ -413,6 +415,25 @@ double angle_sep( double a, double b, double modulo ) {
   }
 
 
+/*************************************************************/
+/*** me_trim() *********************************************/
+/*************************************************************/
+
+void me_trim( char *src, char *dest ) {
+
+  int i;
+  int k=0;
+  for (i=0;i<strlen(src);i++) {
+    if (src[i]!=' ') { 
+      dest[k] = src[i];
+      k++;
+      }
+    }
+  dest[k] = '\0';
+
+  return;
+  } /* me_trim() */
+
 /*******************************************************************/
 /*** main() ********************************************************/
 /*******************************************************************/
@@ -489,6 +510,8 @@ int main ( int narg, char *argv[] ) {
   int bOBS=0;
 
   int err=0;
+
+  char sProjectIDtrimmed[1024];
 
   /* First, announce thyself */
   printf("[%d/%d] I am me_inproc\n",ME_INPROC,getpid());
@@ -1021,7 +1044,9 @@ int main ( int narg, char *argv[] ) {
                 sprintf(gfile,"default.gf"); /* this will be overwritten if OBS_BDM keyword is invoked (see below) */
                 /* 140310: Adding support for OBS_BDM keyword */
                 if (strlen(osf.OBS_BDM)>0) {
-                  sprintf(gfile,"c%s_%04u_%04u.gf",osf.PROJECT_ID,osf.SESSION_ID,osf.OBS_ID);
+                  me_trim(osf.PROJECT_ID,sProjectIDtrimmed);
+                  //sprintf(gfile,"c%s_%04u_%04u.gf",osf.PROJECT_ID,osf.SESSION_ID,osf.OBS_ID);
+                  sprintf(gfile,"c%s_%04u_%04u.gf",sProjectIDtrimmed,osf.SESSION_ID,osf.OBS_ID);
                   me_bdm_setup( osf.OBS_BDM, fpl, gfile ); 
                   } 
       
@@ -1231,7 +1256,9 @@ int main ( int narg, char *argv[] ) {
                 /* Figure out what gfile to use (construct filename) */
                 sprintf(gfile,"default.gf"); 
                 if (strlen(osf.OBS_BDM)>0) {
-                  sprintf(gfile,"c%s_%04u_%04u_%04d.gf",osf.PROJECT_ID,osf.SESSION_ID,osf.OBS_ID,m);
+                  me_trim(osf.PROJECT_ID,sProjectIDtrimmed);
+                  //sprintf(gfile,"c%s_%04u_%04u_%04d.gf",osf.PROJECT_ID,osf.SESSION_ID,osf.OBS_ID,m);
+                  sprintf(gfile,"c%s_%04u_%04u_%04d.gf",sProjectIDtrimmed,osf.SESSION_ID,osf.OBS_ID,m);
                   me_bdm_setup( osf.OBS_BDM, fpl, gfile ); 
                   } 
 
@@ -1243,8 +1270,11 @@ int main ( int narg, char *argv[] ) {
 
                 /* come up with unique root filename for delay and gain files */ 
                 /* These start with "c" to denote "custom" -- this keeps me_beamspec() from getting confused */
-                sprintf(dfile,"c%s_%04u_%04u_%04d.df",osf.PROJECT_ID,osf.SESSION_ID,osf.OBS_ID,m);
-                sprintf(gfile,"c%s_%04u_%04u_%04d.gf",osf.PROJECT_ID,osf.SESSION_ID,osf.OBS_ID,m);
+                me_trim(osf.PROJECT_ID,sProjectIDtrimmed);
+                //sprintf(dfile,"c%s_%04u_%04u_%04d.df",osf.PROJECT_ID,osf.SESSION_ID,osf.OBS_ID,m);
+                //sprintf(gfile,"c%s_%04u_%04u_%04d.gf",osf.PROJECT_ID,osf.SESSION_ID,osf.OBS_ID,m);
+                sprintf(dfile,"c%s_%04u_%04u_%04d.df",sProjectIDtrimmed,osf.SESSION_ID,osf.OBS_ID,m);
+                sprintf(gfile,"c%s_%04u_%04u_%04d.gf",sProjectIDtrimmed,osf.SESSION_ID,osf.OBS_ID,m);
 
                 /* read custom delays and gains */
                 fread(&beam,sizeof(struct beam_struct),1,fpo);
@@ -1425,6 +1455,9 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: S.W. Ellingson, Virginia Tech, 2014 Mar 24
+//   .1 In me_bdm_setup(), transposed gain matrix; looks like I had it wrong before.
+//   .2 Fix for "less than 8-char project ID" issue (trimming spaces prior to forming filenames)
 // me_inproc.c: S.W. Ellingson, Virginia Tech, 2014 Mar 10
 //   .1 Added support for OBS_BDM keyword
 // me_inproc.c: S.W. Ellingson, Virginia Tech, 2013 Jan 28
