@@ -28,7 +28,7 @@
 //#include "LWA_MCS.h"
 #include "mcs.h"
 
-#define MY_NAME "msei (v.20100608.1)"
+#define MY_NAME "msei (v.20150810.1)"
 #define ME "7" 
 
 #define B 256
@@ -58,8 +58,9 @@ main ( int narg, char *argv[] ) {
 
   int bError;
   short int i2u1, i2u2, i2u3;
-  int i4u1, i4u2;
+  int i4u1, i4u2, i4s1, i4s2;
   float f41; /* assuming this is 32 bits */
+  long int i8u1;
 
   union {
     unsigned short int i;
@@ -69,6 +70,14 @@ main ( int narg, char *argv[] ) {
     unsigned int i;
     unsigned char b[4];
     } i4u;
+  union {
+    int i;
+    char b[4];
+    } i4s;
+  union {
+    unsigned long int i;
+    char b[8];
+    } i8u;
   union {
     float f;
     unsigned char b[4];
@@ -141,7 +150,118 @@ main ( int narg, char *argv[] ) {
   /* Gets changed by ms_exec */
   strcpy(c.data,data); /* changed in reply */
   c.datalen = -1; /* assumed to be a string */
+  
+#ifdef USE_ADP
+  /* For ADP, c.data is raw binary, assembled from command line parameters. */
+  /* the parameters are command-dependent */
+  if (c.sid==LWA_SID_ADP) {
+    
+    switch (c.cid) {
 
+       case LWA_CMD_PNG:
+       case LWA_CMD_RPT:
+       case LWA_CMD_SHT:
+         break;
+        
+       case LWA_CMD_TBF:
+         // DATA field structure:
+         // uint8 TBF_BITS;
+         // sint32 TBF_TRIG_TIME; 
+         // sint32 TBF_SAMPLES;
+         // uint64 DRX_TUNING_MASK
+         bError=0;
+         if (narg>3) { sscanf(argv[3],"%hu",&i2u1); } else {bError=1;}
+         if (narg>4) { sscanf(argv[4],"%i", &i4s1); } else {bError=1;}
+         if (narg>5) { sscanf(argv[5],"%i", &i4s2); } else {bError=1;}
+         if (narg>6) { sscanf(argv[6],"%lu", &i8u1; } else {bError=1;}
+         if (bError) {
+           printf("[%s] FATAL: %s/%s args are:\n TBF_BITS {0|1}\n TBF_TRIG_TIME (samples, int32)\n TBF_SAMPLES (samples, int32)\n DRX_TUNING_MASK (mask, uint64)\n",ME,dest,cmd);
+           return;
+           }
+         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;
+         i2u.i = i2u1;                     c.data[0]=i2u.b[0]; 
+         i4u.i = i4u1; c.data[1]=i4u.b[3]; c.data[2]=i4u.b[2]; c.data[3]=i4u.b[1]; c.data[4]=i4u.b[0];
+         i4u.i = i4u2; c.data[5]=i4u.b[3]; c.data[6]=i4u.b[2]; c.data[7]=i4u.b[1]; c.data[8]=i4u.b[0];
+         c.datalen=9;
+         break;
+
+       case LWA_CMD_TBN:
+         // DATA field structure:
+         // float32 TBN_FREQ;
+         // uint16 TBN_BW;
+         // uint16 TBN_GAIN;
+         // uint8 sub_slot;
+         bError=0;
+         if (narg>3) { sscanf(argv[3],"%f", &f41 ); } else {bError=1;}
+         if (narg>4) { sscanf(argv[4],"%hu",&i2u1); } else {bError=1;}
+         if (narg>4) { sscanf(argv[5],"%hu",&i2u2); } else {bError=1;}
+         if (narg>5) { sscanf(argv[6],"%hu",&i2u3); } else {bError=1;}
+         if (bError) {
+           printf("[%s] FATAL: %s/%s args are:\n TBN_FREQ (Hz, float32)\n TBN_BW {5..11}\n TBN_GAIN {0..15}\n sub_slot {0..99}",ME,dest,cmd);
+           return;
+           }
+         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;
+         f4.f  = f41;  c.data[0]= f4.b[3]; c.data[1]= f4.b[2]; c.data[2]= f4.b[1]; c.data[3]= f4.b[0];
+         i2u.i = i2u1; c.data[4]=i2u.b[1]; c.data[5]=i2u.b[0]; 
+         i2u.i = i2u2; c.data[6]=i2u.b[1]; c.data[7]=i2u.b[0]; 
+         i2u.i = i2u3;                     c.data[8]=i2u.b[0]; 
+         c.datalen=9;
+         break;
+
+       case LWA_CMD_COR:
+         // DATA field structure:
+         // int32 COR_NAVG;
+         // uint64  DRX_TUNING_MASK
+         // int16 COR_GAIN
+         // uint8 sub_slot
+         bError=0;
+         if (narg>3) { sscanf(argv[3],"%i", &i4s1); } else {bError=1;}
+         if (narg>4) { sscanf(argv[4],"%lu",&i8u1); } else {bError=1;}
+         if (narg>4) { sscanf(argv[5],"%hu",&i2u2); } else {bError=1;}
+         if (narg>5) { sscanf(argv[6],"%hu",&i2u3); } else {bError=1;}
+         if (bError) {
+           printf("[%s] FATAL: %s/%s args are:\n COR_NAVG (Number, int32)\n DRX_TUNING_MASK (mask, uint64)\n COR_GAIN {0..15}\n sub_slot {0..99}",ME,dest,cmd);
+           return;
+           }
+         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;
+         i4s.i = i4s1; c.data[0]=i4s.b[3]; c.data[1]=i4s.b[2]; c.data[2]=i4s.b[1]; c.data[3]=i4s.b[0];
+         i8u.i = i8u1; c.data[4]=i8u.b[7]; c.data[5]=i8u.b[6]; c.data[6]=i8u.b[5]; c.data[7]=i8u.b[4]; \
+                       c.data[8]=i8u.b[3]; c.data[9]=i8u.b[2]; c.data[10]=i8u.b[1]; c.data[11]=i8u.b[0]; 
+         i2u.i = i2u2; c.data[12]=i2u.b[1]; c.data[13]=i2u.b[0]; 
+         i2u.i = i2u3;                      c.data[14]=i2u.b[0]; 
+         c.datalen=15;
+         break;
+         
+       case LWA_CMD_CLK:
+         //float32 CLK_SET_TIME;
+         bError=0;
+         if (narg>3) { sscanf(argv[3],"%u",&i4u1); } else {bError=1;}
+         if (bError) {
+           printf("[%s] FATAL: %s/%s arg is CLK_SET_TIME (uint32)\n",ME,dest,cmd);
+           return;
+           }
+         i4u.i = i4u1; c.data[0]=i4u.b[3]; c.data[1]=i4u.b[2]; c.data[2]=i4u.b[1]; c.data[3]=i4u.b[0];
+         c.datalen=4;
+         break;
+
+       case LWA_CMD_INI:
+         break;
+ 
+       default:
+         printf("[%s] FATAL: cmd <%s> not recognized as valid for DP\n",ME,cmd);
+         return;
+         break;
+
+       } /* switch (c.cid) */
+
+    if (c.datalen > -1) { 
+     char hex[256];
+     LWA_raw2hex( c.data, hex, c.datalen );      
+     printf("[%s] Outbound DATA field is: 0x%s (raw binary)\n",ME,hex);  
+    }
+
+    } /* if (c.sid==LWA_SID_ADP) */
+#else
   /* For DP, c.data is raw binary, assembled from command line parameters. */
   /* the parameters are command-dependent */
   if (c.sid==LWA_SID_DP_) {
@@ -225,6 +345,7 @@ main ( int narg, char *argv[] ) {
     }
 
     } /* if (c.sid==LWA_SID_DP_) */
+#endif
 
   /* create socket */
   sockfd = socket(
@@ -257,6 +378,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// msei.c: J. Dowell, UNM, 2015 Aug 10
+//   .1: Added support for MCS-ADP.  This is similar to DP.
 // msei.c: S.W. Ellingson, Virginia Tech, 2010 Jun 08
 //   .1: Adding support for MCS-DR.  Nothing to do besides update comments
 // msei.c: S.W. Ellingson, Virginia Tech, 2009 Nov 7

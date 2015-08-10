@@ -106,7 +106,11 @@ int LWA_mibupdate_RPT(
 /* Each file contains just one function call, "LWA_mibupdate_XXX()" */ 
 #include "ms_mcic_SHL.c" /* LWA_mibupdate_SHL() */
 #include "ms_mcic_ASP.c" /* LWA_mibupdate_ASP() */
+#ifdef USE_ADP
+#include "ms_mcic_ADP.c" /* LWA_mibupdate_ADP() */
+#else
 #include "ms_mcic_DP_.c" /* LWA_mibupdate_DP_() */
+#endif
 #include "ms_mcic_DR_.c" /* LWA_mibupdate_DR_() */
 
 /* ======================================================================= */
@@ -215,10 +219,15 @@ int mib_update(
               case LWA_SID_ASP:
                 eMIBerror = eMIBerror | LWA_mibupdate_ASP( dbm_ptr, cid, cmdata, r_comment, datalen );                
                 break;
-
+#ifdef USE_ADP
+              case LWA_SID_ADP:
+                eMIBerror = eMIBerror | LWA_mibupdate_ADP( dbm_ptr, cid, cmdata, r_comment, datalen, ref, sent_tv );                
+                break;
+#else
               case LWA_SID_DP_:
                 eMIBerror = eMIBerror | LWA_mibupdate_DP_( dbm_ptr, cid, cmdata, r_comment, datalen, ref, sent_tv );                
                 break;
+#endif
 
               case LWA_SID_DR1:
               case LWA_SID_DR2:
@@ -252,6 +261,8 @@ int mib_update(
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mcic_mib.c: J. Dowell, UNM, 2015 Aug 10
+//   adding MCS-ADP ("ADP") support
 // ms_mcic_mib.c: S.W. Ellingson, Virginia Tech, 2010 Jun 07
 //   adding MCS-DR ("DR#") support
 // ms_mcic_mib.c: S.W. Ellingson, Virginia Tech, 2010 May 30
