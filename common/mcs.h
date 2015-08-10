@@ -10,6 +10,14 @@
 #ifndef MCS_H  /* this keeps this header from getting rolled in more than once */
 #define MCS_H
 
+/****************************************************/
+/* Station Configuration:                           */
+/* Uncomment the following to command ADP instead   */ 
+/* of DP.                                           */
+/****************************************************/
+//#define USE_ADP /* Use the new ADP at LWA-SV
+
+
 /*****************************************************/
 /* LAN configuration:                                */
 /* Must uncomment one and only one of the following: */
@@ -238,6 +246,7 @@ char *LWA_saysum( int sidsum ) {
 #define LWA_SID_DR3 16 /* MCS-DR #3 */
 #define LWA_SID_DR4 17 /* MCS-DR #4 */
 #define LWA_SID_DR5 18 /* MCS-DR #5 */
+#define LWA_SID_ADP 19 /* ADP */
 /* When adding subsystems, remember to change LWA_MAX_SID ! */
 
 int LWA_getsid( char *ssc ) {
@@ -262,6 +271,7 @@ int LWA_getsid( char *ssc ) {
   if (!strcmp(ssc,"DR3")) sid = LWA_SID_DR3;
   if (!strcmp(ssc,"DR4")) sid = LWA_SID_DR4;
   if (!strcmp(ssc,"DR5")) sid = LWA_SID_DR5;
+  if (!strcmp(ssc,"ADP")) sid = LWA_SID_ADP;
   return sid;
   } /* LWA_getsid() */
 
@@ -287,51 +297,55 @@ char *LWA_sid2str( int sid ) {
   if (sid == LWA_SID_DR3) return "DR3";
   if (sid == LWA_SID_DR4) return "DR4";
   if (sid == LWA_SID_DR5) return "DR5";
+  if (sid == LWA_SID_ADP) return "ADP";
   return "XXX";
   } /* LWA_sid2str() */
  
 /* === LWA Command (TYPE) IDs === */
 #define LWA_MAX_CMD  38 /* maximum code; also maximum number of commands */
 #define LWA_CMD_MCSSHT 0 /* Not a subsystem command.  Directs ms_mcic to shutdown */
-#define LWA_CMD_PNG    1 /* PNG */
-#define LWA_CMD_RPT    2 /* RPT */
-#define LWA_CMD_SHT    3 /* SHT */
-#define LWA_CMD_INI    4 /* INI (SHL,ASP,DP_,DR#) */
-#define LWA_CMD_TMP    5 /* TMP (SHL) */
-#define LWA_CMD_DIF    6 /* DIF (SHL) */
-#define LWA_CMD_PWR    7 /* PWR (SHL) */
-#define LWA_CMD_FIL    8 /* FIL (ASP) */
-#define LWA_CMD_AT1    9 /* AT1 (ASP) */
-#define LWA_CMD_AT2   10 /* AT2 (ASP) */
-#define LWA_CMD_ATS   11 /* ATS (ASP) */
-#define LWA_CMD_FPW   12 /* FPW (ASP) */
-#define LWA_CMD_RXP   13 /* RXP (ASP) */
-#define LWA_CMD_FEP   14 /* FEP (ASP) */
-#define LWA_CMD_TBW   15 /* TBW (DP_) */
-#define LWA_CMD_TBN   16 /* TBN (DP_) */
-#define LWA_CMD_DRX   17 /* DRX (DP_) */
-#define LWA_CMD_BAM   18 /* BAM (DP_) */
-#define LWA_CMD_FST   19 /* FST (DP_) */
-#define LWA_CMD_CLK   20 /* CLK (DP_) */
-#define LWA_CMD_REC   21 /* REC (DR#) */
-#define LWA_CMD_DEL   22 /* DEL (DR#) */
-#define LWA_CMD_STP   23 /* STP (DR#) */
-#define LWA_CMD_GET   24 /* GET (DR#) */
-#define LWA_CMD_CPY   25 /* CPY (DR#) */
-#define LWA_CMD_DMP   26 /* DMP (DR#) */
-#define LWA_CMD_FMT   27 /* FMT (DR#) */
-#define LWA_CMD_DWN   28 /* DWN (DR#) */
-#define LWA_CMD_UP_   29 /* UP_ (DR#).  Note ICD calls this "UP" (no underscore) */
-#define LWA_CMD_SEL   30 /* SEL (DR#) */
-#define LWA_CMD_SYN   31 /* SYN (DR#) */
-#define LWA_CMD_TST   32 /* TST (DR#) */
-#define LWA_CMD_BUF   33 /* BUF (DR#) */
-#define LWA_CMD_NUL   34 /* (MCS) null command; does nothing. */
-#define LWA_CMD_ESN   35 /* (MCS) end session normally */
-#define LWA_CMD_ESF   36 /* (MCS) end session as failed */
-#define LWA_CMD_OBS   37 /* (MCS) observation start  */
-#define LWA_CMD_OBE   38 /* (MCS) observation end */
-#define LWA_CMD_SPC   39 /* SPC (DR#) */
+#define LWA_CMD_PNG      1 /* PNG */
+#define LWA_CMD_RPT      2 /* RPT */
+#define LWA_CMD_SHT      3 /* SHT */
+#define LWA_CMD_INI      4 /* INI (SHL,ASP,DP_,DR#,ADP) */
+#define LWA_CMD_TMP      5 /* TMP (SHL) */
+#define LWA_CMD_DIF      6 /* DIF (SHL) */
+#define LWA_CMD_PWR      7 /* PWR (SHL) */
+#define LWA_CMD_FIL      8 /* FIL (ASP) */
+#define LWA_CMD_AT1      9 /* AT1 (ASP) */
+#define LWA_CMD_AT2     10 /* AT2 (ASP) */
+#define LWA_CMD_ATS     11 /* ATS (ASP) */
+#define LWA_CMD_FPW     12 /* FPW (ASP) */
+#define LWA_CMD_RXP     13 /* RXP (ASP) */
+#define LWA_CMD_FEP     14 /* FEP (ASP) */
+#define LWA_CMD_TBW     15 /* TBW (DP_) */
+#define LWA_CMD_TBN     16 /* TBN (DP_,ADP) */
+#define LWA_CMD_DRX     17 /* DRX (DP_,ADP) */
+#define LWA_CMD_BAM     18 /* BAM (DP_) */
+#define LWA_CMD_FST     19 /* FST (DP_) */
+#define LWA_CMD_CLK     20 /* CLK (DP_) */
+#define LWA_CMD_REC     21 /* REC (DR#) */
+#define LWA_CMD_DEL     22 /* DEL (DR#) */
+#define LWA_CMD_STP     23 /* STP (DR#,DP_,ADP) */
+#define LWA_CMD_GET     24 /* GET (DR#) */
+#define LWA_CMD_CPY     25 /* CPY (DR#) */
+#define LWA_CMD_DMP     26 /* DMP (DR#) */
+#define LWA_CMD_FMT     27 /* FMT (DR#) */
+#define LWA_CMD_DWN     28 /* DWN (DR#) */
+#define LWA_CMD_UP_     29 /* UP_ (DR#).  Note ICD calls this "UP" (no underscore) */
+#define LWA_CMD_SEL     30 /* SEL (DR#) */
+#define LWA_CMD_SYN     31 /* SYN (DR#) */
+#define LWA_CMD_TST     32 /* TST (DR#) */
+#define LWA_CMD_BUF     33 /* BUF (DR#) */
+#define LWA_CMD_NUL     34 /* (MCS) null command; does nothing. */
+#define LWA_CMD_ESN     35 /* (MCS) end session normally */
+#define LWA_CMD_ESF     36 /* (MCS) end session as failed */
+#define LWA_CMD_OBS     37 /* (MCS) observation start  */
+#define LWA_CMD_OBE     38 /* (MCS) observation end */
+#define LWA_CMD_SPC     39 /* SPC (DR#) */
+#define LWA_CMD_TBF     40 /* TBF (ADP) */
+#define LWA_CMD_COR     41 /* COR (ADP) */
+#define LWA_CMD_ADP_BAM 42 /* ADP variant of BAM */
 
 /* When adding commands, remember to change LWA_MAX_CMD ! */
 
@@ -356,7 +370,11 @@ int LWA_getcmd( char *ssc ) {
   if (!strcmp(ssc,"TBW")) cmd = LWA_CMD_TBW;
   if (!strcmp(ssc,"TBN")) cmd = LWA_CMD_TBN;
   if (!strcmp(ssc,"DRX")) cmd = LWA_CMD_DRX;
+#ifdef USE_ADP
+  if (!strcmp(ssc,"BAM")) cmd = LWA_CMD_ADP_BAM;
+#else
   if (!strcmp(ssc,"BAM")) cmd = LWA_CMD_BAM;
+#endif
   if (!strcmp(ssc,"FST")) cmd = LWA_CMD_FST;
   if (!strcmp(ssc,"CLK")) cmd = LWA_CMD_CLK;
   if (!strcmp(ssc,"REC")) cmd = LWA_CMD_REC;
@@ -378,52 +396,57 @@ int LWA_getcmd( char *ssc ) {
   if (!strcmp(ssc,"OBS")) cmd = LWA_CMD_OBS;
   if (!strcmp(ssc,"OBE")) cmd = LWA_CMD_OBE;
   if (!strcmp(ssc,"SPC")) cmd = LWA_CMD_SPC;
+  if (!strcmp(ssc,"TBF")) cmd = LWA_CMD_TBF;
+  if (!strcmp(ssc,"COR")) cmd = LWA_CMD_COR;
   return cmd;
   } /* LWA_getcmd() */
 
 char *LWA_cmd2str( int cmd ) {
   /* ssc is the three-character command (TYP) */
   /* returns the LWA command ("TYPE"), or "   " if there is an error */
-  if (cmd == LWA_CMD_MCSSHT) return "SHT";
-  if (cmd == LWA_CMD_PNG)    return "PNG";
-  if (cmd == LWA_CMD_RPT)    return "RPT";
-  if (cmd == LWA_CMD_SHT)    return "SHT";
-  if (cmd == LWA_CMD_INI)    return "INI";
-  if (cmd == LWA_CMD_TMP)    return "TMP";
-  if (cmd == LWA_CMD_DIF)    return "DIF";
-  if (cmd == LWA_CMD_PWR)    return "PWR";
-  if (cmd == LWA_CMD_FIL)    return "FIL";
-  if (cmd == LWA_CMD_AT1)    return "AT1";
-  if (cmd == LWA_CMD_AT2)    return "AT2";
-  if (cmd == LWA_CMD_ATS)    return "ATS";
-  if (cmd == LWA_CMD_FPW)    return "FPW";
-  if (cmd == LWA_CMD_RXP)    return "RXP";
-  if (cmd == LWA_CMD_FEP)    return "FEP";
-  if (cmd == LWA_CMD_TBW)    return "TBW";
-  if (cmd == LWA_CMD_TBN)    return "TBN";
-  if (cmd == LWA_CMD_DRX)    return "DRX";
-  if (cmd == LWA_CMD_BAM)    return "BAM";
-  if (cmd == LWA_CMD_FST)    return "FST";
-  if (cmd == LWA_CMD_CLK)    return "CLK";
-  if (cmd == LWA_CMD_REC)    return "REC";
-  if (cmd == LWA_CMD_DEL)    return "DEL";
-  if (cmd == LWA_CMD_STP)    return "STP";
-  if (cmd == LWA_CMD_GET)    return "GET";
-  if (cmd == LWA_CMD_CPY)    return "CPY";
-  if (cmd == LWA_CMD_DMP)    return "DMP";
-  if (cmd == LWA_CMD_FMT)    return "FMT";
-  if (cmd == LWA_CMD_DWN)    return "DWN";
-  if (cmd == LWA_CMD_UP_)    return "UP_";
-  if (cmd == LWA_CMD_SEL)    return "SEL";
-  if (cmd == LWA_CMD_SYN)    return "SYN";
-  if (cmd == LWA_CMD_TST)    return "TST";
-  if (cmd == LWA_CMD_BUF)    return "BUF";
-  if (cmd == LWA_CMD_NUL)    return "NUL";
-  if (cmd == LWA_CMD_ESN)    return "ESN";
-  if (cmd == LWA_CMD_ESF)    return "ESF";
-  if (cmd == LWA_CMD_OBS)    return "OBS";
-  if (cmd == LWA_CMD_OBE)    return "OBE";
-  if (cmd == LWA_CMD_SPC)    return "SPC";
+  if (cmd == LWA_CMD_MCSSHT)  return "SHT";
+  if (cmd == LWA_CMD_PNG)     return "PNG";
+  if (cmd == LWA_CMD_RPT)     return "RPT";
+  if (cmd == LWA_CMD_SHT)     return "SHT";
+  if (cmd == LWA_CMD_INI)     return "INI";
+  if (cmd == LWA_CMD_TMP)     return "TMP";
+  if (cmd == LWA_CMD_DIF)     return "DIF";
+  if (cmd == LWA_CMD_PWR)     return "PWR";
+  if (cmd == LWA_CMD_FIL)     return "FIL";
+  if (cmd == LWA_CMD_AT1)     return "AT1";
+  if (cmd == LWA_CMD_AT2)     return "AT2";
+  if (cmd == LWA_CMD_ATS)     return "ATS";
+  if (cmd == LWA_CMD_FPW)     return "FPW";
+  if (cmd == LWA_CMD_RXP)     return "RXP";
+  if (cmd == LWA_CMD_FEP)     return "FEP";
+  if (cmd == LWA_CMD_TBW)     return "TBW";
+  if (cmd == LWA_CMD_TBN)     return "TBN";
+  if (cmd == LWA_CMD_DRX)     return "DRX";
+  if (cmd == LWA_CMD_BAM)     return "BAM";
+  if (cmd == LWA_CMD_FST)     return "FST";
+  if (cmd == LWA_CMD_CLK)     return "CLK";
+  if (cmd == LWA_CMD_REC)     return "REC";
+  if (cmd == LWA_CMD_DEL)     return "DEL";
+  if (cmd == LWA_CMD_STP)     return "STP";
+  if (cmd == LWA_CMD_GET)     return "GET";
+  if (cmd == LWA_CMD_CPY)     return "CPY";
+  if (cmd == LWA_CMD_DMP)     return "DMP";
+  if (cmd == LWA_CMD_FMT)     return "FMT";
+  if (cmd == LWA_CMD_DWN)     return "DWN";
+  if (cmd == LWA_CMD_UP_)     return "UP_";
+  if (cmd == LWA_CMD_SEL)     return "SEL";
+  if (cmd == LWA_CMD_SYN)     return "SYN";
+  if (cmd == LWA_CMD_TST)     return "TST";
+  if (cmd == LWA_CMD_BUF)     return "BUF";
+  if (cmd == LWA_CMD_NUL)     return "NUL";
+  if (cmd == LWA_CMD_ESN)     return "ESN";
+  if (cmd == LWA_CMD_ESF)     return "ESF";
+  if (cmd == LWA_CMD_OBS)     return "OBS";
+  if (cmd == LWA_CMD_OBE)     return "OBE";
+  if (cmd == LWA_CMD_SPC)     return "SPC";
+  if (cmd == LWA_CMD_TBF)     return "TBF";
+  if (cmd == LWA_CMD_COR)     return "COR";
+  if (cmd == LWA_CMD_ADP_BAM) return "BAM";
   return "   ";
   } /* LWA_getsid() */
 
@@ -646,6 +669,8 @@ float LWA_f4_swap( float x ) {
 #define LWA_OM_TBW       5
 #define LWA_OM_TBN       6
 #define LWA_OM_DIAG1     7
+#define LWA_OM_TBF       8
+#define LWA_OM_COR       9
 
 int LWA_getmode( char *ssc ) {
   /* ssc is a string from which to determine mode */
@@ -658,6 +683,8 @@ int LWA_getmode( char *ssc ) {
   if (!strncmp(ssc,"TBW"      ,3)) mode = LWA_OM_TBW;
   if (!strncmp(ssc,"TBN"      ,3)) mode = LWA_OM_TBN;
   if (!strncmp(ssc,"DIAG1"    ,5)) mode = LWA_OM_DIAG1;
+  if (!strncmp(ssc,"TBF"      ,3)) mode = LWA_OM_TBF;
+  if (!strncmp(ssc,"COR"      ,3)) mode = LWA_OM_COR;
   return mode;
   } /* LWA_getmode() */
 
@@ -672,6 +699,8 @@ void LWA_saymode( unsigned short int mode, char *ssc ) {
   if (mode==LWA_OM_TBW      ) strcpy(ssc,"TBW");
   if (mode==LWA_OM_TBN      ) strcpy(ssc,"TBN");
   if (mode==LWA_OM_DIAG1    ) strcpy(ssc,"DIAG1");
+  if (mode==LWA_OM_TBF      ) strcpy(ssc,"TBF");
+  if (mode==LWA_OM_COR      ) strcpy(ssc,"COR");
   return;
   } /* LWA_saymode() */
 
@@ -701,7 +730,7 @@ void LWA_saybeamtype( int mode, char *ssc ) {
   } /* LWA_saybeamtype() */
 
 int LWA_dpoavail( 
-  signed short int dpo,            /* DP output, numbered 1 through 5 (5 is TBW/TBN) */
+  signed short int dpo,            /* DP/ADP output: numbered 1 through 5 (5 is TBW/TBN) for DP; 1 through 33 for ADP (33 is TBF) */
   struct timeval t0,  /* start time */
   long int d,         /* duration (ms) */
   char *path,         /* path to mess.dat, no trailing slash */
@@ -715,7 +744,11 @@ int LWA_dpoavail(
   FILE *fp;
   char filename[256];
   char line[256];
+#ifdef USE_ADP
+  int dpos[33];
+#else
   int dpos[5]; 
+#endif
   int i;
   long int mjd,mpm;
   int dpox;
@@ -725,10 +758,17 @@ int LWA_dpoavail(
   char session_id[256];
   struct timeval t1,t2,t3;
 
+#ifdef USE_ADP
+   if ((dpo<1) || (dpo>33)) {
+    sprintf(msg,"dpo=%d is out of range (1-33)",dpo);
+    return -1;
+    }
+#else
   if ((dpo<1) || (dpo>5)) {
     sprintf(msg,"dpo=%d is out of range (1-5)",dpo);
     return -1;
     }
+#endif
 
   sprintf(filename,"%s/mess.dat",path);
   if (!(fp=fopen(filename,"r"))) {
@@ -736,8 +776,12 @@ int LWA_dpoavail(
     return -2;
     }
 
+#ifdef USE_ADP
+  for (i=0;i<33;i++) dpos[i]=-1; /* initialize these */
+#else
   for (i=0;i<5;i++) dpos[i]=-1; /* initialize these */
-
+#endif
+	  
   fgets(line,256,fp); /* this should be MCS_CRA */
   fgets(line,256,fp); /* this should five numbers representing status of each beam output */
   //printf("LWA_dpoavail: <%s>\n",line);
@@ -879,7 +923,11 @@ struct me_action_struct {  /* atomic unit of action as me_exec executes session 
 /*** moved here from me.h *************/
 /**************************************/
 
+#ifdef USE_ADP
+#define ME_SSMIF_FORMAT_VERSION 8
+#else
 #define ME_SSMIF_FORMAT_VERSION 7
+#endif
 
 #define ME_MAX_NSTD 260
 #define ME_MAX_NFEE 260
@@ -894,16 +942,26 @@ struct me_action_struct {  /* atomic unit of action as me_exec executes session 
 #define ME_MAX_NARB 33
 #define ME_MAX_NARBCH 16
 #define ME_MAX_ARBID_LENGTH 10
+#ifdef USE_ADP
+#define ME_MAX_NROACH 16
+#define ME_MAX_NROACHCH 32
+#define ME_MAX_ROACHID_LENGTH 10
+#else
 #define ME_MAX_NDP1 26
 #define ME_MAX_NDP1CH 20
 #define ME_MAX_DP1ID_LENGTH 10
 #define ME_MAX_NDP2 2
 #define ME_MAX_DP2ID_LENGTH 10
+#endif
 #define ME_MAX_NDR 5
 #define ME_MAX_DRID_LENGTH 10
 #define ME_MAX_NPWRPORT 50
 #define ME_MAX_SSNAME_LENGTH 3 /* for codes used for PWR_NAME */
+#ifdef USE_ADP
+#define ME_MAX_NDPOUT 33 /* ADP outputs; = #beams + 1 for TBF */
+#else
 #define ME_MAX_NDPOUT 5 /* DP outputs; = #beams + 1 for TBW/TBN */
+#endif
 
 /* this sub-structure is used in both the ssmif and sdm */
 struct station_settings_struct {
@@ -993,6 +1051,17 @@ struct ssmif_struct {
   int    iARBAnt[ME_MAX_NARB][ME_MAX_NARBCH];        /* ARB_ANT[][] */
   char   sARBIN[ME_MAX_NARB][ME_MAX_NARBCH][ME_MAX_ARBID_LENGTH+1]; /* ARB_IN[][] */
   char   sARBOUT[ME_MAX_NARB][ME_MAX_NARBCH][ME_MAX_ARBID_LENGTH+1]; /* ARB_OUT[][] */
+#ifdef USE_ADP
+  int    nRoach;                     /* N_ROACH */
+  int    nRoachCh;                   /* N_ROACHCH */
+  char   sRoachID[ME_MAX_NROACH][ME_MAX_NROACHID_LENGTH+1]; /* ROACH_ID[] */
+  char   sRoachSlot[ME_MAX_NROACH][ME_MAX_NROACHID_LENGTH+1]; /* ROACH_SLOT[] */
+  int    eRoachDesi[ME_MAX_NROACH]; /* ROACH_DESI[] */
+  int    eRoachStat[ME_MAX_NROACH][ME_MAX_NROACHCH];       /* ROACH_STAT[][] */
+  char   sRoachINR[ME_MAX_NROACH][ME_MAX_NROACHCH][ME_MAX_NROACHID_LENGTH+1]; /* ROACH_INR[][] */
+  char   sRoachINC[ME_MAX_NROACH][ME_MAX_NROACHCH][ME_MAX_NROACHID_LENGTH+1]; /* ROACH_INC[][] */
+  int    iRoachAnt[ME_MAX_NROACH][ME_MAX_NROACHCH];        /* ROACH_ANT[][] */
+#else
   int    nDP1;                     /* N_DP1 */
   int    nDP1Ch;                     /* N_DP1CH */
   char   sDP1ID[ME_MAX_NDP1][ME_MAX_DP1ID_LENGTH+1]; /* DP1_ID[] */
@@ -1007,6 +1076,7 @@ struct ssmif_struct {
   char   sDP2Slot[ME_MAX_NDP2][ME_MAX_DP2ID_LENGTH+1]; /* DP1_SLOT[] */
   int    eDP2Stat[ME_MAX_NDP2];       /* DP2_STAT[] */
   int    eDP2Desi[ME_MAX_NDP2];       /* DP2_DESI[] */
+#endif
   int    nDR;                     /* N_DR */
   int    eDRStat[ME_MAX_NDR];       /* DR_STAT[] */
   char   sDRID[ME_MAX_NDR][ME_MAX_DRID_LENGTH+1]; /* DR_ID[] */
@@ -1041,8 +1111,12 @@ struct subsubsystem_status_struct {
   int    eRPDStat[ME_MAX_NRPD];                /* RPD_STAT[] */
   int    eSEPStat[ME_MAX_NSEP];                /* SEP_STAT[] */
   int    eARBStat[ME_MAX_NARB][ME_MAX_NARBCH]; /* ARB_STAT[][] */
+#ifdef USE_ADP
+  int    eRoachStat[ME_MAX_NROACH1][ME_MAX_NROACHCH]; /* ROACH_STAT[][] */
+#else
   int    eDP1Stat[ME_MAX_NDP1][ME_MAX_NDP1CH]; /* DP1_STAT[][] */
   int    eDP2Stat[ME_MAX_NDP2];                /* DP2_STAT[] */
+#endif
   int    eDRStat[ME_MAX_NDR];                  /* DR_STAT[] */
   };
 
@@ -1106,8 +1180,8 @@ struct arx_ch_struct {
   int iStat; /* ARB_STAT[][] */
   };
 
-/* ARX channel configuration */
-struct dp1_ch_struct {
+/* DP/ADP channel configuration */
+struct dp_ch_struct {
   int i;     /* index of DP1 (in 1..N_DP1) */
   int c;     /* index of DP1 input channel (in 1..N_DP1CH) */
   int iStat; /* DP1_STAT[][] */
@@ -1125,7 +1199,7 @@ struct ant_struct {
   struct rpd_struct RPD;
   struct sep_struct SEP;
   struct arx_ch_struct ARX;
-  struct dp1_ch_struct DP1;
+  struct dp_ch_struct DP;
   };
 
 /* Stand analog configuration. Describes 1 stand (both antennas). */
@@ -1255,6 +1329,18 @@ int me_sc_MakeASM( struct ssmif_struct s, struct sc_struct *sc ) {
       } /* for c */ 
     } /* for i */
 
+#ifdef USE_ADP
+  /* load ROACH channel information into station config data structure */
+  for ( i=0; i<s.nROACH; i++ ) {
+    for ( c=0; c<s.nRoachCh; c++ ) {
+      m = s.iRoachAnt[i][c]-1; /* this is the ANT that this ROACH channel is associated with */ 
+      k = s.iAntStd[m]-1;    /* this is the STD that this ROACH channel is associated with */
+      sc->Stand[k].Ant[s.iAntOrie[m]].DP.i = i;  
+      sc->Stand[k].Ant[s.iAntOrie[m]].DP.c = c;     
+      sc->Stand[k].Ant[s.iAntOrie[m]].DP.iStat = s.eRoachStat[i][c];
+      } /* for c */ 
+    } /* for i */
+#else
   /* load DP1 channel information into station config data structure */
   for ( i=0; i<s.nDP1; i++ ) {
     for ( c=0; c<s.nDP1Ch; c++ ) {
@@ -1265,6 +1351,7 @@ int me_sc_MakeASM( struct ssmif_struct s, struct sc_struct *sc ) {
       sc->Stand[k].Ant[s.iAntOrie[m]].DP1.iStat = s.eDP1Stat[i][c];
       } /* for c */ 
     } /* for i */
+#endif
 
   /* compute the stand's iStat */
   for ( i=0; i<s.nStd; i++ ) {
@@ -1275,7 +1362,7 @@ int me_sc_MakeASM( struct ssmif_struct s, struct sc_struct *sc ) {
       if ( sc->Stand[i].Ant[k].RPD.iStat < sc->Stand[i].Ant[k].iSS ) { sc->Stand[i].Ant[k].iSS = sc->Stand[i].Ant[k].RPD.iStat; }
       if ( sc->Stand[i].Ant[k].SEP.iStat < sc->Stand[i].Ant[k].iSS ) { sc->Stand[i].Ant[k].iSS = sc->Stand[i].Ant[k].SEP.iStat; }
       if ( sc->Stand[i].Ant[k].ARX.iStat < sc->Stand[i].Ant[k].iSS ) { sc->Stand[i].Ant[k].iSS = sc->Stand[i].Ant[k].ARX.iStat; }
-      if ( sc->Stand[i].Ant[k].DP1.iStat < sc->Stand[i].Ant[k].iSS ) { sc->Stand[i].Ant[k].iSS = sc->Stand[i].Ant[k].DP1.iStat; }
+      if ( sc->Stand[i].Ant[k].DP.iStat < sc->Stand[i].Ant[k].iSS ) { sc->Stand[i].Ant[k].iSS = sc->Stand[i].Ant[k].DP.iStat; }
       }
     }
 
@@ -1296,7 +1383,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
   /* figure out which DR is assigned to each DP output */
   for ( i=0; i<s.nDR; i++ ) { sc->DPO[ s.iDRDP[i]-1 ].iDR = i+1; }
 
-  /* figure out status of each DP output */
+  /* figure out status of each DP/ADP output */
   /* Note that only the status of the associated DP board and DR are considered. */ 
   for ( i=0; i<ME_MAX_NDPOUT; i++ ) {
 
@@ -1308,6 +1395,17 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
       sc->DPO[i].iStat = s.eDRStat[ sc->DPO[i].iDR -1 ]; 
       }
 
+#ifdef USE_ADP
+    /* consider the status of the ROACH boards */
+    if (i<32) { /* i=0 to 31: These are standard beams */
+       /* no basis for marking this anything other than "3" at the moment*/
+      sc->DPO[i].iStat = 3;
+    }
+    if (i==32) { /* this is the TBF output */
+      /* no basis for marking this anything other than "3" at the moment*/
+      sc->DPO[i].iStat = 3;
+      }
+#else
     /* consider status of associated DP2 board */
     if (i<2) { /* i=0 or 1: These go through the first DP2 board */
       if ( s.nDP2<1 ) { 
@@ -1329,6 +1427,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
       /* no basis for marking this anything other than "3" at the moment*/
       sc->DPO[i].iStat = 3;
       }
+#endif
 
     }
 
@@ -1366,6 +1465,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// Jul 14, 2015: Added new SID and CMDs for the Advanced Digital Processor (ADP)
 // Mar 10, 2014: Added BDM command; added OBS_BDM keyword to osf_ struct
 // Jan 23, 2013: Fixed index overrun in me_sc_MakeASM( ) (see lwa1 staff exploder emails)
 // Apr 12, 2012: Modified dpoavail() error codes to facilitate change in tpss
