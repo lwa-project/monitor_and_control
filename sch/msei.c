@@ -303,7 +303,6 @@ main ( int narg, char *argv[] ) {
          if (narg>3) { sscanf(argv[3],"%f", &f41 ); } else {bError=1;}
          if (narg>4) { sscanf(argv[4],"%hu",&i2u1); } else {bError=1;}
          if (narg>4) { sscanf(argv[5],"%hu",&i2u2); } else {bError=1;}
-         if (narg>5) { sscanf(argv[6],"%hu",&i2u3); } else {bError=1;}
          if (bError) {
            printf("[%s] FATAL: %s/%s args are:\n TBN_FREQ (Hz, float32)\n TBN_BW {1..7}\n TBN_GAIN {0..15}\n sub_slot {0..99}",ME,dest,cmd);
            return;
