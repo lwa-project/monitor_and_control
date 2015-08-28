@@ -24,6 +24,7 @@ int main ( int narg, char *argv[] ) {
   float dec;   /* (input) [deg] dec */
   long int mjd; /* (input) mean julian date */
   long int mpm; /* (input) milliseconds past UTC midnight */ 
+  float m, s;
 
   /* Parse command line */
   if (narg>1) sscanf(argv[1],"%ld",&mjd);
@@ -43,8 +44,12 @@ int main ( int narg, char *argv[] ) {
               &dec  /* (output) [deg] calculated dec */ 
              );
 
-  printf("RA  = %8.3f h   =  %02.0f h %02.0f m\n",ra, floor(ra), (ra-floor(ra))*60.0);
-  printf("dec = %8.3f deg = %+03.0f d %02.0f m\n",dec,(dec/fabs(dec))*floor(fabs(dec)),(fabs(dec)-floor(fabs(dec)))*60.0);
+  m = (ra - floor(ra))*60.0;
+  s = (m - floor(m))*60.0;
+  printf("RA  = %8.3f h   =  %02.0f h %02.0f m %05.2f s\n",ra, floor(ra), floor(m), s);
+  m = (fabs(dec)-floor(fabs(dec)))*60.0;
+  s = (m - floor(m))*60.0;
+  printf("dec = %8.3f deg = %+03.0f d %02.0f m %04.1f s\n",dec, (dec/fabs(dec))*floor(fabs(dec)), floor(m), s);
 
   return 0;
   } /* main() */
