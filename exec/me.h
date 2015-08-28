@@ -77,9 +77,9 @@ void me_sc_init( struct sc_struct *sc ) {
       sc->Stand[i].Ant[k].ARX.i = -1;
       sc->Stand[i].Ant[k].ARX.c = -1;
       sc->Stand[i].Ant[k].ARX.iStat = 0;
-      sc->Stand[i].Ant[k].DP1.i = -1;
-      sc->Stand[i].Ant[k].DP1.c = -1;
-      sc->Stand[i].Ant[k].DP1.iStat = 0;
+      sc->Stand[i].Ant[k].DP.i = -1;
+      sc->Stand[i].Ant[k].DP.c = -1;
+      sc->Stand[i].Ant[k].DP.iStat = 0;
       }
     }
   for (i=0; i<ME_MAX_NDPOUT; i++) {

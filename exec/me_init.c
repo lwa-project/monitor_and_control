@@ -14,7 +14,7 @@
 
 #include "me.h"
 
-#define MY_NAME "me_init (v.20110311.1)"
+#define MY_NAME "me_init (v.20150828.1)"
 
 main ( int narg, char *argv[] ) {
 
@@ -227,10 +227,16 @@ main ( int narg, char *argv[] ) {
   for (i=0;i<ME_MAX_NARB;i++) { 
     for (j=0;j<ME_MAX_NARBCH;j++) { 
       sdm.ssss.eARBStat[i][j] = 0; } }                   /* ARB_STAT[][] */
+#ifdef USE_ADP
+  for (i=0;i<ME_MAX_NROACH;i++) { 
+    for (j=0;j<ME_MAX_NROACHCH;j++) { 
+      sdm.ssss.eRoachStat[i][j] = 0; } }                   /* ROACH_STAT[][] */
+#else
   for (i=0;i<ME_MAX_NDP1;i++) { 
     for (j=0;j<ME_MAX_NDP1CH;j++) { 
       sdm.ssss.eDP1Stat[i][j] = 0; } }                   /* DP1_STAT[][] */
   for (i=0;i<ME_MAX_NDP2;i++) { sdm.ssss.eDP2Stat[i] = 0; } /* DP2_STAT[] */
+#endif
   for (i=0;i<ME_MAX_NDR;i++)  { sdm.ssss.eDRStat[i]  = 0;  } /* DR_STAT[] */
 
   /* setting all status to "not installed" */
@@ -329,6 +335,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_init.c: J. Dowell, UNM, 2015 Aug 28
+//   .1 Updated for ADP.
 // me_init.c: S.W. Ellingson, Virginia Tech, 2012 Jul 05
 //   .1 Previously, default.gf  was copied from tp/mbox to exec/state and sch/gfiles
 //      Now,        default.gft is  copied from tp/mbox to exec/state (only)
