@@ -1,4 +1,4 @@
-// mefsdfg.c: S.W. Ellingson, Virginia Tech, 2012 Jan 24
+// mefsdfg.c: J. Dowell, UNM, 2015 Aug 28
 // ---
 // COMPILE: gcc -o mefsdfg mefsdfg.c -I../common -lm
 // ---
@@ -7,7 +7,7 @@
 // REQUIRES: 
 //   mcs.h via me.h
 // ---
-// Generates delay files for DP
+// Generates delay files for DP/ADP
 // needs to see state/ssmif.dat
 // See end of this file for history.
 
@@ -17,7 +17,11 @@
 #define FS (196.0e+6)      /* [samples/s] sample rate */
 #define DTR 0.017453292520 /* pi/180 */
 #define FLAG_VAL (1e+20)
+#ifdef USE_ADP
+#define MAX_DP_CH 512      /* number of ROACH channel inputs (per ADP ICD) */
+#else
 #define MAX_DP_CH 520      /* number of DP1 channel inputs (per DP ICD) */
+#endif
 
 /*==============================================================*/
 /*=== main() ===================================================*/
@@ -200,7 +204,7 @@ int main ( int narg, char *argv[] ) {
   /*********************************************/
   /* Figure out px[],py[],pz[] *****************/
   /*********************************************/
-  /* note: these are indexed 0..519, per DP ICD channel ordering */
+  /* note: these are indexed 0..519, per DP ICD channel ordering (0..511 for ADP) */
 
   /* flag all antenna locations to begin, so we can detect if one has been missed */
   for ( i=0; i<MAX_DP_CH; i++ ) { /* iterating by DP1-input index (per DP ICD) */
@@ -212,6 +216,24 @@ int main ( int narg, char *argv[] ) {
     id[i] = -1;
     }
 
+#ifdef USE_ADP
+  /* figure out antenna positions, indexed by ADP channel */
+  for (i=0;i<s.nRoach;i++) { 
+    for (k=0;k<s.nRoachCh;k++) { 
+
+      if (s.iRoachAnt[i][k]!=0) { /* otherwise this Roach input is not connected to an antenna */      
+        ia = s.iRoachAnt[i][k] - 1;
+        px[i*s.nRoackCh+k] = s.fStdLx[ s.iAntStd[ia] - 1 ];
+        py[i*s.nRoachCh+k] = s.fStdLy[ s.iAntStd[ia] - 1 ];
+        pz[i*s.nRoachCh+k] = s.fStdLz[ s.iAntStd[ia] - 1 ];
+        id[ia] = i*s.nRoachCh+k; /* reverse lookup (ADP input channel index given antenna index); simplifies work later */
+        }
+
+      //printf("%d %d | %d | %d %d | %f\n",i,k,i*s.nDP1Ch+k,ia+1,s.iAntStd[ia],px[i*s.nDP1Ch+k]);
+
+      } /* for k */
+    } /* for i */
+#else
   /* figure out antenna positions, indexed by DP channel */
   for (i=0;i<s.nDP1;i++) { 
     for (k=0;k<s.nDP1Ch;k++) { 
@@ -228,6 +250,7 @@ int main ( int narg, char *argv[] ) {
 
       } /* for k */
     } /* for i */
+#endif
 
   /* check for un-determined stand positions */
   if (inpm!=2) {
@@ -469,6 +492,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// mefsdfg.c: J. Dowell, UNM, 2015 Aug 28
+//   .1: Added support for ADP
 // mefsdfg.c: S.W. Ellingson, Virginia Tech, 2012 Jan 24
 //   .1: Added option to generate outputs for alt/az list file
 // mefsdfg.c: S.W. Ellingson, Virginia Tech, 2012 Jan 10

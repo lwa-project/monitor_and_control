@@ -1,4 +1,4 @@
-// medfg.c: S.W. Ellingson, Virginia Tech, 2010 Nov 11
+// medfg.c: J. Dowell, UNM, 2015 Aug 28
 // ---
 // Delay file generator: Converts .dft files to .df, 
 // suitable for DP "uint16 BEAM_DELAY[520]" arguments
@@ -22,8 +22,13 @@
 
 #define ME "medfg"
 
+#ifdef USE_ADP
+#define MAX_ANT 512           /* number of antennas ("channels") */  
+#define MAX_COARSE_DELAY 1023 /* maximum coarse delay, in sample periods */
+#else
 #define MAX_ANT 520           /* number of antennas ("channels") */  
 #define MAX_COARSE_DELAY 4095 /* maximum coarse delay, in sample periods */
+#endif
 
 int main( int narg, char *argv[] ) {
 
@@ -101,7 +106,9 @@ int main( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
-// mecfg.c: S.W. Ellingson, Virginia Tech, 2010 Nov 11
+// medfg.c: J. Dowell, UNM, 2015 Aug 28
+//   .1: Updated for ADP
+// medfg.c: S.W. Ellingson, Virginia Tech, 2010 Nov 11
 //   .1: Initial version
 
 

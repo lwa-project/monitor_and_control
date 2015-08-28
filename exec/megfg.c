@@ -1,4 +1,4 @@
-// megfg.c: S.W. Ellingson, Virginia Tech, 2014 Mar 11
+// megfg.c: J. Dowell, UNM, 2015 Aug 28
 // ---
 // Gains file generator: Converts .gft files to .gf, 
 // suitable for DP "sint16 BEAM_GAIN[260][2][2]" argument
@@ -21,7 +21,11 @@
 
 #define ME "megfg"
 
+#ifdef USE_ADP
+#define MAX_STD 256           /* max number of stands */  
+#else
 #define MAX_STD 260           /* max number of stands */  
+#endif
 
 int main( int narg, char *argv[] ) {
 
@@ -111,6 +115,8 @@ int main( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// megfg.c: J. Dowell, UNM, 2015 Aug 28
+//   .1: Added support for ADP
 // megfg.c: S.W. Ellingson, Virginia Tech, 2014 Mar 11
 //   .1: Removed some annoying printf's
 // megfg.c: S.W. Ellingson, Virginia Tech, 2010 Nov 11
