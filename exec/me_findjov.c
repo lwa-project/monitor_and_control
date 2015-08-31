@@ -14,6 +14,14 @@
 #include "ephem_vsop87.h"
 #include "ephem_vsop87_data.c" 
 #include "ephem_vsop87.c"
+#include "ephem_sun.c"
+#include "ephem_obliq.c"
+#include "ephem_mjd.c"
+#include "ephem_sphcart.c"
+
+#include "ephem_eq_ecl.c"
+#include "ephem_nutation.c"
+#include "ephem_aberration.c"
 
 #define MEFJ_DTR 0.017453292520
 #define MEFJ_PI  3.141592653590
@@ -30,55 +38,60 @@ void me_findjov(
   double L,  B,  R;
   double L0, B0, R0;
   double x,y,z;
-  double lambda, beta;
-  double T, epsilon0, epsilon; 
+  double x0,y0,z0;
+  double lambda, beta, rho;
+  double dRA, dDec;
 
   /* Get JD from mjd/mpm */
   JD0 = ((double)mjd) + 2400000.5;     /* ref: http://tycho.usno.navy.mil/mjd.html */
   H   = ((double)mpm)/(3600.0*1000.0); /* mpm in hours */
   JD = JD0 + H/24.0; /* days */
 
-  /* Get L, B, R for Jupiter */
-  vsop87 ( JD-2415020.0, JUPITER, 0, ret);
+  /* Get L, B, R for Jupiter so we can figure out how far away it is */
+  vsop87 ( JD-MJD0, JUPITER, 0, ret);
+  L = ret[0]; /* [rad] */
+  B = ret[1]; /* [rad] */
+  R = ret[2]; /* [AU] */
+  
+  /* Correct L, B, and R for the light travel time by looking back in time a bit*/
+  vsop87 ( JD-MJD0-R/173.144633, JUPITER, 0, ret);
   L = ret[0]; /* [rad] */
   B = ret[1]; /* [rad] */
   R = ret[2]; /* [AU] */
   //printf("me_findjov(): L =%lf rad, B =%lf rad, R =%lf AU\n",L,B,R);
+  
+  /* Convert the location of number to cartesian x, y, z */
+  sphcart(L, B, R, &x, &y, &z);
 
-  /* Get L0, B0, R0 for Earth */
-  vsop87 ( JD-2415020.0,       8, 0, ret);
+  /* Get L0, B0, R0 for Earth and convert to cartesian x0, y0, z0 */
+  vsop87 ( JD-MJD0,       8, 0, ret);
   L0 = ret[0]; /* [rad] */
   B0 = ret[1]; /* [rad] */
   R0 = ret[2]; /* [AU] */
+  sphcart(L0, B0, R0, &x0, &y0, &z0);
   //printf("me_findjov(): L0=%lf rad, B0=%lf rad, R0=%lf AU\n",L0,B0,R0);
+  
+  /* to ecliptical coordinates */
+  cartsph(x-x0, y-y0, z-z0, &lambda, &beta, &rho);
 
-  /* following "First Method" scheme in Meeus, Ch 33 */
-
-  x = R*cos(B)*cos(L) - R0*cos(B0)*cos(L0);
-  y = R*cos(B)*sin(L) - R0*cos(B0)*sin(L0);
-  z = R*sin(B)        - R0*sin(B0);
-
-  lambda = atan2( y, x             );
-  beta   = atan2( z, sqrt(x*x+y*y) );
-
-  /* getting epsilon */
-  T = (JD-2451545.0)/36525.0;
-  epsilon0 = ( 23.0+26.0/60.0+21.448   /3600.0) 
-            -(                46.8150  /3600.0)*T
-            -(                 0.00059 /3600.0)*T*T
-            +(                 0.001813/3600.0)*T*T*T;
-  epsilon = ( epsilon0 + 0.0 )*MEFJ_DTR; /* neglecting delta-epsilon */
-
-  /* neglecting light travel time, other corrections */
-
-  *ra  = atan2( sin(lambda)*cos(epsilon) - tan(beta)*sin(epsilon) , cos(lambda) ) *24.0/(2.0*MEFJ_PI);
-  while ((*ra)>=24.0) { (*ra)-=24.0; }
-  while ((*ra)<  0.0) { (*ra)+=24.0; }
-
-  *dec = asin( sin(beta)*cos(epsilon) + cos(beta)*sin(epsilon)*sin(lambda) ) / MEFJ_DTR;  
+  /* to equatorial coordinates */
+  ecl_eq(JD-MJD0, beta, lambda, &dRA, &dDec);
+ 
+  /* Apply nutation */
+  nut_eq(JD-MJD0, &dRA, &dDec);
+  
+  /* Locate the Sun */
+  sunpos(JD-MJD0, &lambda, &rho, &beta);
+  
+  /* Apply aberration */
+  ab_eq(JD-MJD0, lambda, &dRA, &dDec);
+  
+  /* Back to floats */
+  *ra = (float) radhr(dRA);
+  *dec = (float) raddeg(dDec);
 
   return;
-  } /* me_getaltaz */
+  } /* me_findjov */
 
 // me_findjov.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07
 //   -- initial version, using me_getaltaz.c as a starting point 
