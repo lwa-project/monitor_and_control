@@ -49,11 +49,20 @@ int tp_xfer( char *mepath,   /* relative path for file on MCS/Exec */
   /* setting up commands */
   switch (direction) {
     case TP_XFER_TP_TO_ME:
-      sprintf(cmd, "scp -q %s:%s/%s %s/.",LWA_TP_SCP_ADDR,LWA_TP_SCP_DIR,filename,mepath);
-      sprintf(cmd2,"ssh %s rm %s/%s",LWA_TP_SCP_ADDR,LWA_TP_SCP_DIR,filename);
+      #ifdef ME_SCP2CP  /*see me.h */
+         sprintf(cmd, "cp %s/%s %s/.",LWA_TP_SCP_DIR,filename,mepath);
+         sprintf(cmd2,"rm %s/%s",LWA_TP_SCP_DIR,filename);
+      #else
+         sprintf(cmd, "scp -q %s:%s/%s %s/.",LWA_TP_SCP_ADDR,LWA_TP_SCP_DIR,filename,mepath);
+         sprintf(cmd2,"ssh %s rm %s/%s",LWA_TP_SCP_ADDR,LWA_TP_SCP_DIR,filename);
+      #endif
       break; 
     case TP_XFER_ME_TO_TP:
-      sprintf(cmd, "scp -q %s/%s %s:%s/.",mepath,filename,LWA_TP_SCP_ADDR,LWA_TP_SCP_DIR);
+      #ifdef ME_SCP2CP  /*see me.h */
+         sprintf(cmd, "cp %s/%s %s/.",mepath,filename,LWA_TP_SCP_DIR);
+      #else
+         sprintf(cmd, "scp -q %s/%s %s:%s/.",mepath,filename,LWA_TP_SCP_ADDR,LWA_TP_SCP_DIR);
+      #endif
       sprintf(cmd2,"rm %s/%s",mepath,filename); 
       break; 
     default:
