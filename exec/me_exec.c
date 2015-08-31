@@ -67,6 +67,8 @@ int main ( int narg, char *argv[] ) {
 
   long int reference;
   int err;
+  
+  char cmd[1024];
 
   /* First, announce thyself */
   printf("[%d/%d] I am me_exec\n",ME_INIT,getpid());
@@ -273,8 +275,6 @@ int main ( int narg, char *argv[] ) {
        return;
        }
 
-    /* FIXME test it with a PNG; write log message */
-    
     /* Send PNG to MCS to make sure Scheduler is responding */
     err = mesi( &sockfd_sch, "MCS", "PNG", "", "today", "asap", &reference );
     sprintf(msg,"Pinged MCS/Sch: mesi() returned %d, reference=%ld",err,reference);
@@ -449,18 +449,30 @@ int main ( int narg, char *argv[] ) {
     if ( LWA_timediff(tv,tv_last_poll_of_subsystems) > ME_INTERVAL_POLL_SUBSYSTEMS ) {
       gettimeofday( &tv_last_poll_of_subsystems, NULL );
 
+#ifdef USE_ADP
+      err = mesi(NULL,"ADP","RPT","SUMMARY",    "today","asap",&reference);
+      err = mesi(NULL,"ADP","RPT","INFO",       "today","+1",  &reference);
+#else
       err = mesi(NULL,"DP_","RPT","SUMMARY",    "today","asap",&reference);
       err = mesi(NULL,"DP_","RPT","INFO",       "today","+1",  &reference);
+#endif
       err = mesi(NULL,"ASP","RPT","SUMMARY",    "today","+2",  &reference);
       err = mesi(NULL,"SHL","RPT","SUMMARY",    "today","+3",  &reference);
       err = mesi(NULL,"SHL","RPT","CURRENT-R1", "today","+4",  &reference);
+#ifdef USE_ADP
+      err = mesi(NULL,"SHL","RPT","CURRENT-R2", "today","+5",  &reference);
       err = mesi(NULL,"SHL","RPT","CURRENT-R3", "today","+5",  &reference);
+      err = mesi(NULL,"SHL","RPT","CURRENT-R4", "today","+5",  &reference);
+#else
+      err = mesi(NULL,"SHL","RPT","CURRENT-R3", "today","+5",  &reference);
+#endif
       err = mesi(NULL,"SHL","RPT","TEMPERATURE","today","+6",  &reference);
 
       err = mesi(NULL,"DR1","RPT","SUMMARY",    "today","+10",  &reference);
       err = mesi(NULL,"DR1","RPT","OP-TYPE",    "today","+11",  &reference);
       //err = mesi(NULL,"DR1","RPT","SYN",        "today","+12",  &reference);
 
+#ifndef USE_ADP
       err = mesi(NULL,"DR2","RPT","SUMMARY",    "today","+20",  &reference);
       err = mesi(NULL,"DR2","RPT","OP-TYPE",    "today","+21",  &reference);
       //err = mesi(NULL,"DR2","RPT","SYN",        "today","+22",  &reference);
@@ -476,6 +488,7 @@ int main ( int narg, char *argv[] ) {
       err = mesi(NULL,"DR5","RPT","SUMMARY",    "today","+50",  &reference);
       err = mesi(NULL,"DR5","RPT","OP-TYPE",    "today","+51",  &reference);
       //err = mesi(NULL,"DR5","RPT","SYN",        "today","+52",  &reference);
+#endif
 
       //if (err!=MESI_ERR_OK) {
       //   sprintf(longmsg,"FATAL: in me_action(), mesi(NULL,'%s','%s','%s','%s','%s',*) returned code %d",
@@ -536,6 +549,14 @@ int main ( int narg, char *argv[] ) {
   /* close log file */
   me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "Shutdown complete. Bye.", sq_ptr, 0 );
   fclose(fpl);
+  
+  /* put it somewhere safe */
+  /* get the current time in conventional format */
+  gettimeofday(&tv,&tz); 
+  tm = gmtime(&tv.tv_sec);
+  sprintf(cmd,"cp %s meelog_%02d%02d%02d_%02d%02d.txt", ME_LOG_FILENAME, 
+         (tm->tm_year)-100, (tm->tm_mon)+1, tm->tm_mday, tm->tm_hour, tm->tm_min);
+  system(cmd);
 
   /* just in case */
   fcloseall();
@@ -550,6 +571,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_exec.c: J. Dowell, UNM, 2015 Aug 28
+//  .1: Added a call to save the meelog.txt file on shutdown, added support for ADP
 // me_exec.c: S.W. Ellingson, Virginia Tech, 2014 Feb 10
 //   .1: Adding meeix "STP" command -- allows termination of an observing session after submission
 // me_exec.c: S.W. Ellingson, Virginia Tech, 2012 Mar 01

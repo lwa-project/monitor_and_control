@@ -500,19 +500,19 @@ int me_action(
                   #ifdef ME_SCP2CP /*see me.h */
                       sprintf(cmd, "cp %s/ASP.pag sinbox/%s_%04u_ASP_begin.pag",
                               LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
-                    #else
+                  #else
                       sprintf(cmd, "scp %s:%s/ASP.pag sinbox/%s_%04u_ASP_begin.pag",
                               LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
-                    #endif
+                  #endif
                   system(cmd);
 
                   #ifdef ME_SCP2CP /*see me.h */
                       sprintf(cmd, "cp %s/ASP.dir sinbox/%s_%04u_ASP_begin.dir",
                               LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
-                    #else
+                  #else
                       sprintf(cmd, "scp %s:%s/ASP.dir sinbox/%s_%04u_ASP_begin.dir",
                               LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
-                    #endif
+                  #endif
                   system(cmd);
 
                   break;
@@ -574,11 +574,17 @@ int me_action(
             //case LWA_SID_MCS: // this taken care of above 
             case LWA_SID_SHL: break;
             case LWA_SID_ASP: break;
-              
+            
+#ifdef USE_ADP
+            case LWA_SID_ADP:
+              bGo=1;
+              break;
+#else
             case LWA_SID_DP_: 
               bGo=1; 
               break;
-
+#endif
+              
             case LWA_SID_DR1:
             case LWA_SID_DR2:
             case LWA_SID_DR3:
@@ -812,7 +818,7 @@ int me_pull_from_tp( struct me_session_queue_struct *sq,
     fclose(fp);
     system("rm sinbox/manifest.dat");
 
-    } /* if (stat( */
+    } /* if (stat) */
 
   return iErr;
   } /* me_pull_from_tp() */
@@ -915,10 +921,16 @@ int me_init_sdm( struct ssmif_struct s,
   for (i=0;i<ME_MAX_NARB;i++) { 
     for (j=0;j<ME_MAX_NARBCH;j++) { 
       sdm->ssss.eARBStat[i][j] = s.eARBStat[i][j]; } }                   /* ARB_STAT[][] */
+#ifdef USE_ADP
+  for (i=0;i<ME_MAX_NROACH;i++) { 
+    for (j=0;j<ME_MAX_NROACHCH;j++) { 
+      sdm->ssss.eRoachStat[i][j] = s.eRoachStat[i][j]; } }                   /* ROACH_STAT[][] */
+#else
   for (i=0;i<ME_MAX_NDP1;i++) { 
     for (j=0;j<ME_MAX_NDP1CH;j++) { 
       sdm->ssss.eDP1Stat[i][j] = s.eDP1Stat[i][j]; } }                   /* DP1_STAT[][] */
   for (i=0;i<ME_MAX_NDP2;i++) { sdm->ssss.eDP2Stat[i] = s.eDP2Stat[i]; } /* DP2_STAT[] */
+#endif
   for (i=0;i<ME_MAX_NDR;i++)  { sdm->ssss.eDRStat[i]  = s.eDRStat[i];  } /* DR_STAT[] */
 
   for (i=0;i<s.nStd;i++) { 
