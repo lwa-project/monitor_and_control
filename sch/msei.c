@@ -246,13 +246,13 @@ main ( int narg, char *argv[] ) {
 
        case LWA_CMD_INI:
          break;
-	 
+         
        case LWA_CMD_STP:
          //string STP;
          bError=0;
          if (narg<=3) {bError=1;}
          if (bError) {
-           printf("[%s] FATAL: %s/%s arg is BEAMn|TBN (string)\n",ME,dest,cmd);
+           printf("[%s] FATAL: %s/%s arg is TBN|TBF|BEAM#|COR (string)\n",ME,dest,cmd);
            return;
            }
          c.datalen=-1;
@@ -346,7 +346,7 @@ main ( int narg, char *argv[] ) {
          bError=0;
          if (narg<=3) {bError=1;}
          if (bError) {
-           printf("[%s] FATAL: %s/%s arg is BEAMn|TBN (string)\n",ME,dest,cmd);
+           printf("[%s] FATAL: %s/%s arg is TBN|TBW|BEAM# (string)\n",ME,dest,cmd);
            return;
            }
          c.datalen=-1;
@@ -399,6 +399,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// msei.c: J. Dowell, UNM, 2015 Sep 1
+//   .1: Added support for sending STP to DP/ADP
 // msei.c: J. Dowell, UNM, 2015 Aug 10
 //   .1: Added support for MCS-ADP.  This is similar to DP.
 // msei.c: S.W. Ellingson, Virginia Tech, 2010 Jun 08

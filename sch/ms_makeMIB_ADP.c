@@ -75,7 +75,7 @@ main ( int narg, char *argv[] ) {
     }
   
   fprintf(fp,"B 0.8           TUNING_CONFIG 		NUL 	NUL 	NUL\n");
-  for ( i=1; i<=32 , i++ ) {
+  for ( i=1; i<=32; i++ ) {
     fprintf(fp,"B 0.8.%d         TUNINGM%d 			NUL 	NUL 	NUL\n", i, i); /* corresponds to DRX_BEAM in DRX commands, BEAM_ID in BAM commands */
     fprintf(fp,"V 0.8.%d.1     TUNING%d_FREQ 		0.000 	a12 	NUL\n", i, i); /* corresponds to DRX_FREQ in DRX commands [Hz] */
     fprintf(fp,"V 0.8.%d.2     TUNING%d_BW 		0 	a1 	NUL\n", i, i); /* 1-8 */
@@ -83,7 +83,7 @@ main ( int narg, char *argv[] ) {
     }
     
   fprintf(fp,"B 0.9           BEAM_CONFIG 		NUL 	NUL 	NUL\n");
-  for ( i=1; i<=32 , i++ ) {
+  for ( i=1; i<=32; i++ ) {
     fprintf(fp,"B 0.9.%d         BEAM%d 			NUL 	NUL 	NUL\n", i, i); /* corresponds to DRX_BEAM in DRX commands, BEAM_ID in BAM commands */
     fprintf(fp,"V 0.9.%d.1       BEAM%d_DFILE 		UNK 	a32 	NUL\n", i, i); /* name of file of delays (BEAM_DELAY[520] in BAM command */
     fprintf(fp,"V 0.9.%d.2       BEAM%d_GFILE 		UNK 	a32 	NUL\n", i, i); /* name of file of gains (sint16 BEAM_GAIN[260][2][2] in BAM command */
@@ -113,7 +113,7 @@ main ( int narg, char *argv[] ) {
   fprintf(fp,"V 4.4.2 		NUM_SERVERS		0	i1ur	i1ur\n");
   fprintf(fp,"V 4.5 		BEAM_FIR_COEFFS		0	i1ur	i1ur\n");
   fprintf(fp,"B 4.6 		T_NOM			NUL	NUL	NUL\n");
-  for ( i=1; i<=32 , i++ ) {
+  for ( i=1; i<=32; i++ ) {
     fprintf(fp,"V 4.6.%d\t\tT_NOM%d			0	i2ur	i2ur\n", i, i);
     }
   
