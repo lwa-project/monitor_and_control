@@ -33,9 +33,10 @@
  *	1e-3	139	1.0	0.9
  */
 
-//#include <math.h>
-//#include "astro.h"
-//#include "vsop87.h"
+#include <math.h>
+
+#include "ephem_astro.h"
+#include "ephem_vsop87.h"
 
 #define VSOP_A1000	365250.0	/* days per millenium */
 #define VSOP_MAXALPHA	5		/* max degree of time */

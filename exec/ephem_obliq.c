@@ -1,6 +1,6 @@
-// #include <stdio.h>
+#include <stdio.h>
 
-// #include "astro.h"
+#include "ephem_astro.h"
 
 /* given the modified Julian date, mj, find the mean obliquity of the
  * ecliptic, *eps, in radians.

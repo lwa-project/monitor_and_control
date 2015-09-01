@@ -39,11 +39,12 @@ int meos (
   char *sExtDev,  /* (input) name of DR's external device to copy acquisition to */
   char *sDestDir, /* (input) Desination directory (in user space) for file.  No trailing slash. */
   char *mode,     /* (input) "TBW", "TBN", or "DRX" */
-  char *args      /* (input) For TBW: "12" means 12-bit, "4" means 4-bit;  */
-                  /* (input) For TBW: "b n" where b = "12" means 12-bit [DEFAULT], "4" means 4-bit */
+  char *args      /* (input) For TBW: "b n" where b = "12" means 12-bit [DEFAULT], "4" means 4-bit */
                   /*                              n = number of samples (up to 12000000 [DEFAULT] for 12-bit; */
                   /*                                                     up to 36000000 [DEFAULT] for 36-bit) */
                   /*                  e.g., "12 12000000" */
+                  /*         For TBF: "n m" where n = number of samples   */
+                  /*                              m = DRX tuning mask     */
                   /*         For TBN: "f r g s d" where f = center freq [Hz], */
                   /*                                    r = rate "1"|"2"|...|"7" */
                   /*                                    g = gain "0"|"1"|... */
@@ -67,6 +68,7 @@ int meos (
   int b4bits = 0;
   int temp = 0;
   long int nsamp = 12000000;
+  unsigned long int tuning_mask;
   float tbn_f = 0;
   int tbn_r = 0;
   int tbn_g = 0;
@@ -119,6 +121,12 @@ int meos (
     sprintf(dr_format,"DEFAULT_TBW");
     bDone=1;
     }
+  if (!strncmp(mode,"TBF",3)) {\
+    sscanf(args,"%ld %lu",&nsamp,&tuning_mask);
+    printf("[%d/%d] mode='%s', nsamp=%ld, tuning_mask=%lu\n",ME_MEOS,getpid(),mode,nsamp,tuning_mask);
+    sprintf(dr_format,"DEFAULT_TBF");
+    bDone=1;
+  }
   if (!strncmp(mode,"TBN",3)) {
     //printf("[%d/%d] args='%s'\n",ME_MEOS,getpid(),args);
     sscanf(args,"%f %d %d %d %ld",&tbn_f,&tbn_r,&tbn_g,&tbn_s,&tbn_d);
@@ -199,14 +207,23 @@ int meos (
 
   /* if TBN, then we want to start DP first (since this mode runs continuously), and then DR */
   if (!strncmp(mode,"TBN",3)) {
+#ifdef USE_ADP
+    sprintf(data,"%8.0f %d %d",tbn_f,tbn_r,tbn_g);
+    err = mesi( NULL, "ADP", "TBN", data, "today", "asap", &reference );
+#else
     sprintf(data,"%8.0f %d %d %d",tbn_f,tbn_r,tbn_g,tbn_s);
     err = mesi( NULL, "DP_", "TBN", data, "today", "asap", &reference );
+#endif
     if (err!=MESI_ERR_OK) {
-      printf("[%d/%d] FATAL: mesi(NULL,'DP_','REC',...) returned code %d\n",ME_MEOS,getpid(),err);  
+      printf("[%d/%d] FATAL: mesi(NULL,'DP_','TBN',...) returned code %d\n",ME_MEOS,getpid(),err);  
       eResult += MEOS_ERR_DP_TBX;
       return eResult;  
       } 
+#ifdef USE_ADP
+    printf("[%d/%d] ADP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
+#else
     printf("[%d/%d] DP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
+#endif
     }
 
   /* if DRX, we assume DP is already running; so above procedure (for TBN) is not necessary */
@@ -238,6 +255,18 @@ int meos (
       return eResult;  
       } 
     printf("[%d/%d] DP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
+    }
+    
+  /* if TBF, now tell ADP to start. */
+  if (!strncmp(mode,"TBF",3)) {
+    sprintf(data,"16 0 %d %lu",b4bits,nsamp,tuning_mask);
+    err = mesi( NULL, "ADP", "TBF", data, "today", "asap", &reference );
+    if (err!=MESI_ERR_OK) {
+      printf("[%d/%d] FATAL: mesi(NULL,'ADP','TBF',...) returned code %d\n",ME_MEOS,getpid(),err);  
+      eResult += MEOS_ERR_DP_TBX;
+      return eResult;  
+      } 
+    printf("[%d/%d] ADP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
     }
   
   /* start looking for DR to be done */

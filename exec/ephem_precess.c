@@ -1,7 +1,7 @@
-//#include <stdio.h>
-//#include <math.h>
-//
-//#include "astro.h"
+#include <stdio.h>
+#include <math.h>
+
+#include "ephem_astro.h"
 
 static void precess_hiprec (double mjd1, double mjd2, double *ra, double *dec);
 

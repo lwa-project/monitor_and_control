@@ -68,6 +68,8 @@ int main ( int narg, char *argv[] ) {
   long int reference;
   int err;
   
+  struct timezone tz;
+  struct tm *tm;      /* from sys/time.h */
   char cmd[1024];
 
   /* First, announce thyself */

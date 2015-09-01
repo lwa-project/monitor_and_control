@@ -9,8 +9,9 @@
 //   <mode>:    "TBW" (12-bit; DEFAULT), "TBN", "DRX"   
 //   <args>:    For TBW: "b n" where b = "12" means 12-bit [DEFAULT], "4" means 4-bit */
 //                                   n = number of samples (up to 12000000 [DEFAULT] for 12-bit;
-//                                                          up to 36000000 [DEFAULT] for 36-bit)
-//                e.g., "12 12000000" 
+//                                                          up to 36000000 [DEFAULT] for  4-bit)
+//                e.g., "12 12000000"
+//              For TBF: "n" where n = number of samples
 //              For TBN: "f r g s d" where f = center freq [Hz], 
 //                                         r = rate "1"|"2"|...|"7" 
 //                                         g = gain "0"|"1"|... 

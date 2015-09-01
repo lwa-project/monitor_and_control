@@ -1,8 +1,8 @@
-//#include <stdio.h>
-//#include <math.h>
+#include <stdio.h>
+#include <math.h>
 
-//#include "astro.h"
-//#include "vsop87.h"
+#include "ephem_astro.h"
+#include "ephem_vsop87.h"
 
 /* given the modified JD, mj, return the true geocentric ecliptic longitude
  *   of the sun for the mean equinox of the date, *lsn, in radians, the

@@ -1,9 +1,9 @@
 /* functions to manipulate the modified-julian-date used throughout xephem. */
 
-//#include <stdio.h>
-//#include <math.h>
+#include <stdio.h>
+#include <math.h>
 
-//#include "astro.h"
+#include "ephem_astro.h"
 
 /* given a date in months, mn, days, dy, years, yr,
  * return the modified Julian date (number of days elapsed since 1900 jan 0.5),

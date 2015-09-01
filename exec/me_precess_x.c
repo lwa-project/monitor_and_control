@@ -16,7 +16,7 @@
 #include <math.h>
 #include <stdio.h>
 
-#include "me_precess.c"
+#include "me_astro.h"
 
 int main ( int narg, char *argv[] ) {
 

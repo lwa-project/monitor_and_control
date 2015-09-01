@@ -1,7 +1,7 @@
-// #include <stdio.h>
-// #include <math.h>
+#include <stdio.h>
+#include <math.h>
 
-// #include "astro.h"
+#include "ephem_astro.h"
 
 static void ecleq_aux (int sw, double mj, double x, double y,
     double *p, double *q);

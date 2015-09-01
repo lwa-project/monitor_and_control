@@ -11,20 +11,6 @@
 
 /* The codes below are ported from Xephem */
 #include "ephem_astro.h"  /* mostly gutted, leaving only stuff needed for others */
-#include "ephem_vsop87.h"
-#include "ephem_vsop87_data.c" 
-#include "ephem_vsop87.c"
-#include "ephem_sun.c"
-#include "ephem_obliq.c"
-#include "ephem_mjd.c"
-#include "ephem_sphcart.c"
-
-#include "ephem_eq_ecl.c"
-#include "ephem_nutation.c"
-#include "ephem_aberration.c"
-
-#define MEFJ_DTR 0.017453292520
-#define MEFJ_PI  3.141592653590
 
 void me_findjov(
                  long int mjd, /* (input) modified julian date */
@@ -40,6 +26,8 @@ void me_findjov(
   double x,y,z;
   double x0,y0,z0;
   double lambda, beta, rho;
+  double lambdaHelio, betaHelio, rhoHelio;
+  double lambdaSun, rhoSun, betaSun;
   double dRA, dDec;
 
   /* Get JD from mjd/mpm */
@@ -71,20 +59,26 @@ void me_findjov(
   sphcart(L0, B0, R0, &x0, &y0, &z0);
   //printf("me_findjov(): L0=%lf rad, B0=%lf rad, R0=%lf AU\n",L0,B0,R0);
   
-  /* to ecliptical coordinates */
+//   /* to ecliptical heliocentric coordinates */
+//   cartsph(x, y, z, &lambdaHelio, &betaHelio, &rhoHelio);
+  
+  /* to ecliptical geocentric coordinates */
   cartsph(x-x0, y-y0, z-z0, &lambda, &beta, &rho);
-
+  
   /* to equatorial coordinates */
   ecl_eq(JD-MJD0, beta, lambda, &dRA, &dDec);
+  
+  /* Locate the Sun */
+  sunpos(JD-MJD0, &lambdaSun, &rhoSun, &betaSun);
+  
+//   /* Apply relativistic deflection */
+//   deflect(JD-MJD0, lambdaHelio, betaHelio, lambdaSun, rhoSun, rho, &dRA, &dDec);
  
   /* Apply nutation */
   nut_eq(JD-MJD0, &dRA, &dDec);
   
-  /* Locate the Sun */
-  sunpos(JD-MJD0, &lambda, &rho, &beta);
-  
   /* Apply aberration */
-  ab_eq(JD-MJD0, lambda, &dRA, &dDec);
+  ab_eq(JD-MJD0, lambdaSun, &dRA, &dDec);
   
   /* Back to floats */
   *ra = (float) radhr(dRA);

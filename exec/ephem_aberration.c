@@ -5,11 +5,11 @@
  * epoch of date.
  */
 
-//#include <stdio.h>
-//#include <math.h>
-//#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
 
-//#include "astro.h"
+#include "ephem_astro.h"
 
 #define ABERR_CONST	(20.49552/3600./180.*PI)  /* aberr const in rad */
 #define AB_ECL_EOD	0

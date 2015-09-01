@@ -25,12 +25,7 @@
 #include <dirent.h>      /* this is listing files in a directory */
 
 #include "me.h"
-#include "me_getaltaz.c"   /* me_getaltaz(): astro coordinate routine */
-#include "me_point_corr.c" /* me_point_corr(): pointing correction for DRX beamforming */
-
-#include "me_findsol.c" /* me_findsol(): gives position of Sun in RA,Dec */
-
-#include "me_findjov.c" /* me_findjov(): gives position of Jupiter in RA,Dec */
+#include "me_astro.h"
 /* NOTE: the above also pulls in four additional files "ephem_*" */
 
 #define ME_INPROC_DATA_LEN 256   /* size of the "data" string associated with each */
@@ -1021,7 +1016,7 @@ int main ( int narg, char *argv[] ) {
                                 (4.563480616e-02)*(osf.OBS_FREQ1), /* center freq in Hz */
                                       osf.OBS_BW,                  /* 1-11 */
                                           osf2.OBS_TBN_GAIN);      /* 0-30 */
-#else:
+#else
                 cs[ncs].action.sid = LWA_SID_DP_;
                 cs[ncs].action.cid = LWA_CMD_TBN;  
                 sprintf( cs[ncs].data, "%8.0f %hu %hd %ld",
@@ -1527,7 +1522,7 @@ int main ( int narg, char *argv[] ) {
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_FLT[%d]=%hd\n",m,osf2.OBS_ASP_FLT[m]); }
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_AT1[%d]=%hd\n",m,osf2.OBS_ASP_AT1[m]); }
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_AT2[%d]=%hd\n",m,osf2.OBS_ASP_AT2[m]); }
-          for (m=0;m<LWA_MAX_NSTD0;m++) { fprintf(fpl,"osf2.OBS_ASP_ATS[%d]=%hd\n",m,osf2.OBS_ASP_ATS[m]); }
+          for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_ATS[%d]=%hd\n",m,osf2.OBS_ASP_ATS[m]); }
           fprintf(fpl,"osf2.OBS_TBW_BITS=%hu\n",osf2.OBS_TBW_BITS); 
           fprintf(fpl,"osf2.OBS_TBW_SAMPLES=%u\n",osf2.OBS_TBW_SAMPLES);   
           fprintf(fpl,"osf2.OBS_TBN_GAIN=%hd\n",osf2.OBS_TBN_GAIN);  

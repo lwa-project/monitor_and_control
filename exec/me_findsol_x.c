@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "me_findsol.c"
+#include "me_astro.h"
 
 int main ( int narg, char *argv[] ) {
 

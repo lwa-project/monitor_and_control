@@ -61,6 +61,9 @@ reports to:                    E-mail     : comments@bdl.fr
   implemented for C: stern
 */
 
+#ifndef VSOP87_H  /* this keeps this header from getting rolled in more than once */
+#define VSOP87_H
+
 #define VSOP_ASCALE	1e8	/* amplitude factor as stored */
 
 /* coding flags */
@@ -87,7 +90,5 @@ extern int vn_neptune[][3];
 
 extern int vsop87 (double mj, int obj, double prec, double *ret);
 
+#endif // #ifndef VSOP87_H
 
-/* For RCS Only -- Do Not Edit
- * @(#) $RCSfile: vsop87.h,v $ $Date: 2003/03/20 08:51:37 $ $Revision: 1.2 $ $Name:  $
- */

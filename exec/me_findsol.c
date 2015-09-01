@@ -9,20 +9,6 @@
 // Find RA and DEC of the sun
 // See end of this file for history.
 #include "ephem_astro.h"  /* mostly gutted, leaving only stuff needed for others */
-#include "ephem_vsop87.h"
-#include "ephem_vsop87_data.c" 
-#include "ephem_vsop87.c"
-#include "ephem_sun.c"
-#include "ephem_obliq.c"
-#include "ephem_mjd.c"
-#include "ephem_sphcart.c"
-
-#include "ephem_eq_ecl.c"
-#include "ephem_nutation.c"
-#include "ephem_aberration.c"
-
-#define MEFS_DTR 0.017453292520
-#define MEFS_PI  3.141592653590
 
 void me_findsol(
                  long int mjd, /* (input) mean julian date */

@@ -16,7 +16,7 @@
 #include <math.h>
 
 #include "me.h"
-#include "me_getaltaz.c"
+#include "me_astro.h"
 
 int main ( int narg, char *argv[] ) {
 

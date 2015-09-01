@@ -1,7 +1,7 @@
-//#include <math.h>
-//#include <stdio.h>
+#include <math.h>
+#include <stdio.h>
 
-//#include "astro.h"
+#include "ephem_astro.h"
 
 /* transformation from spherical to cartesian coordinates */
 void

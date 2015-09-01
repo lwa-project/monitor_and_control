@@ -11,17 +11,6 @@
 
 /* The codes below are ported from Xephem */
 #include "ephem_astro.h"  /* mostly gutted, leaving only stuff needed for others */
-#include "ephem_vsop87.h"
-#include "ephem_vsop87_data.c" 
-#include "ephem_vsop87.c"
-#include "ephem_sun.c"
-#include "ephem_obliq.c"
-#include "ephem_mjd.c"
-#include "ephem_sphcart.c"
-
-#include "ephem_precess.c"
-#include "ephem_nutation.c"
-#include "ephem_aberration.c"
 
 void me_precess(
                  long int mjd, /* (input) modified julian date */
@@ -30,8 +19,9 @@ void me_precess(
                  float *dec  /* (input/output) [deg] dec */
                 ) {
 
-   double JD, H, JD0;
+  double JD, H, JD0;
   double lambda, rho, beta;
+  double lambdaSun, rhoSun, betaSun;
   double dRA, dDec;
   
   /* Get JD from mjd/mpm */
@@ -46,14 +36,20 @@ void me_precess(
   /* Precess to the current epoch from J2000.0 */
   precess(J2000, JD-MJD0, &dRA, &dDec);
   
+  /* Convert to ecliptic so that we can do the relativistic deflection */
+  eq_ecl(JD-MJD0, dRA, dDec, &beta, &lambda);
+  
+  /* Locate the Sun */
+  sunpos(JD-MJD0, &lambdaSun, &rhoSun, &betaSun);
+  
+//   /* Apply relativistic deflection */
+//   deflect(JD-MJD0, lambda, beta, lambdaSun, rhoSun, 1e10, &dRA, &dDec);
+  
   /* Apply nutation */
   nut_eq(JD-MJD0, &dRA, &dDec);
   
-  /* Locate the Sun */
-  sunpos(JD-MJD0, &lambda, &rho, &beta);
-  
   /* Apply aberration */
-  ab_eq(JD-MJD0, lambda, &dRA, &dDec);
+  ab_eq(JD-MJD0, lambdaSun, &dRA, &dDec);
   
   /* Back to floats */
   *ra = (float) radhr(dRA);

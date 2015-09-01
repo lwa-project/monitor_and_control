@@ -2,10 +2,10 @@
  * on an HP PA processor, this reproduces the Almanac nutation values
  * (given to 0.001") EXACTLY over 750 days (1995 and 1996)
  */
-//#include <stdio.h>
-//#include <math.h>
+#include <stdio.h>
+#include <math.h>
 
-//#include "astro.h"
+#include "ephem_astro.h"
 
 #define NUT_SCALE	1e4
 #define NUT_SERIES	106
