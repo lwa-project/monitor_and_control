@@ -5,7 +5,9 @@
 CFLAGS := -I/usr/include/gdbm -I../common 
 LDFLAGS := -lgdbm_compat -lgdbm -lncurses
 
-all: ms_init dat2dbm ms_mcic ms_exec msei ms_mdr ms_mdre ms_makeMIB_ASP ms_makeMIB_ADP ms_makeMIB_DP ms_makeMIB_DR ms_md2t ms_mb ms_mu ms_mdre_ip ms_mon
+TARGETS := ms_init dat2dbm ms_mcic ms_exec msei ms_mdr ms_mdre ms_makeMIB_ASP ms_makeMIB_ADP ms_makeMIB_DP ms_makeMIB_DR ms_md2t ms_mb ms_mu ms_mdre_ip ms_mon
+
+all: $(TARGETS)
 
 ms_init: ms_init.c ../common/mcs.h
 	$(CC) $(CFLAGS) -o ms_init ms_init.c $(LDFLAGS)
@@ -55,15 +57,17 @@ ms_mdre_ip: ms_mdre_ip.c ../common/mcs.h
 ms_mon: ms_mon.c ../common/mcs.h 
 	$(CC) $(CFLAGS) -o ms_mon ms_mon.c $(LDFLAGS)
 
+.PHONY: install
 install:
-	cp *.py ../../sch/.
-	cp *.sh ../../sch/.
-	cp readme*.txt ../../sch/.
-	cp *_MIB_init.dat ../../sch/.
-	for targ in $(all); do \
-		cp $$targ ../../sch/.; \
+	for target in $(TARGETS); do \
+		install $$target ../../sch/.; \
 	done
-	
+	install *.py ../../sch/.
+	install *.sh ../../sch/.
+	install -m 644 readme*.txt ../../sch/.
+	install -m 644 *_MIB_init.dat ../../sch/.
+
+.PHONY: clean
 clean:
-	-rm -f ms_init dat2dbm ms_mcic ms_exec msei ms_mdr ms_mdre ms_makeMIB_ASP ms_makeMIB_ADP ms_makeMIB_DP ms_makeMIB_DR ms_md2t ms_mb ms_mu ms_mdre_ip ms_mon
+	-rm -f $(TARGETS)
 
