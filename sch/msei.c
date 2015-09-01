@@ -246,9 +246,20 @@ main ( int narg, char *argv[] ) {
 
        case LWA_CMD_INI:
          break;
+	 
+       case LWA_CMD_STP:
+         //string STP;
+         bError=0;
+         if (narg<=3) {bError=1;}
+         if (bError) {
+           printf("[%s] FATAL: %s/%s arg is BEAMn|TBN (string)\n",ME,dest,cmd);
+           return;
+           }
+         c.datalen=-1;
+         break;
  
        default:
-         printf("[%s] FATAL: cmd <%s> not recognized as valid for DP\n",ME,cmd);
+         printf("[%s] FATAL: cmd <%s> not recognized as valid for ADP\n",ME,cmd);
          return;
          break;
 
@@ -329,7 +340,18 @@ main ( int narg, char *argv[] ) {
 
        case LWA_CMD_INI:
          break;
- 
+  
+      case LWA_CMD_STP:
+         //string STP;
+         bError=0;
+         if (narg<=3) {bError=1;}
+         if (bError) {
+           printf("[%s] FATAL: %s/%s arg is BEAMn|TBN (string)\n",ME,dest,cmd);
+           return;
+           }
+         c.datalen=-1;
+         break;
+           
        default:
          printf("[%s] FATAL: cmd <%s> not recognized as valid for DP\n",ME,cmd);
          return;
