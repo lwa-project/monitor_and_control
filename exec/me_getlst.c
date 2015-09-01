@@ -6,6 +6,8 @@
 //   
 // Find the local apparent sidereal time for a location
 
+#include <math.h>
+
 #include "ephem_astro.h"  /* mostly gutted, leaving only stuff needed for others */
 
 void me_getlst(

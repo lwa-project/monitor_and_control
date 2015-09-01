@@ -1,4 +1,4 @@
-// me_findjov.c: J. Dowell, UNM, 2015 Aug 31
+// me_findjov.c: J. Dowell, UNM, 2015 Sep 1
 // ---
 // COMPILE: intended to be called from another program which it is compiled into
 // ---
@@ -15,8 +15,9 @@
 void me_findjov(
                  long int mjd, /* (input) modified julian date */
                  long int mpm, /* (input) milliseconds past UTC midnight */ 
-                 float *ra,   /* (output) [h] RA */
-                 float *dec  /* (output) [deg] dec */
+                 float *ra,    /* (output) [h] RA */
+                 float *dec,   /* (output) [deg] dec */
+                 float *dist   /* (output) [AU] distance from Earth */
                 ) {
 
   double JD, H, JD0;
@@ -83,10 +84,13 @@ void me_findjov(
   /* Back to floats */
   *ra = (float) radhr(dRA);
   *dec = (float) raddeg(dDec);
+  *dist = (float) rho;
 
   return;
   } /* me_findjov */
 
+// me_findjov.c: J. Dowell, UNM, 2015 Sep 1
+//  -- changed the call so that the distance to Jupiter in AU is also returned
 // me_findjov.c: J. Dowell, UNM, 2015 Aug 31
 //   -- updated to do everything through XEphem
 // me_findjov.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07

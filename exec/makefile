@@ -28,7 +28,6 @@ megfg: megfg.c
 	$(CC) $(CFLAGS) -o megfg megfg.c $(LDFLAGS)
 
 me_exec: me_exec.c me_exec_1.c me.h ../common/mcs.h
-#
 	$(CC) $(CFLAGS) -o me_exec me_exec.c $(LDFLAGS)
 
 meeix: meeix.c meei.c me.h ../common/mcs.h
@@ -42,9 +41,6 @@ me_tpcom: me_tpcom.c me.h ../common/mcs.h
 
 mefsdfg: mefsdfg.c me.h ../common/mcs.h
 	$(CC) $(CFLAGS) -o mefsdfg mefsdfg.c $(LDFLAGS)
-
-me_getaltaz_x: me_getaltaz_x.o me_getaltaz.o
-	$(CC) -o me_getaltaz_x me_getaltaz_x.o me_getaltaz.o $(LDFLAGS)
 
 me_point_corr_x: me_point_corr_x.o me_point_corr.o
 	$(CC) $(CFLAGS) -o me_point_corr_x me_point_corr_x.o me_point_corr.o $(LDFLAGS) 
@@ -60,6 +56,9 @@ EPHEM_OBJECTS := ephem_aberration.o ephem_deflect.o ephem_eq_ecl.o ephem_mjd.o e
 
 me_inproc: me_inproc.o me_getaltaz.o me_point_corr.o me_findsol.o me_findjov.o me_precess.o  $(EPHEM_OBJECTS) me.h ../common/mcs.h
 	$(CC) -o me_inproc me_inproc.o  me_getaltaz.o me_point_corr.o me_findsol.o me_findjov.o me_precess.o  $(EPHEM_OBJECTS) $(LDFLAGS)
+
+me_getaltaz_x: me_getaltaz_x.o me_getaltaz.o $(EPHEM_OBJECTS)
+	$(CC) -o me_getaltaz_x me_getaltaz_x.o me_getaltaz.o $(EPHEM_OBJECTS) $(LDFLAGS)
 
 me_getlst_x: me_getlst_x.o me_getlst.o $(EPHEM_OBJECTS)
 	$(CC) -o me_getlst_x me_getlst_x.o me_getlst.o $(EPHEM_OBJECTS) $(LDFLAGS) 
@@ -111,6 +110,10 @@ ephem_vsop87.o: ephem_vsop87.c ephem_vsop87_data.c ephem_vsop87.h ephem_astro.h
 
 ephem_vsop87_data.o: ephem_vsop87_data.c ephem_vsop87.h ephem_astro.h
 	$(CC) $(CFLAGS) -c -o ephem_vsop87_data.o ephem_vsop87_data.c
+
+#
+# End Programs that rely on code from PyEphem/XEphem
+#
 
 .PHONY: install
 install:

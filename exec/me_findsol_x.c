@@ -20,10 +20,11 @@
 
 int main ( int narg, char *argv[] ) {
 
-  float ra;    /* (input) [h] RA */
-  float dec;   /* (input) [deg] dec */
   long int mjd; /* (input) mean julian date */
   long int mpm; /* (input) milliseconds past UTC midnight */ 
+  float ra;     /* (output) [h] RA */
+  float dec;    /* (output) [deg] dec */
+  float dist;   /* (output) [AU] distance from Earth */
   float m, s;
 
   /* Parse command line */
@@ -41,16 +42,18 @@ int main ( int narg, char *argv[] ) {
               mjd,  /* (input) mean julian date */
               mpm,  /* (input) milliseconds past UTC midnight */ 
               &ra,  /* (output) [h] calculated RA */
-              &dec  /* (output) [deg] calculated dec */ 
+              &dec, /* (output) [deg] calculated dec */ 
+              &dist /* (output) [AU] distance from Earth */
              );
 
   m = (ra - floor(ra))*60.0;
   s = (m - floor(m))*60.0;
-  printf("RA  = %8.3f h   =  %02.0f h %02.0f m %05.2f s\n",ra, floor(ra), floor(m), s);
+  printf("RA   = %8.3f h   =  %02.0f h %02.0f m %05.2f s\n",ra, floor(ra), floor(m), s);
   m = (fabs(dec)-floor(fabs(dec)))*60.0;
   s = (m - floor(m))*60.0;
-  printf("dec = %8.3f deg = %+03.0f d %02.0f m %04.1f s\n",dec, (dec/fabs(dec))*floor(fabs(dec)), floor(m), s);
-
+  printf("dec  = %8.3f deg = %+03.0f d %02.0f m %04.1f s\n",dec, (dec/fabs(dec))*floor(fabs(dec)), floor(m), s);
+  printf("dist = %8.6f AU\n", dist);
+  
   return 0;
   } /* main() */
 

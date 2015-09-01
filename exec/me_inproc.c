@@ -506,6 +506,7 @@ int main ( int narg, char *argv[] ) {
   struct ssmif_struct s; 
 
   long int mjd, mpm;
+  float dist;
  
   double alt, az, last;
   double last_alt, last_az;
@@ -1174,18 +1175,19 @@ int main ( int narg, char *argv[] ) {
                   /* into geocentric apparent coordiantes at the epoch of date.      */
                   /* Updated: 2015 Aug 31                                            */
                   switch (osf.OBS_MODE) {
-                    case LWA_OM_TRK_SOL: me_findsol( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC) ); break;  
-                    case LWA_OM_TRK_JOV: me_findjov( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC) ); break;
+                    case LWA_OM_TRK_SOL: me_findsol( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist ); break;  
+                    case LWA_OM_TRK_JOV: me_findjov( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist ); break;
                     /* FIXME:  Does this do anything bad to the metadata that comes out? */
-                    case LWA_OM_TRK_RADEC: me_precess( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC) ); break;
+                    case LWA_OM_TRK_RADEC: me_precess( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC) ); dist=1e10; break;
                     default: break;
                     }
 
                   /* get updated alt/az */
                   me_getaltaz( osf.OBS_RA, 
                                osf.OBS_DEC, 
+                               dist, 
                                mjd, mpm, 
-                               s.fGeoN, s.fGeoE, 
+                               s.fGeoN, s.fGeoE, s.fGeoEl, 
                                &last, &alt, &az ); /* alt and az are in degrees */                    
                   /* pointing correction */
                   me_point_corr( s.fPCAxisTh, s.fPCAxisPh, s.fPCRot, &alt, &az );                    
@@ -1403,11 +1405,12 @@ int main ( int narg, char *argv[] ) {
                     /* and move them into geocentric apparent coordiantes at the epoch of     */
                     /* date.                                                                  */
                     /* Updated: 2015 Aug 31                                                   */
-                    me_precess( mjd, mpm, &(osfs.OBS_STP_C1), &(osfs.OBS_STP_C2));
+                    me_precess( mjd, mpm, &(osfs.OBS_STP_C1), &(osfs.OBS_STP_C2));  dist=1e10; 
                     me_getaltaz( osfs.OBS_STP_C1, 
                                  osfs.OBS_STP_C2, 
+                                 dist, 
                                  mjd, mpm, 
-                                 s.fGeoN, s.fGeoE, 
+                                 s.fGeoN, s.fGeoE, s.fGeoEl, 
                                  &last, &alt, &az ); /* alt and az are in degrees */  
                   } else {
                     az  = osfs.OBS_STP_C1;
