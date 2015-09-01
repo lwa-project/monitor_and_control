@@ -39,7 +39,7 @@ int main ( int narg, char *argv[] ) {
   if (narg>6) sscanf(argv[6],"%lf",&lon);     
   if (narg<7) {
     printf("Useage:\n");
-    printf("me_getaltazx <ra> <dec> <mjd> <mpm> <lat> <lon>\n");
+    printf("me_getaltaz_x <ra> <dec> <mjd> <mpm> <lat> <lon>\n");
     printf("  <ra>:  [decimal h] RA\n");
     printf("  <dec>: [decimal dec] DEC\n");
     printf("  <mjd>: integer MJD\n");

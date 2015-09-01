@@ -137,6 +137,20 @@ mjd_year (double mj, double *yr)
 	last_yr = *yr;
 }
 
+/* given an mjd, truncate it to the beginning of the whole day */
+double
+mjd_day(double mj)
+{
+	return (floor(mj-0.5)+0.5);
+}
+
+/* given an mjd, return the number of hours past midnight of the whole day */
+double
+mjd_hr(double mj)
+{
+	return ((mj-mjd_day(mj))*24.0);
+}
+
 /* insure 0 <= *v < r.
  */
 void

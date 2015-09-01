@@ -8,6 +8,8 @@
 //   
 // See end of this file for history.
  
+#include <math.h>
+
 #define MPC_DTR  0.017453292520
 #define MPC_TINY (1e-3);  
 

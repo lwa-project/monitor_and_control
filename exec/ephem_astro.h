@@ -18,6 +18,13 @@
 #define	hrrad(x)	degrad(hrdeg(x))
 #define	radhr(x)	deghr(raddeg(x))
 
+/* ratio of from synodic (solar) to sidereal (stellar) rate */
+#define	SIDRATE		.9972695677
+
+/* manifest names for planets.
+ * N.B. must coincide with usage in pelement.c and plans.c.
+ * N.B. only the first 8 are valid for use with plans().
+ */
 typedef enum {
     MERCURY,
     VENUS,
@@ -55,6 +62,8 @@ extern void ecl_eq (double m, double lt, double lg, double *ra,double *dec);
 extern void cal_mjd (int mn, double dy, int yr, double *m);
 extern void mjd_cal (double m, int *mn, double *dy, int *yr);
 extern void mjd_year (double m, double *yr);
+extern double mjd_day (double jd);
+extern double mjd_hr (double jd);
 extern void ephem_range (double *v, double r);
 extern void radecrange (double *ra, double *dec);
 
@@ -65,6 +74,9 @@ extern void nut_eq (double m, double *ra, double *dec);
 /* ephem_obliq.c */
 extern void obliquity (double m, double *eps);
 
+/* ephem_parallax.c */
+extern void ta_par (double tha, double tdec, double phi, double ht, double *rho, double *aha, double *adec);
+
 /* ephem_precess.c */
 extern void precess (double mjd1, double mjd2, double *ra, double *dec);
 
@@ -74,6 +86,10 @@ extern void cartsph (double x, double y, double z, double *l, double *b, double 
 
 /* ephem_sun.c */
 extern void sunpos (double m, double *lsn, double *rsn, double *bsn);
+
+/* ephem_utc_gst.c */
+extern void utc_gst (double m, double utc, double *gst);
+extern void gst_utc (double m, double gst, double *utc);
 
 /* ephem_vsop87.c */
 extern int vsop87 (double m, int obj, double prec, double *ret);

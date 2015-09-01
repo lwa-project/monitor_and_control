@@ -5,7 +5,7 @@
 CFLAGS := -I../common
 LDFLAGS := -lm -lncurses
 
-TARGETS :=  mesix meosx memdrex mecfg medfg megfg me_exec meeix me_init me_tpcom me_inproc mefsdfg me_getaltaz_x me_point_corr_x me_findsol_x me_findjov_x me_precess_x
+TARGETS :=  mesix meosx memdrex mecfg medfg megfg me_exec meeix me_init me_tpcom me_inproc mefsdfg me_getaltaz_x me_point_corr_x me_findsol_x me_findjov_x me_precess_x me_getlst_x
 
 all: $(TARGETS)
 
@@ -56,10 +56,13 @@ me_mon: me_mon.c
 # Programs that rely on code from PyEphem/XEphem
 #
 
-EPHEM_OBJECTS := ephem_aberration.o ephem_deflect.o ephem_eq_ecl.o ephem_mjd.o ephem_nutation.o ephem_obliq.o ephem_precess.o ephem_sphcart.o ephem_sun.o ephem_vsop87.o ephem_vsop87_data.o
+EPHEM_OBJECTS := ephem_aberration.o ephem_deflect.o ephem_eq_ecl.o ephem_mjd.o ephem_nutation.o ephem_obliq.o ephem_parallax.o ephem_precess.o ephem_sphcart.o ephem_sun.o ephem_utc_gst.o ephem_vsop87.o ephem_vsop87_data.o
 
 me_inproc: me_inproc.o me_getaltaz.o me_point_corr.o me_findsol.o me_findjov.o me_precess.o  $(EPHEM_OBJECTS) me.h ../common/mcs.h
 	$(CC) -o me_inproc me_inproc.o  me_getaltaz.o me_point_corr.o me_findsol.o me_findjov.o me_precess.o  $(EPHEM_OBJECTS) $(LDFLAGS)
+
+me_getlst_x: me_getlst_x.o me_getlst.o $(EPHEM_OBJECTS)
+	$(CC) -o me_getlst_x me_getlst_x.o me_getlst.o $(EPHEM_OBJECTS) $(LDFLAGS) 
 
 me_findsol_x: me_findsol_x.o me_findsol.o $(EPHEM_OBJECTS)
 	$(CC) -o me_findsol_x me_findsol_x.o me_findsol.o $(EPHEM_OBJECTS) $(LDFLAGS) 
@@ -88,6 +91,9 @@ ephem_nutation.o: ephem_nutation.c ephem_astro.h
 ephem_obliq.o: ephem_obliq.c ephem_astro.h
 	$(CC) $(CFLAGS) -c -o ephem_obliq.o ephem_obliq.c
 
+ephem_parallax.o: ephem_parallax.c ephem_astro.h
+	$(CC) $(CFLAGS) -c -o ephem_parallax.o ephem_parallax.c
+
 ephem_precess.o: ephem_precess.c ephem_astro.h
 	$(CC) $(CFLAGS) -c -o ephem_precess.o ephem_precess.c
 
@@ -96,6 +102,9 @@ ephem_sphcart.o: ephem_sphcart.c ephem_astro.h
 
 ephem_sun.o: ephem_sun.c ephem_astro.h ephem_vsop87.c ephem_vsop87_data.c ephem_vsop87.h
 	$(CC) $(CFLAGS) -c -o ephem_sun.o ephem_sun.c
+
+ephem_utc_gst.o: ephem_utc_gst.c ephem_astro.h
+	$(CC) $(CFLAGS) -c -o ephem_utc_gst.o ephem_utc_gst.c
 
 ephem_vsop87.o: ephem_vsop87.c ephem_vsop87_data.c ephem_vsop87.h ephem_astro.h
 	$(CC) $(CFLAGS) -c -o ephem_vsop87.o ephem_vsop87.c

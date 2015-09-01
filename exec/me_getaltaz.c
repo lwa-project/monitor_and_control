@@ -7,6 +7,8 @@
 // REQUIRES: 
 //   
 // See end of this file for history.
+
+#include <math.h>
  
 #define DTR 0.017453292520
 #define PI  3.141592653590
