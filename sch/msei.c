@@ -173,7 +173,7 @@ main ( int narg, char *argv[] ) {
          if (narg>3) { sscanf(argv[3],"%hu",&i2u1); } else {bError=1;}
          if (narg>4) { sscanf(argv[4],"%i", &i4s1); } else {bError=1;}
          if (narg>5) { sscanf(argv[5],"%i", &i4s2); } else {bError=1;}
-         if (narg>6) { sscanf(argv[6],"%lu", &i8u1; } else {bError=1;}
+         if (narg>6) { sscanf(argv[6],"%lu",&i8u1); } else {bError=1;}
          if (bError) {
            printf("[%s] FATAL: %s/%s args are:\n TBF_BITS {0|1}\n TBF_TRIG_TIME (samples, int32)\n TBF_SAMPLES (samples, int32)\n DRX_TUNING_MASK (mask, uint64)\n",ME,dest,cmd);
            return;

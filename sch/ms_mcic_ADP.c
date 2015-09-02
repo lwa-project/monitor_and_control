@@ -82,7 +82,7 @@ int LWA_mibupdate_ADP(
       /* parse the contents of cmdata (the DATA field form the command message) into the included 4 parameters */
       memset(&uc,0,1);
         memcpy(&uc,cmdata+0,1); 
-        sprintf(tbf_bits,"%2bu",uc);
+        sprintf(tbf_bits,"%hhu",uc);
       memset(&si,0,4);
         memcpy(&si,cmdata+1,4);
         //sprintf(tbw_trig_time,"%9u",ui);
@@ -94,7 +94,7 @@ int LWA_mibupdate_ADP(
         sprintf(tbf_samples,"%9d",LWA_i4s_swap(si));
         //printf("ABC: <%u> <%u> <%s>\n",ui,LWA_i4u_swap(ui),tbw_samples);
       memset(&uli,0,8);
-        memcopy(&uli,cmdata+9,8);
+        memcpy(&uli,cmdata+9,8);
         //sprintf(tbw_tuning_mask,"%20u",uli);
         sprintf(tbf_tuning_mask,"%20d",LWA_i8u_swap(uli));
 
@@ -301,7 +301,7 @@ int LWA_mibupdate_ADP(
       if( !strncmp("TBN", output, 3) ) {
           /* TBN */
           sprintf(sMIBlabel,"TBN_FREQ");
-          eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0.0" -1 );
+          eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0.0", -1 );
           
           sprintf(sMIBlabel,"TBN_BW");
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
@@ -339,7 +339,7 @@ int LWA_mibupdate_ADP(
       }
       if( !strncmp("BEAM", output, 4) ) {
           /* Beam */
-          sscanf(output,"BEAM%hhu", &beam_id);
+          sscanf(output,"BEAM%hu", &beam_id);
           
           sprintf(sMIBlabel,"BEAM%1hu_DFILE",beam_id);
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "", -1 );
