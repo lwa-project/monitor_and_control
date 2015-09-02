@@ -1466,6 +1466,209 @@
       } /* for (k */
     } /* for ( iARB */
 
+#ifdef USE_ADP
+  /* reading N_ROACH */
+  sprintf(keyword,"N_ROACH"); s.nRoach = 0;
+  while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+  switch (i) {
+    case MERS_PL_KEYWORD_MATCH: 
+      sscanf(data,"%d",&(s.nRoach));     
+      strcpy(data,"");  
+      break;
+    case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+    case MERS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: MERS_PL_KEYWORD_MISMATCH\n",MT_TPRS,getpid()); return; break;
+    case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+    }       
+  if ((s.nRoach<0) || (s.nRoach>ME_MAX_NROACH)) {
+    printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.nRoach);
+    return;
+    } 
+  printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.nRoach); 
+
+  /* reading N_ROACHCH */
+  sprintf(keyword,"N_ROACHCH"); s.nRoachCh = 0;
+  while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+  switch (i) {
+    case MERS_PL_KEYWORD_MATCH: 
+      sscanf(data,"%d",&(s.nRoachCh));     
+      strcpy(data,"");  
+      break;
+    case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+    case MERS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: MERS_PL_KEYWORD_MISMATCH\n",MT_TPRS,getpid()); return; break;
+    case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+    }       
+  if ((s.nRoachCh<0) || (s.nRoachCh>ME_MAX_NROACHCH)) {
+    printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.nRoachCh);
+    return;
+    } 
+  printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.nRoachCh); 
+
+  /* reading ROACH_ID[] */
+  for ( iDP1=0; iDP1<s.nRoach; iDP1++ ) {
+
+    sprintf(keyword,"ROACH_ID[%d]",iDP1+1,k+1); sprintf(s.sRoachID[iDP1],"UNK");
+    while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+    switch (i) {
+      case MERS_PL_KEYWORD_MATCH: 
+        if (strlen(data)>ME_MAX_ROACHID_LENGTH) {
+          printf("[%d/%d] FATAL: ROACH_ID[%d]='%s' is greater than %d characters\n",
+            MT_TPRS,getpid(),iDP1,data,ME_MAX_ROACHID_LENGTH);   
+          return;
+          }
+        sprintf(s.sRoachID[iDP1],"%s",data);     
+        strcpy(data,"");  
+        break;
+      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+      case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+      }        
+    printf("[%d/%d] %s='%s'\n",MT_TPRS,getpid(),keyword,s.sRoachID[iDP1]);   
+ 
+    } /* for ( iDP1 */
+
+  /* reading ROACH_SLOT[] */
+  for ( iDP1=0; iDP1<s.nRoach; iDP1++ ) {
+
+    sprintf(keyword,"ROACH_SLOT[%d]",iDP1+1,k+1); sprintf(s.sRoachSlot[iDP1],"UNK");
+    while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+    switch (i) {
+      case MERS_PL_KEYWORD_MATCH: 
+        if (strlen(data)>ME_MAX_ROACHID_LENGTH) {
+          printf("[%d/%d] FATAL: ROACH_SLOT[%d]='%s' is greater than %d characters\n",
+            MT_TPRS,getpid(),iDP1,data,ME_MAX_ROACHID_LENGTH);   
+          return;
+          }
+        sprintf(s.sRoachSlot[iDP1],"%s",data);     
+        strcpy(data,"");  
+        break;
+      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+      case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+      }        
+    printf("[%d/%d] %s='%s'\n",MT_TPRS,getpid(),keyword,s.sRoachSlot[iDP1]);   
+ 
+    } /* for ( iDP1 */
+
+  /* reading ROACH_DESI[] */
+  for ( iDP1=0; iDP1<s.nRoach; iDP1++ ) {
+
+    sprintf(keyword,"ROACH_DESI[%d]",iDP1+1); s.eRoachDesi[iDP1] = 1;
+    while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+    switch (i) {
+      case MERS_PL_KEYWORD_MATCH: 
+        sscanf(data,"%d",&(s.eRoachDesi[iDP1]));     
+        strcpy(data,"");  
+        break;
+      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+      case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+      }       
+    if (s.eRoachDesi[iDP1]<0) {
+      printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.eRoachDesi[iDP1]);
+      return;
+      } 
+    printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.eRoachDesi[iDP1]);    
+
+    } /* for ( iDP1 */
+
+  /* reading ROACH_STAT[] */
+  for ( iDP1=0; iDP1<(s.nRoach); iDP1++ ) {
+    for (k=0;k<s.nRoachCh;k++) {
+
+      sprintf(keyword,"ROACH_STAT[%d][%d]",iDP1+1,k+1); s.eRoachStat[iDP1][k] = 3;
+      while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+      switch (i) {
+        case MERS_PL_KEYWORD_MATCH: 
+          sscanf(data,"%d",&(s.eRoachStat[iDP1][k]));  
+          strcpy(data,"");  
+          break;
+        case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+        case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+        case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+        }        
+      if ( (s.eRoachStat[iDP1][k]<0) || (s.eRoachStat[iDP1][k]>3) ) {
+        printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.eRoachStat[iDP1][k]);
+        return;
+        }   
+      printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.eRoachStat[iDP1][k]);    
+
+      } /* for (k */
+    } /* for ( iDP1 */
+
+  /* reading ROACH_INR[] */
+  for ( iDP1=0; iDP1<s.nRoach; iDP1++ ) {
+    for (k=0;k<s.nRoachCh;k++) {
+
+      sprintf(keyword,"ROACH_INR[%d][%d]",iDP1+1,k+1); sprintf(s.sRoachINR[iDP1][k],"UNK");
+      while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+      switch (i) {
+        case MERS_PL_KEYWORD_MATCH: 
+          if (strlen(data)>ME_MAX_ROACHID_LENGTH) {
+            printf("[%d/%d] FATAL: ROACH_INR[%d]='%s' is greater than %d characters\n",
+              MT_TPRS,getpid(),iDP1,data,ME_MAX_ROACHID_LENGTH);   
+            return;
+            }
+          sprintf(s.sRoachINR[iDP1][k],"%s",data);     
+          strcpy(data,"");  
+          break;
+        case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+        case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+        case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+        }        
+      printf("[%d/%d] %s='%s'\n",MT_TPRS,getpid(),keyword,s.sRoachINR[iDP1][k]);   
+ 
+      } /* for (k */
+    } /* for ( iDP1 */
+
+  /* reading ROACH_INC[] */
+  for ( iDP1=0; iDP1<s.nRoach; iDP1++ ) {
+    for (k=0;k<s.nRoachCh;k++) {
+
+      sprintf(keyword,"ROACH_INC[%d][%d]",iDP1+1,k+1); sprintf(s.sRoachINC[iDP1][k],"UNK");
+      while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+      switch (i) {
+        case MERS_PL_KEYWORD_MATCH: 
+          if (strlen(data)>ME_MAX_ROACHID_LENGTH) {
+            printf("[%d/%d] FATAL: ROACH_INC[%d]='%s' is greater than %d characters\n",
+              MT_TPRS,getpid(),iDP1,data,ME_MAX_ROACHID_LENGTH);   
+            return;
+            }
+          sprintf(s.sRoachINC[iDP1][k],"%s",data);     
+          strcpy(data,"");  
+          break;
+        case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+        case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+        case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+        }        
+      printf("[%d/%d] %s='%s'\n",MT_TPRS,getpid(),keyword,s.sRoachINC[iDP1][k]);   
+ 
+      } /* for (k */
+    } /* for ( iDP1 */
+
+  /* reading ROACH_ANT[][] */
+  for ( iDP1=0; iDP1<s.nRoach; iDP1++ ) {
+    for (k=0;k<s.nRoachCh;k++) {
+
+      sprintf(keyword,"ROACH_ANT[%d][%d]",iDP1+1,k+1); s.iRoachAnt[iDP1][k] = 0;
+      while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+      switch (i) {
+        case MERS_PL_KEYWORD_MATCH: 
+          sscanf(data,"%d",&(s.iRoachAnt[iDP1][k]));
+          if ( (s.iRoachAnt[iDP1][k]<0) || (s.iRoachAnt[iDP1][k]>2*s.nStd) ) {
+            printf("[%d/%d] FATAL: ROACH_ANT[%d][%d]=%d is invalid\n",MT_TPRS,getpid(),iDP1+1,k+1,s.iRoachAnt[iDP1][k]);   
+            return; 
+            }     
+          strcpy(data,"");  
+          break;
+        case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+        case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+        case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+        }       
+      printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.iRoachAnt[iDP1][k]);   
+ 
+      } /* for (k */
+    } /* for ( iDP1 */
+#else
   /* reading N_DP1 */
   sprintf(keyword,"N_DP1"); s.nDP1 = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
@@ -1775,7 +1978,8 @@
     printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.eDP2Desi[iDP2]);    
 
     } /* for ( iDP2 */
-
+#endif
+    
   /* reading N_DR */
   sprintf(keyword,"N_DR"); s.nDR = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
@@ -1994,6 +2198,15 @@
                   (!strncmp(data,"FAN",2)) || (!strncmp(data,"SYN",2)) || (!strncmp(data,"SWI",2))  ;
               if (!b) {
                 printf("[%d/%d] FATAL: PWR_NAME='%s' not valid for PWR_SS[%d][%d]='DP_'\n",
+                  MT_TPRS,getpid(),data,iRack+1,iPort+1);   
+                return;
+                }
+              break;
+            case LWA_SID_ADP:
+              b = (!strncmp(data,"MCS",3)) || (!strncmp(data,"DC1",3)) || (!strncmp(data,"DC1",2)) ||
+                  (!strncmp(data,"FAN",2)) || (!strncmp(data,"SYN",2)) || (!strncmp(data,"SWI",2))  ;
+              if (!b) {
+                printf("[%d/%d] FATAL: PWR_NAME='%s' not valid for PWR_SS[%d][%d]='ADP'\n",
                   MT_TPRS,getpid(),data,iRack+1,iPort+1);   
                 return;
                 }

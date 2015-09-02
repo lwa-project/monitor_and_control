@@ -381,6 +381,17 @@ int main ( int narg, char *argv[] ) {
     }
   if (b_TB_requested) SESSION_DRX_BEAM=5;
 
+#ifdef USE_ADP
+   /* if mode = TBF, OBS_DUR needs to be computed */
+  for (n=1;n<=nobs;n++) {
+    if (obs[n].OBS_MODE==LWA_OM_TBF) {
+      t_tbw = ( obs[n].OBS_TBF_SAMPLES / 196000 ) +1; /* convert samples to ms */
+      t_tbw *= TBW_INVERSE_DUTY_CYCLE;         /* account for read-out time after triggering (~1000:1) */
+      obs[n].OBS_DUR = t_tbw; /* convert samples to ms */
+      printf("[%d/%d] Computed obs[%d].OBS_DUR = %ld [ms] for this TBF observation\n",MT_TPSS,getpid(),n,obs[n].OBS_DUR);
+      }
+    }
+#else
   /* if mode = TBW, OBS_DUR needs to be computed */
   for (n=1;n<=nobs;n++) {
     if (obs[n].OBS_MODE==LWA_OM_TBW) {
@@ -389,7 +400,8 @@ int main ( int narg, char *argv[] ) {
       obs[n].OBS_DUR = t_tbw; /* convert samples to ms */
       printf("[%d/%d] Computed obs[%d].OBS_DUR = %ld [ms] for this TBW observation\n",MT_TPSS,getpid(),n,obs[n].OBS_DUR);
       }
-    }  
+    }
+#endif
 
   /* check to make sure no observation end times overlap with subsequent observation start times */
   for (n=1;n<nobs;n++) {
@@ -409,15 +421,15 @@ int main ( int narg, char *argv[] ) {
   //printf("%d %d %d\n",obs[1].OBS_FEE[0][0],obs[1].OBS_FEE[1][0],obs[1].OBS_FEE[2][0]);
   for (i=1;i<=nobs;i++) {
     obs[i].ASP_setup_time = 0;
-    for (n=1;n<=260;n++) { 
+    for (n=1;n<=LWA_MAX_NSTD;n++) { 
       for (p=0;p<=1;p++) { 
         if (obs[i].OBS_FEE[n][p]!=-1) { obs[i].ASP_setup_time += LWA_ASP_OP_TIME_MS; }
         }
       }
-    for (n=1;n<=260;n++) { if (obs[i].OBS_ASP_FLT[n]!=-1) obs[i].ASP_setup_time += LWA_ASP_OP_TIME_MS; }
-    for (n=1;n<=260;n++) { if (obs[i].OBS_ASP_AT1[n]!=-1) obs[i].ASP_setup_time += LWA_ASP_OP_TIME_MS; }
-    for (n=1;n<=260;n++) { if (obs[i].OBS_ASP_AT2[n]!=-1) obs[i].ASP_setup_time += LWA_ASP_OP_TIME_MS; }
-    for (n=1;n<=260;n++) { if (obs[i].OBS_ASP_ATS[n]!=-1) obs[i].ASP_setup_time += LWA_ASP_OP_TIME_MS; }
+    for (n=1;n<=LWA_MAX_NSTD;n++) { if (obs[i].OBS_ASP_FLT[n]!=-1) obs[i].ASP_setup_time += LWA_ASP_OP_TIME_MS; }
+    for (n=1;n<=LWA_MAX_NSTD;n++) { if (obs[i].OBS_ASP_AT1[n]!=-1) obs[i].ASP_setup_time += LWA_ASP_OP_TIME_MS; }
+    for (n=1;n<=LWA_MAX_NSTD;n++) { if (obs[i].OBS_ASP_AT2[n]!=-1) obs[i].ASP_setup_time += LWA_ASP_OP_TIME_MS; }
+    for (n=1;n<=LWA_MAX_NSTD;n++) { if (obs[i].OBS_ASP_ATS[n]!=-1) obs[i].ASP_setup_time += LWA_ASP_OP_TIME_MS; }
     printf("[%d/%d] Obs#%d ASP setup time is %ld [ms]\n",MT_TPSS,getpid(),i,obs[i].ASP_setup_time);
     } /* for i */
 
@@ -589,12 +601,12 @@ int main ( int narg, char *argv[] ) {
         if (obs[n].OBS_STP_B[m]==LWA_BT_SPEC_DELAYS_GAINS) {
 
           fprintf(fp,"\n");   
-          for (p=1;p<=520;p++) {
+          for (p=1;p<=2*LWA_MAX_NSTD;p++) {
             fprintf(fp,"OBS_BEAM_DELAY[%d][%d] %hu\n",m,p,obs[n].OBS_BEAM_DELAY[m][p]);
             }
   
           fprintf(fp,"\n");   
-          for (p=1;p<=520;p++) {
+          for (p=1;p<=2*LWA_MAX_NSTD;p++) {
             for (q=1;q<=2;q++) {
               for (r=1;r<=2;r++) {
                 fprintf(fp,"OBS_BEAM_GAIN[%d][%d][%d][%d] %hd\n",m,p,q,r,obs[n].OBS_BEAM_GAIN[m][p][q][r]);
@@ -609,37 +621,46 @@ int main ( int narg, char *argv[] ) {
       } /* if (obs[n].OBS_MODE==LWA_OM_STEPPED) */
 
     fprintf(fp,"\n");
-    for (m=1;m<=260;m++) {
+    for (m=1;m<=LWA_MAX_NSTD;m++) {
       for (p=1;p<=2;p++) {
         fprintf(fp,"OBS_FEE[%d][%d] %d\n",m,p,obs[n].OBS_FEE[m][p]);
         }
       }
 
     fprintf(fp,"\n");
-    for (m=1;m<=260;m++) {
+    for (m=1;m<=LWA_MAX_NSTD;m++) {
       fprintf(fp,"OBS_ASP_FLT[%d] %d\n",m,obs[n].OBS_ASP_FLT[m]);
       }
 
     fprintf(fp,"\n");
-    for (m=1;m<=260;m++) {
+    for (m=1;m<=LWA_MAX_NSTD;m++) {
       fprintf(fp,"OBS_ASP_AT1[%d] %d\n",m,obs[n].OBS_ASP_AT1[m]);
       }
 
     fprintf(fp,"\n");
-    for (m=1;m<=260;m++) {
+    for (m=1;m<=LWA_MAX_NSTD;m++) {
       fprintf(fp,"OBS_ASP_AT2[%d] %d\n",m,obs[n].OBS_ASP_AT2[m]);
       }
 
     fprintf(fp,"\n");
-    for (m=1;m<=260;m++) {
+    for (m=1;m<=LWA_MAX_NSTD;m++) {
       fprintf(fp,"OBS_ASP_ATS[%d] %d\n",m,obs[n].OBS_ASP_ATS[m]);
       }
 
     fprintf(fp,"\n");
+#ifdef USE_ADP
+    fprintf(fp,"OBS_TBF_SAMPLES %ld\n",obs[n].OBS_TBF_SAMPLES);
+    fprintf(fp,"OBS_TBF_TUNING_MASK %lu\n",obs[n].OBS_TBF_TUNING_MASK);
+#else
     fprintf(fp,"OBS_TBW_BITS %d\n",obs[n].OBS_TBW_BITS);
     fprintf(fp,"OBS_TBW_SAMPLES %ld\n",obs[n].OBS_TBW_SAMPLES);
+#endif
     fprintf(fp,"OBS_TBN_GAIN %d\n",obs[n].OBS_TBN_GAIN);
     fprintf(fp,"OBS_DRX_GAIN %d\n",obs[n].OBS_DRX_GAIN);
+#ifdef USE_ADP
+    fprintf(fp,"OBS_COR_NAVG %d\n",obs[n].OBS_COR_NAVG);
+    fprintf(fp,"OBS_COR_TUNING_MASK %lu\n",obs[n].OBS_COR_TUNING_MASK);
+#endif
 
     } /* for n */
 
@@ -741,7 +762,7 @@ int main ( int narg, char *argv[] ) {
           beam.OBS_BEAM_DELAY[p-1] = obs[n].OBS_BEAM_DELAY[m][p]; 
           }
 
-        for (p=1;p<=260;p++) {
+        for (p=1;p<=LWA_MAX_NSTD;p++) {
           for (q=1;q<=2;q++) {
             for (r=1;r<=2;r++) {
               beam.OBS_BEAM_GAIN[p-1][q-1][r-1] = obs[n].OBS_BEAM_GAIN[m][p][q][r]; 
@@ -757,19 +778,28 @@ int main ( int narg, char *argv[] ) {
 
       } /* for m */
 
-    for (m=1;m<=260;m++) {
+    for (m=1;m<=LWA_MAX_NSTD;m++) {
       for (p=1;p<=2;p++) {
         osf2.OBS_FEE[m-1][p-1] = obs[n].OBS_FEE[m][p]; 
         }
       }
-    for (m=1;m<=260;m++) { osf2.OBS_ASP_FLT[m-1] = obs[n].OBS_ASP_FLT[m]; }
-    for (m=1;m<=260;m++) { osf2.OBS_ASP_AT1[m-1] = obs[n].OBS_ASP_AT1[m]; }
-    for (m=1;m<=260;m++) { osf2.OBS_ASP_AT2[m-1] = obs[n].OBS_ASP_AT2[m]; }
-    for (m=1;m<=260;m++) { osf2.OBS_ASP_ATS[m-1] = obs[n].OBS_ASP_ATS[m]; }
-    osf2.OBS_TBW_BITS    = obs[n].OBS_TBW_BITS; 
-    osf2.OBS_TBW_SAMPLES = obs[n].OBS_TBW_SAMPLES;
-    osf2.OBS_TBN_GAIN    = obs[n].OBS_TBN_GAIN;
-    osf2.OBS_DRX_GAIN    = obs[n].OBS_DRX_GAIN; 
+    for (m=1;m<=LWA_MAX_NSTD;m++) { osf2.OBS_ASP_FLT[m-1] = obs[n].OBS_ASP_FLT[m]; }
+    for (m=1;m<=LWA_MAX_NSTD;m++) { osf2.OBS_ASP_AT1[m-1] = obs[n].OBS_ASP_AT1[m]; }
+    for (m=1;m<=LWA_MAX_NSTD;m++) { osf2.OBS_ASP_AT2[m-1] = obs[n].OBS_ASP_AT2[m]; }
+    for (m=1;m<=LWA_MAX_NSTD;m++) { osf2.OBS_ASP_ATS[m-1] = obs[n].OBS_ASP_ATS[m]; }
+#ifdef USE_ADP
+    osf2.OBS_TBF_SAMPLES     = obs[n].OBS_TBF_SAMPLES;
+    osf2.OBS_TBF_TUNING_MASK = obs[n].OBS_TBF_TUNING_MASK;
+#else
+    osf2.OBS_TBW_BITS        = obs[n].OBS_TBW_BITS; 
+    osf2.OBS_TBW_SAMPLES     = obs[n].OBS_TBW_SAMPLES;
+#endif
+    osf2.OBS_TBN_GAIN        = obs[n].OBS_TBN_GAIN;
+    osf2.OBS_DRX_GAIN        = obs[n].OBS_DRX_GAIN; 
+#ifdef USE_ADP
+    osf2.OBS_COR_NAVG        = obs[n].OBS_COR_NAVG;
+    osf2.OBS_COR_TUNING_MASK = obs[n].OBS_COR_TUNING_MASK;
+#endif
 
     fwrite(&osf2,sizeof(struct osf2_struct),1,fp);
 
@@ -854,7 +884,7 @@ int main ( int narg, char *argv[] ) {
   for (n=1;n<=nobs;n++) sprintf(data,"%s\n%s %4u %4d %s_%04d_%04d.obs",data,PROJECT_ID,SESSION_ID,n,PROJECT_ID,SESSION_ID,n);
 
   //printf("<%s>\n",data);
-  sprintf(cmd,"echo \"%s\" > manifest_add.dat",data); system(cmd); 
+  sprintf(cmd,"echo \"%s\" > manifest_add.dat",data); system(cmd);
   sprintf(cmd,"cat manifest_add.dat >> %s/manifest.dat",mbox); system(cmd);
   printf("[%d/%d] Updated %s/manifest.dat\n",MT_TPSS,getpid(),mbox);
 

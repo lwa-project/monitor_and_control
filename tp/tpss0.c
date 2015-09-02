@@ -75,16 +75,25 @@
     char OBS_STP_FREQ2p[MAX_STP_N][MAX_SDF_NOTE_LENGTH];
     int OBS_STP_B[MAX_STP_N];
     unsigned short int OBS_BEAM_DELAY[MAX_STP_N][521];
-    short int OBS_BEAM_GAIN[MAX_STP_N][261][3][3];
-    int OBS_FEE[261][2];
-    int OBS_ASP_FLT[261];
-    int OBS_ASP_AT1[261];
-    int OBS_ASP_AT2[261];
-    int OBS_ASP_ATS[261];
+    short int OBS_BEAM_GAIN[MAX_STP_N][LWA_MAX_NSTD+1][3][3];
+    int OBS_FEE[LWA_MAX_NSTD+1][2];
+    int OBS_ASP_FLT[LWA_MAX_NSTD+1];
+    int OBS_ASP_AT1[LWA_MAX_NSTD+1];
+    int OBS_ASP_AT2[LWA_MAX_NSTD+1];
+    int OBS_ASP_ATS[LWA_MAX_NSTD+1];
+#ifdef USE_ADP
+    long int OBS_TBF_SAMPLES;
+    unsigned long int OBS_TBF_TUNING_MASK;
+#else
     int OBS_TBW_BITS;
     long int OBS_TBW_SAMPLES;
+#endif
     int OBS_TBN_GAIN;
     int OBS_DRX_GAIN;
+#ifdef USE_ADP
+    int OBS_COR_NAVG;
+    unsigned long int OBS_COR_TUNING_MASK;
+#endif
     long int ASP_setup_time; // not part of SDF 
     };
 

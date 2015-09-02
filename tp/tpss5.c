@@ -1,6 +1,6 @@
 
-for (n=0;n<=260;n++) { for (p=0;p<=1;p++) { obs[nobs].OBS_FEE[n][p]=-1; } }
-for (n=0;n<=260;n++) {
+for (n=0;n<=LWA_MAX_NSTD;n++) { for (p=0;p<=1;p++) { obs[nobs].OBS_FEE[n][p]=-1; } }
+for (n=0;n<=LWA_MAX_NSTD;n++) {
   for (p=0;p<=1;p++) {
 
     sprintf(keyword,"OBS_FEE[%d][%d]",n,p+1);  
@@ -16,7 +16,7 @@ for (n=0;n<=260;n++) {
           }
         if (n==0) { /* this is intended to apply to all FEEs */
           printf("[%d/%d] ...Applying this setting to this pol of all FEEs\n",MT_TPSS,getpid()); 
-          for (k=1;k<=260;k++) { 
+          for (k=1;k<=LWA_MAX_NSTD;k++) { 
             obs[nobs].OBS_FEE[k][p] = obs[nobs].OBS_FEE[n][p];  
             //printf("%d %d %d | %d\n",nobs,k,p,obs[nobs].OBS_FEE[k][p]);
             }
@@ -32,8 +32,8 @@ for (n=0;n<=260;n++) {
 
   //printf("%d %d %d\n",obs[1].OBS_FEE[0][0],obs[1].OBS_FEE[1][0],obs[1].OBS_FEE[2][0]);
 
-for (n=0;n<=260;n++) { obs[nobs].OBS_ASP_FLT[n]=-1; }
-for (n=0;n<=260;n++) {
+for (n=0;n<=LWA_MAX_NSTD;n++) { obs[nobs].OBS_ASP_FLT[n]=-1; }
+for (n=0;n<=LWA_MAX_NSTD;n++) {
 
     sprintf(keyword,"OBS_ASP_FLT[%d]",n);  
     while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
@@ -47,7 +47,7 @@ for (n=0;n<=260;n++) {
           return;
           }
         if (n==0) { /* this is intended to apply to all n */
-          for (k=1;k<=260;k++) obs[nobs].OBS_ASP_FLT[k] = obs[nobs].OBS_ASP_FLT[n];
+          for (k=1;k<=LWA_MAX_NSTD;k++) obs[nobs].OBS_ASP_FLT[k] = obs[nobs].OBS_ASP_FLT[n];
           }
         strcpy(data,"");   
         break;
@@ -58,8 +58,8 @@ for (n=0;n<=260;n++) {
 
   } /* for n */ 
 
-for (n=0;n<=260;n++) { obs[nobs].OBS_ASP_AT1[n]=-1; }
-for (n=0;n<=260;n++) {
+for (n=0;n<=LWA_MAX_NSTD;n++) { obs[nobs].OBS_ASP_AT1[n]=-1; }
+for (n=0;n<=LWA_MAX_NSTD;n++) {
 
     sprintf(keyword,"OBS_ASP_AT1[%d]",n);  
     while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
@@ -73,7 +73,7 @@ for (n=0;n<=260;n++) {
           return;
           }
         if (n==0) { /* this is intended to apply to all n */
-          for (k=1;k<=260;k++) obs[nobs].OBS_ASP_AT1[k] = obs[nobs].OBS_ASP_AT1[n];
+          for (k=1;k<=LWA_MAX_NSTD;k++) obs[nobs].OBS_ASP_AT1[k] = obs[nobs].OBS_ASP_AT1[n];
           }
         strcpy(data,"");   
         break;
@@ -84,8 +84,8 @@ for (n=0;n<=260;n++) {
 
   } /* for n */ 
 
-for (n=0;n<=260;n++) {  obs[nobs].OBS_ASP_AT2[n]=-1; }
-for (n=0;n<=260;n++) {
+for (n=0;n<=LWA_MAX_NSTD;n++) {  obs[nobs].OBS_ASP_AT2[n]=-1; }
+for (n=0;n<=LWA_MAX_NSTD;n++) {
 
     sprintf(keyword,"OBS_ASP_AT2[%d]",n); 
     while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
@@ -99,7 +99,7 @@ for (n=0;n<=260;n++) {
           return;
           }
         if (n==0) { /* this is intended to apply to all n */
-          for (k=1;k<=260;k++) obs[nobs].OBS_ASP_AT2[k] = obs[nobs].OBS_ASP_AT2[n];
+          for (k=1;k<=LWA_MAX_NSTD;k++) obs[nobs].OBS_ASP_AT2[k] = obs[nobs].OBS_ASP_AT2[n];
           }
         strcpy(data,"");   
         break;
@@ -110,8 +110,8 @@ for (n=0;n<=260;n++) {
 
   } /* for n */
 
-for (n=0;n<=260;n++) { obs[nobs].OBS_ASP_ATS[n]=-1; }
-for (n=0;n<=260;n++) {
+for (n=0;n<=LWA_MAX_NSTD;n++) { obs[nobs].OBS_ASP_ATS[n]=-1; }
+for (n=0;n<=LWA_MAX_NSTD;n++) {
 
     sprintf(keyword,"OBS_ASP_ATS[%d]",n);  
     while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
@@ -125,7 +125,7 @@ for (n=0;n<=260;n++) {
           return;
           }
         if (n==0) { /* this is intended to apply to all n */
-          for (k=1;k<=260;k++) obs[nobs].OBS_ASP_ATS[k] = obs[nobs].OBS_ASP_ATS[n];
+          for (k=1;k<=LWA_MAX_NSTD;k++) obs[nobs].OBS_ASP_ATS[k] = obs[nobs].OBS_ASP_ATS[n];
           }
         strcpy(data,"");   
         break;
@@ -136,6 +136,8 @@ for (n=0;n<=260;n++) {
 
   } /* for n */
 
+#ifdef USE_ADP
+#else
     sprintf(keyword,"OBS_TBW_BITS");  obs[nobs].OBS_TBW_BITS=12;
     while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
     switch (i) {
@@ -176,6 +178,7 @@ for (n=0;n<=260;n++) {
       case TPSS_PL_KEYWORD_MISMATCH:                                                                               break;
       case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
       }
+#endif
 
     sprintf(keyword,"OBS_TBN_GAIN");  obs[nobs].OBS_TBN_GAIN=-1; 
     while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
@@ -184,7 +187,11 @@ for (n=0;n<=260;n++) {
         printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
         sscanf(data,"%d",&(obs[nobs].OBS_TBN_GAIN));
         printf("...converts to %d\n",obs[nobs].OBS_TBN_GAIN);
+#ifdef USE_ADP
+        if ( ( obs[nobs].OBS_TBN_GAIN<-1 ) || (obs[nobs].OBS_TBN_GAIN>15) ) {  
+#else
         if ( ( obs[nobs].OBS_TBN_GAIN<-1 ) || (obs[nobs].OBS_TBN_GAIN>30) ) {   
+#endif
           printf("[%d/%d] FATAL: OBS_TBN_GAIN out of range\n",MT_TPSS,getpid());  
           return;
           }
@@ -202,7 +209,11 @@ for (n=0;n<=260;n++) {
         printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
         sscanf(data,"%d",&(obs[nobs].OBS_DRX_GAIN));
         printf("...converts to %d\n",obs[nobs].OBS_DRX_GAIN);
-        if ( ( obs[nobs].OBS_DRX_GAIN<-1 ) || (obs[nobs].OBS_DRX_GAIN>12) ) {   
+#ifdef USE_ADP
+        if ( ( obs[nobs].OBS_DRX_GAIN<-1 ) || (obs[nobs].OBS_DRX_GAIN>15) ) {
+#else
+        if ( ( obs[nobs].OBS_DRX_GAIN<-1 ) || (obs[nobs].OBS_DRX_GAIN>255) ) {   
+#endif
           printf("[%d/%d] FATAL: OBS_DRX_GAIN out of range\n",MT_TPSS,getpid());  
           return;
           }

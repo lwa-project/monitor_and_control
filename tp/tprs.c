@@ -195,22 +195,6 @@ int main ( int narg, char *argv[] ) {
   #include "tprs1.c" /* a lot of code for reading SSMIF keywords */
   fclose(fp);
 
-  ///* check for multiple ARB_ANT[][] assignments to the same antenna */
-  //for ( iAnt=0; iAnt<(2*s.nStd); iAnt++ ) { c[iAnt]=0; } 
-  //for ( iARB=0; iARB<s.nARB; iARB++ ) {
-  //  for (k=0;k<s.nARBCH;k++) {
-  //    if ( c[ s.iARBAnt[iARB][k] ] ) {
-  //      if (s.iARBAnt[iARB][k]!=0) {
-  //        printf("[%d/%d] FATAL: ARB_ANT[%d][%d] = %d has multiple assignments\n",MT_TPRS,getpid(),iARB+1,k+1,s.iARBAnt[iARB][k]);
-  //        //return; 
-  //        }
-  //      } 
-  //    c[ s.iARBAnt[iARB][k] ] = 1;
-  //    printf("[%d/%d] Saw: ARB_ANT[%d][%d] = %d\n",MT_TPRS,getpid(),iARB+1,k+1,s.iARBAnt[iARB][k]);
-  //    } /* for (k */
-  //  } /* for ( iARB */     
-  //return;
-
   /* check for multiple ARB_ANT[][] assignments to the same antenna */
   for ( iAnt=0; iAnt<(2*s.nStd); iAnt++ ) { c[iAnt]=0; } 
   for ( iARB=0; iARB<s.nARB; iARB++ ) {
