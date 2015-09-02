@@ -345,7 +345,6 @@ char *LWA_sid2str( int sid ) {
 #define LWA_CMD_SPC     39 /* SPC (DR#) */
 #define LWA_CMD_TBF     40 /* TBF (ADP) */
 #define LWA_CMD_COR     41 /* COR (ADP) */
-#define LWA_CMD_ADP_BAM 42 /* ADP variant of BAM */
 
 /* When adding commands, remember to change LWA_MAX_CMD ! */
 
@@ -370,11 +369,7 @@ int LWA_getcmd( char *ssc ) {
   if (!strcmp(ssc,"TBW")) cmd = LWA_CMD_TBW;
   if (!strcmp(ssc,"TBN")) cmd = LWA_CMD_TBN;
   if (!strcmp(ssc,"DRX")) cmd = LWA_CMD_DRX;
-#ifdef USE_ADP
-  if (!strcmp(ssc,"BAM")) cmd = LWA_CMD_ADP_BAM;
-#else
   if (!strcmp(ssc,"BAM")) cmd = LWA_CMD_BAM;
-#endif
   if (!strcmp(ssc,"FST")) cmd = LWA_CMD_FST;
   if (!strcmp(ssc,"CLK")) cmd = LWA_CMD_CLK;
   if (!strcmp(ssc,"REC")) cmd = LWA_CMD_REC;
@@ -446,7 +441,6 @@ char *LWA_cmd2str( int cmd ) {
   if (cmd == LWA_CMD_SPC)     return "SPC";
   if (cmd == LWA_CMD_TBF)     return "TBF";
   if (cmd == LWA_CMD_COR)     return "COR";
-  if (cmd == LWA_CMD_ADP_BAM) return "BAM";
   return "   ";
   } /* LWA_getsid() */
 
@@ -619,7 +613,7 @@ unsigned short int LWA_i2u_swap( unsigned short int x) {
   }
 
 signed short int LWA_i2s_swap( signed short int x) {
-  /* changes endianness of an unsigned short int */
+  /* changes endianness of an signed short int */
   unsigned char c;
   union {
     signed short int i;
@@ -642,7 +636,35 @@ unsigned int LWA_i4u_swap( unsigned int x ) {
   c = i4u.b[1]; i4u.b[1] = i4u.b[2]; i4u.b[2] = c;
   return i4u.i;
   }
+  
+unsigned int LWA_i4s_swap( signed int x ) {
+  /* changes endianness of an signed int */
+  unsigned char c;
+  union {
+    signed int i;
+    unsigned char b[4];
+    } i4s;
+  i4s.i = x;
+  c = i4s.b[0]; i4s.b[0] = i4s.b[3]; i4s.b[3] = c;
+  c = i4s.b[1]; i4s.b[1] = i4s.b[2]; i4s.b[2] = c;
+  return i4s.i;
+  }
 
+unsigned int LWA_i8u_swap( unsigned long int x ) {
+  /* changes endianness of an unsigned long int */
+  unsigned char c;
+  union {
+    unsigned long int i;
+    unsigned char b[8];
+    } i8u;
+  i8u.i = x;
+  c = i8u.b[0]; i8u.b[0] = i8u.b[7]; i8u.b[7] = c;
+  c = i8u.b[1]; i8u.b[1] = i8u.b[6]; i8u.b[6] = c;
+  c = i8u.b[2]; i8u.b[2] = i8u.b[5]; i8u.b[5] = c;
+  c = i8u.b[3]; i8u.b[3] = i8u.b[4]; i8u.b[4] = c;
+  return i8u.i;
+  }
+  
 float LWA_f4_swap( float x ) {
   /* changes endianness of a float (assumes 4 bytes) */
   unsigned char c;
@@ -892,7 +914,11 @@ struct osfs_struct { /* one step within an observation */
   unsigned short int OBS_STP_B;
   };
 
+#ifdef USE_ADP
+#define LWA_MAX_NSTD 256 /* FIXME should be reconciled with ME_MAX_NSTD */
+#else
 #define LWA_MAX_NSTD 260 /* FIXME should be reconciled with ME_MAX_NSTD */
+#endif
 struct beam_struct {
   unsigned short int OBS_BEAM_DELAY[2*LWA_MAX_NSTD];
   signed short int   OBS_BEAM_GAIN[LWA_MAX_NSTD][2][2];
@@ -904,10 +930,19 @@ struct osf2_struct { /* really just a continuation of osf_struct */
   signed short int   OBS_ASP_AT1[LWA_MAX_NSTD];
   signed short int   OBS_ASP_AT2[LWA_MAX_NSTD];
   signed short int   OBS_ASP_ATS[LWA_MAX_NSTD];
+#ifdef USE_ADP
+  unsigned int       OBS_TBF_SAMPLES;
+  unsigned long int  OBS_TBF_TUNING_MASK;
+#else
   unsigned short int OBS_TBW_BITS;
   unsigned int       OBS_TBW_SAMPLES;
+#endif
   signed short int   OBS_TBN_GAIN;
   signed short int   OBS_DRX_GAIN;
+#ifdef USE_ADP
+  signed int         OBS_COR_NAVG;
+  unsigned long int  OBS_COR_TUNING_MASK;
+#endif
   };
 
 struct me_action_struct {  /* atomic unit of action as me_exec executes session */
@@ -1054,12 +1089,12 @@ struct ssmif_struct {
 #ifdef USE_ADP
   int    nRoach;                     /* N_ROACH */
   int    nRoachCh;                   /* N_ROACHCH */
-  char   sRoachID[ME_MAX_NROACH][ME_MAX_NROACHID_LENGTH+1]; /* ROACH_ID[] */
-  char   sRoachSlot[ME_MAX_NROACH][ME_MAX_NROACHID_LENGTH+1]; /* ROACH_SLOT[] */
+  char   sRoachID[ME_MAX_NROACH][ME_MAX_ROACHID_LENGTH+1]; /* ROACH_ID[] */
+  char   sRoachSlot[ME_MAX_NROACH][ME_MAX_ROACHID_LENGTH+1]; /* ROACH_SLOT[] */
   int    eRoachDesi[ME_MAX_NROACH]; /* ROACH_DESI[] */
   int    eRoachStat[ME_MAX_NROACH][ME_MAX_NROACHCH];       /* ROACH_STAT[][] */
-  char   sRoachINR[ME_MAX_NROACH][ME_MAX_NROACHCH][ME_MAX_NROACHID_LENGTH+1]; /* ROACH_INR[][] */
-  char   sRoachINC[ME_MAX_NROACH][ME_MAX_NROACHCH][ME_MAX_NROACHID_LENGTH+1]; /* ROACH_INC[][] */
+  char   sRoachINR[ME_MAX_NROACH][ME_MAX_NROACHCH][ME_MAX_ROACHID_LENGTH+1]; /* ROACH_INR[][] */
+  char   sRoachINC[ME_MAX_NROACH][ME_MAX_NROACHCH][ME_MAX_ROACHID_LENGTH+1]; /* ROACH_INC[][] */
   int    iRoachAnt[ME_MAX_NROACH][ME_MAX_NROACHCH];        /* ROACH_ANT[][] */
 #else
   int    nDP1;                     /* N_DP1 */
@@ -1112,7 +1147,7 @@ struct subsubsystem_status_struct {
   int    eSEPStat[ME_MAX_NSEP];                /* SEP_STAT[] */
   int    eARBStat[ME_MAX_NARB][ME_MAX_NARBCH]; /* ARB_STAT[][] */
 #ifdef USE_ADP
-  int    eRoachStat[ME_MAX_NROACH1][ME_MAX_NROACHCH]; /* ROACH_STAT[][] */
+  int    eRoachStat[ME_MAX_NROACH][ME_MAX_NROACHCH]; /* ROACH_STAT[][] */
 #else
   int    eDP1Stat[ME_MAX_NDP1][ME_MAX_NDP1CH]; /* DP1_STAT[][] */
   int    eDP2Stat[ME_MAX_NDP2];                /* DP2_STAT[] */
@@ -1331,7 +1366,7 @@ int me_sc_MakeASM( struct ssmif_struct s, struct sc_struct *sc ) {
 
 #ifdef USE_ADP
   /* load ROACH channel information into station config data structure */
-  for ( i=0; i<s.nROACH; i++ ) {
+  for ( i=0; i<s.nRoach; i++ ) {
     for ( c=0; c<s.nRoachCh; c++ ) {
       m = s.iRoachAnt[i][c]-1; /* this is the ANT that this ROACH channel is associated with */ 
       k = s.iAntStd[m]-1;    /* this is the STD that this ROACH channel is associated with */
@@ -1346,9 +1381,9 @@ int me_sc_MakeASM( struct ssmif_struct s, struct sc_struct *sc ) {
     for ( c=0; c<s.nDP1Ch; c++ ) {
       m = s.iDP1Ant[i][c]-1; /* this is the ANT that this DP1 channel is associated with */ 
       k = s.iAntStd[m]-1;    /* this is the STD that this DP1 channel is associated with */
-      sc->Stand[k].Ant[s.iAntOrie[m]].DP1.i = i;  
-      sc->Stand[k].Ant[s.iAntOrie[m]].DP1.c = c;     
-      sc->Stand[k].Ant[s.iAntOrie[m]].DP1.iStat = s.eDP1Stat[i][c];
+      sc->Stand[k].Ant[s.iAntOrie[m]].DP.i = i;  
+      sc->Stand[k].Ant[s.iAntOrie[m]].DP.c = c;     
+      sc->Stand[k].Ant[s.iAntOrie[m]].DP.iStat = s.eDP1Stat[i][c];
       } /* for c */ 
     } /* for i */
 #endif
@@ -1362,7 +1397,7 @@ int me_sc_MakeASM( struct ssmif_struct s, struct sc_struct *sc ) {
       if ( sc->Stand[i].Ant[k].RPD.iStat < sc->Stand[i].Ant[k].iSS ) { sc->Stand[i].Ant[k].iSS = sc->Stand[i].Ant[k].RPD.iStat; }
       if ( sc->Stand[i].Ant[k].SEP.iStat < sc->Stand[i].Ant[k].iSS ) { sc->Stand[i].Ant[k].iSS = sc->Stand[i].Ant[k].SEP.iStat; }
       if ( sc->Stand[i].Ant[k].ARX.iStat < sc->Stand[i].Ant[k].iSS ) { sc->Stand[i].Ant[k].iSS = sc->Stand[i].Ant[k].ARX.iStat; }
-      if ( sc->Stand[i].Ant[k].DP.iStat < sc->Stand[i].Ant[k].iSS ) { sc->Stand[i].Ant[k].iSS = sc->Stand[i].Ant[k].DP.iStat; }
+      if ( sc->Stand[i].Ant[k].DP.iStat  < sc->Stand[i].Ant[k].iSS ) { sc->Stand[i].Ant[k].iSS = sc->Stand[i].Ant[k].DP.iStat;  }
       }
     }
 
