@@ -223,7 +223,7 @@ int main ( int narg, char *argv[] ) {
 
       if (s.iRoachAnt[i][k]!=0) { /* otherwise this Roach input is not connected to an antenna */      
         ia = s.iRoachAnt[i][k] - 1;
-        px[i*s.nRoackCh+k] = s.fStdLx[ s.iAntStd[ia] - 1 ];
+        px[i*s.nRoachCh+k] = s.fStdLx[ s.iAntStd[ia] - 1 ];
         py[i*s.nRoachCh+k] = s.fStdLy[ s.iAntStd[ia] - 1 ];
         pz[i*s.nRoachCh+k] = s.fStdLz[ s.iAntStd[ia] - 1 ];
         id[ia] = i*s.nRoachCh+k; /* reverse lookup (ADP input channel index given antenna index); simplifies work later */

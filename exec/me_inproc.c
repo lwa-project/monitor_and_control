@@ -1047,10 +1047,10 @@ int main ( int narg, char *argv[] ) {
                 cs[ncs].action.bASAP = 0; 
                 cs[ncs].action.sid = LWA_SID_ADP;
                 cs[ncs].action.cid = LWA_CMD_COR;  
-                sprintf( cs[ncs].data, "%d %lld %hu %ld",
-                                osf.OBS_CORR_NAVG,                 /* integration time */
-                                   osf.OBS_COR_TUNING_MASK,        /* tuning mask */
-                                       osf2.OBS_TBN_GAIN);      /* 0-15 */
+                sprintf( cs[ncs].data, "%d %ld %hu %ld",
+                                osf2.OBS_COR_NAVG,             /* integration time */
+                                   osf2.OBS_COR_TUNING_MASK,    /* tuning mask */
+                                       osf2.OBS_TBN_GAIN,      /* 0-15 */
                                           t0);                 // subslot 0..99 (uint8 sub_slot)
                 cs[ncs].action.len = strlen(cs[ncs].data)+1;
                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
@@ -1459,7 +1459,7 @@ int main ( int narg, char *argv[] ) {
 #ifdef USE_ADP
               cs[ncs].action.sid = LWA_SID_ADP;  
               cs[ncs].action.cid = LWA_CMD_BAM; 
-              sprintf( cs[ncs].data, "%hd %s %s %ld %ld",
+              sprintf( cs[ncs].data, "%hd %s %s %d %ld",
                                       osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                           dfile,
                                              gfile,
@@ -1526,10 +1526,19 @@ int main ( int narg, char *argv[] ) {
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_AT1[%d]=%hd\n",m,osf2.OBS_ASP_AT1[m]); }
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_AT2[%d]=%hd\n",m,osf2.OBS_ASP_AT2[m]); }
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_ATS[%d]=%hd\n",m,osf2.OBS_ASP_ATS[m]); }
+#ifdef USE_ADP
+          fprintf(fpl,"osf2.OBS_TBF_SAMPLES=%u\n",osf2.OBS_TBF_SAMPLES); 
+          fprintf(fpl,"osf2.OBS_TBF_TUNING_MASK=%lu\n",osf2.OBS_TBF_TUNING_MASK);
+#else
           fprintf(fpl,"osf2.OBS_TBW_BITS=%hu\n",osf2.OBS_TBW_BITS); 
           fprintf(fpl,"osf2.OBS_TBW_SAMPLES=%u\n",osf2.OBS_TBW_SAMPLES);   
+#endif
           fprintf(fpl,"osf2.OBS_TBN_GAIN=%hd\n",osf2.OBS_TBN_GAIN);  
           fprintf(fpl,"osf2.OBS_DRX_GAIN=%hd\n",osf2.OBS_DRX_GAIN); 
+#ifdef USE_ADP
+          fprintf(fpl,"osf2.OBS_COR_NAVG=%u\n",osf2.OBS_COR_NAVG); 
+          fprintf(fpl,"osf2.OBS_COR_TUNING_MASK=%lu\n",osf2.OBS_COR_TUNING_MASK);
+#endif
 
           } /* for ( i=1, i<=ssf.SESSION_NOBS; i++ ) */
 
