@@ -5,7 +5,7 @@
 CFLAGS := -I../common
 LDFLAGS := -lm -lncurses
 
-TARGETS :=  mesix meosx memdrex mecfg medfg megfg me_exec meeix me_init me_tpcom me_inproc mefsdfg me_getaltaz_x me_point_corr_x me_findsol_x me_findjov_x me_precess_x me_getlst_x
+TARGETS :=  mesix meosx memdrex mecfg medfg megfg me_exec meeix me_init me_tpcom me_inproc me_mon mefsdfg me_getaltaz_x me_point_corr_x me_findsol_x me_findjov_x me_precess_x me_getlst_x
 
 all: $(TARGETS)
 
@@ -39,14 +39,14 @@ me_init: me_init.c me.h ../common/mcs.h
 me_tpcom: me_tpcom.c me.h ../common/mcs.h
 	$(CC) $(CFLAGS) -o me_tpcom me_tpcom.c $(LDFLAGS)
 
+me_mon: me_mon.c me.h ../common/mcs.h
+	$(CC) $(CFLAGS) -o me_mon me_mon.c $(LDFLAGS)
+
 mefsdfg: mefsdfg.c me.h ../common/mcs.h
 	$(CC) $(CFLAGS) -o mefsdfg mefsdfg.c $(LDFLAGS)
 
 me_point_corr_x: me_point_corr_x.o me_point_corr.o
 	$(CC) $(CFLAGS) -o me_point_corr_x me_point_corr_x.o me_point_corr.o $(LDFLAGS) 
-
-me_mon: me_mon.c
-	$(CC) $(CFLAGS) -o me_mon me_mon.c -lncurses $(LDFLAGS)
 
 #
 # Programs that rely on code from PyEphem/XEphem
