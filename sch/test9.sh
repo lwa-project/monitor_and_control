@@ -21,10 +21,20 @@
 # Note this script assumes all software running on the same computer
 # (Otherwise, change 127.0.0.1 to appropriate IPs)
 
+# Figure out if we are DP or ADP-compatible
+usingADP=`strings msei | grep ADP `
+if [ ${usingADP} == "" ]; then
+	# DP
+	dpName="DP_"
+else
+	# ADP
+	dpName="ADP"
+fi
+
 # Fire up an emulator to play the role of subsystems
 python mch_minimal_server_acceptall.py SHL 127.0.0.1 1739 1738 &
 python mch_minimal_server_acceptall.py ASP 127.0.0.1 1741 1740 &
-python mch_minimal_server_acceptall.py DP_ 127.0.0.1 1743 1742 &
+python mch_minimal_server_acceptall.py ${dpName} 127.0.0.1 1743 1742 &
 python mch_minimal_server_acceptall.py DR1 127.0.0.1 1745 1744 &
 python mch_minimal_server_acceptall.py DR2 127.0.0.1 1747 1746 &
 python mch_minimal_server_acceptall.py DR3 127.0.0.1 1749 1748 &
@@ -47,12 +57,12 @@ python mch_minimal_server_acceptall.py DR5 127.0.0.1 1753 1752 &
 
 # Create an ms_init initialization file called "test9.dat" 
 echo \
-'mibinit SHL 127.0.0.1 1738 1739
+"mibinit SHL 127.0.0.1 1738 1739
 mcic    SHL
 mibinit ASP 127.0.0.1 1740 1741
 mcic    ASP
-mibinit DP_ 127.0.0.1 1742 1743
-mcic    DP_
+mibinit ${dpName} 127.0.0.1 1742 1743
+mcic    ${dpName}
 mibinit DR1 127.0.0.1 1744 1745
 mcic    DR1
 mibinit DR2 127.0.0.1 1746 1747
@@ -62,12 +72,8 @@ mcic    DR3
 mibinit DR4 127.0.0.1 1750 1751
 mcic    DR4
 mibinit DR5 127.0.0.1 1752 1753
-mcic    DR5' > test9.dat
+mcic    DR5" > test9.dat
 
 # MCS/Scheduler start (allow a few seconds to get everything running)
 ./ms_init test9.dat
 sleep 5
-
-
-
-
