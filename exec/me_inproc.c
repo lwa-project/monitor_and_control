@@ -1208,7 +1208,7 @@ int main ( int narg, char *argv[] ) {
                   /* pointing correction */
                   me_point_corr( s.fPCAxisTh, s.fPCAxisPh, s.fPCRot, &alt, &az );                    
 
-                  //printf("alt=%f last_alt=%f %f | az=%f last_az=%f %f\n",alt,last_alt,angle_sep(alt,last_alt,360.0),az,last_az,angle_sep(alt,last_alt,360.0));
+                  printf("alt=%f last_alt=%f %f | az=%f last_az=%f %f\n",alt,last_alt,angle_sep(alt,last_alt,360.0),az,last_az,angle_sep(alt,last_alt,360.0));
                   if ( (angle_sep(alt,last_alt,360.0)>=LWA_RES_DEG) || (angle_sep(az,last_az,360.0)>=LWA_RES_DEG) || bFirst ) {
 
                     bFirst = 0;
@@ -1422,7 +1422,7 @@ int main ( int narg, char *argv[] ) {
                     /* date.                                                                  */
                     /* Updated: 2015 Aug 31                                                   */
                     ra = osfs.OBS_STP_C1;
-                    dec = osf.OBS_STP_C2;
+                    dec = osfs.OBS_STP_C2;
                     me_precess( mjd, mpm, &ra, &dec);
                     dist = 1e10; 
                     me_getaltaz( ra, 
@@ -1511,7 +1511,7 @@ int main ( int narg, char *argv[] ) {
               printf(     "[%d/%d] FATAL: me_inproc doesn't see '2^32-2' marker\n",ME_INPROC,getpid());
               closedir(dir); 
               fcloseall();          
-              return; 
+              return;
               }
 
             } /* for m */
@@ -1594,7 +1594,7 @@ int main ( int narg, char *argv[] ) {
               default: break;
               }
               
-          cs[ncs].action.tv.tv_sec   = cs[ncs-1].action.tv.tv_sec;
+          cs[ncs].action.tv.tv_sec   = cs[ncs-1].action.tv.tv_sec + 1;
           cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec;
           cs[ncs].action.bASAP = 0;                   
           cs[ncs].action.sid = LWA_SID_MCS;           /* first command is always directed to MCS */
