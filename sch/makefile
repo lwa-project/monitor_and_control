@@ -59,6 +59,7 @@ ms_mon: ms_mon.c ../common/mcs.h
 
 .PHONY: install
 install:
+	install -d ../../sch ../../sch/cfiles ../../sch/dfiles ../../sch/gfiles
 	for target in $(TARGETS); do \
 		install $$target ../../sch/.; \
 	done

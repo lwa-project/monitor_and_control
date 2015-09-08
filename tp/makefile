@@ -29,6 +29,7 @@ tprcs: tprcs.c mt.h ../common/mcs.h
 
 .PHONY: install
 install: all
+	install -d ../../tp ../../tp/mbox ../../tp/test
 	for target in $(TARGETS); do \
 		install $$target ../../tp/.; \
 	done

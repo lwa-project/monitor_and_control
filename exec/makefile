@@ -117,6 +117,7 @@ ephem_vsop87_data.o: ephem_vsop87_data.c ephem_vsop87.h ephem_astro.h
 
 .PHONY: install
 install:
+	install -d ../../exec
 	for target in $(TARGETS); do \
 		install $$target ../../exec/.; \
 	done
