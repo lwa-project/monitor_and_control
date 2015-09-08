@@ -78,7 +78,11 @@ int me_medfg( struct beam_struct beam,
   fclose(fp);
 
   /* Transfer the file */
-  sprintf(cmd, "scp %s %s:%s/dfiles/.",df_file,LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
+  #ifdef ME_SCP2CP  /*see me.h */
+    sprintf(cmd, "cp %s %s/dfiles/.",df_file,LWA_SCH_SCP_DIR);
+  #else
+     sprintf(cmd, "scp %s %s:%s/dfiles/.",df_file,LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
+  #endif
   fprintf(fpl,"me_medfg(): system('%s')\n",cmd);
   //printf("'%s'\n",cmd);
   system(cmd);
@@ -139,7 +143,11 @@ int me_megfg( struct beam_struct beam,
   fclose(fp);
 
   /* Transfer the file */
-  sprintf(cmd, "scp %s %s:%s/gfiles/.",gf_file,LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
+  #ifdef ME_SCP2CP  /*see me.h */
+     sprintf(cmd, "cp %s %s/gfiles/.",gf_file,LWA_SCH_SCP_DIR);
+  #else
+     sprintf(cmd, "scp %s %s:%s/gfiles/.",gf_file,LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
+  #endif
   fprintf(fpl,"me_megfg(): system('%s')\n",cmd);
   //printf("'%s'\n",cmd);
   system(cmd);
@@ -231,7 +239,11 @@ int me_beamspec( char *cs_filename,
     system(cmd);
 
     /* Transfer the files */
-    sprintf(cmd, "scp me_inproc_bm/* %s:%s/dfiles/.",LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
+    #ifdef ME_SCP2CP  /*see me.h */
+       sprintf(cmd, "cp me_inproc_bm/* %s/dfiles/.",LWA_SCH_SCP_DIR);
+    #else
+       sprintf(cmd, "scp me_inproc_bm/* %s:%s/dfiles/.",LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
+    #endif
     fprintf(fpl,"me_beamspec(): system('%s')\n",cmd);
     //printf("'%s'\n",cmd);
     system(cmd);
@@ -337,11 +349,11 @@ int me_bdm_setup( char *OBS_BDM,
   system(cmd);
 
   /* copy this file to ../sch/gfiles/. */
-  #ifdef ME_SCP2CP
-      sprintf(cmd, "cp me_inproc_bm/%s %s/gfiles/.",gfile,LWA_SCH_SCP_DIR);
-    #else
-      sprintf(cmd, "scp me_inproc_bm/%s %s:%s/gfiles/.",gfile,LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
-    #endif
+  #ifdef ME_SCP2CP  /*see me.h */
+     sprintf(cmd, "cp me_inproc_bm/%s %s/gfiles/.",gfile,LWA_SCH_SCP_DIR);
+  #else
+     sprintf(cmd, "scp me_inproc_bm/%s %s:%s/gfiles/.",gfile,LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
+  #endif
   system(cmd);
 
   return err;
@@ -506,6 +518,7 @@ int main ( int narg, char *argv[] ) {
   struct ssmif_struct s; 
 
   long int mjd, mpm;
+  float ra, dec;
   float dist;
  
   double alt, az, last;
@@ -819,16 +832,10 @@ int main ( int narg, char *argv[] ) {
 
             /* for DP outputs 1-4 (beams), we do this once; i.e., one recording per session */
             /* for DP output 5 (TBN/TBW), we do a new recording for each observation */
-            /* for ADP outputs 1-32 (beams), we do this once; i.e., one recording per session */
-            /* for ADP output 33 (TBF), we do a new recording for each observation */
-#ifdef USE_ADP
-            if ( ( (osf.SESSION_DRX_BEAM<33) && (i==1) ) || 
-                 (  osf.SESSION_DRX_BEAM==33           )   ) {
-#else
-            if ( ( (osf.SESSION_DRX_BEAM<5) && (i==1) ) || 
-                 (  osf.SESSION_DRX_BEAM==5           )   ) {
-#endif
-
+            /* for ADP outputs 1-31 (beams), we do this once; i.e., one recording per session */
+            /* for ADP output 32 (TBF), we do a new recording for each observation */
+            if ( ( (osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) && (i==1) ) || 
+                 (  osf.SESSION_DRX_BEAM==ME_MAX_NDPOUT           )   ) {
               dr_sid=-1;
               for( i=0; i<ME_MAX_NDR; i++ ) {
                  if( osf.SESSION_DRX_BEAM == s.iDRDP[i] ) {
@@ -843,12 +850,8 @@ int main ( int narg, char *argv[] ) {
                 fcloseall();
                 return;
                 }
-
-#ifdef USE_ADP
-              if (osf.SESSION_DRX_BEAM<33) {
-#else
-              if (osf.SESSION_DRX_BEAM<5) {
-#endif
+                
+              if (osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) {
                   dr_length_ms = ssf.SESSION_DUR; /* beam obs are recorded contiguously in one session */
                 } else {
                   dr_length_ms = osf.OBS_DUR; /* each TBN/TBW/TBF observation is a separate recording */ 
@@ -1175,16 +1178,29 @@ int main ( int narg, char *argv[] ) {
                   /* into geocentric apparent coordiantes at the epoch of date.      */
                   /* Updated: 2015 Aug 31                                            */
                   switch (osf.OBS_MODE) {
-                    case LWA_OM_TRK_SOL: me_findsol( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist ); break;  
-                    case LWA_OM_TRK_JOV: me_findjov( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist ); break;
+                    case LWA_OM_TRK_SOL:
+                      me_findsol( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist );
+                      ra = osf.OBS_RA;
+                      dec = osf.OBS_DEC;
+	                 break;  
+                    case LWA_OM_TRK_JOV:
+                      me_findjov( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist );
+                      ra = osf.OBS_RA;
+                      dec = osf.OBS_DEC;
+                      break;
                     /* FIXME:  Does this do anything bad to the metadata that comes out? */
-                    case LWA_OM_TRK_RADEC: me_precess( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC) ); dist=1e10; break;
+                    case LWA_OM_TRK_RADEC:
+                      ra = osf.OBS_RA;
+                      dec = osf.OBS_DEC;
+                      me_precess( mjd, mpm, &ra, &dec );
+                      dist = 1e10;
+                      break;
                     default: break;
                     }
 
                   /* get updated alt/az */
-                  me_getaltaz( osf.OBS_RA, 
-                               osf.OBS_DEC, 
+                  me_getaltaz( ra, 
+                               dec, 
                                dist, 
                                mjd, mpm, 
                                s.fGeoN, s.fGeoE, s.fGeoEl, 
@@ -1405,9 +1421,12 @@ int main ( int narg, char *argv[] ) {
                     /* and move them into geocentric apparent coordiantes at the epoch of     */
                     /* date.                                                                  */
                     /* Updated: 2015 Aug 31                                                   */
-                    me_precess( mjd, mpm, &(osfs.OBS_STP_C1), &(osfs.OBS_STP_C2));  dist=1e10; 
-                    me_getaltaz( osfs.OBS_STP_C1, 
-                                 osfs.OBS_STP_C2, 
+                    ra = osfs.OBS_STP_C1;
+                    dec = osf.OBS_STP_C2;
+                    me_precess( mjd, mpm, &ra, &dec);
+                    dist = 1e10; 
+                    me_getaltaz( ra, 
+                                 dec, 
                                  dist, 
                                  mjd, mpm, 
                                  s.fGeoN, s.fGeoE, s.fGeoEl, 
@@ -1555,7 +1574,7 @@ int main ( int narg, char *argv[] ) {
               case LWA_OM_TRK_SOL:
               case LWA_OM_TRK_JOV:
               case LWA_OM_STEPPED:
-                 cs[ncs].action.tv.tv_sec  = cs[ncs-1].action.tv.tv_sec + 1;
+                 cs[ncs].action.tv.tv_sec  = cs[ncs-1].action.tv.tv_sec;
                  cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec;
 #ifdef USE_ADP
                  cs[ncs].action.sid = LWA_SID_ADP;  
