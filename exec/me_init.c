@@ -165,6 +165,7 @@ main ( int narg, char *argv[] ) {
       printf("[%d/%d] me_init: FATAL: fork for ./me_tpcom failed\n",ME_INIT,getpid());
       me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: FATAL: fork for ./me_tpcom failed", sq_ptr, 0 );
       return;
+      break;
     case 0: /* fork() succeeded; we are now in the child process */
       err = execl("./me_tpcom","me_tpcom",NULL); /* launch me_tpcom */
       /* if we get to this point then we failed to launch */
@@ -191,6 +192,7 @@ main ( int narg, char *argv[] ) {
       printf("[%d/%d] me_init: FATAL: fork for ./me_inproc failed\n",ME_INIT,getpid());
       me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: FATAL: fork for ./me_inproc failed", sq_ptr, 0 );
       return;
+      break;
     case 0: /* fork() succeeded; we are now in the child process */
       err = execl("./me_inproc","me_inproc",NULL); /* launch me_inproc */
       /* if we get to this point then we failed to launch */
@@ -312,7 +314,7 @@ main ( int narg, char *argv[] ) {
       printf("[%d/%d] FATAL: fork for ./me_exec failed\n",ME_INIT,getpid());
       return;
     case 0: /* fork() succeeded; we are now in the child process */
-      err = execl("./me_exec","me_exec",sFlagset,filename_ssmif,sMeTpcomPid,sMeInprocPid,NULL); /* launch me_exec */
+      err = execl("./me_exec","me_exec",sFlagset,sMeTpcomPid,sMeInprocPid,NULL); /* launch me_exec */
       /* if we get to this point then we failed to launch */
       if (err==-1) {
         printf("[%d/%d] me_init: FATAL: failed to execl('./me_exec',...)\n",ME_INIT,getpid()); 

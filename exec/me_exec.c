@@ -552,20 +552,21 @@ int main ( int narg, char *argv[] ) {
   me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "Shutdown complete. Bye.", sq_ptr, 0 );
   fclose(fpl);
   
+  /* just in case */
+  fcloseall();
+  
   /* put it somewhere safe */
   /* get the current time in conventional format */
   gettimeofday(&tv,&tz); 
   tm = gmtime(&tv.tv_sec);
-  sprintf(cmd,"cp %s meelog_%02d%02d%02d_%02d%02d.txt", ME_LOG_FILENAME, 
+  sprintf(cmd,"cp %s state/meelog_%02d%02d%02d_%02d%02d.txt", ME_LOG_FILENAME, 
          (tm->tm_year)-100, (tm->tm_mon)+1, tm->tm_mday, tm->tm_hour, tm->tm_min);
   system(cmd);
-
-  /* just in case */
-  fcloseall();
 
   /* Say goodnight Gracie */
   printf("[%d/%d] me_exec: Shutdown complete. Bye.\n",ME_ME_C,getpid());
   fflush(stdout);
+  
   //sleep(3); /* give time for message to write out without borking command prompt */
   return eQuit-1;
   } /* main() */

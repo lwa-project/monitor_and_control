@@ -26,7 +26,7 @@
 
 #include "me.h"
 #include "me_astro.h"
-/* NOTE: the above also pulls in four additional files "ephem_*" */
+/* NOTE: the above also pulls in several additional files "ephem_*" */
 
 #define ME_INPROC_DATA_LEN 256   /* size of the "data" string associated with each */
                                  /* command in the command script */
@@ -1208,7 +1208,7 @@ int main ( int narg, char *argv[] ) {
                   /* pointing correction */
                   me_point_corr( s.fPCAxisTh, s.fPCAxisPh, s.fPCRot, &alt, &az );                    
 
-                  printf("alt=%f last_alt=%f %f | az=%f last_az=%f %f\n",alt,last_alt,angle_sep(alt,last_alt,360.0),az,last_az,angle_sep(alt,last_alt,360.0));
+                  //printf("alt=%f last_alt=%f %f | az=%f last_az=%f %f\n",alt,last_alt,angle_sep(alt,last_alt,360.0),az,last_az,angle_sep(alt,last_alt,360.0));
                   if ( (angle_sep(alt,last_alt,360.0)>=LWA_RES_DEG) || (angle_sep(az,last_az,360.0)>=LWA_RES_DEG) || bFirst ) {
 
                     bFirst = 0;
