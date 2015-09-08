@@ -15,7 +15,7 @@
 /* Uncomment the following to command ADP instead   */ 
 /* of DP.                                           */
 /****************************************************/
-//#define USE_ADP /* Use the new ADP at LWA-SV
+#define USE_ADP /* Use the new ADP at LWA-SV
 
 
 /*****************************************************/
@@ -683,6 +683,50 @@ float LWA_f4_swap( float x ) {
 /*=== MCS/Exec stuff =================================*/
 /*====================================================*/
 
+/**************************************/
+/*** moved here from me.h *************/
+/**************************************/
+
+#ifdef USE_ADP
+#define ME_SSMIF_FORMAT_VERSION 8
+#else
+#define ME_SSMIF_FORMAT_VERSION 7
+#endif
+
+#define ME_MAX_NSTD 260
+#define ME_MAX_NFEE 260
+#define ME_MAX_FEEID_LENGTH 10
+#define ME_MAX_RACK 6
+#define ME_MAX_PORT 50
+#define ME_MAX_NRPD 520
+#define ME_MAX_RPDID_LENGTH 25
+#define ME_MAX_NSEP 520
+#define ME_MAX_SEPID_LENGTH 25
+#define ME_MAX_SEPCABL_LENGTH 25
+#define ME_MAX_NARB 33
+#define ME_MAX_NARBCH 16
+#define ME_MAX_ARBID_LENGTH 10
+#ifdef USE_ADP
+#define ME_MAX_NROACH 16
+#define ME_MAX_NROACHCH 32
+#define ME_MAX_ROACHID_LENGTH 10
+#else
+#define ME_MAX_NDP1 26
+#define ME_MAX_NDP1CH 20
+#define ME_MAX_DP1ID_LENGTH 10
+#define ME_MAX_NDP2 2
+#define ME_MAX_DP2ID_LENGTH 10
+#endif
+#define ME_MAX_NDR 5
+#define ME_MAX_DRID_LENGTH 10
+#define ME_MAX_NPWRPORT 50
+#define ME_MAX_SSNAME_LENGTH 3 /* for codes used for PWR_NAME */
+#ifdef USE_ADP
+#define ME_MAX_NDPOUT 32 /* ADP outputs; = #tunings */
+#else
+#define ME_MAX_NDPOUT 5 /* DP outputs; = #beams + 1 for TBW/TBN */
+#endif
+
 /* defined observing modes (MCS0030) */
 #define LWA_OM_TRK_RADEC 1
 #define LWA_OM_TRK_SOL   2
@@ -752,7 +796,7 @@ void LWA_saybeamtype( int mode, char *ssc ) {
   } /* LWA_saybeamtype() */
 
 int LWA_dpoavail( 
-  signed short int dpo,            /* DP/ADP output: numbered 1 through 5 (5 is TBW/TBN) for DP; 1 through 33 for ADP (33 is TBF) */
+  signed short int dpo,            /* DP/ADP output: numbered 1 through 5 (5 is TBW/TBN) for DP; 1 through 32 for ADP (32 is TBF/COR) */
   struct timeval t0,  /* start time */
   long int d,         /* duration (ms) */
   char *path,         /* path to mess.dat, no trailing slash */
@@ -766,11 +810,7 @@ int LWA_dpoavail(
   FILE *fp;
   char filename[256];
   char line[256];
-#ifdef USE_ADP
-  int dpos[33];
-#else
-  int dpos[5]; 
-#endif
+  int dpos[ME_MAX_NDPOUT];
   int i;
   long int mjd,mpm;
   int dpox;
@@ -780,30 +820,19 @@ int LWA_dpoavail(
   char session_id[256];
   struct timeval t1,t2,t3;
 
-#ifdef USE_ADP
-   if ((dpo<1) || (dpo>33)) {
-    sprintf(msg,"dpo=%d is out of range (1-33)",dpo);
+   if ((dpo<1) || (dpo>ME_MAX_NDPOUT)) {
+    sprintf(msg,"dpo=%d is out of range (1-%i)",dpo,ME_MAX_NDPOUT);
     return -1;
     }
-#else
-  if ((dpo<1) || (dpo>5)) {
-    sprintf(msg,"dpo=%d is out of range (1-5)",dpo);
-    return -1;
-    }
-#endif
-
+    
   sprintf(filename,"%s/mess.dat",path);
   if (!(fp=fopen(filename,"r"))) {
     sprintf(msg,"can't open file '%s'",filename);
     return -2;
     }
-
-#ifdef USE_ADP
-  for (i=0;i<33;i++) dpos[i]=-1; /* initialize these */
-#else
-  for (i=0;i<5;i++) dpos[i]=-1; /* initialize these */
-#endif
-	  
+    
+  for (i=0;i<ME_MAX_NDPOUT;i++) dpos[i]=-1; /* initialize these */
+  
   fgets(line,256,fp); /* this should be MCS_CRA */
   fgets(line,256,fp); /* this should five numbers representing status of each beam output */
   //printf("LWA_dpoavail: <%s>\n",line);
@@ -952,51 +981,6 @@ struct me_action_struct {  /* atomic unit of action as me_exec executes session 
   int cid;            /* command ID; see LWA_CMD_* */
   int len;            /* number of bytes in remainder of command */
   };
-
-
-/**************************************/
-/*** moved here from me.h *************/
-/**************************************/
-
-#ifdef USE_ADP
-#define ME_SSMIF_FORMAT_VERSION 8
-#else
-#define ME_SSMIF_FORMAT_VERSION 7
-#endif
-
-#define ME_MAX_NSTD 260
-#define ME_MAX_NFEE 260
-#define ME_MAX_FEEID_LENGTH 10
-#define ME_MAX_RACK 6
-#define ME_MAX_PORT 50
-#define ME_MAX_NRPD 520
-#define ME_MAX_RPDID_LENGTH 25
-#define ME_MAX_NSEP 520
-#define ME_MAX_SEPID_LENGTH 25
-#define ME_MAX_SEPCABL_LENGTH 25
-#define ME_MAX_NARB 33
-#define ME_MAX_NARBCH 16
-#define ME_MAX_ARBID_LENGTH 10
-#ifdef USE_ADP
-#define ME_MAX_NROACH 16
-#define ME_MAX_NROACHCH 32
-#define ME_MAX_ROACHID_LENGTH 10
-#else
-#define ME_MAX_NDP1 26
-#define ME_MAX_NDP1CH 20
-#define ME_MAX_DP1ID_LENGTH 10
-#define ME_MAX_NDP2 2
-#define ME_MAX_DP2ID_LENGTH 10
-#endif
-#define ME_MAX_NDR 5
-#define ME_MAX_DRID_LENGTH 10
-#define ME_MAX_NPWRPORT 50
-#define ME_MAX_SSNAME_LENGTH 3 /* for codes used for PWR_NAME */
-#ifdef USE_ADP
-#define ME_MAX_NDPOUT 33 /* ADP outputs; = #beams + 1 for TBF */
-#else
-#define ME_MAX_NDPOUT 5 /* DP outputs; = #beams + 1 for TBW/TBN */
-#endif
 
 /* this sub-structure is used in both the ssmif and sdm */
 struct station_settings_struct {

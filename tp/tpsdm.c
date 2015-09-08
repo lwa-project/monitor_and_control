@@ -657,9 +657,9 @@ int main ( int narg, char *argv[] ) {
       if (bStatic) {
 
 #ifdef USE_ADP
-        for ( i=0; i<33; i++ ) {
-          if (i<32)              { sprintf(st1," Beam #%d",i+1);                     }
-          if (i>31)              { k=0; m = 0;             sprintf(st1," TBF/COR "); }
+        for ( i=0; i<ME_MAX_NDPOUT; i++ ) {
+          if (i<ME_MAX_NDPOUT-1)              { sprintf(st1," Beam #%d",i+1);                     }
+          if (i>ME_MAX_NDPOUT-2)              { k=0; m = 0;             sprintf(st1," TBF/COR "); }
           if ( sc.DPO[i].iDR > 0 ) { 
               sprintf(st2," DR%1d %1d",sc.DPO[i].iDR,s.eDRStat[sc.DPO[i].iDR-1]); 
               //printf("<%1d>",s.eDRStat[sc.DPO[i].iDR]); 
@@ -681,10 +681,10 @@ int main ( int narg, char *argv[] ) {
         printf("| DR_ID (DR associated with this DP output)\n");
         printf("  stat (for this DR) (static)\n");
 #else
-        for ( i=0; i<5; i++ ) {
+        for ( i=0; i<ME_MAX_NDPOUT; i++ ) {
           if (i<2)              { k=1; m = s.eDP2Stat[0]; sprintf(st1," DP2 #%1d %1d",k,m); }
-          if ( (i>1) && (i<4) ) { k=2; m = s.eDP2Stat[1]; sprintf(st1," DP2 #%1d %1d",k,m); }
-          if (i>4)              { k=0; m = 0;             sprintf(st1," TBW/TBN ");         }
+          if ( (i>1) && (i<ME_MAX_NDPOUT-1) ) { k=2; m = s.eDP2Stat[1]; sprintf(st1," DP2 #%1d %1d",k,m); }
+          if (i>ME_MAX_NDPOUT-2)              { k=0; m = 0;             sprintf(st1," TBW/TBN ");         }
           if ( sc.DPO[i].iDR > 0 ) { 
               sprintf(st2," DR%1d %1d",sc.DPO[i].iDR,s.eDRStat[sc.DPO[i].iDR-1]); 
               //printf("<%1d>",s.eDRStat[sc.DPO[i].iDR]); 
