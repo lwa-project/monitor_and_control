@@ -5,7 +5,7 @@
 CFLAGS := -I/usr/include/gdbm -I../common 
 LDFLAGS := -lgdbm_compat -lgdbm -lncurses
 
-TARGETS := ms_init dat2dbm ms_mcic ms_exec msei ms_mdr ms_mdre ms_makeMIB_ASP ms_makeMIB_ADP ms_makeMIB_DP ms_makeMIB_DR ms_md2t ms_mb ms_mu ms_mdre_ip ms_mon
+TARGETS := ms_init dat2dbm ms_mcic ms_exec msei ms_mdr ms_mdre ms_makeMIB_ASP ms_makeMIB_ADP ms_makeMIB_DP ms_makeMIB_DR ms_makeMIB_SHL ms_md2t ms_mb ms_mu ms_mdre_ip ms_mon
 
 all: $(TARGETS)
 

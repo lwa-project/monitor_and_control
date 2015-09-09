@@ -53,7 +53,9 @@ int LWA_mibupdate_DP_(
   float freq=1.0;
   unsigned char ebw;
   unsigned short int gain;
-
+  
+  char output[1024];
+  
   switch (cid) {
 
     case LWA_CMD_TBW:
@@ -242,7 +244,7 @@ int LWA_mibupdate_DP_(
           sprintf(sMIBlabel,"MCS_TBN_GAIN");
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
       }
-      f( !strncmp("BEAM", output, 4) ) {
+      if( !strncmp("BEAM", output, 4) ) {
           /* Beam */
           sscanf(output,"BEAM%hu", &beam_id);
           

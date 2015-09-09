@@ -108,7 +108,7 @@ main ( int narg, char *argv[] ) {
 
   fprintf(fp,"B 5 			FIR				NUL	NUL		NUL\n");
   for ( i=0; i<4; i++ ) {
-    fprintf(fp,"V 5.%d		FIR%d			NUL	r1024	r1024\n");
+    fprintf(fp,"V 5.%d		FIR%d			NUL	r1024	r1024\n",i+1,i+1);
     }
   fprintf(fp,"V 5.5 		FIR_CHAN_INDEX		0	i2u		i2u\n");
 

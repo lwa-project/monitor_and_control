@@ -84,7 +84,7 @@ main ( int narg, char *argv[] ) {
   fprintf(fp,"B 3 		SHL-ECS 		NUL 	NUL 	NUL\n");
   fprintf(fp,"V 3.1		SET-POINT		UNK	a10	a10\n");
   fprintf(fp,"V 3.2		DIFFERENTIAL	UNK	a10	a10\n");
-  fprintf(fp,"V 3.3		TEMPERATURE	UNK	a10	a10\n);
+  fprintf(fp,"V 3.3		TEMPERATURE	UNK	a10	a10\n");
   
   /* SHL-WX */
   fprintf(fp,"B 4 		SHL-WX 		NUL 	NUL 	NUL\n");
@@ -102,7 +102,7 @@ main ( int narg, char *argv[] ) {
   fprintf(fp,"B 5 		SHL-LIGHTNING 		NUL 	NUL 	NUL\n");
   fprintf(fp,"V 5.1		LIGHTNING-RADIUS		UNK	a10	a10\n");
   fprintf(fp,"V 5.2		LIGHTNING-10MIN	UNK	a10	a10\n");
-  fprintf(fp,"V 5.3		LIGHTNING-30MIN	UNK	a10	a10\n);
+  fprintf(fp,"V 5.3		LIGHTNING-30MIN	UNK	a10	a10\n");
   
   close(fp);
   } /* main() */
