@@ -100,23 +100,23 @@ int LWA_mibupdate_ADP(
 
       /* updating the MIB using the LWA_mibupdate_RPT() function */
 
-      sprintf(sMIBlabel,"TBF_BITS");
+      sprintf(sMIBlabel,"MCS_TBF_BITS");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbf_bits, -1 );
 
-      sprintf(sMIBlabel,"TBF_TRIG_TIME");
+      sprintf(sMIBlabel,"MCS_TBF_TRIG_TIME");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbf_trig_time, -1 );
 
-      sprintf(sMIBlabel,"TBF_SAMPLES");
+      sprintf(sMIBlabel,"MCS_TBF_SAMPLES");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbf_samples, -1 );
 
-      sprintf(sMIBlabel,"TBF_TUNING_MASK");
+      sprintf(sMIBlabel,"MCS_TBF_TUNING_MASK");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbf_tuning_mask, -1 );
       
-      sprintf(sMIBlabel,"TBF_REFERENCE");
+      sprintf(sMIBlabel,"MCS_TBF_REFERENCE");
       sprintf(sData,"%9ld",ref);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
 
-      sprintf(sMIBlabel,"TBF_CMD_SENT_MPM");
+      sprintf(sMIBlabel,"MCS_TBF_CMD_SENT_MPM");
       LWA_timeval(&sent_tv,&mjd,&mpm);
       sprintf(sData,"%9ld",mpm);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
@@ -148,20 +148,20 @@ int LWA_mibupdate_ADP(
 
       /* updating the MIB using the LWA_mibupdate_RPT() function */
 
-      sprintf(sMIBlabel,"TBN_FREQ");
+      sprintf(sMIBlabel,"MCS_TBN_FREQ");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbn_freq, -1 );
 
-      sprintf(sMIBlabel,"TBN_BW");
+      sprintf(sMIBlabel,"MCS_TBN_BW");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbn_bw, -1 );
 
-      sprintf(sMIBlabel,"TBN_GAIN");
+      sprintf(sMIBlabel,"MCS_TBN_GAIN");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbn_gain, -1 );
 
-      sprintf(sMIBlabel,"TBN_REFERENCE");
+      sprintf(sMIBlabel,"MCS_TBN_REFERENCE");
       sprintf(sData,"%9ld",ref);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
 
-      sprintf(sMIBlabel,"TBN_CMD_SENT_MPM");
+      sprintf(sMIBlabel,"MCS_TBN_CMD_SENT_MPM");
       LWA_timeval(&sent_tv,&mjd,&mpm);
       sprintf(sData,"%9ld",mpm);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
@@ -196,23 +196,23 @@ int LWA_mibupdate_ADP(
 
       /* updating the MIB using the LWA_mibupdate_RPT() function */
 
-      sprintf(sMIBlabel,"COR_NAVG");
+      sprintf(sMIBlabel,"MCS_COR_NAVG");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, cor_navg, -1 );
 
-      sprintf(sMIBlabel,"COR_TUNING_MASK");
+      sprintf(sMIBlabel,"MCS_COR_TUNING_MASK");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, cor_tuning_mask, -1 );
 
-      sprintf(sMIBlabel,"COR_GAIN");
+      sprintf(sMIBlabel,"MCS_COR_GAIN");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, cor_gain, -1 );
 
-      sprintf(sMIBlabel,"COR_SUB_SLOT");
+      sprintf(sMIBlabel,"MCS_COR_SUB_SLOT");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, cor_sub_slot, -1 );
 
-      sprintf(sMIBlabel,"COR_REFERENCE");
+      sprintf(sMIBlabel,"MCS_COR_REFERENCE");
       sprintf(sData,"%9ld",ref);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
 
-      sprintf(sMIBlabel,"COR_CMD_SENT_MPM");
+      sprintf(sMIBlabel,"MCS_COR_CMD_SENT_MPM");
       LWA_timeval(&sent_tv,&mjd,&mpm);
       sprintf(sData,"%9ld",mpm);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
@@ -244,15 +244,15 @@ int LWA_mibupdate_ADP(
 
       //printf("freq=%f %hhu %hhu %hhu %hhu\n",freq, cmdata[5], cmdata[4], cmdata[3], cmdata[2] );
 
-      sprintf(sMIBlabel,"TUNING%1hhu_FREQ",tuning);
+      sprintf(sMIBlabel,"MCS_TUNING%1hhu_FREQ",tuning);
       sprintf(sData,"%12.3f",freq);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
 
-      sprintf(sMIBlabel,"TUNING%1hhu_BW",tuning);
+      sprintf(sMIBlabel,"MCS_TUNING%1hhu_BW",tuning);
       sprintf(sData,"%1hhu",ebw);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
 
-      sprintf(sMIBlabel,"TUNING%1hhu_GAIN",tuning);
+      sprintf(sMIBlabel,"MCS_TUNING%1hhu_GAIN",tuning);
       sprintf(sData,"%2hu",gain);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
 
@@ -276,15 +276,15 @@ int LWA_mibupdate_ADP(
       sscanf(cmdata,"%hu %s %s %hhu %hhu",&beam_id,dfile,gfile,&tuning,&subslot);
 
       /* Save dfile name in MIB as BEAM<beam_id>_DFILE */
-      sprintf(sMIBlabel,"BEAM%1hu_DFILE",beam_id);
+      sprintf(sMIBlabel,"MCS_BEAM%1hu_DFILE",beam_id);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, dfile, -1 );
 
       /* Save gfile name in MIB as BEAM<beam_id>_GFILE */
-      sprintf(sMIBlabel,"BEAM%1hu_GFILE",beam_id);
+      sprintf(sMIBlabel,"MCS_BEAM%1hu_GFILE",beam_id);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, gfile, -1 );
 
       /* Save tuning in MIB as BEAM<beam_id>_TUNING */
-      sprintf(sMIBlabel,"BEAM%1hu_TUNING",beam_id);
+      sprintf(sMIBlabel,"MCS_BEAM%1hu_TUNING",beam_id);
       sprintf(sData,"%2hu",gain);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
        
@@ -300,54 +300,54 @@ int LWA_mibupdate_ADP(
       /* Which is it? */
       if( !strncmp("TBN", output, 3) ) {
           /* TBN */
-          sprintf(sMIBlabel,"TBN_FREQ");
+          sprintf(sMIBlabel,"MCS_TBN_FREQ");
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0.0", -1 );
           
-          sprintf(sMIBlabel,"TBN_BW");
+          sprintf(sMIBlabel,"MCS_TBN_BW");
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
           
-          sprintf(sMIBlabel,"TBN_GAIN");
+          sprintf(sMIBlabel,"MCS_TBN_GAIN");
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
       }
       if( !strncmp("TBF", output, 3) ) {
           /* TBF */
-          sprintf(sMIBlabel,"TBF_BITS");
+          sprintf(sMIBlabel,"MCS_TBF_BITS");
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
           
-          sprintf(sMIBlabel,"TBF_TRIG_TIME");
+          sprintf(sMIBlabel,"MCS_TBF_TRIG_TIME");
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
           
-          sprintf(sMIBlabel,"TBF_SAMPLES");
+          sprintf(sMIBlabel,"MCS_TBF_SAMPLES");
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
           
-          sprintf(sMIBlabel,"TBF_TUNING_MASK");
+          sprintf(sMIBlabel,"MCS_TBF_TUNING_MASK");
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
       }
       if( !strncmp("COR", output, 3) ) {
           /* COR */
-          sprintf(sMIBlabel,"COR_NAVG");
+          sprintf(sMIBlabel,"MCS_COR_NAVG");
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
           
-          sprintf(sMIBlabel,"COR_TUNING_MASK");
+          sprintf(sMIBlabel,"MCS_COR_TUNING_MASK");
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
           
-          sprintf(sMIBlabel,"COR_GAIN");
+          sprintf(sMIBlabel,"MCS_COR_GAIN");
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
           
-          sprintf(sMIBlabel,"COR_SUB_SLOT");
+          sprintf(sMIBlabel,"MCS_COR_SUB_SLOT");
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
       }
       if( !strncmp("BEAM", output, 4) ) {
           /* Beam */
           sscanf(output,"BEAM%hu", &beam_id);
           
-          sprintf(sMIBlabel,"BEAM%1hu_DFILE",beam_id);
+          sprintf(sMIBlabel,"MCS_BEAM%1hu_DFILE",beam_id);
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "", -1 );
           
-          sprintf(sMIBlabel,"BEAM%1hu_GFILE",beam_id);
+          sprintf(sMIBlabel,"MCS_BEAM%1hu_GFILE",beam_id);
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "", -1 );
           
-          sprintf(sMIBlabel,"BEAM%1hu_TUNING",beam_id);
+          sprintf(sMIBlabel,"MCS_BEAM%1hu_TUNING",beam_id);
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
       }
       
@@ -364,18 +364,18 @@ int LWA_mibupdate_ADP(
       switch (ssi) {
         case -1: /* all filters have been loaded with defaults from DP */
           for ( i=1; i<=520; i++) {
-            sprintf(sMIBlabel,"CF%03d",i);
+            sprintf(sMIBlabel,"MCS_CF%03d",i);
             eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "DP_DEFAULT", -1 );
             }
           break;
         case 0: /* all filters have been loaded with specified coefficients */
           for ( i=1; i<=520; i++) {
-            sprintf(sMIBlabel,"CF%03d",i);
+            sprintf(sMIBlabel,"MCS_CF%03d",i);
             eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, cmdata+2, -1 );
             }
           break;
         default: /* only specified filter has been loaded with specified coefficients */
-          sprintf(sMIBlabel,"CF%03hd",ssi); 
+          sprintf(sMIBlabel,"MCS_CF%03hd",ssi); 
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, cmdata+2, -1 );
           break;
         } /* switch (ssi) */

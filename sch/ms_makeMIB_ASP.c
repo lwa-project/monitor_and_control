@@ -83,15 +83,17 @@ main ( int narg, char *argv[] ) {
   for ( i=0; i<n_ARXSUPPLY_NO; i++) {
     fprintf(fp,"V 2.1.3.%d	ARXPWRUNIT_%d 		UNK 	a256 	a256\n",i+1,i+1);
     }
-  fprintf(fp,"V 2.1.4		ARXCURR			0000000 a7 	a7\n");
+  fprintf(fp,"V 2.1.4		ARXCURR			0000000 a7	a7\n");
+  fprintf(fp,"V 2.1.5		ARXVOLT			0000000 a7	a7\n");
   fprintf(fp,"B 2.2		FEESUPPLY-INFO		NUL	NUL 	NUL\n");
   fprintf(fp,"V 2.2.1		FEESUPPLY		UNK 	a3 	a3\n");
   fprintf(fp,"V 2.2.2		FEESUPPLY_NO 		%02d 	a2 	a2\n",n_FEESUPPLY_NO);
   fprintf(fp,"B 2.2.3		FEESUPPLY-STATUS	NUL 	NUL 	NUL\n");
   for ( i=0; i<n_FEESUPPLY_NO; i++) {
-    fprintf(fp,"V 2.2.3.%d	FEEPWRUNIT_%d 		UNK 	a256 	a256\n",i+1,i+1);
+    fprintf(fp,"V 2.2.3.%d	FEEPWRUNIT_%d 		UNK 	a256	a256\n",i+1,i+1);
     }
-  fprintf(fp,"V 2.1.4		FEECURR			0000000 a7 	a7\n");
+  fprintf(fp,"V 2.2.4		FEECURR			0000000 a7	a7\n");
+  fprintf(fp,"V 2.2.5		FEEVOLT			0000000 a7	a7\n");
 
   /* ARX-FILTERS */
   fprintf(fp,"B 3 		ARX-FILTERS 		NUL 	NUL 	NUL\n");

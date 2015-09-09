@@ -85,20 +85,20 @@ int LWA_mibupdate_DP_(
 
       /* updating the MIB using the LWA_mibupdate_RPT() function */
 
-      sprintf(sMIBlabel,"TBW_BITS");
+      sprintf(sMIBlabel,"MCS_TBW_BITS");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbw_bits, -1 );
 
-      sprintf(sMIBlabel,"TBW_TRIG_TIME");
+      sprintf(sMIBlabel,"MCS_TBW_TRIG_TIME");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbw_trig_time, -1 );
 
-      sprintf(sMIBlabel,"TBW_SAMPLES");
+      sprintf(sMIBlabel,"MCS_TBW_SAMPLES");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbw_samples, -1 );
 
-      sprintf(sMIBlabel,"TBW_REFERENCE");
+      sprintf(sMIBlabel,"MCS_TBW_REFERENCE");
       sprintf(sData,"%9ld",ref);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
 
-      sprintf(sMIBlabel,"TBW_CMD_SENT_MPM");
+      sprintf(sMIBlabel,"MCS_TBW_CMD_SENT_MPM");
       LWA_timeval(&sent_tv,&mjd,&mpm);
       sprintf(sData,"%9ld",mpm);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
@@ -133,23 +133,23 @@ int LWA_mibupdate_DP_(
 
       /* updating the MIB using the LWA_mibupdate_RPT() function */
 
-      sprintf(sMIBlabel,"TBN_FREQ");
+      sprintf(sMIBlabel,"MCS_TBN_FREQ");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbn_freq, -1 );
 
-      sprintf(sMIBlabel,"TBN_BW");
+      sprintf(sMIBlabel,"MCS_TBN_BW");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbn_bw, -1 );
 
-      sprintf(sMIBlabel,"TBN_GAIN");
+      sprintf(sMIBlabel,"MCS_TBN_GAIN");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbn_gain, -1 );
 
-      sprintf(sMIBlabel,"TBN_SUB_SLOT");
+      sprintf(sMIBlabel,"MCS_TBN_SUB_SLOT");
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbn_sub_slot, -1 );
 
-      sprintf(sMIBlabel,"TBN_REFERENCE");
+      sprintf(sMIBlabel,"MCS_TBN_REFERENCE");
       sprintf(sData,"%9ld",ref);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
 
-      sprintf(sMIBlabel,"TBN_CMD_SENT_MPM");
+      sprintf(sMIBlabel,"MCS_TBN_CMD_SENT_MPM");
       LWA_timeval(&sent_tv,&mjd,&mpm);
       sprintf(sData,"%9ld",mpm);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
@@ -182,15 +182,15 @@ int LWA_mibupdate_DP_(
 
       //printf("freq=%f %hhu %hhu %hhu %hhu\n",freq, cmdata[5], cmdata[4], cmdata[3], cmdata[2] );
 
-      sprintf(sMIBlabel,"BEAM%1hhu_T%1hhu_FREQ",beam,tuning);
+      sprintf(sMIBlabel,"MCS_BEAM%1hhu_T%1hhu_FREQ",beam,tuning);
       sprintf(sData,"%12.3f",freq);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
 
-      sprintf(sMIBlabel,"BEAM%1hhu_T%1hhu_BW",beam,tuning);
+      sprintf(sMIBlabel,"MCS_BEAM%1hhu_T%1hhu_BW",beam,tuning);
       sprintf(sData,"%1hhu",ebw);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
 
-      sprintf(sMIBlabel,"BEAM%1hhu_T%1hhu_GAIN",beam,tuning);
+      sprintf(sMIBlabel,"MCS_BEAM%1hhu_T%1hhu_GAIN",beam,tuning);
       sprintf(sData,"%2hu",gain);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
 
@@ -214,15 +214,46 @@ int LWA_mibupdate_DP_(
       sscanf(cmdata,"%hu %s %s %hhu",&beam_id,dfile,gfile,&subslot);
 
       /* Save dfile name in MIB as BEAM<beam_id>_DFILE */
-      sprintf(sMIBlabel,"BEAM%1hu_DFILE",beam_id);
+      sprintf(sMIBlabel,"MCS_BEAM%1hu_DFILE",beam_id);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, dfile, -1 );
 
       /* Save gfile name in MIB as BEAM<beam_id>_GFILE */
-      sprintf(sMIBlabel,"BEAM%1hu_GFILE",beam_id);
+      sprintf(sMIBlabel,"MCS_BEAM%1hu_GFILE",beam_id);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, gfile, -1 );
 
       break;
 
+    case LWA_CMD_STP:
+      /* When we get an "A" in response to the STP command, use LWA_mibupdate_RPT() */
+      /* to update the relevant non-ICD (i.e., added by me) MIB entries */
+
+      /* Extract the parameters from string */
+      sscanf(cmdata,"%s", output);
+      
+      /* Which is it? */
+      if( !strncmp("TBN", output, 3) ) {
+          /* TBN */
+          sprintf(sMIBlabel,"MCS_TBN_FREQ");
+          eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0.0", -1 );
+          
+          sprintf(sMIBlabel,"MCS_TBN_BW");
+          eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
+          
+          sprintf(sMIBlabel,"MCS_TBN_GAIN");
+          eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
+      }
+      f( !strncmp("BEAM", output, 4) ) {
+          /* Beam */
+          sscanf(output,"BEAM%hu", &beam_id);
+          
+          sprintf(sMIBlabel,"MCS_BEAM%1hu_DFILE",beam_id);
+          eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "", -1 );
+          
+          sprintf(sMIBlabel,"MCS_BEAM%1hu_GFILE",beam_id);
+          eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "", -1 );
+      }
+      
+      break;
     case LWA_CMD_FST:
       /* When we get an "A" in response to the FST command, use LWA_mibupdate_RPT() */
       /* to update the corresponding non-ICD (i.e., added by me) MIB entries CF???. */
@@ -234,18 +265,18 @@ int LWA_mibupdate_DP_(
       switch (ssi) {
         case -1: /* all filters have been loaded with defaults from DP */
           for ( i=1; i<=520; i++) {
-            sprintf(sMIBlabel,"CF%03d",i);
+            sprintf(sMIBlabel,"MCS_CF%03d",i);
             eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "DP_DEFAULT", -1 );
             }
           break;
         case 0: /* all filters have been loaded with specified coefficients */
           for ( i=1; i<=520; i++) {
-            sprintf(sMIBlabel,"CF%03d",i);
+            sprintf(sMIBlabel,"MCS_CF%03d",i);
             eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, cmdata+2, -1 );
             }
           break;
         default: /* only specified filter has been loaded with specified coefficients */
-          sprintf(sMIBlabel,"CF%03hd",ssi); 
+          sprintf(sMIBlabel,"MCS_CF%03hd",ssi); 
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, cmdata+2, -1 );
           break;
         } /* switch (ssi) */

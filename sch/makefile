@@ -42,6 +42,9 @@ ms_makeMIB_DP: ms_makeMIB_DP.c
 ms_makeMIB_DR: ms_makeMIB_DR.c 
 	$(CC) $(CFLAGS) -o ms_makeMIB_DR ms_makeMIB_DR.c $(LDFLAGS)
 
+ms_makeMIB_SHL: ms_makeMIB_SHL.c 
+	$(CC) $(CFLAGS) -o ms_makeMIB_SHL ms_makeMIB_SHL.c $(LDFLAGS)
+
 ms_md2t: ms_md2t.c ../common/mcs.h
 	$(CC) $(CFLAGS) -o ms_md2t ms_md2t.c $(LDFLAGS)
 

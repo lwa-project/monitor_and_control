@@ -46,48 +46,48 @@ main ( int narg, char *argv[] ) {
 
   /* lay in ADP-specific entries used by MCS (not part of ADP ICD) */
 
-  fprintf(fp,"B 0.4           TBF_TRIGGER 		NUL 	NUL 	NUL\n");
-  fprintf(fp,"V 0.4.1         TBF_BITS                0       a2      NUL\n");
-  fprintf(fp,"V 0.4.2         TBF_TRIG_TIME           0       a9      NUL\n");
-  fprintf(fp,"V 0.4.3         TBF_SAMPLES             0       a8      NUL\n");
-  fprintf(fp,"V 0.4.4         TBF_TUNING_MASK         0       i8ur    NUL\n");
-  fprintf(fp,"V 0.4.5         TBF_REFERENCE           0       a9      NUL\n");
-  fprintf(fp,"V 0.4.6         TBF_CMD_SENT_MPM        0       a9      NUL\n");  
+  fprintf(fp,"B 0.4           MCS_TBF_TRIGGER 		NUL 	NUL 	NUL\n");
+  fprintf(fp,"V 0.4.1         MCS_TBF_BITS                0       a2      NUL\n");
+  fprintf(fp,"V 0.4.2         MCS_TBF_TRIG_TIME           0       a9      NUL\n");
+  fprintf(fp,"V 0.4.3         MCS_TBF_SAMPLES             0       a8      NUL\n");
+  fprintf(fp,"V 0.4.4         MCS_TBF_TUNING_MASK         0       i8ur    NUL\n");
+  fprintf(fp,"V 0.4.5         MCS_TBF_REFERENCE           0       a9      NUL\n");
+  fprintf(fp,"V 0.4.6         MCS_TBF_CMD_SENT_MPM        0       a9      NUL\n");  
  
-  fprintf(fp,"B 0.5           TBN_CONFIG 		NUL 	NUL 	NUL\n");
-  fprintf(fp,"V 0.5.1         TBN_FREQ                0.000\ta12     NUL\n");
-  fprintf(fp,"V 0.5.2         TBN_BW                  0       a1      NUL\n");
-  fprintf(fp,"V 0.5.3         TBN_GAIN                0       a2      NUL\n");
-  fprintf(fp,"V 0.5.4         TBN_REFERENCE           0       a9      NUL\n");
-  fprintf(fp,"V 0.5.5         TBN_CMD_SENT_MPM        0       a9      NUL\n"); 
+  fprintf(fp,"B 0.5           MCS_TBN_CONFIG 		NUL 	NUL 	NUL\n");
+  fprintf(fp,"V 0.5.1         MCS_TBN_FREQ                0.000\ta12     NUL\n");
+  fprintf(fp,"V 0.5.2         MCS_TBN_BW                  0       a1      NUL\n");
+  fprintf(fp,"V 0.5.3         MCS_TBN_GAIN                0       a2      NUL\n");
+  fprintf(fp,"V 0.5.4         MCS_TBN_REFERENCE           0       a9      NUL\n");
+  fprintf(fp,"V 0.5.5         MCS_TBN_CMD_SENT_MPM        0       a9      NUL\n"); 
   
-  fprintf(fp,"B 0.6           COR_CONFIG		NUL 	NUL 	NUL\n");
-  fprintf(fp,"V 0.6.1         COR_NAVG                0      a10      NUL\n");
-  fprintf(fp,"V 0.6.2         COR_TUNING_MASK         0      i8u      NUL\n");
-  fprintf(fp,"V 0.6.3         COR_GAIN                0       a2      NUL\n");
-  fprintf(fp,"V 0.6.4         COR_SUB_SLOT            0       a2      NUL\n");
-  fprintf(fp,"V 0.6.5         COR_REFERENCE           0       a9      NUL\n");
-  fprintf(fp,"V 0.6.6         COR_CMD_SENT_MPM        0       a9      NUL\n"); 
+  fprintf(fp,"B 0.6           MCS_COR_CONFIG		NUL 	NUL 	NUL\n");
+  fprintf(fp,"V 0.6.1         MCS_COR_NAVG                0      a10      NUL\n");
+  fprintf(fp,"V 0.6.2         MCS_COR_TUNING_MASK         0      i8u      NUL\n");
+  fprintf(fp,"V 0.6.3         MCS_COR_GAIN                0       a2      NUL\n");
+  fprintf(fp,"V 0.6.4         MCS_COR_SUB_SLOT            0       a2      NUL\n");
+  fprintf(fp,"V 0.6.5         MCS_COR_REFERENCE           0       a9      NUL\n");
+  fprintf(fp,"V 0.6.6         MCS_COR_CMD_SENT_MPM        0       a9      NUL\n"); 
 
-  fprintf(fp,"B 0.7           CH_FILTER_SET 		NUL 	NUL 	NUL\n");
+  fprintf(fp,"B 0.7           MCS_CH_FILTER_SET 		NUL 	NUL 	NUL\n");
   for ( i=1; i<=512; i++ ) {
-    fprintf(fp,"V 0.7.%d\tCF%03d\t\t\tUNK 	a32 	NUL\n",i,i);
+    fprintf(fp,"V 0.7.%d\tMCS_CF%03d\t\t\tUNK 	a32 	NUL\n",i,i);
     }
   
-  fprintf(fp,"B 0.8           TUNING_CONFIG 		NUL 	NUL 	NUL\n");
+  fprintf(fp,"B 0.8           MCS_TUNING_CONFIG 		NUL 	NUL 	NUL\n");
   for ( i=1; i<=32; i++ ) {
-    fprintf(fp,"B 0.8.%d         TUNINGM%d 			NUL 	NUL 	NUL\n", i, i); /* corresponds to DRX_BEAM in DRX commands, BEAM_ID in BAM commands */
-    fprintf(fp,"V 0.8.%d.1     TUNING%d_FREQ 		0.000 	a12 	NUL\n", i, i); /* corresponds to DRX_FREQ in DRX commands [Hz] */
-    fprintf(fp,"V 0.8.%d.2     TUNING%d_BW 		0 	a1 	NUL\n", i, i); /* 1-8 */
-    fprintf(fp,"V 0.8.%d.3     TUNING%d_GAIN 		0 	a2 	NUL\n", i, i); /* 0-15 */
+    fprintf(fp,"B 0.8.%d         MCS_TUNING%d 			NUL 	NUL 	NUL\n", i, i); /* corresponds to DRX_BEAM in DRX commands, BEAM_ID in BAM commands */
+    fprintf(fp,"V 0.8.%d.1     MCS_TUNING%d_FREQ 		0.000 	a12 	NUL\n", i, i); /* corresponds to DRX_FREQ in DRX commands [Hz] */
+    fprintf(fp,"V 0.8.%d.2     MCS_TUNING%d_BW 		0 	a1 	NUL\n", i, i); /* 1-8 */
+    fprintf(fp,"V 0.8.%d.3     MCS_TUNING%d_GAIN 		0 	a2 	NUL\n", i, i); /* 0-15 */
     }
     
-  fprintf(fp,"B 0.9           BEAM_CONFIG 		NUL 	NUL 	NUL\n");
+  fprintf(fp,"B 0.9           MCS_BEAM_CONFIG 		NUL 	NUL 	NUL\n");
   for ( i=1; i<=32; i++ ) {
-    fprintf(fp,"B 0.9.%d         BEAM%d 			NUL 	NUL 	NUL\n", i, i); /* corresponds to DRX_BEAM in DRX commands, BEAM_ID in BAM commands */
-    fprintf(fp,"V 0.9.%d.1       BEAM%d_DFILE 		UNK 	a32 	NUL\n", i, i); /* name of file of delays (BEAM_DELAY[520] in BAM command */
-    fprintf(fp,"V 0.9.%d.2       BEAM%d_GFILE 		UNK 	a32 	NUL\n", i, i); /* name of file of gains (sint16 BEAM_GAIN[260][2][2] in BAM command */
-    fprintf(fp,"B 0.9.%d.3       BEAM%d_TUNING		UNK 	NUL 	NUL\n", i, i); /* corresponds to DRX_TUNING in DRX commands */
+    fprintf(fp,"B 0.9.%d         MCS_BEAM%d 			NUL 	NUL 	NUL\n", i, i); /* corresponds to DRX_BEAM in DRX commands, BEAM_ID in BAM commands */
+    fprintf(fp,"V 0.9.%d.1       MCS_BEAM%d_DFILE 		UNK 	a32 	NUL\n", i, i); /* name of file of delays (BEAM_DELAY[520] in BAM command */
+    fprintf(fp,"V 0.9.%d.2       MCS_BEAM%d_GFILE 		UNK 	a32 	NUL\n", i, i); /* name of file of gains (sint16 BEAM_GAIN[260][2][2] in BAM command */
+    fprintf(fp,"B 0.9.%d.3       MCS_BEAM%d_TUNING		UNK 	NUL 	NUL\n", i, i); /* corresponds to DRX_TUNING in DRX commands */
     }
 
   /* lay in MCS-RESERVED */
@@ -127,13 +127,13 @@ main ( int narg, char *argv[] ) {
   fprintf(fp,"V 6 		CLK_VAL			0	i4ur	i4ur\n");
  
   for ( i=0; i<512; i++ ) {
-    fprintf(fp,"B 7.%d\t\tANT%d_STAT 		NUL 	NUL 	NUL\n",i+1,i+1); 
-    fprintf(fp,"V 7.%d.1\tANT%d_RMS\t\t0 	f4r 	f4r\n",i+1,i+1);
-    fprintf(fp,"V 7.%d.2\tANT%d_DCOFFSET\t\t0 	f4r 	f4r\n",i+1,i+1);
-    fprintf(fp,"V 7.%d.3\tANT%d_SAT\t\t0 	i4ur 	i4ur\n",i+1,i+1);
-    fprintf(fp,"V 7.%d.4\t\tANT%d_PEAK\t\t0	fr 	f4r\n",i+1,i+1);
+    fprintf(fp,"B 7.%d		ANT%d_STAT 		NUL 	NUL 	NUL\n",i+1,i+1); 
+    fprintf(fp,"V 7.%d.1		ANT%d_RMS			0 	f4r 	f4r\n",i+1,i+1);
+    fprintf(fp,"V 7.%d.2		ANT%d_DCOFFSET		0 	f4r 	f4r\n",i+1,i+1);
+    fprintf(fp,"V 7.%d.3		ANT%d_SAT			0 	i4ur i4ur\n",i+1,i+1);
+    fprintf(fp,"V 7.%d.4		ANT%d_PEAK		0    i4ur i4ur\n",i+1,i+1);
     }
-  fprintf(fp,"V 7.521 	STAT_SAMP_SIZE 		0 	i4ur 	i4ur\n"); 
+  fprintf(fp,"V 7.516 	STAT_SAMP_SIZE 		0 	i4ur 	i4ur\n"); 
 
   fprintf(fp,"B 8 		BOARD_STAT		NUL	NUL	NUL\n");
   for ( i=0; i<16; i++ ) {
