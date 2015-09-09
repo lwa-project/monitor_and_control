@@ -488,7 +488,7 @@ int main ( int narg, char *argv[] ) {
   DIR *dir;
   struct dirent *sDirEnt;
 
-  int i,m,p;
+  int i,j,m,p;
 
   struct osf_struct osf;
   struct osfs_struct osfs;
@@ -837,9 +837,9 @@ int main ( int narg, char *argv[] ) {
             if ( ( (osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) && (i==1) ) || 
                  (  osf.SESSION_DRX_BEAM==ME_MAX_NDPOUT           )   ) {
               dr_sid=-1;
-              for( i=0; i<ME_MAX_NDR; i++ ) {
-                 if( osf.SESSION_DRX_BEAM == s.iDRDP[i] ) {
-                    dr_sid = LWA_SID_DR1 + i;
+              for( j=0; j<ME_MAX_NDR; j++ ) {
+                 if( osf.SESSION_DRX_BEAM == s.iDRDP[j] ) {
+                    dr_sid = LWA_SID_DR1 + j;
                     break;
                     }
                  }

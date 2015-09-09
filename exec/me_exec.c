@@ -559,7 +559,7 @@ int main ( int narg, char *argv[] ) {
   /* get the current time in conventional format */
   gettimeofday(&tv,&tz); 
   tm = gmtime(&tv.tv_sec);
-  sprintf(cmd,"cp %s state/meelog_%02d%02d%02d_%02d%02d.txt", ME_LOG_FILENAME, 
+  sprintf(cmd,"cp %s meelog_%02d%02d%02d_%02d%02d.txt", ME_LOG_FILENAME, 
          (tm->tm_year)-100, (tm->tm_mon)+1, tm->tm_mday, tm->tm_hour, tm->tm_min);
   system(cmd);
 
