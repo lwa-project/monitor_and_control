@@ -23,7 +23,7 @@
 
 # Figure out if we are DP or ADP-compatible
 usingADP=`strings msei | grep ADP `
-if [ ${usingADP} == "" ]; then
+if [ "${usingADP}" == "" ]; then
 	# DP
 	dpName="DP_"
 else
@@ -45,8 +45,14 @@ python mch_minimal_server_acceptall.py DR5 127.0.0.1 1753 1752 &
 # 3 ARX power supplies, 2 FEE power supplies, and 10 temperature sensors
 ./ms_makeMIB_ASP 3 2 10
 
-# Create a DP MIB initialization file 
-./ms_makeMIB_DP 
+# Create a DP/ADP MIB initialization file 
+if [ "${dpName}" == "DP_" ]; then
+	# DP
+	./ms_makeMIB_DP 
+else
+	# ADP
+	./ms_makeMIB_ADP
+fi
 
 # Create DP MIB initialization files 
 ./ms_makeMIB_DR 1 5 5 2 8 5 3 10 2

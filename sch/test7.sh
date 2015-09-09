@@ -20,7 +20,7 @@
 
 # Figure out if we are DP or ADP-compatible
 usingADP=`strings msei | grep ADP `
-if [ ${usingADP} == "" ]; then
+if [ "${usingADP}" == "" ]; then
 	# DP
 	dpName="DP_"
 else
@@ -31,8 +31,8 @@ fi
 # Fire up an emulator to play the role of DP/ADP
 python mch_minimal_server.py ${dpName} 127.0.0.1 1739 1738 &
 
-# Create a DP MIB initialization file 
-if [ ${dpName} == "DP_" ]; then
+# Create a DP/ADP MIB initialization file 
+if [ "${dpName}" == "DP_" ]; then
 	# DP
 	./ms_makeMIB_DP 
 else
