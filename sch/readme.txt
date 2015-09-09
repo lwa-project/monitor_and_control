@@ -75,6 +75,7 @@ ms_mcic_SHL.c
 ms_mcic_ASP.c
 ms_mcic_DP_.c
 ms_mcic_DR_.c (handles MCS-DRs #1-#5)
+ms_mcic_ADP.c
 -- Code for the subsystem handler process "ms_mcic".  One instance of ms_mcic is launched for each subsystem to be managed. 
 
 ms_mdre_ip.c
@@ -86,9 +87,11 @@ dat2dbm.c
 ../common/mcs.h
 -- Header files, including macro defines and some utility functions.
 
+ms_makeMIB_SHL.c
 ms_makeMIB_ASP.c
 ms_makeMIB_DP.c
 ms_makeMIB_DR.c (handles MCS-DRs #1-#5)
+ms_makeMIB_ADP.c
 -- Automates process of creating a text-format MIB init files for ASP and DR (required by ms_init), respectively.
 
 ****************************************************
@@ -333,7 +336,8 @@ The reader may be curious as to why this software uses the "dbm" facility as opp
 Why ncurses?
 ==============
 
-The library "ncurses" is used by ms_mb and ms_mon to create simple text-based status displays for showing subsystem MIB information.  Alternatively, this could be done using a graphical user interface (GUI), and this is in no way precluded by MCS/Scheduler software.  A primary motivation for using ncurses is that it provides a simple way to create displays which can be easily modified or customized using human-readable text-based configuration files.  A second reason for using this approach has to do with remote monitoring; that is, monitoring from a remote location over the internet.  Because the display is text-based, it can be viewed from pretty much anywhere the user can get an xterm with a command prompt.  That is, ms_mb can run in the shelter, and information sent between the shelter and the remote user is just xterm screen updates.  Although a similar method of operation is possible with a GUI, this approach is not as simple or robust, as it depends on either (1) the GUI being able to run on the remote PC, or (2) the GUI being able to run on a PC in the shelter, with graphical output being sent over the limited bandwidth to/from the shelter.      
+The library "ncurses" is used by ms_mb and ms_mon to create simple text-based status displays for showing subsystem MIB information.  Alternatively, this could be done using a graphical user interface (GUI), and this is in no way precluded by MCS/Scheduler software.  A primary motivation for using ncurses is that it provides a simple way to create displays which can be easily modified or customized using human-readable text-based configuration files.  A second reason for using this approach has to do with remote monitoring; that is, monitoring from a remote location over the internet.  Because the display is text-based, it can be viewed from pretty much anywhere the user can get an xterm with a command prompt.  That is, ms_mb can run in the shelter, and information sent between the shelter and the remote user is just xterm screen updates.  Although a similar method of operation is possible with a GUI, this approach is not as simple or robust, as it depends on either (1) the GUI being able to run on the 
+remote PC, or (2) the GUI being able to run on a PC in the shelter, with graphical output being sent over the limited bandwidth to/from the shelter.      
 
 
 Troubleshooting / Known Bugs
@@ -430,7 +434,8 @@ Major Changes in Release 0.5:
 
 1. Additional Tier-1 monitoring/control programs have been provided.  These include: ms_md2t, which converts a MIB dbm file to text (unlike ms_mdr, the output is sorted in order of MIB index, and many raw binary values also are converted to human-readable text);  ms_mu, which uses MCS/Scheduler to update every ICD-defined MIB value for a subsystem (periodically, if desired); and ms_mb, an easily-reconfigurable ncurses-based subsystem MIB monitor which also can be used to do periodic MIB updates.  See below for additional information about these new programs, and also see LWA Engineering Memo MCS0029 for examples of how they can used.
 
-2. Enhancements to monitoring and control of DP.  MCS/Scheduler now adds MIB entries (numbered 0.4 and 0.5) to the DP MIB to allow easier monitoring of TBW and TBN status.  This is a work-around for the problem created by the fact that the MIB defined in the DP ICD does not include many parameters which need to be monitored.  For example, the DP ICD-defined MIB has no entry for TBN center frequency.  To accommodate this, MCS/Scheduler adds TBN center frequency (TBN_FREQ) to the locally-maintained MIB.  TBN_FREQ is updated by MCS/Scheduler whenever a sent TBN command (which includes TBN center frequency as an argument) is acknowledged.  Although these new MIB entries can be monitored in exactly the same way as ICD-defined MIB entries (that is, through the tier-1 interface using, for example, ms_md2t), DP will not recognize these entries, so they cannot be updated using the "RPT" command.   Most of the new entries are in the same raw binary form required by DP command message formats, however ms_md2t converts many (but not all) of these to human-readable text form.  To determine which entries MCS/Scheduler has added to the local MIB, use ms_md2t to look for entries with indices less than 1.  
+2. Enhancements to monitoring and control of DP.  MCS/Scheduler now adds MIB entries (numbered 0.4 and 0.5) to the DP MIB to allow easier monitoring of TBW and TBN status.  This is a work-around for the problem created by the fact that the MIB defined in the DP ICD does not include many parameters which need to be monitored.  For example, the DP ICD-defined MIB has no entry for TBN center frequency.  To accommodate this, MCS/Scheduler adds TBN center frequency (TBN_FREQ) to the locally-maintained MIB.  TBN_FREQ is updated by MCS/Scheduler whenever a sent TBN command (which includes TBN center frequency as an argument) is acknowledged.  Although these new MIB entries can be monitored in exactly the same way as ICD-defined MIB entries (that is, through the tier-1 interface using, for example, ms_md2t), DP will not recognize these entries, so they cannot be updated using the "RPT" command.   Most of the new entries are in the same raw binary form required by DP command message formats, however ms_md2t converts 
+many (but not all) of these to human-readable text form.  To determine which entries MCS/Scheduler has added to the local MIB, use ms_md2t to look for entries with indices less than 1.  
 
 3. The new MIB browser (ms_mb) uses the popular ncurses library to generate text-based xterm displays.  As a result, ncurses is now required for "make".  See comments below about how to deal with this if your computer complains about this library being missing.  Also see the new section "Why ncurses?" below.  
 
