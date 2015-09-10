@@ -11,6 +11,8 @@
 #define MCS_H
 
 /****************************************************/
+/***        WARNING: COMPILE-TIME OPTION:         ***/
+/****************************************************/
 /* Station Configuration:                           */
 /* Uncomment the following to command ADP instead   */ 
 /* of DP.                                           */
@@ -18,6 +20,8 @@
 //#define USE_ADP /* Use the new ADP at LWA-SV
 
 
+/*****************************************************/
+/***         WARNING: COMPILE-TIME OPTION:         ***/
 /*****************************************************/
 /* LAN configuration:                                */
 /* Must uncomment one and only one of the following: */
@@ -958,7 +962,6 @@ struct osf2_struct { /* really just a continuation of osf_struct */
   signed short int   OBS_ASP_ATS[LWA_MAX_NSTD];
 #ifdef USE_ADP
   unsigned int       OBS_TBF_SAMPLES;
-  unsigned long int  OBS_TBF_TUNING_MASK;
 #else
   unsigned short int OBS_TBW_BITS;
   unsigned int       OBS_TBW_SAMPLES;
@@ -1409,14 +1412,10 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 
 #ifdef USE_ADP
     /* consider the status of the ROACH boards */
-    if (i<32) { /* i=0 to 31: These are standard beams */
+    if (i<ME_MAX_NDPOUT) { /* i=0 to 1: These are standard beams */
        /* no basis for marking this anything other than "3" at the moment*/
       sc->DPO[i].iStat = 3;
     }
-    if (i==32) { /* this is the TBF output */
-      /* no basis for marking this anything other than "3" at the moment*/
-      sc->DPO[i].iStat = 3;
-      }
 #else
     /* consider status of associated DP2 board */
     if (i<2) { /* i=0 or 1: These go through the first DP2 board */
