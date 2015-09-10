@@ -209,11 +209,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
         sscanf(data,"%d",&(obs[nobs].OBS_DRX_GAIN));
         printf("...converts to %d\n",obs[nobs].OBS_DRX_GAIN);
-#ifdef USE_ADP
-        if ( ( obs[nobs].OBS_DRX_GAIN<-1 ) || (obs[nobs].OBS_DRX_GAIN>15) ) {
-#else
         if ( ( obs[nobs].OBS_DRX_GAIN<-1 ) || (obs[nobs].OBS_DRX_GAIN>255) ) {   
-#endif
           printf("[%d/%d] FATAL: OBS_DRX_GAIN out of range\n",MT_TPSS,getpid());  
           return;
           }

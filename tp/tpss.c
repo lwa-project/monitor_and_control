@@ -328,42 +328,82 @@ int main ( int narg, char *argv[] ) {
     }
 
   for (n=1;n<=nobs;n++) {
+#ifdef USE_ADP
+    if ( (obs[n].OBS_DUR==0) && ( ! ( (obs[n].OBS_MODE==LWA_OM_TBF)     || 
+                                      (obs[n].OBS_MODE==LWA_OM_DIAG1)     ) ) )  {
+      printf("[%d/%d] FATAL: obs[%d].OBS_DUR==0 for a mode other than TBF or DIAG\n",MT_TPSS,getpid(),n);
+      return;
+      }
+#else
     if ( (obs[n].OBS_DUR==0) && ( ! ( (obs[n].OBS_MODE==LWA_OM_TBW)     || 
                                       (obs[n].OBS_MODE==LWA_OM_DIAG1)     ) ) )  {
       printf("[%d/%d] FATAL: obs[%d].OBS_DUR==0 for a mode other than TBW or DIAG\n",MT_TPSS,getpid(),n);
       return;
       }
+#endif
     if ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) && (obs[n].OBS_RA<0) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_RA<0 when mode is TRK_RADEC\n",MT_TPSS,getpid(),n);
       return;
       }
+    if ( ( obs[n].OBS_MODE==LWA_OM_TBN ) && ( obs[n].OBS_FREQ1<1095654922 ) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TBN\n",MT_TPSS,getpid(),n);
+      return;
+      }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TBN      )   ) && (obs[n].OBS_FREQ1<219130984) ) {
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ) && (obs[n].OBS_FREQ1<219130984) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
       return;
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_FREQ2<219130984) ) {
-      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
+      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
       return;
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+#ifdef USE_ADP
+           (obs[n].OBS_MODE==LWA_OM_TRK_TBF  ) ||
+#endif
            (obs[n].OBS_MODE==LWA_OM_TBN      )   ) && (obs[n].OBS_BW<=0) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
       return;
       }
+#ifdef USE_ADP
+    if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_BW>=8) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
+      return;
+      }
+#else
     if ( ( (obs[n].OBS_MODE==LWA_OM_TBW      ) || 
            (obs[n].OBS_MODE==LWA_OM_TBN      )   ) && (SESSION_DRX_BEAM>-1) ) {
       printf("[%d/%d] FATAL: SESSION_DRX_BEAM>-1 when obs[%d].OBS_MODE is TBW or TBN\n",MT_TPSS,getpid(),n);
       return;
       }
+#endif
     } /* for n */
 
+#ifdef USE_ADP
+  /* check to make sure that session doesn't mix TBF/TBN with other observing modes */
+  b_TB_requested = 0;
+  b_DRX_requested = 0;
+  for (n=1;n<=nobs;n++) {
+    if ( (obs[n].OBS_MODE==LWA_OM_TBF      ) || 
+         (obs[n].OBS_MODE==LWA_OM_TBN      )   ) b_TB_requested = 1;
+    if ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) || 
+         (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
+         (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+         (obs[n].OBS_MODE==LWA_OM_STEPPED  )   ) b_DRX_requested = 1;
+    }
+  if ( b_TB_requested && b_DRX_requested ) {
+    printf("[%d/%d] FATAL: Sessions cannot mix TBF/TBN with other observing modes\n",MT_TPSS,getpid(),n);
+    return;
+    }
+#else
   /* check to make sure that session doesn't mix TBW/TBN with other observing modes */
   b_TB_requested = 0;
   b_DRX_requested = 0;
@@ -379,7 +419,9 @@ int main ( int narg, char *argv[] ) {
     printf("[%d/%d] FATAL: Sessions cannot mix TBW/TBN with other observing modes\n",MT_TPSS,getpid(),n);
     return;
     }
-  if (b_TB_requested) SESSION_DRX_BEAM=5;
+    
+  if (b_TB_requested) SESSION_DRX_BEAM=ME_MAX_NDPOUT;
+#endif
 
 #ifdef USE_ADP
    /* if mode = TBF, OBS_DUR needs to be computed */
@@ -650,17 +692,12 @@ int main ( int narg, char *argv[] ) {
     fprintf(fp,"\n");
 #ifdef USE_ADP
     fprintf(fp,"OBS_TBF_SAMPLES %ld\n",obs[n].OBS_TBF_SAMPLES);
-    fprintf(fp,"OBS_TBF_TUNING_MASK %lu\n",obs[n].OBS_TBF_TUNING_MASK);
 #else
     fprintf(fp,"OBS_TBW_BITS %d\n",obs[n].OBS_TBW_BITS);
     fprintf(fp,"OBS_TBW_SAMPLES %ld\n",obs[n].OBS_TBW_SAMPLES);
 #endif
     fprintf(fp,"OBS_TBN_GAIN %d\n",obs[n].OBS_TBN_GAIN);
     fprintf(fp,"OBS_DRX_GAIN %d\n",obs[n].OBS_DRX_GAIN);
-#ifdef USE_ADP
-    fprintf(fp,"OBS_COR_NAVG %d\n",obs[n].OBS_COR_NAVG);
-    fprintf(fp,"OBS_COR_TUNING_MASK %lu\n",obs[n].OBS_COR_TUNING_MASK);
-#endif
 
     } /* for n */
 
@@ -789,17 +826,12 @@ int main ( int narg, char *argv[] ) {
     for (m=1;m<=LWA_MAX_NSTD;m++) { osf2.OBS_ASP_ATS[m-1] = obs[n].OBS_ASP_ATS[m]; }
 #ifdef USE_ADP
     osf2.OBS_TBF_SAMPLES     = obs[n].OBS_TBF_SAMPLES;
-    osf2.OBS_TBF_TUNING_MASK = obs[n].OBS_TBF_TUNING_MASK;
 #else
     osf2.OBS_TBW_BITS        = obs[n].OBS_TBW_BITS; 
     osf2.OBS_TBW_SAMPLES     = obs[n].OBS_TBW_SAMPLES;
 #endif
     osf2.OBS_TBN_GAIN        = obs[n].OBS_TBN_GAIN;
-    osf2.OBS_DRX_GAIN        = obs[n].OBS_DRX_GAIN; 
-#ifdef USE_ADP
-    osf2.OBS_COR_NAVG        = obs[n].OBS_COR_NAVG;
-    osf2.OBS_COR_TUNING_MASK = obs[n].OBS_COR_TUNING_MASK;
-#endif
+    osf2.OBS_DRX_GAIN        = obs[n].OBS_DRX_GAIN;
 
     fwrite(&osf2,sizeof(struct osf2_struct),1,fp);
 

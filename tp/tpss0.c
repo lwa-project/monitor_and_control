@@ -83,17 +83,12 @@
     int OBS_ASP_ATS[LWA_MAX_NSTD+1];
 #ifdef USE_ADP
     long int OBS_TBF_SAMPLES;
-    unsigned long int OBS_TBF_TUNING_MASK;
 #else
     int OBS_TBW_BITS;
     long int OBS_TBW_SAMPLES;
 #endif
     int OBS_TBN_GAIN;
     int OBS_DRX_GAIN;
-#ifdef USE_ADP
-    int OBS_COR_NAVG;
-    unsigned long int OBS_COR_TUNING_MASK;
-#endif
     long int ASP_setup_time; // not part of SDF 
     };
 
