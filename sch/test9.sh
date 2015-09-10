@@ -47,6 +47,10 @@ fi
 # 3 ARX power supplies, 2 FEE power supplies, and 10 temperature sensors
 ./ms_makeMIB_ASP 3 2 10
 
+# Creat SHL MIB initialization file for a SHL with
+# 8 racks and 8 ports per rack
+./ms_makeMIB_SHL 8 8
+
 # Create a DP/ADP MIB initialization file 
 if [ "${dpName}" == "DP_" ]; then
 	# DP
