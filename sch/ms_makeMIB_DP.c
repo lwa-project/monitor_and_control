@@ -1,4 +1,4 @@
-// ms_makeMIB_DP.c: S.W. Ellingson, Virginia Tech, 2010 May 31
+// ms_makeMIB_DP.c: J. Dowell, UNM, 2015 Sep 9
 // ---
 // COMPILE: gcc -o ms_makeMIB_DP ms_makeMIB_DP.c
 // ---
@@ -14,7 +14,7 @@
 
 //#include "LWA_MCS.h"
 
-#define MY_NAME "ms_makeMIB_DP (v.20100531.1)"
+#define MY_NAME "ms_makeMIB_DP (v.20150909.1)"
 #define ME "11" 
 
 main ( int narg, char *argv[] ) {
@@ -158,6 +158,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_makeMIB_DP.c: J. Dowell, UNM, 2015 Sep 9
+//  .1: Updated for recent changes to the DP ICD
 // ms_makeMIB_DP.c: S.W. Ellingson, Virginia Tech, 2010 May 31
 //   .1: Added MIB branch 0.5, TBN_CONFIG
 // ms_makeMIB_DP.c: S.W. Ellingson, Virginia Tech, 2010 May 30

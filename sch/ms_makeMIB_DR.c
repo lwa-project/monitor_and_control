@@ -1,4 +1,4 @@
-// ms_makeMIB_DR.c: S.W. Ellingson, Virginia Tech, 2013 Jul 18
+// ms_makeMIB_DR.c: J. Dowell, UNM, 2015 Sep 10
 // ---
 // COMPILE: gcc -o ms_makeMIB_DR ms_makeMIB_DR.c
 // ---
@@ -25,7 +25,7 @@
 
 //#include "LWA_MCS.h"
 
-#define MY_NAME "ms_makeMIB_DR (v.20100607.1)"
+#define MY_NAME "ms_makeMIB_DR (v.20150910.1)"
 #define ME "15" 
 
 main ( int narg, char *argv[] ) {
@@ -151,7 +151,7 @@ main ( int narg, char *argv[] ) {
   fprintf(fp,"B 2.4 		OP-FILEINFO-INTERNAL	NUL	NUL	NUL\n");
   fprintf(fp,"V 2.4.1 	OP-TAG			UNK	a16	a16\n");
   fprintf(fp,"V 2.4.2 	OP-FORMAT		UNK	a32	a32\n");
-  fprintf(fp,"V 2.4.3 	OP-FILEPOSITION		UNK	a47	a47\n");
+  fprintf(fp,"V 2.4.3 	OP-POSITION		UNK	a47	a47\n");
 
   fprintf(fp,"B 2.5 		OP-FILEINFO-EXTERNAL	NUL	NUL	NUL\n");
   fprintf(fp,"V 2.5.1 	OP-FILENAME		UNK	a193	a193\n");
@@ -174,6 +174,7 @@ main ( int narg, char *argv[] ) {
   fprintf(fp,"B 5 		STORAGE-INFO		NUL	NUL	NUL\n");
   fprintf(fp,"V 5.1 		TOTAL-STORAGE		UNK	a15	a15\n");
   fprintf(fp,"V 5.2 		REMAINING-STORAGE	UNK	a15	a15\n");
+  fprintf(fp,"V 5.3 		CONTIGUOUS-STORAGE	UNK	a15	a15\n");
 
   fprintf(fp,"B 6 		REMOVABLE-DEVICES	NUL	NUL	NUL\n");
   fprintf(fp,"V 6.1 		DEVICE-COUNT		UNK	a6	a6\n");
@@ -181,14 +182,18 @@ main ( int narg, char *argv[] ) {
   for ( i=0; i<nMaxDeviceCount; i++) {
     fprintf(fp,"V 6.2.%d		DEVICE-ID-%d 		UNK 	a64 	a64\n",i+1,i+1);
     }
-  fprintf(fp,"B 6.3 		DEVICE-STORAGES		NUL	NUL	NUL\n");
+  fprintf(fp,"B 6.3 		DEVICE-BARCODES		NUL	NUL	NUL\n");
   for ( i=0; i<nMaxDeviceCount; i++) {
-    fprintf(fp,"V 6.3.%d		DEVICE-STORAGE-%d 	UNK 	a15 	a15\n",i+1,i+1);
+    fprintf(fp,"V 6.3.%d		DEVICE-BARCODE-%d 		UNK 	a64 	a64\n",i+1,i+1);
+    }
+  fprintf(fp,"B 6.4 		DEVICE-STORAGES		NUL	NUL	NUL\n");
+  for ( i=0; i<nMaxDeviceCount; i++) {
+    fprintf(fp,"V 6.4.%d		DEVICE-STORAGE-%d 	UNK 	a15 	a15\n",i+1,i+1);
     }
 
   fprintf(fp,"B 7 		CPU-INFO		NUL	NUL	NUL\n");
   fprintf(fp,"V 7.1 		CPU-COUNT		UNK	a3	a3\n");
-  fprintf(fp,"B 7.2 		CPUTEMPS		NUL	NUL	NUL\n");
+  fprintf(fp,"B 7.2 		CPU-TEMPS		NUL	NUL	NUL\n");
   for ( i=0; i<nMaxCPUCount; i++) {
     fprintf(fp,"V 7.2.%d		CPU-TEMP-%d 		UNK 	a3 	a3\n",i+1,i+1);
     }
@@ -238,6 +243,10 @@ main ( int narg, char *argv[] ) {
     fprintf(fp,"V 12.3.%d	DRSU-INFO-%d 		UNK 	a88 	a88\n",i+1,i+1);
     }
   fprintf(fp,"V 12.4 		DRSU-BARCODE		UNK	a1024	a1024\n");
+  
+  fprintf(fp,"B 13 		TIMETAG-LAG		NUL	NUL	NUL\n"):
+  fprintf(fp,"V 13.1		TT-LAG-INITIAL		UNK	a64	a64\n");
+  fprintf(fp,"V 13.2		TT-LAG		UNK	a64	a64\n");
 
   close(fp);
   } /* main() */
@@ -245,14 +254,12 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_makeMIB_DR.c: J. Dowell, UNM, 2015 Sep 10
+//   .1: Updated for DROS v2
 // ms_makeMIB_DR.c: S.W. Ellingson, Virginia Tech, 2013 Jul 18
 //   .1: Added 12.4 (DRSU-BARCODE)
 // ms_makeMIB_DR.c: S.W. Ellingson, Virginia Tech, 2010 Jun 07
 //   .1: Initial version, using ms_makeMIB_ASP.c as a starting point
-// ms_makeMIB_ASP.c: S.W. Ellingson, Virginia Tech, 2009 Aug 14
-//   .1: Fixed bug
-// ms_makeMIB_ASP.c: S.W. Ellingson, Virginia Tech, 2009 Aug 06
-//   .1: Initial version
 
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
