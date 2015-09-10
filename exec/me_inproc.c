@@ -934,7 +934,7 @@ int main ( int narg, char *argv[] ) {
                  cs[ncs].action.tv.tv_usec = tv.tv_usec; 
                  cs[ncs].action.bASAP = 0;                   
                  cs[ncs].action.sid = dr_sid;       /* DR that this is directed to */
-                 cs[ncs].action.cid = LWA_CMD_RPT
+                 cs[ncs].action.cid = LWA_CMD_RPT;
                  sprintf(cs[ncs].data,"DRSU-BARCODE");
                  cs[ncs].action.len = strlen(cs[ncs].data)+1;
                  me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */

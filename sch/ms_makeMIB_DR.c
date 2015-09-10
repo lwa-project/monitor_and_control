@@ -244,7 +244,7 @@ main ( int narg, char *argv[] ) {
     }
   fprintf(fp,"V 12.4 		DRSU-BARCODE		UNK	a1024	a1024\n");
   
-  fprintf(fp,"B 13 		TIMETAG-LAG		NUL	NUL	NUL\n"):
+  fprintf(fp,"B 13 		TIMETAG-LAG		NUL	NUL	NUL\n");
   fprintf(fp,"V 13.1		TT-LAG-INITIAL		UNK	a64	a64\n");
   fprintf(fp,"V 13.2		TT-LAG		UNK	a64	a64\n");
 
