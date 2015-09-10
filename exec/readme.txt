@@ -243,36 +243,37 @@ $ ./mesix DP_ TBW "0 0 12000000"
 $ ./mesix DP_ TBN "74000000 7 28 0"
 (See banner comments in the associated source code for additional details of syntax)
 When MCS receives response messages indicating that DP has accepted these commands, the associated non-ICD MIB entries are updated.  For example: for TBW, the associated non-ICD MIB indices and labels are:
-0.4.1         TBW_BITS                
-0.4.2         TBW_TRIG_TIME          
-0.4.3         TBW_SAMPLES        
-0.4.4         TBW_REFERENCE      
-0.4.5         TBW_CMD_SENT_MPM       
+0.4.1         MCS_TBW_BITS                
+0.4.2         MCS_TBW_TRIG_TIME          
+0.4.3         MCS_TBW_SAMPLES        
+0.4.4         MCS_TBW_REFERENCE      
+0.4.5         MCS_TBW_CMD_SENT_MPM       
 And for TBN these are:		
-0.5.1         TBN_FREQ                
-0.5.2         TBN_BW                  
-0.5.3         TBN_GAIN               
-0.5.4         TBN_SUB_SLOT            
-0.5.5         TBN_REFERENCE           
-0.5.6         TBN_CMD_SENT_MPM       
+0.5.1         MCS_TBN_FREQ                
+0.5.2         MCS_TBN_BW                  
+0.5.3         MCS_TBN_GAIN               
+0.5.4         MCS_TBN_SUB_SLOT            
+0.5.5         MCS_TBN_REFERENCE           
+0.5.6         MCS_TBN_CMD_SENT_MPM       
 These MIB entries can be read and manipulated in exactly the same manner as ICD-specified MIB entries; for example, using the ms_mdre utility. 
 
 (2) mesix (only) can send the DP commands "FST", "BAM", and "DRX".  Examples follow:
 $ ./mesix DP_ FST "23 cfile.cf"
 $ ./mesix DP_ BAM "1 dfile.df gfile.gf"
 $ ./mesix DP_ DRX "1 2 74000000 7 15 0"
-See banner comments in the associated source code for specific details of syntax.  However, I wish to note here how these commands are processed by mesix.  The DRX command is handled in exactly the same manner as TBW and TBN; see above.  The FST and BAM commands are handled a little differently.  The DATA field of the FST and BAM commands contain the names of files which contain the raw binary data that DP is expecting.  mesix does not attempt to include this data in the DATA field before sending the command to the MCS/Scheduler ms_exec process.  Instead, MCS/Scheduler reads the specified files and makes the substitution immediately prior to sending the command to DP.  Scheduler assumes that the "cfile.cf" file specified in the FST command is located in a subdirectory called "cfiles"; and that the files "dfile.df" and "gfile.gf" specified in the BAM command are in subdirectories "dfiles" and "gfiles", respectively. When a response message is received indicating that the FST or BAM command is accepted, MCS/Scheduler updates the associated non-ICD MIB entries with the names of the files containing the data (i.e., *not* the data itself).  The associated non-ICD MIB entries are explained by example below.  
+See banner comments in the associated source code for specific details of syntax.  However, I wish to note here how these commands are processed by mesix.  The DRX command is handled in exactly the same manner as TBW and TBN; see above.  The FST and BAM commands are handled a little differently.  The DATA field of the FST and BAM commands contain the names of files which contain the raw binary data that DP is expecting.  mesix does not attempt to include this data in the DATA field before sending the command to the MCS/Scheduler ms_exec process.  Instead, MCS/Scheduler reads the specified files and makes the substitution immediately prior to sending the command to DP.  Scheduler assumes that the "cfile.cf" file specified in the FST command is located in a subdirectory called "cfiles"; and that the files "dfile.df" and "gfile.gf" specified in the BAM command are in subdirectories "dfiles" and "gfiles", respectively. When a response message is received indicating that the FST or BAM command is accepted, MCS/
+Scheduler updates the associated non-ICD MIB entries with the names of the files containing the data (i.e., *not* the data itself).  The associated non-ICD MIB entries are explained by example below.  
 
 For example, when MCS/Scheduler receives a response message indicating that the FST command shown above has been accepted, it sets the non-ICD MIB entry 0.6.23, called "CF023", to be the string "cfile.cf".  There is one such non-ICD MIB entry for each of the 520 possible channels.  This provides a convenient mechanism for keeping track of which coefficient sets are assigned to which channels, since the filename then can be used as a convenient human-readable shorthand for data that was actually sent.  It is also possible to have DP read back the actual binary data sent with FST commands using subsequent RPT commands, however this is extraordinarily cumbersome (see the DP ICD for details).  DP does not allow binary data sent with BAM command to be read back at all.    
 
 The BAM command works similarly.  For example, when MCS/Scheduler receives a response message indicating that the BAM command shown above has been accepted, it updates non-ICD MIB entries as follows:
-MIB index 0.7.1.1 having label "BEAM1_DFILE" is set to "dfile.df"
-MIB index 0.7.1.2 having label "BEAM1_GFILE" is set to "gfile.gf"
+MIB index 0.7.1.1 having label "MCS_BEAM1_DFILE" is set to "dfile.df"
+MIB index 0.7.1.2 having label "MCS_BEAM1_GFILE" is set to "gfile.gf"
 
 Finally, when Scheduler receives a response message indicating that the DRX command shown above has been accepted, it updates non-ICD MIB entries as follows:
-MIB index 0.7.1.4.1 having label BEAM1_T2_FREQ is set to 74000000.0
-MIB index 0.7.1.4.2 having label BEAM1_T2_BW   is set to 7
-MIB index 0.7.1.4.3 having label BEAM1_T2_GAIN is set to 15
+MIB index 0.7.1.4.1 having label MCS_BEAM1_T2_FREQ is set to 74000000.0
+MIB index 0.7.1.4.2 having label MCS_BEAM1_T2_BW   is set to 7
+MIB index 0.7.1.4.3 having label MCS_BEAM1_T2_GAIN is set to 15
 
 A complete list of DP non-ICD MIB entries can be viewed using the MCS/Scheduler ms_md2t utility.  
 

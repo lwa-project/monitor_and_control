@@ -506,6 +506,7 @@ int main ( int narg, char *argv[] ) {
   long int dp_cmd_mpm;
   long int t0;
   int b4bits;
+  unsigned long int tuning_mask;
   int gain1, gain2;
 
   int dr_sid;
@@ -680,7 +681,6 @@ int main ( int narg, char *argv[] ) {
             case LWA_OM_STEPPED:
 #ifdef USE_ADP
             case LWA_OM_TBF:
-            case LWA_OM_COR:
 #else
             case LWA_OM_TBW:      
 #endif
@@ -829,11 +829,22 @@ int main ( int narg, char *argv[] ) {
             /* ====================== */
             /* === DR REC command === */
             /* ====================== */
-
+            
+#ifdef USE_ADP
+            /* for ADP beam output we do this once; i.e., one recording per session */
+            /* for ADP TBF output we do a new recording for each observation */
+            if ( ( (osf.OBS_MODE != LWA_OM_TBF) && (i==1) ) || 
+                 (  osf.OBS_MODE == LWA_OM_TBF            )   ) {
+              dr_sid=-1;
+              for( j=0; j<ME_MAX_NDR; j++ ) {
+                 if( osf.SESSION_DRX_BEAM == s.iDRDP[j] ) {
+                    dr_sid = LWA_SID_DR1 + j;
+                    break;
+                    }
+                 }
+#else
             /* for DP outputs 1-4 (beams), we do this once; i.e., one recording per session */
             /* for DP output 5 (TBN/TBW), we do a new recording for each observation */
-            /* for ADP outputs 1-31 (beams), we do this once; i.e., one recording per session */
-            /* for ADP output 32 (TBF), we do a new recording for each observation */
             if ( ( (osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) && (i==1) ) || 
                  (  osf.SESSION_DRX_BEAM==ME_MAX_NDPOUT           )   ) {
               dr_sid=-1;
@@ -843,6 +854,7 @@ int main ( int narg, char *argv[] ) {
                     break;
                     }
                  }
+#endif
               if (dr_sid==-1) {
                 printf(     "[%d/%d] FATAL: osf.SESSION_DRX_BEAM=%d is not in s.iDRDP[0..%d]\n",ME_INPROC,getpid(),osf.SESSION_DRX_BEAM,ME_MAX_NDR-1); 
                 fprintf(fpl,"[%d/%d] FATAL: osf.SESSION_DRX_BEAM=%d is not in s.iDRDP[0..%d]\n",ME_INPROC,getpid(),osf.SESSION_DRX_BEAM,ME_MAX_NDR-1);
@@ -894,8 +906,9 @@ int main ( int narg, char *argv[] ) {
                            &mjd, &mpm );  
               LWA_time2tv( &tv, mjd, mpm );
 
-              /* construct the command (if there is a DR to send it to) */
+              /* construct the command and poll the barcode (if there is a DR to send it to) */
               if( dr_sid != -1 ) {
+                 /* data capture command */
                  cs[ncs].action.tv.tv_sec  = tv.tv_sec;
                  cs[ncs].action.tv.tv_usec = tv.tv_usec; 
                  cs[ncs].action.bASAP = 0;                   
@@ -912,6 +925,17 @@ int main ( int narg, char *argv[] ) {
                      sprintf(cs[ncs].data,"%6ld %9ld %9ld %s",osf.OBS_START_MJD,osf.OBS_START_MPM,dr_length_ms,osf.SESSION_SPC); // no leading zeros
                    }
                    
+                 cs[ncs].action.len = strlen(cs[ncs].data)+1;
+                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+                 ncs++;
+                 
+                 /* barcode query */
+                 cs[ncs].action.tv.tv_sec  = tv.tv_sec + 1;
+                 cs[ncs].action.tv.tv_usec = tv.tv_usec; 
+                 cs[ncs].action.bASAP = 0;                   
+                 cs[ncs].action.sid = dr_sid;       /* DR that this is directed to */
+                 cs[ncs].action.cid = LWA_CMD_RPT
+                 sprintf(cs[ncs].data,"DRSU-BARCODE");
                  cs[ncs].action.len = strlen(cs[ncs].data)+1;
                  me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                  ncs++;
@@ -936,7 +960,7 @@ int main ( int narg, char *argv[] ) {
             /* === DP/ADP command === */
             /* ====================== */
 
-            /* DP commands neet to be sent in first 80% of slot N-2, given start time in slot N */
+            /* DP/ADP commands neet to be sent in first 80% of slot N-2, given start time in slot N */
             me_timecalc( osf.OBS_START_MJD, osf.OBS_START_MPM, /* calc time to send command to DP */
                         -2000,
                          &dp_cmd_mjd, &dp_cmd_mpm );  
@@ -945,20 +969,31 @@ int main ( int narg, char *argv[] ) {
 
 #ifdef USE_ADP
               case LWA_OM_TBF:
-                
-                /* FIXME: We need a tuning mask/setup for this */
+                 /* TBF needs a DRX command to set things up */
+                LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
+                cs[ncs].action.bASAP = 0;
+                cs[ncs].action.sid = LWA_SID_ADP;  
+                cs[ncs].action.cid = LWA_CMD_DRX; 
+                sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
+                                2*(osf.SESSION_DRX_BEAM-1)+1, //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
+                                      (4.563480616e-02)*(osf.OBS_FREQ1), /* center freq in Hz */
+                                            osf.OBS_BW,                  /* 0-8 */
+                                                gain1);                  /* 0-15 */
+                cs[ncs].action.len = strlen(cs[ncs].data)+1; 
+                me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+                ncs++;
                 
                 /* TBF trigger time is in units of samples from beginning of slot */
                 t0 = osf.OBS_START_MPM % 1000; /* number of ms beyond a second boundary */
                 t0 = 196000 * t0; /* [samples/ms] * [ms] */
+                
+                tuning_mask = 1 << (64-(2*(osf.SESSION_DRX_BEAM-1)+1));
 
-                b4bits = 16;
-
-                LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
+                LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 );
                 cs[ncs].action.bASAP = 0;                   
                 cs[ncs].action.sid = LWA_SID_ADP;  
                 cs[ncs].action.cid = LWA_CMD_TBF;  
-                sprintf( cs[ncs].data, "%d %ld %u %ld", b4bits, t0, osf2.OBS_TBF_SAMPLES, osf2.OBS_TBF_TUNING_MASK );
+                sprintf( cs[ncs].data, "16 %ld %u %lu", t0, osf2.OBS_TBF_SAMPLES, tuning_mask );
                 cs[ncs].action.len = strlen(cs[ncs].data)+1; 
                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                 ncs++;
@@ -1011,16 +1046,21 @@ int main ( int narg, char *argv[] ) {
                 //osf2.OBS_TBN_GAIN = 20; /* FIXME */
 
                 /* construct the command */ 
+#ifdef USE_ADP
                 LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
                 cs[ncs].action.bASAP = 0; 
-#ifdef USE_ADP
                 cs[ncs].action.sid = LWA_SID_ADP;
                 cs[ncs].action.cid = LWA_CMD_TBN;  
                 sprintf( cs[ncs].data, "%8.0f %hu %hd",
                                 (4.563480616e-02)*(osf.OBS_FREQ1), /* center freq in Hz */
                                       osf.OBS_BW,                  /* 1-11 */
                                           osf2.OBS_TBN_GAIN);      /* 0-30 */
+                cs[ncs].action.len = strlen(cs[ncs].data)+1;
+                me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+                ncs++;
 #else
+                LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
+                cs[ncs].action.bASAP = 0; 
                 cs[ncs].action.sid = LWA_SID_DP_;
                 cs[ncs].action.cid = LWA_CMD_TBN;  
                 sprintf( cs[ncs].data, "%8.0f %hu %hd %ld",
@@ -1028,39 +1068,11 @@ int main ( int narg, char *argv[] ) {
                                       osf.OBS_BW,                  /* 1-7 */
                                           osf2.OBS_TBN_GAIN,       /* 0-30 */
                                               t0);                 /* subslot */ 
-#endif
                 cs[ncs].action.len = strlen(cs[ncs].data)+1;
                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                 ncs++;
-
+#endif
                 break; /* LWA_OM_TBN */ 
-#ifdef USE_ADP
-              case LWA_OM_COR:
-                /* COR trigger time is in units of "subslots" (1/100ths of a second) */
-                t0 = osf.OBS_START_MPM % 1000; /* number of ms beyond a second boundary */
-                t0 /= 10; if (t0>99) t0=99; /* now in subslots */
-                
-                ///* deal with user requests to use SSMIF-specified defaults */ 
-                //if (osf2.OBS_TBN_GAIN==-1) { osf2.OBS_TBN_GAIN = s.settings.tbn_gain; }
-                ///* if SSMIF also leaves it up MCS, set this to 20 */ 
-                if (osf2.OBS_TBN_GAIN==-1) { osf2.OBS_TBN_GAIN = 20; }
-
-                /* construct the command */ 
-                LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
-                cs[ncs].action.bASAP = 0; 
-                cs[ncs].action.sid = LWA_SID_ADP;
-                cs[ncs].action.cid = LWA_CMD_COR;  
-                sprintf( cs[ncs].data, "%d %ld %hu %ld",
-                                osf2.OBS_COR_NAVG,             /* integration time */
-                                   osf2.OBS_COR_TUNING_MASK,    /* tuning mask */
-                                       osf2.OBS_TBN_GAIN,      /* 0-15 */
-                                          t0);                 // subslot 0..99 (uint8 sub_slot)
-                cs[ncs].action.len = strlen(cs[ncs].data)+1;
-                me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
-                ncs++;
-
-                break; /* LWA_OM_COR */ 
-#endif
 
               case LWA_OM_TRK_RADEC:
               case LWA_OM_TRK_SOL:
@@ -1094,25 +1106,48 @@ int main ( int narg, char *argv[] ) {
 
                 //printf("debug: osf2.OBS_DRX_GAIN=%hd\n",osf2.OBS_DRX_GAIN);
 
-                /* DRX commands */
+#ifdef USE_ADP
+                /* ADP - DRX commands */
+//     For cmd="DRX": Args are beam          1..NUM_BEAMS(16)        (uint8 DRX_BEAM)
+//                             freq          [Hz]                   (float32 DRX_FREQ)
+//                             ebw  	     Bandwidth setting 1..8 (unit8 DRX_BW)
+//                             gain          0..15                  (uint16 DRX_GAIN)
+                LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
+                cs[ncs].action.bASAP = 0;
+                cs[ncs].action.sid = LWA_SID_ADP;  
+                cs[ncs].action.cid = LWA_CMD_DRX; 
+                sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
+                                2*(osf.SESSION_DRX_BEAM-1)+1, //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
+                                      (4.563480616e-02)*(osf.OBS_FREQ1), /* center freq in Hz */
+                                            osf.OBS_BW,                  /* 0-8 */
+                                                gain1);                  /* 0-15 */
+                cs[ncs].action.len = strlen(cs[ncs].data)+1; 
+                me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+                ncs++;
+                
+                LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 ); /* staggering send times for DP commands by 10 ms */
+                cs[ncs].action.bASAP = 0;                   
+                cs[ncs].action.sid = LWA_SID_ADP;  
+                cs[ncs].action.cid = LWA_CMD_DRX; 
+                sprintf( cs[ncs].data, "%hd 2 %8.0f %hu %hd %ld",
+                                2*(osf.SESSION_DRX_BEAM-1)+2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                    //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
+                                      (4.563480616e-02)*(osf.OBS_FREQ2), /* center freq in Hz */
+                                            osf.OBS_BW,                  /* 0-8 */
+                                                gain2);                  /* 0-15 */
+                cs[ncs].action.len = strlen(cs[ncs].data)+1;
+                me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+                ncs++;
+#else
+                /* DP - DRX commands */
 //     For cmd="DRX": Args are beam          1..NUM_BEAMS(4)        (uint8 DRX_BEAM)
 //                             tuning        1..NUM_TUNINGS(2)      (uint8 DRX_TUNING)
 //                             freq          [Hz]                   (float32 DRX_FREQ)
 //                             ebw  	     Bandwidth setting 1..7 (unit8 DRX_BW)
 //                             gain          0..15                  (uint16 DRX_GAIN)
 //                             subslot       0..99                  (uint8 sub_slot)
-
                 LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
                 cs[ncs].action.bASAP = 0;
-#ifdef USE_ADP
-                cs[ncs].action.sid = LWA_SID_ADP;  
-                cs[ncs].action.cid = LWA_CMD_DRX; 
-                sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
-                                osf.SESSION_DRX_BEAM, //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
-                                      (4.563480616e-02)*(osf.OBS_FREQ1), /* center freq in Hz */
-                                            osf.OBS_BW,                  /* 0-8 */
-                                                gain1);      /* 0-15 */
-#else
                 cs[ncs].action.sid = LWA_SID_DP_;  
                 cs[ncs].action.cid = LWA_CMD_DRX; 
                 sprintf( cs[ncs].data, "%hd 1 %8.0f %hu %hd %ld",
@@ -1120,14 +1155,12 @@ int main ( int narg, char *argv[] ) {
                                     //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
                                       (4.563480616e-02)*(osf.OBS_FREQ1), /* center freq in Hz */
                                             osf.OBS_BW,                  /* 1-7 */
-                                                gain1,       /* 0-15 */
-                                                    t0);                 // subslot 0..99 (uint8 sub_slot)
-#endif
+                                                gain1,                   /* 0-15 */
+                                                    t0);                 /* subslot 0..99 (uint8 sub_slot) */
                 cs[ncs].action.len = strlen(cs[ncs].data)+1; 
                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                 ncs++;
 
-#ifndef USE_ADP
                 LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 ); /* staggering send times for DP commands by 10 ms */
                 cs[ncs].action.bASAP = 0;                   
                 cs[ncs].action.sid = LWA_SID_DP_;  
@@ -1138,12 +1171,12 @@ int main ( int narg, char *argv[] ) {
                                       (4.563480616e-02)*(osf.OBS_FREQ2), /* center freq in Hz */
                                             osf.OBS_BW,                  /* 1-7 */
                                                 gain2,                   /* 0-15 */
-                                                    t0);                 // subslot 0..99 (uint8 sub_slot)
+                                                    t0);                 /* subslot 0..99 (uint8 sub_slot) */
                 cs[ncs].action.len = strlen(cs[ncs].data)+1;
                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                 ncs++;
 #endif
-
+                
                 /*--- BAM commands ---*/
 
                 /* figure out when to stop doing BAM updates */
@@ -1188,7 +1221,6 @@ int main ( int narg, char *argv[] ) {
                       ra = osf.OBS_RA;
                       dec = osf.OBS_DEC;
                       break;
-                    /* FIXME:  Does this do anything bad to the metadata that comes out? */
                     case LWA_OM_TRK_RADEC:
                       ra = osf.OBS_RA;
                       dec = osf.OBS_DEC;
@@ -1220,14 +1252,30 @@ int main ( int narg, char *argv[] ) {
                     /* Figure out what dfile to use (construct filename) */
                     sprintf(dfile,"740_%03.0lf_%04.0lf.df",alt*10,az*10); /* FIXME */
                     //sprintf(dfile,"dfile.df"); 
-
+                    
+#ifdef USE_ADP
                     /* Must be sent in first 80% of slot N-2 */
                     cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2;
                     cs[ncs].action.tv.tv_usec = 20000; /* staggering send times for DP commands by 10 ms */
-                    cs[ncs].action.bASAP = 0;       
-#ifdef USE_ADP
+                    cs[ncs].action.bASAP = 0;      
                     sprintf( cs[ncs].data, "%hd %s %s %hd %ld",
-                                    osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                    2*(osf.SESSION_DRX_BEAM-1)+1, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                        dfile,
+                                           gfile,
+                                              osf.SESSION_DRX_BEAM, 
+                                                 t0);
+                    
+                    cs[ncs].action.sid = LWA_SID_ADP;  
+                    cs[ncs].action.cid = LWA_CMD_BAM; 
+                    cs[ncs].action.len = strlen(cs[ncs].data)+1; 
+                    me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+                    ncs++;
+                    
+                    cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2;
+                    cs[ncs].action.tv.tv_usec = 30000; /* staggering send times for DP commands by 10 ms */
+                    cs[ncs].action.bASAP = 0;      
+                    sprintf( cs[ncs].data, "%hd %s %s %hd %ld",
+                                    2*(osf.SESSION_DRX_BEAM-1)+2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                         dfile,
                                            gfile,
                                               osf.SESSION_DRX_BEAM, 
@@ -1235,7 +1283,14 @@ int main ( int narg, char *argv[] ) {
             
                     cs[ncs].action.sid = LWA_SID_ADP;  
                     cs[ncs].action.cid = LWA_CMD_BAM; 
+                    cs[ncs].action.len = strlen(cs[ncs].data)+1; 
+                    me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+                    ncs++; 
 #else
+                    /* Must be sent in first 80% of slot N-2 */
+                    cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2;
+                    cs[ncs].action.tv.tv_usec = 20000; /* staggering send times for DP commands by 10 ms */
+                    cs[ncs].action.bASAP = 0;      
                     sprintf( cs[ncs].data, "%hd %s %s %ld",
                                     osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                         dfile,
@@ -1244,11 +1299,11 @@ int main ( int narg, char *argv[] ) {
               
                     cs[ncs].action.sid = LWA_SID_DP_;  
                     cs[ncs].action.cid = LWA_CMD_BAM; 
-#endif
                     cs[ncs].action.len = strlen(cs[ncs].data)+1; 
                     me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                     ncs++; 
-
+#endif
+                    
                     last_alt = alt;
                     last_az  = az;
 
@@ -1363,20 +1418,42 @@ int main ( int narg, char *argv[] ) {
               LWA_timeval( &tv, &mjd, &mpm ); /* get MJD and MPM for start of this step */
               t0 = mpm % 1000;                /* number of ms beyond a second boundary */
               t0 /= 10; if (t0>99) t0=99;     /* now in subslots */                  
-          
+              
+#ifdef USE_ADP
               /* here's the DRX command setting FREQ1: */
               cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
               cs[ncs].action.tv.tv_usec = 0; 
               cs[ncs].action.bASAP = 0; 
-#ifdef USE_ADP
               cs[ncs].action.sid = LWA_SID_ADP;  
               cs[ncs].action.cid = LWA_CMD_DRX; 
               sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
-                              osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                              2*(osf.SESSION_DRX_BEAM-1)+1, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                     (4.563480616e-02)*(osfs.OBS_STP_FREQ1), /* center freq in Hz */
-                                          osf.OBS_BW,                  /* 0-8 */
-                                              osf2.OBS_DRX_GAIN);      /* 0-15 */
+                                          osf.OBS_BW,                       /* 0-8 */
+                                              gain1);                       /* 0-15 */
+              cs[ncs].action.len = strlen(cs[ncs].data)+1; 
+              me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+              ncs++;
+              
+              /* here's the DRX command setting FREQ2: */
+              cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
+              cs[ncs].action.tv.tv_usec = 10000;         /* staggering send times for DP commands by 10 ms */
+              cs[ncs].action.bASAP = 0;    
+              cs[ncs].action.sid = LWA_SID_ADP;  
+              cs[ncs].action.cid = LWA_CMD_DRX; 
+              sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
+                              2*(osf.SESSION_DRX_BEAM-1)+2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                    (4.563480616e-02)*(osfs.OBS_STP_FREQ2), /* center freq in Hz */
+                                          osf.OBS_BW,                       /* 0-8 */
+                                              gain2);                       /* 0-15 */
+              cs[ncs].action.len = strlen(cs[ncs].data)+1;
+              me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+              ncs++;
 #else
+              /* here's the DRX command setting FREQ1: */
+              cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
+              cs[ncs].action.tv.tv_usec = 0; 
+              cs[ncs].action.bASAP = 0; 
               cs[ncs].action.sid = LWA_SID_DP_;  
               cs[ncs].action.cid = LWA_CMD_DRX; 
               sprintf( cs[ncs].data, "%hd 1 %8.0f %hu %hd %ld",
@@ -1386,16 +1463,14 @@ int main ( int narg, char *argv[] ) {
                                           osf.OBS_BW,                  /* 1-7 */
                                               gain1,                   /* 0-15 */
                                                   t0);                 // subslot 0..99 (uint8 sub_slot)
-#endif
               cs[ncs].action.len = strlen(cs[ncs].data)+1; 
               me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
               ncs++;
-
-#ifndef USE_ADP
+              
               /* here's the DRX command setting FREQ2: */
               cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
               cs[ncs].action.tv.tv_usec = 10000;         /* staggering send times for DP commands by 10 ms */
-              cs[ncs].action.bASAP = 0;                   
+              cs[ncs].action.bASAP = 0;
               cs[ncs].action.sid = LWA_SID_DP_;  
               cs[ncs].action.cid = LWA_CMD_DRX; 
               sprintf( cs[ncs].data, "%hd 2 %8.0f %hu %hd %ld",
@@ -1405,11 +1480,11 @@ int main ( int narg, char *argv[] ) {
                                           osf.OBS_BW,                  /* 1-7 */
                                               gain2,                   /* 0-15 */
                                                   t0);                 // subslot 0..99 (uint8 sub_slot)
-              cs[ncs].action.len = strlen(cs[ncs].data)+1;
+                                                  cs[ncs].action.len = strlen(cs[ncs].data)+1;
               me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
               ncs++;
 #endif
-
+              
               /* working out dfile and gfile for BAM command.  Two possibilities: */
               if ( osfs.OBS_STP_B!=LWA_BT_SPEC_DELAYS_GAINS) { 
 
@@ -1471,20 +1546,44 @@ int main ( int narg, char *argv[] ) {
 
                 } /* if ( osfs.OBS_STP_B!=LWA_BT_SPEC_DELAYS_GAINS) {} else {} */
 
+
+#ifdef USE_ADP
               /* so here's the BAM command: */
               cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
               cs[ncs].action.tv.tv_usec = 20000;         /* staggering send times for DP commands by 10 ms */
               cs[ncs].action.bASAP = 0;
-#ifdef USE_ADP
               cs[ncs].action.sid = LWA_SID_ADP;  
               cs[ncs].action.cid = LWA_CMD_BAM; 
               sprintf( cs[ncs].data, "%hd %s %s %d %ld",
-                                      osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                      2*(osf.SESSION_DRX_BEAM-1)+1, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                           dfile,
                                              gfile,
                                                 osf.SESSION_DRX_BEAM, 
                                                    t0);
+              cs[ncs].action.len = strlen(cs[ncs].data)+1;
+              me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+              ncs++;
+              
+              /* so here's the other BAM command: */
+              cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
+              cs[ncs].action.tv.tv_usec = 30000;         /* staggering send times for DP commands by 10 ms */
+              cs[ncs].action.bASAP = 0;
+              cs[ncs].action.sid = LWA_SID_ADP;  
+              cs[ncs].action.cid = LWA_CMD_BAM; 
+              sprintf( cs[ncs].data, "%hd %s %s %d %ld",
+                                      2*(osf.SESSION_DRX_BEAM-1)+2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                          dfile,
+                                             gfile,
+                                                osf.SESSION_DRX_BEAM, 
+                                                   t0);
+              cs[ncs].action.len = strlen(cs[ncs].data)+1;
+              me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+              ncs++;
 #else
+              /* so here's the BAM command: */
+              cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
+              cs[ncs].action.tv.tv_usec = 20000;         /* staggering send times for DP commands by 10 ms */
+              cs[ncs].action.bASAP = 0;
               cs[ncs].action.sid = LWA_SID_DP_;  
               cs[ncs].action.cid = LWA_CMD_BAM; 
               sprintf( cs[ncs].data, "%hd %s %s %ld",
@@ -1492,11 +1591,11 @@ int main ( int narg, char *argv[] ) {
                                           dfile,
                                              gfile,
                                                 t0);
-#endif
               cs[ncs].action.len = strlen(cs[ncs].data)+1;
               me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
               ncs++;
-
+#endif
+              
               /* determine the absolute start time for NEXT step */
               LWA_timeadd( &tv, osfs.OBS_STP_T );   
 
@@ -1547,17 +1646,12 @@ int main ( int narg, char *argv[] ) {
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_ATS[%d]=%hd\n",m,osf2.OBS_ASP_ATS[m]); }
 #ifdef USE_ADP
           fprintf(fpl,"osf2.OBS_TBF_SAMPLES=%u\n",osf2.OBS_TBF_SAMPLES); 
-          fprintf(fpl,"osf2.OBS_TBF_TUNING_MASK=%lu\n",osf2.OBS_TBF_TUNING_MASK);
 #else
           fprintf(fpl,"osf2.OBS_TBW_BITS=%hu\n",osf2.OBS_TBW_BITS); 
           fprintf(fpl,"osf2.OBS_TBW_SAMPLES=%u\n",osf2.OBS_TBW_SAMPLES);   
 #endif
           fprintf(fpl,"osf2.OBS_TBN_GAIN=%hd\n",osf2.OBS_TBN_GAIN);  
-          fprintf(fpl,"osf2.OBS_DRX_GAIN=%hd\n",osf2.OBS_DRX_GAIN); 
-#ifdef USE_ADP
-          fprintf(fpl,"osf2.OBS_COR_NAVG=%u\n",osf2.OBS_COR_NAVG); 
-          fprintf(fpl,"osf2.OBS_COR_TUNING_MASK=%lu\n",osf2.OBS_COR_TUNING_MASK);
-#endif
+          fprintf(fpl,"osf2.OBS_DRX_GAIN=%hd\n",osf2.OBS_DRX_GAIN);
 
           } /* for ( i=1, i<=ssf.SESSION_NOBS; i++ ) */
 
@@ -1574,22 +1668,35 @@ int main ( int narg, char *argv[] ) {
               case LWA_OM_TRK_SOL:
               case LWA_OM_TRK_JOV:
               case LWA_OM_STEPPED:
+#ifdef USE_ADP
                  cs[ncs].action.tv.tv_sec  = cs[ncs-1].action.tv.tv_sec;
                  cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec;
-#ifdef USE_ADP
                  cs[ncs].action.sid = LWA_SID_ADP;  
                  cs[ncs].action.cid = LWA_CMD_STP; 
                  sprintf( cs[ncs].data, "BEAM%d",
-                                      osf.SESSION_DRX_BEAM); //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                      2*(osf.SESSION_DRX_BEAM-1)+1); //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
 #else
+                 cs[ncs].action.tv.tv_sec  = cs[ncs-1].action.tv.tv_sec;
+                 cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec;
                  cs[ncs].action.sid = LWA_SID_DP_;  
                  cs[ncs].action.cid = LWA_CMD_STP; 
-                sprintf( cs[ncs].data, "BEAM%d",
+                 sprintf( cs[ncs].data, "BEAM%d",
                                       osf.SESSION_DRX_BEAM); //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
 #endif
                  cs[ncs].action.len = strlen(cs[ncs].data)+1;
                  me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                  ncs++;
+#ifdef USE_ADP
+                 cs[ncs].action.tv.tv_sec  = cs[ncs-1].action.tv.tv_sec;
+                 cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec;
+                 cs[ncs].action.sid = LWA_SID_ADP;  
+                 cs[ncs].action.cid = LWA_CMD_STP; 
+                 sprintf( cs[ncs].data, "BEAM%d",
+                                      2*(osf.SESSION_DRX_BEAM-1)+2); //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                 cs[ncs].action.len = strlen(cs[ncs].data)+1;
+                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+                 ncs++;
+#endif
                  break;
               default: break;
               }
