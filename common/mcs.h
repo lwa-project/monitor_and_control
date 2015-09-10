@@ -722,7 +722,7 @@ float LWA_f4_swap( float x ) {
 #define ME_MAX_NPWRPORT 50
 #define ME_MAX_SSNAME_LENGTH 3 /* for codes used for PWR_NAME */
 #ifdef USE_ADP
-#define ME_MAX_NDPOUT 32 /* ADP outputs; = #tunings */
+#define ME_MAX_NDPOUT 1 /* ADP outputs; 1 because of how things are tied together */
 #else
 #define ME_MAX_NDPOUT 5 /* DP outputs; = #beams + 1 for TBW/TBN */
 #endif
@@ -736,7 +736,6 @@ float LWA_f4_swap( float x ) {
 #define LWA_OM_TBN       6
 #define LWA_OM_DIAG1     7
 #define LWA_OM_TBF       8
-#define LWA_OM_COR       9
 
 int LWA_getmode( char *ssc ) {
   /* ssc is a string from which to determine mode */
@@ -750,7 +749,6 @@ int LWA_getmode( char *ssc ) {
   if (!strncmp(ssc,"TBN"      ,3)) mode = LWA_OM_TBN;
   if (!strncmp(ssc,"DIAG1"    ,5)) mode = LWA_OM_DIAG1;
   if (!strncmp(ssc,"TBF"      ,3)) mode = LWA_OM_TBF;
-  if (!strncmp(ssc,"COR"      ,3)) mode = LWA_OM_COR;
   return mode;
   } /* LWA_getmode() */
 
@@ -766,7 +764,6 @@ void LWA_saymode( unsigned short int mode, char *ssc ) {
   if (mode==LWA_OM_TBN      ) strcpy(ssc,"TBN");
   if (mode==LWA_OM_DIAG1    ) strcpy(ssc,"DIAG1");
   if (mode==LWA_OM_TBF      ) strcpy(ssc,"TBF");
-  if (mode==LWA_OM_COR      ) strcpy(ssc,"COR");
   return;
   } /* LWA_saymode() */
 
@@ -796,7 +793,7 @@ void LWA_saybeamtype( int mode, char *ssc ) {
   } /* LWA_saybeamtype() */
 
 int LWA_dpoavail( 
-  signed short int dpo,            /* DP/ADP output: numbered 1 through 5 (5 is TBW/TBN) for DP; 1 through 32 for ADP (32 is TBF/COR) */
+  signed short int dpo,            /* DP/ADP output: numbered 1 through 5 (5 is TBW/TBN) for DP; 1 for ADP */
   struct timeval t0,  /* start time */
   long int d,         /* duration (ms) */
   char *path,         /* path to mess.dat, no trailing slash */
@@ -968,10 +965,6 @@ struct osf2_struct { /* really just a continuation of osf_struct */
 #endif
   signed short int   OBS_TBN_GAIN;
   signed short int   OBS_DRX_GAIN;
-#ifdef USE_ADP
-  signed int         OBS_COR_NAVG;
-  unsigned long int  OBS_COR_TUNING_MASK;
-#endif
   };
 
 struct me_action_struct {  /* atomic unit of action as me_exec executes session */
