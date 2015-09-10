@@ -36,10 +36,12 @@ python mch_minimal_server_acceptall.py SHL 127.0.0.1 1739 1738 &
 python mch_minimal_server_acceptall.py ASP 127.0.0.1 1741 1740 &
 python mch_minimal_server_acceptall.py ${dpName} 127.0.0.1 1743 1742 &
 python mch_minimal_server_acceptall.py DR1 127.0.0.1 1745 1744 &
-python mch_minimal_server_acceptall.py DR2 127.0.0.1 1747 1746 &
-python mch_minimal_server_acceptall.py DR3 127.0.0.1 1749 1748 &
-python mch_minimal_server_acceptall.py DR4 127.0.0.1 1751 1750 &
-python mch_minimal_server_acceptall.py DR5 127.0.0.1 1753 1752 &
+if [ "${dpName}" == "DP_" ]; then
+	python mch_minimal_server_acceptall.py DR2 127.0.0.1 1747 1746 &
+	python mch_minimal_server_acceptall.py DR3 127.0.0.1 1749 1748 &
+	python mch_minimal_server_acceptall.py DR4 127.0.0.1 1751 1750 &
+	python mch_minimal_server_acceptall.py DR5 127.0.0.1 1753 1752 &
+fi
 
 # Create ASP MIB initialization file for an ASP with
 # 3 ARX power supplies, 2 FEE power supplies, and 10 temperature sensors
@@ -56,10 +58,12 @@ fi
 
 # Create DP MIB initialization files 
 ./ms_makeMIB_DR 1 5 5 2 8 5 3 10 2
-./ms_makeMIB_DR 2 5 5 2 8 5 3 10 2
-./ms_makeMIB_DR 3 5 5 2 8 5 3 10 2
-./ms_makeMIB_DR 4 5 5 2 8 5 3 10 2
-./ms_makeMIB_DR 5 5 5 2 8 5 3 10 2
+if [ "${dpName}" == "DP_" ]; then
+	./ms_makeMIB_DR 2 5 5 2 8 5 3 10 2
+	./ms_makeMIB_DR 3 5 5 2 8 5 3 10 2
+	./ms_makeMIB_DR 4 5 5 2 8 5 3 10 2
+	./ms_makeMIB_DR 5 5 5 2 8 5 3 10 2
+fi
 
 # Create an ms_init initialization file called "test9.dat" 
 echo \
@@ -70,15 +74,18 @@ mcic    ASP
 mibinit ${dpName} 127.0.0.1 1742 1743
 mcic    ${dpName}
 mibinit DR1 127.0.0.1 1744 1745
-mcic    DR1
-mibinit DR2 127.0.0.1 1746 1747
+mcic    DR1" > test9.dat
+if [ "${dpName}" == "DP_" ]; then
+	echo \
+"mibinit DR2 127.0.0.1 1746 1747
 mcic    DR2
 mibinit DR3 127.0.0.1 1748 1749
 mcic    DR3
 mibinit DR4 127.0.0.1 1750 1751
 mcic    DR4
 mibinit DR5 127.0.0.1 1752 1753
-mcic    DR5" > test9.dat
+mcic    DR5" >> test9.dat
+fi
 
 # MCS/Scheduler start (allow a few seconds to get everything running)
 ./ms_init test9.dat

@@ -18,32 +18,49 @@
 # Note this script assumes all software running on the same computer
 # (Otherwise, change 127.0.0.1 to appropriate IPs)
 
+# Figure out if we are DP or ADP-compatible
+usingADP=`strings msei | grep ADP `
+if [ "${usingADP}" == "" ]; then
+	# DP
+	dpName="DP_"
+else
+	# ADP
+	dpName="ADP"
+fi
+
 # Fire up emulators to play the role of DR1, DR2, DR3, DR4, DR5
 python mch_minimal_server.py DR1 127.0.0.1 1739 1738 &
-python mch_minimal_server.py DR2 127.0.0.1 1741 1740 &
-python mch_minimal_server.py DR3 127.0.0.1 1743 1742 &
-python mch_minimal_server.py DR4 127.0.0.1 1745 1744 &
-python mch_minimal_server.py DR5 127.0.0.1 1747 1746 &
+if [ "${dpName}" == "DP_" ]; then
+	python mch_minimal_server.py DR2 127.0.0.1 1741 1740 &
+	python mch_minimal_server.py DR3 127.0.0.1 1743 1742 &
+	python mch_minimal_server.py DR4 127.0.0.1 1745 1744 &
+	python mch_minimal_server.py DR5 127.0.0.1 1747 1746 &
+fi
 
 # Create DP MIB initialization files 
 ./ms_makeMIB_DR 1 5 5 2 8 5 3 10 2
-./ms_makeMIB_DR 2 5 5 2 8 5 3 10 2
-./ms_makeMIB_DR 3 5 5 2 8 5 3 10 2
-./ms_makeMIB_DR 4 5 5 2 8 5 3 10 2
-./ms_makeMIB_DR 5 5 5 2 8 5 3 10 2
+if [ "${dpName}" == "DP_" ]; then
+	./ms_makeMIB_DR 2 5 5 2 8 5 3 10 2
+	./ms_makeMIB_DR 3 5 5 2 8 5 3 10 2
+	./ms_makeMIB_DR 4 5 5 2 8 5 3 10 2
+	./ms_makeMIB_DR 5 5 5 2 8 5 3 10 2
+fi
 
 # Create an ms_init initialization file called "test7.dat" 
 echo \
 'mibinit DR1 127.0.0.1 1738 1739
-mcic    DR1
-mibinit DR2 127.0.0.1 1740 1741
+mcic    DR1' > test8.dat
+if [ "${dpName}" == "DP_" ]; then
+	echo \
+'mibinit DR2 127.0.0.1 1740 1741
 mcic    DR2
 mibinit DR3 127.0.0.1 1742 1743
 mcic    DR3
 mibinit DR4 127.0.0.1 1744 1745
 mcic    DR4
 mibinit DR5 127.0.0.1 1746 1747
-mcic    DR5' > test8.dat
+mcic    DR5' >> test8.dat
+fi
 
 # MCS/Scheduler start (allow a few seconds to get everything running)
 ./ms_init test8.dat
@@ -53,30 +70,40 @@ sleep 5
 # Note SUMMARY gets updated with every response, so no need to 
 # explicitly get that
 ./msei DR1 RPT INFO
-./msei DR2 RPT INFO
-./msei DR3 RPT INFO
-./msei DR4 RPT INFO
-./msei DR5 RPT INFO
+if [ "${dpName}" == "DP_" ]; then
+	./msei DR2 RPT INFO
+	./msei DR3 RPT INFO
+	./msei DR4 RPT INFO
+	./msei DR5 RPT INFO
+fi
 ./msei DR1 RPT LASTLOG
-./msei DR2 RPT LASTLOG
-./msei DR3 RPT LASTLOG
-./msei DR4 RPT LASTLOG
-./msei DR5 RPT LASTLOG
+if [ "${dpName}" == "DP_" ]; then
+	./msei DR2 RPT LASTLOG
+	./msei DR3 RPT LASTLOG
+	./msei DR4 RPT LASTLOG
+	./msei DR5 RPT LASTLOG
+fi
 ./msei DR1 RPT SUBSYSTEM
-./msei DR2 RPT SUBSYSTEM
-./msei DR3 RPT SUBSYSTEM
-./msei DR4 RPT SUBSYSTEM
-./msei DR5 RPT SUBSYSTEM
+if [ "${dpName}" == "DP_" ]; then
+	./msei DR2 RPT SUBSYSTEM
+	./msei DR3 RPT SUBSYSTEM
+	./msei DR4 RPT SUBSYSTEM
+	./msei DR5 RPT SUBSYSTEM
+fi
 ./msei DR1 RPT SERIALNO
-./msei DR2 RPT SERIALNO
-./msei DR3 RPT SERIALNO
-./msei DR4 RPT SERIALNO
-./msei DR5 RPT SERIALNO
+if [ "${dpName}" == "DP_" ]; then
+	./msei DR2 RPT SERIALNO
+	./msei DR3 RPT SERIALNO
+	./msei DR4 RPT SERIALNO
+	./msei DR5 RPT SERIALNO
+fi
 ./msei DR1 RPT VERSION
-./msei DR2 RPT VERSION
-./msei DR3 RPT VERSION
-./msei DR4 RPT VERSION
-./msei DR5 RPT VERSION
+if [ "${dpName}" == "DP_" ]; then
+	./msei DR2 RPT VERSION
+	./msei DR3 RPT VERSION
+	./msei DR4 RPT VERSION
+	./msei DR5 RPT VERSION
+fi
 
 # Here, it would be good to try to RPT some DP-specific MIB entries
 # However, there is no point since these will fail with the generic emulator described above.
