@@ -365,7 +365,7 @@ int main ( int narg, char *argv[] ) {
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
 #ifdef USE_ADP
-           (obs[n].OBS_MODE==LWA_OM_TRK_TBF  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TBF      ) ||
 #endif
            (obs[n].OBS_MODE==LWA_OM_TBN      )   ) && (obs[n].OBS_BW<=0) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
