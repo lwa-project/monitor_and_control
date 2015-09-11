@@ -1090,7 +1090,7 @@ int me_stp(
         sprintf(sq->ocs[ii],"Rcvd STP from meei");
 
         /* ask the DR about the barcode of the DRSU it is currently using. (should be current in MIB; was requested on OBS) */
-        if ( sq->ssf[ii].SESSION_DRX_BEA != -1 ) {
+        if ( sq->ssf[ii].SESSION_DRX_BEAM != -1 ) {
            sprintf(sid_macro,"DR%d", sq->ssf[ii].SESSION_DRX_BEAM );
            err = memdre( sid_macro, "DRSU-BARCODE", barcode, &tv );
         } else {
