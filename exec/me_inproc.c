@@ -532,6 +532,7 @@ int main ( int narg, char *argv[] ) {
   int bOBS=0;
 
   int err=0;
+  int esnTimeAdjust;
 
   char sProjectIDtrimmed[1024];
 
@@ -833,8 +834,9 @@ int main ( int narg, char *argv[] ) {
 #ifdef USE_ADP
             /* for ADP beam output we do this once; i.e., one recording per session */
             /* for ADP TBF output we do a new recording for each observation */
-            if ( ( (osf.OBS_MODE != LWA_OM_TBF) && (i==1) ) || 
-                 (  osf.OBS_MODE == LWA_OM_TBF            )   ) {
+            if ( ( ( (osf.OBS_MODE != LWA_OM_TBF) && (i==1) ) || 
+                   (  osf.OBS_MODE == LWA_OM_TBF            )    ) &&
+                   (  osf.OBS_MODE != LWA_OM_TBN                 )   ) {
               dr_sid=-1;
               for( j=0; j<ME_MAX_NDR; j++ ) {
                  if( osf.SESSION_DRX_BEAM == s.iDRDP[j] ) {
@@ -929,16 +931,18 @@ int main ( int narg, char *argv[] ) {
                  me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                  ncs++;
                  
-                 /* barcode query */
-                 cs[ncs].action.tv.tv_sec  = tv.tv_sec + 1;
-                 cs[ncs].action.tv.tv_usec = tv.tv_usec; 
-                 cs[ncs].action.bASAP = 0;                   
-                 cs[ncs].action.sid = dr_sid;       /* DR that this is directed to */
-                 cs[ncs].action.cid = LWA_CMD_RPT;
-                 sprintf(cs[ncs].data,"DRSU-BARCODE");
-                 cs[ncs].action.len = strlen(cs[ncs].data)+1;
-                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
-                 ncs++;
+                 /* barcode query (only for the first observation) */
+                 if ( i==1 ) {
+                    cs[ncs].action.tv.tv_sec  = tv.tv_sec + 1;
+                    cs[ncs].action.tv.tv_usec = tv.tv_usec; 
+                    cs[ncs].action.bASAP = 0;                   
+                    cs[ncs].action.sid = dr_sid;       /* DR that this is directed to */
+                    cs[ncs].action.cid = LWA_CMD_RPT;
+                    sprintf(cs[ncs].data,"DRSU-BARCODE");
+                    cs[ncs].action.len = strlen(cs[ncs].data)+1;
+                    me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+                    ncs++;
+                    }
                  }
 
 //  /* Send DR# REC command */
@@ -969,6 +973,16 @@ int main ( int narg, char *argv[] ) {
 
 #ifdef USE_ADP
               case LWA_OM_TBF:
+                /* TBF trigger time is in units of samples from beginning of slot */
+                t0 = osf.OBS_START_MPM % 1000; /* number of ms beyond a second boundary */
+                t0 = 196000 * t0; /* [samples/ms] * [ms] */
+                
+                ///* deal with user requests to use SSMIF-specified defaults */ 
+                //if (osf2.OBS_TBF_GAIN==-1) { osf2.OBS_TBF_GAIN = s.settings.tbf_gain; }
+                ///* if SSMIF also leaves it up MCS, set this to 6 */ 
+                if (osf2.OBS_TBF_GAIN==-1) { osf2.OBS_TBF_GAIN = 6; }
+                //osf2.OBS_TBF_GAIN = 6; /* FIXME */
+                
                  /* TBF needs a DRX command to set things up */
                 LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
                 cs[ncs].action.bASAP = 0;
@@ -978,17 +992,15 @@ int main ( int narg, char *argv[] ) {
                                 2*(osf.SESSION_DRX_BEAM-1)+1, //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
                                       (4.563480616e-02)*(osf.OBS_FREQ1), /* center freq in Hz */
                                             osf.OBS_BW,                  /* 0-8 */
-                                                gain1);                  /* 0-15 */
+                                                osf2.OBS_TBF_GAIN);      /* 0-15 */
                 cs[ncs].action.len = strlen(cs[ncs].data)+1; 
                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                 ncs++;
                 
-                /* TBF trigger time is in units of samples from beginning of slot */
-                t0 = osf.OBS_START_MPM % 1000; /* number of ms beyond a second boundary */
-                t0 = 196000 * t0; /* [samples/ms] * [ms] */
-                
+                /* Define the tuning mask to use */
                 tuning_mask = 1 << (64-(2*(osf.SESSION_DRX_BEAM-1)+1));
 
+                /* Build up the TBW command */
                 LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 );
                 cs[ncs].action.bASAP = 0;                   
                 cs[ncs].action.sid = LWA_SID_ADP;  
@@ -998,7 +1010,7 @@ int main ( int narg, char *argv[] ) {
                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                 ncs++;
 
-                break; /* LWA_OM_TBW */
+                break; /* LWA_OM_TBF */
 #else
               case LWA_OM_TBW:
 
@@ -1129,9 +1141,8 @@ int main ( int narg, char *argv[] ) {
                 cs[ncs].action.bASAP = 0;                   
                 cs[ncs].action.sid = LWA_SID_ADP;  
                 cs[ncs].action.cid = LWA_CMD_DRX; 
-                sprintf( cs[ncs].data, "%hd 2 %8.0f %hu %hd %ld",
+                sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
                                 2*(osf.SESSION_DRX_BEAM-1)+2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
-                                    //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
                                       (4.563480616e-02)*(osf.OBS_FREQ2), /* center freq in Hz */
                                             osf.OBS_BW,                  /* 0-8 */
                                                 gain2);                  /* 0-15 */
@@ -1262,7 +1273,7 @@ int main ( int narg, char *argv[] ) {
                                     2*(osf.SESSION_DRX_BEAM-1)+1, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                         dfile,
                                            gfile,
-                                              osf.SESSION_DRX_BEAM, 
+                                              2*(osf.SESSION_DRX_BEAM-1)+1, 
                                                  t0);
                     
                     cs[ncs].action.sid = LWA_SID_ADP;  
@@ -1278,7 +1289,7 @@ int main ( int narg, char *argv[] ) {
                                     2*(osf.SESSION_DRX_BEAM-1)+2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                         dfile,
                                            gfile,
-                                              osf.SESSION_DRX_BEAM, 
+                                              2*(osf.SESSION_DRX_BEAM-1)+2, 
                                                  t0);
             
                     cs[ncs].action.sid = LWA_SID_ADP;  
@@ -1558,7 +1569,7 @@ int main ( int narg, char *argv[] ) {
                                       2*(osf.SESSION_DRX_BEAM-1)+1, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                           dfile,
                                              gfile,
-                                                osf.SESSION_DRX_BEAM, 
+                                                2*(osf.SESSION_DRX_BEAM-1)+1, 
                                                    t0);
               cs[ncs].action.len = strlen(cs[ncs].data)+1;
               me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
@@ -1574,7 +1585,7 @@ int main ( int narg, char *argv[] ) {
                                       2*(osf.SESSION_DRX_BEAM-1)+2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                           dfile,
                                              gfile,
-                                                osf.SESSION_DRX_BEAM, 
+                                                2*(osf.SESSION_DRX_BEAM-1)+2, 
                                                    t0);
               cs[ncs].action.len = strlen(cs[ncs].data)+1;
               me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
@@ -1645,7 +1656,8 @@ int main ( int narg, char *argv[] ) {
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_AT2[%d]=%hd\n",m,osf2.OBS_ASP_AT2[m]); }
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_ATS[%d]=%hd\n",m,osf2.OBS_ASP_ATS[m]); }
 #ifdef USE_ADP
-          fprintf(fpl,"osf2.OBS_TBF_SAMPLES=%u\n",osf2.OBS_TBF_SAMPLES); 
+          fprintf(fpl,"osf2.OBS_TBF_SAMPLES=%u\n",osf2.OBS_TBF_SAMPLES);
+          fprintf(fpl,"osf2.OBS_TBF_GAIN=%hd\n",osf2.OBS_TBF_GAIN);
 #else
           fprintf(fpl,"osf2.OBS_TBW_BITS=%hu\n",osf2.OBS_TBW_BITS); 
           fprintf(fpl,"osf2.OBS_TBW_SAMPLES=%u\n",osf2.OBS_TBW_SAMPLES);   
@@ -1663,6 +1675,7 @@ int main ( int narg, char *argv[] ) {
         if (eD>=0) {
           /* Shut down the beams if we are done with them */
           /* Updated: 2015 Aug 31                         */
+          esnTimeAdjust = 0;
           switch( osf.OBS_MODE ) {
               case LWA_OM_TRK_RADEC:
               case LWA_OM_TRK_SOL:
@@ -1670,25 +1683,18 @@ int main ( int narg, char *argv[] ) {
               case LWA_OM_STEPPED:
 #ifdef USE_ADP
                  cs[ncs].action.tv.tv_sec  = cs[ncs-1].action.tv.tv_sec;
-                 cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec;
+                 cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec + 20000;
                  cs[ncs].action.sid = LWA_SID_ADP;  
                  cs[ncs].action.cid = LWA_CMD_STP; 
                  sprintf( cs[ncs].data, "BEAM%d",
                                       2*(osf.SESSION_DRX_BEAM-1)+1); //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
-#else
-                 cs[ncs].action.tv.tv_sec  = cs[ncs-1].action.tv.tv_sec;
-                 cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec;
-                 cs[ncs].action.sid = LWA_SID_DP_;  
-                 cs[ncs].action.cid = LWA_CMD_STP; 
-                 sprintf( cs[ncs].data, "BEAM%d",
-                                      osf.SESSION_DRX_BEAM); //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
-#endif
                  cs[ncs].action.len = strlen(cs[ncs].data)+1;
                  me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                  ncs++;
-#ifdef USE_ADP
+                 esnTimeAdjust += 20000;
+
                  cs[ncs].action.tv.tv_sec  = cs[ncs-1].action.tv.tv_sec;
-                 cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec;
+                 cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec + 20000;
                  cs[ncs].action.sid = LWA_SID_ADP;  
                  cs[ncs].action.cid = LWA_CMD_STP; 
                  sprintf( cs[ncs].data, "BEAM%d",
@@ -1696,13 +1702,25 @@ int main ( int narg, char *argv[] ) {
                  cs[ncs].action.len = strlen(cs[ncs].data)+1;
                  me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                  ncs++;
+                 esnTimeAdjust += 20000;
+#else
+                 cs[ncs].action.tv.tv_sec  = cs[ncs-1].action.tv.tv_sec;
+                 cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec + 20000;
+                 cs[ncs].action.sid = LWA_SID_DP_;  
+                 cs[ncs].action.cid = LWA_CMD_STP; 
+                 sprintf( cs[ncs].data, "BEAM%d",
+                                      osf.SESSION_DRX_BEAM); //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                 cs[ncs].action.len = strlen(cs[ncs].data)+1;
+                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+                 ncs++;
+                 esnTimeAdjust += 20000;
 #endif
                  break;
               default: break;
               }
               
           cs[ncs].action.tv.tv_sec   = cs[ncs-1].action.tv.tv_sec + 1;
-          cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec;
+          cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec - esnTimeAdjust;
           cs[ncs].action.bASAP = 0;                   
           cs[ncs].action.sid = LWA_SID_MCS;           /* first command is always directed to MCS */
           cs[ncs].action.cid = LWA_CMD_ESN;           /* end session normally */
