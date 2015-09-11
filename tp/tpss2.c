@@ -78,10 +78,17 @@
       printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
       sscanf(data,"%hd",&SESSION_DRX_BEAM);
       printf("...converts to %hd\n",SESSION_DRX_BEAM);
+#ifdef USE_ADP
+      if (!( (SESSION_DRX_BEAM==-1) || ( (SESSION_DRX_BEAM>=1) && (SESSION_DRX_BEAM<=ME_MAX_NDPOUT) ) )) {   
+        printf("[%d/%d] FATAL: SESSION_DRX_BEAM not valid\n",MT_TPSS,getpid());  
+        return;
+        }
+#else
       if (!( (SESSION_DRX_BEAM==-1) || ( (SESSION_DRX_BEAM>=1) && (SESSION_DRX_BEAM<=ME_MAX_NDPOUT-1) ) )) {   
         printf("[%d/%d] FATAL: SESSION_DRX_BEAM not valid\n",MT_TPSS,getpid());  
         return;
         }
+#endif
       strcpy(data,"");   
       break;
     case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;

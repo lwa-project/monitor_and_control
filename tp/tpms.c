@@ -138,6 +138,7 @@ int main ( int narg, char *argv[] ) {
       printf("[%d/%d] INPUT: iFreq =%ld\n",MT_TPMS,getpid(),iFreq);
       printf("[%d/%d] INPUT: iFreq2=%ld\n",MT_TPMS,getpid(),iFreq2);
       printf("[%d/%d] INPUT: iBW=%d\n",MT_TPMS,getpid(),iBW);
+      break;
     case LWA_OM_TBN:
       iDur=10000;      if (narg>=4) sscanf(argv[3],"%ld",&iDur);   
       iFreq=832697741; if (narg>=5) sscanf(argv[4],"%ld",&iFreq); 
@@ -149,6 +150,7 @@ int main ( int narg, char *argv[] ) {
       iDur=10000;      if (narg>=4) sscanf(argv[3],"%ld",&iDur);
       iFreq=832697741; if (narg>=5) sscanf(argv[4],"%ld",&iFreq); 
       printf("[%d/%d] INPUT: iDur=%ld\n",MT_TPMS,getpid(),iDur);
+      break;
 #else
     case LWA_OM_TBW:
       iDur=10000;      if (narg>=4) sscanf(argv[3],"%ld",&iDur);  
@@ -269,6 +271,7 @@ int main ( int narg, char *argv[] ) {
       //fprintf(fp,"OBS_FREQ1+     19.999999955 MHz\n");
       fprintf(fp,"OBS_BW         7\n");
       fprintf(fp,"OBS_BW+        19.6 MSPS\n"); 
+      break;
 #else
     case LWA_OM_TBW:
       break;

@@ -1,4 +1,4 @@
-// tpsdm.c: S.W. Ellingson, Virginia Tech, 2011 April 05
+// tpsdm.c: J. Dowell, UNM, 2015 Sep 11
 // ---
 // COMPILE: gcc -o tpsdm tpsdm.c -I../common
 // ---
@@ -22,7 +22,8 @@
 #define TPSDM_RPT_SEP  6
 #define TPSDM_RPT_ARX  7
 #ifdef USE_ADP
-#define TPSDM_RPT_ROACH 8
+#define TPSDM_RPT_ROACH  8
+#define TPSDM_RPT_SERVER 9
 #else
 #define TPSDM_RPT_DP1  8
 #define TPSDM_RPT_DP2  9
@@ -76,6 +77,7 @@ int main ( int narg, char *argv[] ) {
     printf("          'ARX': List status, other info about ARX channels\n");
 #ifdef USE_ADP
     printf("          'ROACH': List status, other info about ROACH channels\n");
+    printf("          'SERVER': List status, other infor about SERVER channels\n");
 #else
     printf("          'DP1': List status, other info about DP1 channels\n");
     printf("          'DP2': List status, other info about DP2 channels\n");
@@ -112,7 +114,8 @@ int main ( int narg, char *argv[] ) {
       if (strncmp(arg,"SEP",3)==0) { eRpt = TPSDM_RPT_SEP; }
       if (strncmp(arg,"ARX",3)==0) { eRpt = TPSDM_RPT_ARX; }
 #ifdef USE_ADP
-      if (strncmp(arg,"ROACH",5)==0) { eRpt = TPSDM_RPT_ROACH; }
+      if (strncmp(arg,"ROACH",5)==0)  { eRpt = TPSDM_RPT_ROACH; }
+      if (strncmp(arg,"SERVER",6)==0) { eRpt = TPSDM_RPT_SERVER; }
 #else
       if (strncmp(arg,"DP1",3)==0) { eRpt = TPSDM_RPT_DP1; }
       if (strncmp(arg,"DP2",3)==0) { eRpt = TPSDM_RPT_DP2; }
@@ -249,7 +252,12 @@ int main ( int narg, char *argv[] ) {
       printf("N_DP1CH: %d\n",s.nDP1Ch);
 #endif
       printf("N_DR:    %d\n",s.nDR);
-      printf("MCS_CRA: %d\n",s.eCRA); /* MCS_CRA */   
+      printf("MCS_CRA: %d\n",s.eCRA); /* MCS_CRA */  
+#ifdef USE_ADP
+                    printf("TBF_GAIN: %2hd",  s.settings.tbf_gain);
+      if (!bStatic) printf(       " | %2hd",sdm.settings.tbf_gain);
+      printf("\n");
+#endif
                     printf("TBN_GAIN: %2hd",  s.settings.tbn_gain);
       if (!bStatic) printf(       " | %2hd",sdm.settings.tbn_gain);
       printf("\n");
@@ -456,6 +464,24 @@ int main ( int narg, char *argv[] ) {
       printf("| ROACH_INR (label on input connector for this channel on DP rack)\n");
       printf("  ROACH_INC (label on input connector for this channel on DP chassis)\n");
       break;
+      
+    case TPSDM_RPT_SERVER: /* Server */
+      for (i=0;i<s.nServer;i++) { 
+        printf( "%2d %1d",i+1,s.eServerStat[i]); 
+        if (!bStatic) printf( " %1d",sdm.ssss.eServerStat[i]); 
+        printf(" | %10s %10s %2d\n",
+                   s.sServerID[i],
+                        s.sServerSlot[i],
+                             s.eServerDesi[i] ); 
+        }
+      printf("key:\n");
+      printf("  Server #\n");
+      printf("  stat (static)\n");
+      if (!bStatic) printf("  stat (dynamic)\n");
+      printf("| SERVER_ID\n");
+      printf("  SERVER_SLOT\n");
+      printf("  SERVER_DESI\n");
+      break;
 #else
     case TPSDM_RPT_DP1:
       /* DP1 */
@@ -658,8 +684,7 @@ int main ( int narg, char *argv[] ) {
 
 #ifdef USE_ADP
         for ( i=0; i<ME_MAX_NDPOUT; i++ ) {
-          if (i<ME_MAX_NDPOUT-1)              { sprintf(st1," Beam #%d",i+1);                     }
-          if (i>ME_MAX_NDPOUT-2)              { k=0; m = 0;             sprintf(st1," TBF/COR "); }
+          if (i<ME_MAX_NDPOUT)              { sprintf(st1," Beam #%d",i+1);                     }
           if ( sc.DPO[i].iDR > 0 ) { 
               sprintf(st2," DR%1d %1d",sc.DPO[i].iDR,s.eDRStat[sc.DPO[i].iDR-1]); 
               //printf("<%1d>",s.eDRStat[sc.DPO[i].iDR]); 
@@ -673,7 +698,7 @@ int main ( int narg, char *argv[] ) {
           } /* for i */
 
         printf("key:\n");
-        printf("  DP output #\n");
+        printf("  ADP output #\n");
         printf("  stat (for this path) (static)\n");
         printf("| 'DP2'                     or 'TBW/TBN'\n");
         printf("  DP2 board #               or ''\n");
@@ -750,6 +775,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpsdm.c: J. Dowell, UNM, 2015 Sep 11
+//   .1: Updated for ADP-based stations
 // tpsdm.c: S.W. Ellingson, Virginia Tech, 2011 April 05
 //   .1: Added new 'settings' parameters to 'sta' report; added 'ana' report
 // tpsdm.c: S.W. Ellingson, Virginia Tech, 2011 March 26

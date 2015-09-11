@@ -151,12 +151,10 @@
         printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
         sscanf(data,"%ld",&(obs[nobs].OBS_STP_FREQ2[k]));
         printf("...converts to %ld\n",obs[nobs].OBS_STP_FREQ2[k]);
-#ifndef USE_ADP
         if ( ( obs[nobs].OBS_STP_FREQ2[k]<219130984 ) || ( obs[nobs].OBS_STP_FREQ2[k]>1928352663 ) ) {   
           printf("[%d/%d] FATAL: OBS_STP_FREQ2[%d] out of range\n",MT_TPSS,getpid(),k);  
           return;
           }
-#endif
         strcpy(data,"");   
         break;
       case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;

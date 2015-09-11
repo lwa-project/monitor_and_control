@@ -345,7 +345,13 @@ int main ( int narg, char *argv[] ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_RA<0 when mode is TRK_RADEC\n",MT_TPSS,getpid(),n);
       return;
       }
-    if ( ( obs[n].OBS_MODE==LWA_OM_TBN ) && ( obs[n].OBS_FREQ1<1095654922 ) ) {
+#ifdef USE_ADP
+    if ( ( obs[n].OBS_MODE==LWA_OM_TBF ) && ( obs[n].OBS_FREQ1<109565492 ) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TBF\n",MT_TPSS,getpid(),n);
+      return;
+      }
+#endif
+    if ( ( obs[n].OBS_MODE==LWA_OM_TBN ) && ( obs[n].OBS_FREQ1<109565492 ) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TBN\n",MT_TPSS,getpid(),n);
       return;
       }
@@ -361,16 +367,30 @@ int main ( int narg, char *argv[] ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
       return;
       }
+#ifdef USE_ADP
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
-#ifdef USE_ADP
            (obs[n].OBS_MODE==LWA_OM_TBF      ) ||
-#endif
            (obs[n].OBS_MODE==LWA_OM_TBN      )   ) && (obs[n].OBS_BW<=0) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
       return;
       }
+    if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_BW>7) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
+      return;
+      }
+#else
+    if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TBN      )   ) && (obs[n].OBS_BW<=0) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
+      return;
+      }
+#endif
 #ifdef USE_ADP
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
@@ -692,6 +712,7 @@ int main ( int narg, char *argv[] ) {
     fprintf(fp,"\n");
 #ifdef USE_ADP
     fprintf(fp,"OBS_TBF_SAMPLES %ld\n",obs[n].OBS_TBF_SAMPLES);
+    fprintf(fp,"OBS_TBF_GAIN %d\n",obs[n].OBS_TBF_GAIN);
 #else
     fprintf(fp,"OBS_TBW_BITS %d\n",obs[n].OBS_TBW_BITS);
     fprintf(fp,"OBS_TBW_SAMPLES %ld\n",obs[n].OBS_TBW_SAMPLES);
@@ -826,6 +847,7 @@ int main ( int narg, char *argv[] ) {
     for (m=1;m<=LWA_MAX_NSTD;m++) { osf2.OBS_ASP_ATS[m-1] = obs[n].OBS_ASP_ATS[m]; }
 #ifdef USE_ADP
     osf2.OBS_TBF_SAMPLES     = obs[n].OBS_TBF_SAMPLES;
+    osf2.OBS_TBF_GAIN        = obs[n].OBS_TBF_GAIN;
 #else
     osf2.OBS_TBW_BITS        = obs[n].OBS_TBW_BITS; 
     osf2.OBS_TBW_SAMPLES     = obs[n].OBS_TBW_SAMPLES;

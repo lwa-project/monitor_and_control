@@ -234,11 +234,21 @@
       sscanf(data,"%ld",&(obs[nobs].OBS_FREQ1));
       printf("...converts to %ld\n",obs[nobs].OBS_FREQ1);
 #ifdef USE_ADP
-      if ( obs[nobs].OBS_MODE == LWA_OM_TBN || obs[nobs].OBS_MODE == LWA_OM_TBF ) {
+      if ( ( obs[nobs].OBS_MODE == LWA_OM_TBN ) || 
+           ( obs[nobs].OBS_MODE == LWA_OM_TBF )   ) {
+         if ( ( obs[nobs].OBS_FREQ1<109565492 ) || ( obs[nobs].OBS_FREQ1>20379181557 ) ) {   
+            printf("[%d/%d] FATAL: OBS_FREQ1 out of range\n",MT_TPSS,getpid());  
+            return;
+            }
+      } else {
+         if ( ( obs[nobs].OBS_FREQ1<219130984 ) || ( obs[nobs].OBS_FREQ1>1928352663 ) ) {   
+            printf("[%d/%d] FATAL: OBS_FREQ1 out of range\n",MT_TPSS,getpid());  
+            return;
+            }
+         }
 #else
       if ( obs[nobs].OBS_MODE == LWA_OM_TBN ) {
-#endif
-         if ( ( obs[nobs].OBS_FREQ1<1095654922 ) || ( obs[nobs].OBS_FREQ1>20379181557 ) ) {   
+         if ( ( obs[nobs].OBS_FREQ1<109565492 ) || ( obs[nobs].OBS_FREQ1>20379181557 ) ) {   
             printf("[%d/%d] FATAL: OBS_FREQ1 out of range\n",MT_TPSS,getpid());  
             return;
             }
@@ -248,6 +258,7 @@
             return;
             }
          }
+#endif
       strcpy(data,"");   
       break;
     case TPSS_PL_EOF:                                                                                            break;

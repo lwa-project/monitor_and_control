@@ -83,6 +83,7 @@
     int OBS_ASP_ATS[LWA_MAX_NSTD+1];
 #ifdef USE_ADP
     long int OBS_TBF_SAMPLES;
+    int OBS_TBF_GAIN;
 #else
     int OBS_TBW_BITS;
     long int OBS_TBW_SAMPLES;

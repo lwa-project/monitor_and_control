@@ -137,6 +137,42 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
   } /* for n */
 
 #ifdef USE_ADP
+    sprintf(keyword,"OBS_TBF_SAMPLES");  
+    obs[nobs].OBS_TBF_SAMPLES=12000000;  /* default values */
+    while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
+    switch (i) {
+      case TPSS_PL_KEYWORD_MATCH:    
+        printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
+        sscanf(data,"%ld",&(obs[nobs].OBS_TBF_SAMPLES));
+        printf("...converts to %ld\n",obs[nobs].OBS_TBF_SAMPLES);
+        if ( (obs[nobs].OBS_TBF_SAMPLES>12000000) ) {   
+          printf("[%d/%d] FATAL: OBS_TBF_SAMPLES out of range\n",MT_TPSS,getpid());  
+          return;
+          }
+        strcpy(data,"");   
+        break;
+      case TPSS_PL_EOF:                                                                                            break;
+      case TPSS_PL_KEYWORD_MISMATCH:                                                                               break;
+      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+      }
+      
+    sprintf(keyword,"OBS_TBF_GAIN");  obs[nobs].OBS_TBF_GAIN=-1; 
+    while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
+    switch (i) {
+      case TPSS_PL_KEYWORD_MATCH:    
+        printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
+        sscanf(data,"%d",&(obs[nobs].OBS_TBF_GAIN));
+        printf("...converts to %d\n",obs[nobs].OBS_TBF_GAIN);
+        if ( ( obs[nobs].OBS_TBF_GAIN<-1 ) || ( obs[nobs].OBS_TBF_GAIN>15 ) ) {  
+          printf("[%d/%d] FATAL: OBS_TBF_GAIN out of range\n",MT_TPSS,getpid());  
+          return;
+          }
+        strcpy(data,"");   
+        break;
+      case TPSS_PL_EOF:                                                                                            break;
+      case TPSS_PL_KEYWORD_MISMATCH:                                                                               break;
+      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+      }
 #else
     sprintf(keyword,"OBS_TBW_BITS");  obs[nobs].OBS_TBW_BITS=12;
     while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
@@ -188,13 +224,16 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         sscanf(data,"%d",&(obs[nobs].OBS_TBN_GAIN));
         printf("...converts to %d\n",obs[nobs].OBS_TBN_GAIN);
 #ifdef USE_ADP
-        if ( ( obs[nobs].OBS_TBN_GAIN<-1 ) || (obs[nobs].OBS_TBN_GAIN>15) ) {  
-#else
-        if ( ( obs[nobs].OBS_TBN_GAIN<-1 ) || (obs[nobs].OBS_TBN_GAIN>30) ) {   
-#endif
+        if ( ( obs[nobs].OBS_TBN_GAIN<-1 ) || ( obs[nobs].OBS_TBN_GAIN>30 ) ) {  
           printf("[%d/%d] FATAL: OBS_TBN_GAIN out of range\n",MT_TPSS,getpid());  
           return;
           }
+#else
+        if ( ( obs[nobs].OBS_TBN_GAIN<-1 ) || ( obs[nobs].OBS_TBN_GAIN>15 ) ) {   
+          printf("[%d/%d] FATAL: OBS_TBN_GAIN out of range\n",MT_TPSS,getpid());  
+          return;
+          }
+#endif
         strcpy(data,"");   
         break;
       case TPSS_PL_EOF:                                                                                            break;
@@ -209,7 +248,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
         sscanf(data,"%d",&(obs[nobs].OBS_DRX_GAIN));
         printf("...converts to %d\n",obs[nobs].OBS_DRX_GAIN);
-        if ( ( obs[nobs].OBS_DRX_GAIN<-1 ) || (obs[nobs].OBS_DRX_GAIN>255) ) {   
+        if ( ( obs[nobs].OBS_DRX_GAIN<-1 ) || ( obs[nobs].OBS_DRX_GAIN>255 ) ) {   
           printf("[%d/%d] FATAL: OBS_DRX_GAIN out of range\n",MT_TPSS,getpid());  
           return;
           }
