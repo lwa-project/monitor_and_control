@@ -412,15 +412,15 @@ int main ( int narg, char *argv[] ) {
   b_TB_requested = 0;
   b_DRX_requested = 0;
   for (n=1;n<=nobs;n++) {
-    if ( (obs[n].OBS_MODE==LWA_OM_TBF      ) || 
-         (obs[n].OBS_MODE==LWA_OM_TBN      )   ) b_TB_requested = 1;
-    if ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) || 
+    if ( (obs[n].OBS_MODE==LWA_OM_TBN      )   ) b_TB_requested = 1;
+    if ( (obs[n].OBS_MODE==LWA_OM_TBF      ) ||
+         (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) || 
          (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
          (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
          (obs[n].OBS_MODE==LWA_OM_STEPPED  )   ) b_DRX_requested = 1;
     }
   if ( b_TB_requested && b_DRX_requested ) {
-    printf("[%d/%d] FATAL: Sessions cannot mix TBF/TBN with other observing modes\n",MT_TPSS,getpid(),n);
+    printf("[%d/%d] FATAL: Sessions cannot mix TBN with other observing modes\n",MT_TPSS,getpid(),n);
     return;
     }
 #else
@@ -532,9 +532,15 @@ int main ( int narg, char *argv[] ) {
        }
 
     } else {                 /* No particular DRX output has been requested  */
-
+#ifdef USE_ADP
+      if ( obs[1].OBS_MODE != LWA_OM_TBN ) {
+         printf("[%d/%d] FATAL: SESSION_DRX_BEAM not specified\n",MT_TPSS,getpid());
+         return;
+         }
+#else
       printf("[%d/%d] FATAL: SESSION_DRX_BEAM not specified\n",MT_TPSS,getpid());
       return;
+#endif
 
       //if (b_DRX_requested) { /* and DRX-dependent mode(s) have been requested */
       //  /* check each beam output, select best */
