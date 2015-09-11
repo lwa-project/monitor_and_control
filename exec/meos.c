@@ -1,4 +1,4 @@
-// meos.c: S.W. Ellingson, Virginia Tech, 2011 Mar 25
+// meos.c: J. Dowell, UNM, 2015 Sep 11
 // ---
 // REQUIRES: 
 //   me.h
@@ -114,6 +114,14 @@ int meos (
 
   /* parse mode/args */
   bDone=0;
+#ifdef USE_ADP
+  if (!strncmp(mode,"TBF",3)) {\
+    sscanf(args,"%ld %lu",&nsamp,&tuning_mask);
+    printf("[%d/%d] mode='%s', nsamp=%ld, tuning_mask=%lu\n",ME_MEOS,getpid(),mode,nsamp,tuning_mask);
+    sprintf(dr_format,"DEFAULT_TBF");
+    bDone=1;
+  }
+#else
   if (!strncmp(mode,"TBW",3)) {
     b4bits = !strncmp(args,"4",1);
     sscanf(args,"%d %ld",&temp,&nsamp);
@@ -121,12 +129,7 @@ int meos (
     sprintf(dr_format,"DEFAULT_TBW");
     bDone=1;
     }
-  if (!strncmp(mode,"TBF",3)) {\
-    sscanf(args,"%ld %lu",&nsamp,&tuning_mask);
-    printf("[%d/%d] mode='%s', nsamp=%ld, tuning_mask=%lu\n",ME_MEOS,getpid(),mode,nsamp,tuning_mask);
-    sprintf(dr_format,"DEFAULT_TBF");
-    bDone=1;
-  }
+#endif
   if (!strncmp(mode,"TBN",3)) {
     //printf("[%d/%d] args='%s'\n",ME_MEOS,getpid(),args);
     sscanf(args,"%f %d %d %d %ld",&tbn_f,&tbn_r,&tbn_g,&tbn_s,&tbn_d);
@@ -244,19 +247,7 @@ int meos (
   /* sleep until past estimated DR start time  */
   usleep((MEOS_DR_START_DELAY_MS+1000)*1000); /* 1 s after start-delay */
 
-  /* if TBW, now tell DP to start.  It will take a couple seconds before it gets going, so */
-  /* make sure DP record time is long enough to account for this! */
-  if (!strncmp(mode,"TBW",3)) {
-    sprintf(data,"%d 0 %ld",b4bits,nsamp);
-    err = mesi( NULL, "DP_", "TBW", data, "today", "asap", &reference );
-    if (err!=MESI_ERR_OK) {
-      printf("[%d/%d] FATAL: mesi(NULL,'DP_','REC',...) returned code %d\n",ME_MEOS,getpid(),err);  
-      eResult += MEOS_ERR_DP_TBX;
-      return eResult;  
-      } 
-    printf("[%d/%d] DP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
-    }
-    
+#ifdef USE_ADP
   /* if TBF, now tell ADP to start. */
   if (!strncmp(mode,"TBF",3)) {
     sprintf(data,"16 0 %d %lu",b4bits,nsamp,tuning_mask);
@@ -269,6 +260,21 @@ int meos (
     printf("[%d/%d] ADP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
     }
   
+#else
+  /* if TBW, now tell DP to start.  It will take a couple seconds before it gets going, so */
+  /* make sure DP record time is long enough to account for this! */
+  if (!strncmp(mode,"TBW",3)) {
+    sprintf(data,"%d 0 %ld",b4bits,nsamp);
+    err = mesi( NULL, "DP_", "TBW", data, "today", "asap", &reference );
+    if (err!=MESI_ERR_OK) {
+      printf("[%d/%d] FATAL: mesi(NULL,'DP_','REC',...) returned code %d\n",ME_MEOS,getpid(),err);  
+      eResult += MEOS_ERR_DP_TBX;
+      return eResult;  
+      } 
+    printf("[%d/%d] DP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
+    }
+#endif
+   
   /* start looking for DR to be done */
   bDone = 0;
   while (!bDone) {
@@ -373,6 +379,8 @@ int meos (
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// meos.c: J. Dowell, UNM, 2015 Sep 11
+//   .1: Modified for the new ADP TBF command
 // meos.c: S.W. Ellingson, Virginia Tech, 2011 Mar 25
 //   .1: Modified to use modified mesi() function, which has new sockfd_ptr arg.
 // meos.c: S.W. Ellingson, Virginia Tech, 2011 Feb 10
