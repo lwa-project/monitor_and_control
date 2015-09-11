@@ -144,7 +144,7 @@ int LWA_mibupdate_ADP(
         sprintf(tbn_bw,"%1u",LWA_i2u_swap(usi));
       memset(&usi,0,2);
         memcpy(&usi,cmdata+6,2);
-        sprintf(tbn_gain,"%2u",LWA_i2u_swap(usi));
+        sprintf(tbn_gain,"%hu",LWA_i2u_swap(usi));
 
       /* updating the MIB using the LWA_mibupdate_RPT() function */
 
@@ -190,9 +190,9 @@ int LWA_mibupdate_ADP(
       memset(&usi,0,2);
         memcpy(&usi,cmdata+12,2);
         sprintf(cor_gain,"%2u",LWA_i2u_swap(usi));
-       memset(&usi,0,2);
-        memcpy(&usi,cmdata+14,2);
-        sprintf(cor_sub_slot,"%2u",LWA_i2u_swap(usi));
+       memset(&uc,0,1);
+        memcpy(&uc,cmdata+14,1);
+        sprintf(cor_sub_slot,"%hhu",uc);
 
       /* updating the MIB using the LWA_mibupdate_RPT() function */
 
@@ -276,16 +276,16 @@ int LWA_mibupdate_ADP(
       sscanf(cmdata,"%hu %s %s %hhu %hhu",&beam_id,dfile,gfile,&tuning,&subslot);
 
       /* Save dfile name in MIB as BEAM<beam_id>_DFILE */
-      sprintf(sMIBlabel,"MCS_BEAM%1hu_DFILE",beam_id);
+      sprintf(sMIBlabel,"MCS_BEAM%hu_DFILE",beam_id);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, dfile, -1 );
 
       /* Save gfile name in MIB as BEAM<beam_id>_GFILE */
-      sprintf(sMIBlabel,"MCS_BEAM%1hu_GFILE",beam_id);
+      sprintf(sMIBlabel,"MCS_BEAM%hu_GFILE",beam_id);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, gfile, -1 );
 
       /* Save tuning in MIB as BEAM<beam_id>_TUNING */
-      sprintf(sMIBlabel,"MCS_BEAM%1hu_TUNING",beam_id);
-      sprintf(sData,"%2hu",gain);
+      sprintf(sMIBlabel,"MCS_BEAM%hu_TUNING",beam_id);
+      sprintf(sData,"%hhu",tuning);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
        
       break;
