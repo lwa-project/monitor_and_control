@@ -693,10 +693,31 @@ float LWA_f4_swap( float x ) {
 
 #ifdef USE_ADP
 #define ME_SSMIF_FORMAT_VERSION 8
+#define ME_MAX_NSTD 256
+#define ME_MAX_NFEE 256
+#define ME_MAX_FEEID_LENGTH 10
+#define ME_MAX_RACK 6
+#define ME_MAX_PORT 50
+#define ME_MAX_NRPD 512
+#define ME_MAX_RPDID_LENGTH 25
+#define ME_MAX_NSEP 512
+#define ME_MAX_SEPID_LENGTH 25
+#define ME_MAX_SEPCABL_LENGTH 25
+#define ME_MAX_NARB 33
+#define ME_MAX_NARBCH 16
+#define ME_MAX_ARBID_LENGTH 10
+#define ME_MAX_NROACH 16
+#define ME_MAX_NROACHCH 32
+#define ME_MAX_ROACHID_LENGTH 10
+#define ME_MAX_NSERVER 7
+#define ME_MAX_SERVERID_LENGTH 10
+#define ME_MAX_NDR 1
+#define ME_MAX_DRID_LENGTH 10
+#define ME_MAX_NPWRPORT 50
+#define ME_MAX_SSNAME_LENGTH 3 /* for codes used for PWR_NAME */
+#define ME_MAX_NDPOUT 1 /* ADP outputs; 1 because of how things are tied together */
 #else
 #define ME_SSMIF_FORMAT_VERSION 7
-#endif
-
 #define ME_MAX_NSTD 260
 #define ME_MAX_NFEE 260
 #define ME_MAX_FEEID_LENGTH 10
@@ -710,24 +731,15 @@ float LWA_f4_swap( float x ) {
 #define ME_MAX_NARB 33
 #define ME_MAX_NARBCH 16
 #define ME_MAX_ARBID_LENGTH 10
-#ifdef USE_ADP
-#define ME_MAX_NROACH 16
-#define ME_MAX_NROACHCH 32
-#define ME_MAX_ROACHID_LENGTH 10
-#else
 #define ME_MAX_NDP1 26
 #define ME_MAX_NDP1CH 20
 #define ME_MAX_DP1ID_LENGTH 10
 #define ME_MAX_NDP2 2
 #define ME_MAX_DP2ID_LENGTH 10
-#endif
 #define ME_MAX_NDR 5
 #define ME_MAX_DRID_LENGTH 10
 #define ME_MAX_NPWRPORT 50
 #define ME_MAX_SSNAME_LENGTH 3 /* for codes used for PWR_NAME */
-#ifdef USE_ADP
-#define ME_MAX_NDPOUT 1 /* ADP outputs; 1 because of how things are tied together */
-#else
 #define ME_MAX_NDPOUT 5 /* DP outputs; = #beams + 1 for TBW/TBN */
 #endif
 
@@ -962,6 +974,7 @@ struct osf2_struct { /* really just a continuation of osf_struct */
   signed short int   OBS_ASP_ATS[LWA_MAX_NSTD];
 #ifdef USE_ADP
   unsigned int       OBS_TBF_SAMPLES;
+  signed short int   OBS_TBF_GAIN;
 #else
   unsigned short int OBS_TBW_BITS;
   unsigned int       OBS_TBW_SAMPLES;
@@ -1003,6 +1016,9 @@ struct station_settings_struct {
   signed short int asp_at1[LWA_MAX_NSTD]; // OBS_ASP_AT1[LWA_MAX_NSTD] // ASP_AT1[LWA_MAX_NSTD]
   signed short int asp_at2[LWA_MAX_NSTD]; // OBS_ASP_AT2[LWA_MAX_NSTD] // ASP_AT2[LWA_MAX_NSTD]
   signed short int asp_ats[LWA_MAX_NSTD]; // OBS_ASP_ATS[LWA_MAX_NSTD] // ASP_ATS[LWA_MAX_NSTD]
+#ifdef USE_ADP
+  signed short int tbf_gain; // OBS_TBF_GAIN // TBF_GAIN
+#endif
   signed short int tbn_gain; // OBS_TBN_GAIN // TBN_GAIN
   signed short int drx_gain; // OBS_DRX_GAIN // DRX_GAIN
   };
@@ -1076,6 +1092,10 @@ struct ssmif_struct {
   char   sRoachINR[ME_MAX_NROACH][ME_MAX_NROACHCH][ME_MAX_ROACHID_LENGTH+1]; /* ROACH_INR[][] */
   char   sRoachINC[ME_MAX_NROACH][ME_MAX_NROACHCH][ME_MAX_ROACHID_LENGTH+1]; /* ROACH_INC[][] */
   int    iRoachAnt[ME_MAX_NROACH][ME_MAX_NROACHCH];        /* ROACH_ANT[][] */
+  char   sServerID[ME_MAX_NSERVER][ME_MAX_SERVERID_LENGTH+1]; /* SERVER_ID[] */
+  char   sServerSlot[ME_MAX_NSERVER][ME_MAX_SERVERID_LENGTH+1]; /* SERVER_SLOT[] */
+  int    eServerStat[ME_MAX_NSERVER];       /* SERVER_STAT[] */
+  int    eServerDesi[ME_MAX_NSERVER];       /* SERVER_DESI[] */
 #else
   int    nDP1;                     /* N_DP1 */
   int    nDP1Ch;                     /* N_DP1CH */
@@ -1128,6 +1148,7 @@ struct subsubsystem_status_struct {
   int    eARBStat[ME_MAX_NARB][ME_MAX_NARBCH]; /* ARB_STAT[][] */
 #ifdef USE_ADP
   int    eRoachStat[ME_MAX_NROACH][ME_MAX_NROACHCH]; /* ROACH_STAT[][] */
+  int    eServerStat[ME_MAX_NSERVER];                /* SERVER_STAT[] */
 #else
   int    eDP1Stat[ME_MAX_NDP1][ME_MAX_NDP1CH]; /* DP1_STAT[][] */
   int    eDP2Stat[ME_MAX_NDP2];                /* DP2_STAT[] */
@@ -1229,7 +1250,7 @@ struct stand_struct {
 /* Describes 1 DP output (i.e., 4 x DRX + TBW/TBN) output, through DR */
 struct dpo_struct {
   int iStat;   /* summary status for this output */
-  /* NOTE: it is assumed that DP2[1] is used for beams 1-2, and DP2[2] for beams 3-4 */
+  /* NOTE: For DP it is assumed that DP2[1] is used for beams 1-2, and DP2[2] for beams 3-4 */
   int iDR;     /* the DR index (1-5) attached to this DP output */
   };
 
@@ -1393,8 +1414,6 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
   int i;
   int iErr = 0;
 
-  /* NOTE: it is assumed that DP2[1] is used for beams 1-2, and DP2[2] for beams 3-4 */
-
   /* figure out which DR is assigned to each DP output */
   for ( i=0; i<s.nDR; i++ ) { sc->DPO[ s.iDRDP[i]-1 ].iDR = i+1; }
 
@@ -1416,7 +1435,15 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
        /* no basis for marking this anything other than "3" at the moment*/
       sc->DPO[i].iStat = 3;
     }
+    
+    /* consider the status of the servers */
+    if (i<ME_MAX_NDPOUT) { /* i=0 to 1: These are standard beams */
+       /* no basis for marking this anything other than "3" at the moment*/
+      sc->DPO[i].iStat = 3;
+    }
 #else
+    /* NOTE: it is assumed that DP2[1] is used for beams 1-2, and DP2[2] for beams 3-4 */
+    
     /* consider status of associated DP2 board */
     if (i<2) { /* i=0 or 1: These go through the first DP2 board */
       if ( s.nDP2<1 ) { 
@@ -1476,6 +1503,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// Sep 11, 2015: Updated various structures and limits for ADP-based stations
 // Jul 14, 2015: Added new SID and CMDs for the Advanced Digital Processor (ADP)
 // Mar 10, 2014: Added BDM command; added OBS_BDM keyword to osf_ struct
 // Jan 23, 2013: Fixed index overrun in me_sc_MakeASM( ) (see lwa1 staff exploder emails)
