@@ -1090,9 +1090,13 @@ int me_stp(
         sprintf(sq->ocs[ii],"Rcvd STP from meei");
 
         /* ask the DR about the barcode of the DRSU it is currently using. (should be current in MIB; was requested on OBS) */
-        sprintf(sid_macro,"DR%d", sq->ssf[ii].SESSION_DRX_BEAM );
-        err = memdre( sid_macro, "DRSU-BARCODE", barcode, &tv );
-
+        if ( sq->ssf[ii].SESSION_DRX_BEA != -1 ) {
+           sprintf(sid_macro,"DR%d", sq->ssf[ii].SESSION_DRX_BEAM );
+           err = memdre( sid_macro, "DRSU-BARCODE", barcode, &tv );
+        } else {
+           sprintf(barcode, "UNK");
+        }
+        
         /* write the metadata file */
         sprintf(filename,"sinbox/%s_%04u_metadata.txt",sq->ssf[ii].PROJECT_ID,sq->ssf[ii].SESSION_ID);
         fp = fopen(filename,"a"); /* note we are appending */

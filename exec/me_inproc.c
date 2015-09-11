@@ -998,7 +998,7 @@ int main ( int narg, char *argv[] ) {
                 ncs++;
                 
                 /* Define the tuning mask to use */
-                tuning_mask = 1 << (64-(2*(osf.SESSION_DRX_BEAM-1)+1));
+                tuning_mask = (unsigned long int) 1 << (64-(2*(osf.SESSION_DRX_BEAM-1)+1));
 
                 /* Build up the TBW command */
                 LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 );
