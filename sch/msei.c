@@ -180,8 +180,8 @@ main ( int narg, char *argv[] ) {
            }
          //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;
          i2u.i = i2u1;                      c.data[ 0]=i2u.b[0]; 
-         i4u.i = i4u1; c.data[ 1]=i4u.b[3]; c.data[ 2]=i4u.b[2]; c.data[ 3]=i4u.b[1]; c.data[ 4]=i4u.b[0];
-         i4u.i = i4u2; c.data[ 5]=i4u.b[3]; c.data[ 6]=i4u.b[2]; c.data[ 7]=i4u.b[1]; c.data[ 8]=i4u.b[0];
+         i4s.i = i4s1; c.data[ 1]=i4s.b[3]; c.data[ 2]=i4s.b[2]; c.data[ 3]=i4s.b[1]; c.data[ 4]=i4s.b[0];
+         i4s.i = i4s2; c.data[ 5]=i4s.b[3]; c.data[ 6]=i4s.b[2]; c.data[ 7]=i4s.b[1]; c.data[ 8]=i4s.b[0];
          i8u.i = i8u1; c.data[ 9]=i8u.b[7]; c.data[10]=i8u.b[6]; c.data[11]=i8u.b[5]; c.data[12]=i8u.b[4];
                        c.data[13]=i8u.b[3]; c.data[14]=i8u.b[2]; c.data[15]=i8u.b[1]; c.data[16]=i8u.b[0];
          c.datalen=17;
