@@ -170,12 +170,12 @@ main ( int narg, char *argv[] ) {
          // sint32 TBF_SAMPLES;
          // uint64 DRX_TUNING_MASK
          bError=0;
-         i2u1 = (unsigned short) 16;
-         if (narg>3) { sscanf(argv[3],"%i", &i4s1); } else {bError=1;}
-         if (narg>4) { sscanf(argv[4],"%i", &i4s2); } else {bError=1;}
-         if (narg>5) { sscanf(argv[5],"%lu",&i8u1); } else {bError=1;}
+         if (narg>3) { sscanf(argv[3],"%hu",&i2u1); } else {bError=1;}
+         if (narg>4) { sscanf(argv[4],"%i", &i4s1); } else {bError=1;}
+         if (narg>5) { sscanf(argv[5],"%i", &i4s2); } else {bError=1;}
+         if (narg>6) { sscanf(argv[6],"%lu",&i8u1); } else {bError=1;}
          if (bError) {
-           printf("[%s] FATAL: %s/%s args are:\n TBF_TRIG_TIME (samples, int32)\n TBF_SAMPLES (samples, int32)\n DRX_TUNING_MASK (mask, uint64)\n",ME,dest,cmd);
+           printf("[%s] FATAL: %s/%s args are:\n TBF_BITS (number, uint8)\nTBF_TRIG_TIME (samples, int32)\n TBF_SAMPLES (samples, int32)\n DRX_TUNING_MASK (mask, uint64)\n",ME,dest,cmd);
            return;
            }
          //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;

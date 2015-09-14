@@ -84,8 +84,11 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
   struct timeval tv;          /* from sys/time.h; included via me.h */
   struct timezone tz;
 
-  short int i2u1, i2u2, i2u3;
-  int i4u1, i4u2;
+  unsigned short int i2u1, i2u2, i2u3;
+  signed short int i2s1, i2s2;
+  unsigned int i4u1, i4u2;
+  signed int i4s1;
+  unsigned long int i8u1;
   float f41;                  /* assuming this is 32 bits */
 
   union {
@@ -93,9 +96,21 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
     unsigned char b[2];
     } i2u;
   union {
+    signed short int i;
+    signed char b[2];
+    } i2s;
+  union {
     unsigned int i;
     unsigned char b[4];
     } i4u;
+  union {
+    signed int i;
+    signed char b[4];
+    } i4s;
+  union {
+    unsigned long int i;
+    unsigned char b[8];
+  } i8u;
   union {
     float f;
     unsigned char b[4];
@@ -189,6 +204,163 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
   strcpy(c.data,data); /* changed in reply */
   c.datalen = -1; /* assumed to be a string */
 
+#ifdef USE_ADP
+  /* For ADP, c.data is raw binary, assembled from command line parameters. */
+  /* the parameters are command-dependent */
+  if (c.sid==LWA_SID_ADP) {
+    
+    switch (c.cid) {
+
+       case LWA_CMD_PNG:
+       case LWA_CMD_RPT:
+       case LWA_CMD_SHT:
+         break;
+        
+       case LWA_CMD_FST:
+         // DATA field structure:
+         // sint16 INDEX;
+         // sint16 COEFF_DATA[16][32];
+
+         // What we will send in this case is simply the string "data" as provided.
+         // ms_mcic will convert this.
+         strcpy(c.data,data); /* changed in reply */
+         c.datalen = -1;      /* it's a string, for now */
+
+         break;
+
+       case LWA_CMD_BAM:
+         // DATA field structure:
+         // uint16 BEAM_ID;
+         // uint16 BEAM_DELAY[520];
+         // sint16 BEAM_GAIN[260][2][2];
+         // uint8 DRX_TUNING;
+         // uint8 sub_slot;
+
+         // What we will send in this case is simply the string "data" as provided.
+         // ms_mcic will convert this.
+         strcpy(c.data,data); /* changed in reply */
+         c.datalen = -1;      /* it's a string, for now */
+
+         break;
+
+       case LWA_CMD_DRX:
+         // uint8 DRX_TUNING;
+         // float32 DRX_FREQ;
+         // unit8 DRX_BW;
+         // uint16 DRX_GAIN;
+
+         // parse the input string into parameters
+         sscanf(data,"%hhu %f %hhu %hu", &tuning, &freq, &ebw, &gain);
+         //printf("%f %1hhu %1hhu %1hhu %1hhu\n",freq,c.data[1],c.data[2],c.data[3],c.data[4]);
+
+         // assemble into c.data:
+         memcpy( &(c.data[0]), &beam,     1 );
+         memcpy( &(c.data[1]), &tuning,   1 );
+
+         /* flipping endian-ness of freq: */
+         f4.f  = freq;  c.data[1]= f4.b[3]; c.data[2]= f4.b[2]; c.data[3]= f4.b[1]; c.data[4]= f4.b[0]; 
+
+         /* flipping endian-ness of gain: */
+         i2u.i  = gain;  c.data[6]= i2u.b[1]; c.data[7]= i2u.b[0];  
+
+         memcpy( &(c.data[5]), &ebw,      1 );
+         //memcpy( &(c.data[7]), (&gain)+1, 1 ); /* flipping endian-ness of gain */
+         //memcpy( &(c.data[8]), (&gain)+0, 1 ); /* flipping endian-ness of gain */
+
+         f4.b[3] = c.data[1]; f4.b[2] = c.data[2]; f4.b[1] = c.data[3]; f4.b[0] = c.data[4]; freq = f4.f;  
+         //printf("%f %1hhu %1hhu %1hhu %1hhu\n",freq,c.data[1],c.data[2],c.data[3],c.data[4]);
+
+         c.datalen=8;
+
+         break;
+
+       case LWA_CMD_TBF:
+         // DATA field structure:
+         // uint8 TBW_BITS;
+         // uint32 TBW_TRIG_TIME; 
+         // uint32 TBW_SAMPLES;
+
+         i2u1 = 0;
+         i4u1 = 0;
+         i4u2 = 0;
+         i8u1 = 0;
+         sscanf(data,"%hu %u %u %lu",&i2u1,&i4u1,&i4u2,&i8u1);
+         //printf("[%d/%d] TBF args: TBF_BITS=%hu, TBF_TRIG_TIME=%u, TBF_SAMPLES=%u, DRX_TUNING_MASK=%lu\n",ME_MESI,getpid(),i2u1,i4u1,i4u2,i8u1);        
+ 
+         i2u.i = i2u1;                      c.data[ 0]=i2u.b[0]; 
+         i4u.i = i4u1; c.data[ 1]=i4u.b[3]; c.data[ 2]=i4u.b[2]; c.data[ 3]=i4u.b[1]; c.data[ 4]=i4u.b[0];
+         i4u.i = i4u2; c.data[ 5]=i4u.b[3]; c.data[ 6]=i4u.b[2]; c.data[ 7]=i4u.b[1]; c.data[ 8]=i4u.b[0];
+         i8u.i = i8b1; c.data[ 9]=i8b.b[7]; c.data[10]=i8u.b[6]; c.data[11]=i8u.b[5]; c.data[12]=i8u.b[4];
+                       c.data[13]=i8u.b[3]; c.data[14]=i8u.b[2]; c.data[15]=i8u.b[1]; c.data[16]=i8u.b[0];
+
+         c.datalen=17;
+
+         break;
+
+       case LWA_CMD_TBN:
+         // DATA field structure:
+         // float32 TBN_FREQ;
+         // sint16 TBN_BW;
+         // sint16 TBN_GAIN;
+
+         f41 = 0.0;
+         i2s1 = 0;
+         i2s2 = 0;
+         sscanf(data,"%f %hu %hu",&f41,&i2s1,&i2s2);
+         //printf("[%d/%d] TBN args TBN_FREQ=%f, TBN_BW=%hu, TBN_GAIN=%hu\n",ME_MESI,getpid(),f41,i2s1,i2s2);
+
+         f4.f  = f41;  c.data[0]= f4.b[3]; c.data[1]= f4.b[2]; c.data[2]= f4.b[1]; c.data[3]= f4.b[0];
+         i2s.i = i2s1; c.data[4]=i2s.b[1]; c.data[5]=i2s.b[0]; 
+         i2s.i = i2s2; c.data[6]=i2s.b[1]; c.data[7]=i2s.b[0]; 
+
+         c.datalen=8;
+
+         break;
+         
+       case LWA_CMD_COR:
+         // DATA field structure:
+         // sint32 COR_NAVG;
+         // uint64 DRX_TUNING_MASK; 
+         // sint16 COR_GAIN;
+         // uint8 sub_slot;
+         
+         i4s1 = 0;
+         i8u1 = 0;
+         i2s1 = 0;
+         i2s2 = 0;
+         sscanf(data,"%i %lu %hu %hhu",&i4s1,&i8u1,&i2s1,&i2s2);
+         //printf("[%d/%d] COR args COR_NAVG=%i, DRX_TUNING_MASK=%lu, COR_GAIN=%hu, sub_slot=%hhu\n",ME_MESI,getpid(),i4s1,i8u1,i2s1,i2s2);
+         
+         i4s.i = i4s1; c.data[ 0]=i4s.b[3]; c.data[ 1]=i4s.b[2]; c.data[ 2]=i4s.b[1]; c.data[ 3]=i4s.b[0];
+         i8u.i = i8u1; c.data[ 4]=i8u.b[7]; c.data[ 5]=i8u.b[6]; c.data[ 6]=i8u.b[5]; c.data[ 7]=i8u.b[4];
+                       c.data[ 8]=i8u.b[3]; c.data[ 9]=i8u.b[2]; c.data[10]=i8u.b[1]; c.data[11]=i8u.b[0];
+         i2s.i = i2s1; c.data[12]=i2s.b[1]; c.data[13]=i2s.b[0];
+         i2s.i = i2s2; c.data[14]=i2s.b[0];
+         
+         c.datalen=15;
+         
+         break;
+         
+       case LWA_CMD_INI:
+         break;
+ 
+       default:
+         printf("[%d/%d] FATAL: cmd <%s> not recognized as valid for ADP\n",ME_MESI,getpid(),cmd);
+         eResult += MESI_ERR_CMD;
+         return eResult;
+         break;
+
+       } /* switch (c.cid) */
+       
+    if (c.datalen > -1) { 
+     char hex[256];
+     LWA_raw2hex( c.data, hex, c.datalen );      
+     //printf("[%d/%d] Outbound DATA field is: 0x%s (raw binary)\n",ME_MESI,getpid(),hex);  
+    }
+
+    } /* if (c.sid==LWA_SID_ADP) */
+    
+#else
   /* For DP, c.data is raw binary, assembled from command line parameters. */
   /* the parameters are command-dependent */
   if (c.sid==LWA_SID_DP_) {
@@ -321,6 +493,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
     }
 
     } /* if (c.sid==LWA_SID_DP_) */
+#endif
 
   /* create socket if necessary */
   if (sockfd_ptr!=NULL) {
