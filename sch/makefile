@@ -15,7 +15,7 @@ ms_init: ms_init.c ../common/mcs.h
 dat2dbm: dat2dbm.c ../common/mcs.h
 	$(CC) $(CFLAGS) -o dat2dbm dat2dbm.c $(LDFLAGS)
 
-ms_mcic: ms_mcic.c ../common/mcs.h ms_mcic_mib.c ms_mcic_SHL.c ms_mcic_ASP.c ms_mcic_DP_.c ms_mcic_DR_.c 
+ms_mcic: ms_mcic.c ../common/mcs.h ms_mcic_mib.c ms_mcic_SHL.c ms_mcic_ASP.c ms_mcic_ADP.c ms_mcic_DP_.c ms_mcic_DR_.c 
 	$(CC) $(CFLAGS) -o ms_mcic ms_mcic.c $(LDFLAGS)
 
 ms_exec: ms_exec.c  ../common/mcs.h ms_exec_log.c 

@@ -226,7 +226,7 @@ int LWA_mibupdate_ADP(
 
       //printf("freq=%f %hhu %hhu %hhu %hhu\n",freq, cmdata[5], cmdata[4], cmdata[3], cmdata[2] );
 
-     /* recovering parameters from packed binary argument */
+      /* recovering parameters from packed binary argument */
       memcpy( &tuning,   cmdata+0, 1 );
       
       memset(&freq,0,4);                  

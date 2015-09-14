@@ -1,4 +1,4 @@
-// mesi.c: S.W. Ellingson, Virginia Tech, 2011 March 25
+// mesi.c: J. Dowell, UNM, 2015 Sep 14
 // ---
 // REQUIRES: 
 //   me.h
@@ -18,7 +18,7 @@
 #define MESI_ERR_CONNECT    4 /* connect() to scheduler (ms_exec) failed */
 #define MESI_ERR_REJECTED   8 /* Scheduler (ms_exec) rejected the command */
 #define MESI_ERR_DATA      16 /* "data" argument not valid for specified "cmd" */
-#define MESI_ERR_FST_FOPEN 32 /* While processing DP_ FST, couldn't open specified .cf file */
+#define MESI_ERR_FST_FOPEN 32 /* While processing DP_/ADP FST, couldn't open specified .cf file */
 
 int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL to open/close a socket for this operation */
           char *dest,  /* (input) DESTINATION.  (three-letter subsystem designator) */
@@ -37,6 +37,36 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 //   For subsystems NU#, SHL, ASP, and DR#, this is ASCII.
 //     (The string provided will be exactly the string used for the DATA field)
 // Concerning "data":
+//   For dest="ADP", this will be a list of parameters that will get translated into a raw binary DATA field
+//     For cmd="TBF": Args are TBF_BITS        (always 16)
+//                             TBF_TRIG_TIME   (samples from start of slot, uint32)
+//                             TBF_SAMPLES     (samples, uint32)
+//                             DRX_TUNING_MASK (drx tunings to pull data from, uint64)
+//     For cmd="TBN": Args are TBN_FREQ        (Hz, float32) 
+//                             TBN_BW          {1..11}
+//                             TBN_GAIN        {0..30}
+//     For cmd="FST": Args are INDEX           ( -1, 0, or channel# (1-512) ) 
+//                             cname           This is the name of a file, presumed to be located in 
+//                                               MCS/Scheduler's "cfiles" 
+//                                               directory, containing "sint16 COEFF_DATA[16][32]"
+//     For cmd="BAM": Args are beam            1..NUM_BEAMS(32) (uint16 BEAM_ID) 
+//                             dfile           This is the name of a file, presumed to be located in 
+//                                               MCS/Scheduler's "dfiles" 
+//                                               directory, containing "uint16 BEAM_DELAY[520]" 
+//                             gfile           This is the name of a file, presumed to be located in 
+//                                               MCS/Scheduler's "gfiles" 
+//                                               directory, containing "sint16 BEAM_GAIN[260][2][2]"   
+//                             drx_tuning      1..NUM_TUNINGS(32) (uint8 DRX_TUNING)
+//                             sub_slot        {0..99}
+//     For cmd="DRX": Args are tuning          1..NUM_TUNINGS(32)     (uint8 DRX_TUNING)
+//                             freq            [Hz]                   (float32 DRX_FREQ)
+//                             ebw             Bandwidth setting 0..8 (unit8 DRX_BW)
+//                             gain            0..15                  (uint16 DRX_GAIN)
+//     For cmd="COR": Args are COR_NAVG        integration time in sub-slots (sint32 COR_NAVG)
+//                             DRX_TUNING_MASK (drx tunings to pull data from, uint64)
+//                             COR_GAIN        {0..15}
+//                             sub_slot        {0..99}
+//
 //   For dest="DP_", this will be a list of parameters that will get translated into a raw binary DATA field
 //     For cmd="TBW": Args are TBW_BITS      {0|1}
 //                             TBW_TRIG_TIME (samples from start of slot, uint32)
@@ -47,15 +77,15 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 //                             sub_slot      {0..99}
 //     For cmd="FST": Args are INDEX         ( -1, 0, or channel# (1-520) ) 
 //                             cname         This is the name of a file, presumed to be located in 
-//                                           MCS/Scheduler's "cfiles" 
-//                                           directory, containing "sint16 COEFF_DATA[16][32]"
+//                                             MCS/Scheduler's "cfiles" 
+//                                             directory, containing "sint16 COEFF_DATA[16][32]"
 //     For cmd="BAM": Args are beam          1..NUM_BEAMS(4) (uint16 BEAM_ID) 
 //                             dfile         This is the name of a file, presumed to be located in 
-//                                           MCS/Scheduler's "dfiles" 
-//                                           directory, containing "uint16 BEAM_DELAY[520]" 
+//                                             MCS/Scheduler's "dfiles" 
+//                                             directory, containing "uint16 BEAM_DELAY[520]" 
 //                             gfile         This is the name of a file, presumed to be located in 
-//                                           MCS/Scheduler's "gfiles" 
-//                                           directory, containing "sint16 BEAM_GAIN[260][2][2]"      
+//                                             MCS/Scheduler's "gfiles" 
+//                                             directory, containing "sint16 BEAM_GAIN[260][2][2]"      
 //                             sub_slot      {0..99}
 //     For cmd="DRX": Args are beam          1..NUM_BEAMS(4)        (uint8 DRX_BEAM)
 //                             tuning        1..NUM_TUNINGS(2)      (uint8 DRX_TUNING)
@@ -254,8 +284,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          //printf("%f %1hhu %1hhu %1hhu %1hhu\n",freq,c.data[1],c.data[2],c.data[3],c.data[4]);
 
          // assemble into c.data:
-         memcpy( &(c.data[0]), &beam,     1 );
-         memcpy( &(c.data[1]), &tuning,   1 );
+         memcpy( &(c.data[0]), &tuning,   1 );
 
          /* flipping endian-ness of freq: */
          f4.f  = freq;  c.data[1]= f4.b[3]; c.data[2]= f4.b[2]; c.data[3]= f4.b[1]; c.data[4]= f4.b[0]; 
@@ -279,6 +308,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          // uint8 TBW_BITS;
          // uint32 TBW_TRIG_TIME; 
          // uint32 TBW_SAMPLES;
+         // uint64 DRX_TUNING_MASK;
 
          i2u1 = 0;
          i4u1 = 0;
@@ -541,6 +571,8 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// msei.c: J. Dowell, UNM, 2015 Sep 14
+//   .1: Updated for the ADP commands
 // mesi.c: S.W. Ellingson, Virginia Tech, 2011 March 25
 //   .1: added sockfd_ptr argument so that already-opened socket can be used
 // mesi.c: S.W. Ellingson, Virginia Tech, 2011 Feb 10

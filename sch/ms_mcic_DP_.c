@@ -165,7 +165,7 @@ int LWA_mibupdate_DP_(
 
       //printf("freq=%f %hhu %hhu %hhu %hhu\n",freq, cmdata[5], cmdata[4], cmdata[3], cmdata[2] );
 
-     /* recovering parameters from packed binary argument */
+      /* recovering parameters from packed binary argument */
       memcpy( &beam,     cmdata+0, 1 );
       memcpy( &tuning,   cmdata+1, 1 );
       
