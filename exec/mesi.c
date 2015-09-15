@@ -373,7 +373,10 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          
        case LWA_CMD_INI:
          break;
- 
+         
+       case LWA_CMD_STP:
+         break;
+         
        default:
          printf("[%d/%d] FATAL: cmd <%s> not recognized as valid for ADP\n",ME_MESI,getpid(),cmd);
          eResult += MESI_ERR_CMD;
@@ -507,7 +510,10 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 
        case LWA_CMD_INI:
          break;
- 
+
+       case LWA_CMD_STP:
+         break;
+         
        default:
          printf("[%d/%d] FATAL: cmd <%s> not recognized as valid for DP\n",ME_MESI,getpid(),cmd);
          eResult += MESI_ERR_CMD;
@@ -571,6 +577,8 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// msei.c: J. Dowell, UNM, 2015 Sep 15
+//   .1: Added STP as a valid command for DP/ADP
 // msei.c: J. Dowell, UNM, 2015 Sep 14
 //   .1: Updated for the ADP commands
 // mesi.c: S.W. Ellingson, Virginia Tech, 2011 March 25
