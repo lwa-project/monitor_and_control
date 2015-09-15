@@ -27,7 +27,7 @@ medfg: medfg.c
 megfg: megfg.c
 	$(CC) $(CFLAGS) -o megfg megfg.c $(LDFLAGS)
 
-me_exec: me_exec.c me_exec_1.c me.h ../common/mcs.h
+me_exec: me_exec.c me_exec_1.c meos.c memdre.c mesi.c me.h ../common/mcs.h
 	$(CC) $(CFLAGS) -o me_exec me_exec.c $(LDFLAGS)
 
 meeix: meeix.c meei.c me.h ../common/mcs.h
