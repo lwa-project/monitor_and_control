@@ -178,12 +178,20 @@ main ( int narg, char *argv[] ) {
     sprintf(record.val,"%lu\0",i8u.i); /* overwrite in human-readable representation */  
     }
   if (!strncmp(record.type_dbm,"f4",2)) {  /* if the format is "f4" */
-    f4.b[0]=record.val[0];           /* unpack the bytes into a union structure */
-    f4.b[1]=record.val[1];
-    f4.b[2]=record.val[2];
-    f4.b[3]=record.val[3];
-    sprintf(record.val,"%f\0",f4.f); /* overwrite in human-readable representation */    
-    }
+      if (!strncmp(record.type_dbm,"f4r",3)) {  /* if the format is "f4r" (same as f4, but big-endian) */
+        f4.b[3]=record.val[0];           /* unpack the bytes into a union structure */
+        f4.b[2]=record.val[1];
+        f4.b[1]=record.val[2];
+        f4.b[0]=record.val[3];
+        sprintf(record.val,"%f\0",f4.f); /* overwrite in human-readable representation */    
+        } else {
+        f4.b[0]=record.val[0];           /* unpack the bytes into a union structure */
+        f4.b[1]=record.val[1];
+        f4.b[2]=record.val[2];
+        f4.b[3]=record.val[3];
+        sprintf(record.val,"%f\0",f4.f); /* overwrite in human-readable representation */    
+        }
+      }
 
   //printf( "%-s %-s %-s |", record.index, label, record.val );
   printf( "%-s\n", record.val );
