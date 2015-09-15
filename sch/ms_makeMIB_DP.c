@@ -133,6 +133,10 @@ main ( int narg, char *argv[] ) {
     fprintf(fp,"V 8.%d.5		BOARD%d_FIRMWARE		0	a256	a256	\n",i+1,i+1);
     fprintf(fp,"V 8.%d.6		BOARD%d_HOSTNAME		0	a256	a256	\n",i+1,i+1);
     }
+  fprintf(fp,"B 8.29		GLOBAL_INFO		NUL	NUL	NUL\n");
+  fprintf(fp,"V 8.29.1		GLOBAL_TEMP_MIN	0	f4r	f4r\n");
+  fprintf(fp,"V 8.29.2		GLOBAL_TEMP_MAX	0	f4r	f4r\n");
+  fprintf(fp,"V 8.29.3		GLOBAL_TEMP_AVG	0	f4r	f4r\n");
 
   fprintf(fp,"V 9 		CMD_STAT 		0 	r606 	r606\n"); 
   
