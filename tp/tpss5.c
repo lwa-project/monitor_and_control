@@ -229,7 +229,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
           return;
           }
 #else
-        if ( ( obs[nobs].OBS_TBN_GAIN<-1 ) || ( obs[nobs].OBS_TBN_GAIN>15 ) ) {   
+        if ( ( obs[nobs].OBS_TBN_GAIN<-1 ) || ( obs[nobs].OBS_TBN_GAIN>30 ) ) {   
           printf("[%d/%d] FATAL: OBS_TBN_GAIN out of range\n",MT_TPSS,getpid());  
           return;
           }
