@@ -102,11 +102,13 @@ main ( int narg, char *argv[] ) {
 
   /* ADP-specific */
 
-  fprintf(fp,"V 2 		TBF_STATUS		0	i1ur	i1ur\n");
+  fprintf(fp,"V 2.1 		TBF_STATUS		0	i1ur	i1ur\n");
+  fprintf(fp,"V 2.2			TBF_TUNING_MASK	0	i8ur	i8ur\n");
 
   fprintf(fp,"V 3 		NUM_TBN_BITS		0	i1ur	i1ur\n");
 
-  fprintf(fp,"V 4.1 		NUM_DRX_TUNINGS		0	i1ur	i1ur\n");
+  fprintf(fp,"V 4.1.1		NUM_DRX_TUNINGS		0	i1ur	i1ur\n");
+  fprintf(fp,"V 4.1.2		NUM_FREQ_CHANS			0	i2ur	i2ur\n");
   fprintf(fp,"V 4.2 		NUM_BEAMS		0	i1ur	i1ur\n"); 
   fprintf(fp,"V 4.3 		NUM_STANDS		0	i2ur	i2ur\n");
   fprintf(fp,"V 4.4.1 		NUM_BOARDS		0	i1ur	i1ur\n");
@@ -137,17 +139,41 @@ main ( int narg, char *argv[] ) {
 
   fprintf(fp,"B 8 		BOARD_STAT		NUL	NUL	NUL\n");
   for ( i=0; i<16; i++ ) {
-    fprintf(fp,"V 8.%d\t\tBOARD%d_STAT 		0 	i4ur 	i4ur\n",i+1,i+1); 
+    fprintf(fp,"B 8.%d\t\tBOARD%d		NUL	NUL	NUL\n",i+1);
+    fprintf(fp,"V 8.%d.1\t\tBOARD%d_STAT 		0 	i8ur 	i8ur\n",i+1,i+1); 
+    fprintf(fp,"V 8.%d.2\t\tBOARD%d_TEMP_MIN 		0 	f4r 	f4r\n",i+1,i+1); 
+    fprintf(fp,"V 8.%d.3\t\tBOARD%d_TEMP_MAX 		0 	f4r 	f4r\n",i+1,i+1); 
+    fprintf(fp,"V 8.%d.4\t\tBOARD%d_TEMP_AVG 		0 	f4r 	f4r\n",i+1,i+1); 
+    fprintf(fp,"V 8.%d.3\t\tBOARD%d_FIRMWARE 		UNK 	a256 	a256\n",i+1,i+1); 
+    fprintf(fp,"V 8.%d.4\t\tBOARD%d_HOSTNAME 		UNK 	a256 	a256\n",i+1,i+1); 
     }
-
-  //fprintf(fp,"V 8.29\t\tBOARD29_STAT 		1 	i4u 	i4u\n"); 
-  //fprintf(fp,"V 8.29\t\tBOARD30_STAT 		255 	i4u 	i4u\n");
-  //fprintf(fp,"V 8.29\t\tBOARD31_STAT 		65536 	i4u 	i4u\n");
-  //fprintf(fp,"V 8.29\t\tBOARD32_STAT 		16777215 	i4u 	i4u\n");
-  //fprintf(fp,"V 8.29\t\tBOARD33_STAT 		3999999999 	i4u 	i4u\n"); 
-
+  
   fprintf(fp,"V 9 		CMD_STAT 		0 	r606 	r606\n"); 
-
+  
+  fprintf(fp,"B 10           TBN_CONFIG 		NUL 	NUL 	NUL\n");
+  fprintf(fp,"V 10.1         TBN_CONFIG_FREQ		0	f4r	f4r\n");
+  fprintf(fp,"V 10.2         TBN_CONFIG_FILTER	0	i2ur	i2ur\n");
+  fprintf(fp,"V 10.3         TBN_CONFIG_GAIN		0	i2ur	i2ur\n");
+  
+  fprintf(fp,"B 11		DRX_CONFIG		NUL	NUL	NUL\n");
+  for ( i=0; i<32; i++ ) {
+    fprintf(fp,"B 11.%d		DRX_CONFIG_%d		NUL	NUL	NUL\n",i+1,i+1);
+    fprintf(fp,"V 11.%d.1	DRX_CONFIG_%d_FREQ		0	f4r	f4r\n",i+1,i+1);
+    fprintf(fp,"V 11.%d.2	DRX_CONFIG_%d_FILTER		0	i2ur	i2ur\n",i+1,i+1);
+    fprintf(fp,"V 11.%d.3	DRX_CONFIG_%d_GAIN		0	i2ur	i2ur\n",i+1,i+1);
+    }
+  
+  fprintf(fp,"B 12 		SERVER_STAT		NUL	NUL	NUL\n");
+  for ( i=0; i<7; i++ ) {
+    fprintf(fp,"B 12.%d\t\tSERVER%d		NUL	NUL	NUL\n",i+1);
+    fprintf(fp,"V 12.%d.1\t\tSERVER%d_STAT 		0 	i8ur 	i8ur\n",i+1,i+1); 
+    fprintf(fp,"V 12.%d.2\t\tSERVER%d_TEMP_MIN 		0 	f4r 	f4r\n",i+1,i+1); 
+    fprintf(fp,"V 12.%d.3\t\tSERVER%d_TEMP_MAX 		0 	f4r 	f4r\n",i+1,i+1); 
+    fprintf(fp,"V 12.%d.4\t\tSERVER%d_TEMP_AVG 		0 	f4r 	f4r\n",i+1,i+1); 
+    fprintf(fp,"V 12.%d.3\t\tSERVER%d_SOFTWARE 		UNK 	a256 	a256\n",i+1,i+1); 
+    fprintf(fp,"V 12.%d.4\t\tSERVER%d_HOSTNAME 		UNK 	a256 	a256\n",i+1,i+1); 
+    }
+  
   close(fp);
   } /* main() */
 
