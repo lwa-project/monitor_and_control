@@ -174,6 +174,11 @@ main ( int narg, char *argv[] ) {
     fprintf(fp,"V 12.%d.4\t\tSERVER%d_HOSTNAME 		UNK 	a256 	a256\n",i+1,i+1); 
     }
   
+  fprintf(fp,"B 13		GLOBAL_INFO		NUL	NUL	NUL\n");
+  fprintf(fp,"V 13.1		GLOBAL_TEMP_MIN	0	f4r	f4r\n");
+  fprintf(fp,"V 13.2		GLOBAL_TEMP_MAX	0	f4r	f4r\n");
+  fprintf(fp,"V 13.3		GLOBAL_TEMP_AVG	0	f4r	f4r\n");
+  
   close(fp);
   } /* main() */
 
