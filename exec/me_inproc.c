@@ -832,11 +832,12 @@ int main ( int narg, char *argv[] ) {
             /* ====================== */
             
 #ifdef USE_ADP
-            /* for ADP beam output we do this once; i.e., one recording per session */
-            /* for ADP TBF output we do a new recording for each observation */
-            if ( ( ( (osf.OBS_MODE != LWA_OM_TBF) && (i==1) ) || 
-                   (  osf.OBS_MODE == LWA_OM_TBF            )    ) &&
-                   (  osf.OBS_MODE != LWA_OM_TBN                 )   ) {
+            /* for ADP output 1 (beams) we do this once; i.e., one recording per session */
+            /* for ADP output 1 (TBF) output we do a new recording for each observation */
+            /* for ADP output 2 (TBN) output we do a new recording for each observation */
+            if ( ( (osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) && (osf.OBS_MODE != LWA_OM_TBF) && (i==1) ) || 
+                 ( (osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) && (osf.OBS_MODE == LWA_OM_TBF) ) ||
+                 (  osf.SESSION_DRX_BEAM==ME_MAX_NDPOUT           )   ) {
               dr_sid=-1;
               for( j=0; j<ME_MAX_NDR; j++ ) {
                  if( osf.SESSION_DRX_BEAM == s.iDRDP[j] ) {
@@ -1137,18 +1138,21 @@ int main ( int narg, char *argv[] ) {
                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                 ncs++;
                 
-                LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 ); /* staggering send times for DP commands by 10 ms */
-                cs[ncs].action.bASAP = 0;                   
-                cs[ncs].action.sid = LWA_SID_ADP;  
-                cs[ncs].action.cid = LWA_CMD_DRX; 
-                sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
-                                2*(osf.SESSION_DRX_BEAM-1)+2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
-                                      (4.563480616e-02)*(osf.OBS_FREQ2), /* center freq in Hz */
-                                            osf.OBS_BW,                  /* 0-8 */
-                                                gain2);                  /* 0-15 */
-                cs[ncs].action.len = strlen(cs[ncs].data)+1;
-                me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
-                ncs++;
+                // Disable the second DRX tuning for half beams
+                if ( osf.OBS_FREQ2 != 0 ) {
+                  LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 ); /* staggering send times for DP commands by 10 ms */
+                  cs[ncs].action.bASAP = 0;                   
+                  cs[ncs].action.sid = LWA_SID_ADP;  
+                  cs[ncs].action.cid = LWA_CMD_DRX; 
+                  sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
+                                  2*(osf.SESSION_DRX_BEAM-1)+2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                        (4.563480616e-02)*(osf.OBS_FREQ2), /* center freq in Hz */
+                                              osf.OBS_BW,                  /* 0-8 */
+                                                  gain2);                  /* 0-15 */
+                  cs[ncs].action.len = strlen(cs[ncs].data)+1;
+                  me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+                  ncs++;
+                  }
 #else
                 /* DP - DRX commands */
 //     For cmd="DRX": Args are beam          1..NUM_BEAMS(4)        (uint8 DRX_BEAM)
@@ -1172,20 +1176,23 @@ int main ( int narg, char *argv[] ) {
                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                 ncs++;
 
-                LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 ); /* staggering send times for DP commands by 10 ms */
-                cs[ncs].action.bASAP = 0;                   
-                cs[ncs].action.sid = LWA_SID_DP_;  
-                cs[ncs].action.cid = LWA_CMD_DRX; 
-                sprintf( cs[ncs].data, "%hd 2 %8.0f %hu %hd %ld",
-                                osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
-                                    //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
-                                      (4.563480616e-02)*(osf.OBS_FREQ2), /* center freq in Hz */
-                                            osf.OBS_BW,                  /* 1-7 */
-                                                gain2,                   /* 0-15 */
-                                                    t0);                 /* subslot 0..99 (uint8 sub_slot) */
-                cs[ncs].action.len = strlen(cs[ncs].data)+1;
-                me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
-                ncs++;
+                // Disable the second DRX tuning for half beams
+                if ( osf.OBS_FREQ2 != 0 ) {
+                  LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 ); /* staggering send times for DP commands by 10 ms */
+                  cs[ncs].action.bASAP = 0;                   
+                  cs[ncs].action.sid = LWA_SID_DP_;  
+                  cs[ncs].action.cid = LWA_CMD_DRX; 
+                  sprintf( cs[ncs].data, "%hd 2 %8.0f %hu %hd %ld",
+                                  osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                      //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
+                                        (4.563480616e-02)*(osf.OBS_FREQ2), /* center freq in Hz */
+                                              osf.OBS_BW,                  /* 1-7 */
+                                                  gain2,                   /* 0-15 */
+                                                      t0);                 /* subslot 0..99 (uint8 sub_slot) */
+                  cs[ncs].action.len = strlen(cs[ncs].data)+1;
+                  me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+                  ncs++;
+                  }
 #endif
                 
                 /*--- BAM commands ---*/
@@ -1446,20 +1453,22 @@ int main ( int narg, char *argv[] ) {
               me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
               ncs++;
               
-              /* here's the DRX command setting FREQ2: */
-              cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
-              cs[ncs].action.tv.tv_usec = 10000;         /* staggering send times for DP commands by 10 ms */
-              cs[ncs].action.bASAP = 0;    
-              cs[ncs].action.sid = LWA_SID_ADP;  
-              cs[ncs].action.cid = LWA_CMD_DRX; 
-              sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
-                              2*(osf.SESSION_DRX_BEAM-1)+2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
-                                    (4.563480616e-02)*(osfs.OBS_STP_FREQ2), /* center freq in Hz */
-                                          osf.OBS_BW,                       /* 0-8 */
-                                              gain2);                       /* 0-15 */
-              cs[ncs].action.len = strlen(cs[ncs].data)+1;
-              me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
-              ncs++;
+              /* here's the DRX command setting FREQ2 (if it hasn't been disabled): */
+              if( osfs.OBS_STP_FREQ2 != 0 ) {
+                cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
+                cs[ncs].action.tv.tv_usec = 10000;         /* staggering send times for DP commands by 10 ms */
+                cs[ncs].action.bASAP = 0;    
+                cs[ncs].action.sid = LWA_SID_ADP;  
+                cs[ncs].action.cid = LWA_CMD_DRX; 
+                sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
+                                2*(osf.SESSION_DRX_BEAM-1)+2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                      (4.563480616e-02)*(osfs.OBS_STP_FREQ2), /* center freq in Hz */
+                                            osf.OBS_BW,                       /* 0-8 */
+                                                gain2);                       /* 0-15 */
+                cs[ncs].action.len = strlen(cs[ncs].data)+1;
+                me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+                ncs++;
+                }
 #else
               /* here's the DRX command setting FREQ1: */
               cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
@@ -1478,22 +1487,23 @@ int main ( int narg, char *argv[] ) {
               me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
               ncs++;
               
-              /* here's the DRX command setting FREQ2: */
-              cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
-              cs[ncs].action.tv.tv_usec = 10000;         /* staggering send times for DP commands by 10 ms */
-              cs[ncs].action.bASAP = 0;
-              cs[ncs].action.sid = LWA_SID_DP_;  
-              cs[ncs].action.cid = LWA_CMD_DRX; 
-              sprintf( cs[ncs].data, "%hd 2 %8.0f %hu %hd %ld",
-                              osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
-                                  //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
-                                    (4.563480616e-02)*(osfs.OBS_STP_FREQ2), /* center freq in Hz */
-                                          osf.OBS_BW,                  /* 1-7 */
-                                              gain2,                   /* 0-15 */
-                                                  t0);                 // subslot 0..99 (uint8 sub_slot)
-                                                  cs[ncs].action.len = strlen(cs[ncs].data)+1;
-              me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
-              ncs++;
+              /* here's the DRX command setting FREQ2 (if it hasn't been disabled): */
+              if( osfs.OBS_STP_FREQ2 != 0 ) {cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
+                cs[ncs].action.tv.tv_usec = 10000;         /* staggering send times for DP commands by 10 ms */
+                cs[ncs].action.bASAP = 0;
+                cs[ncs].action.sid = LWA_SID_DP_;  
+                cs[ncs].action.cid = LWA_CMD_DRX; 
+                sprintf( cs[ncs].data, "%hd 2 %8.0f %hu %hd %ld",
+                                osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                    //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
+                                      (4.563480616e-02)*(osfs.OBS_STP_FREQ2), /* center freq in Hz */
+                                            osf.OBS_BW,                  /* 1-7 */
+                                                gain2,                   /* 0-15 */
+                                                    t0);                 // subslot 0..99 (uint8 sub_slot)
+                                                    cs[ncs].action.len = strlen(cs[ncs].data)+1;
+                me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+                ncs++;
+                }
 #endif
               
               /* working out dfile and gfile for BAM command.  Two possibilities: */
@@ -1815,6 +1825,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c J. Dowell, UNM 2016 Aug 25
+//   .1 Added support for single tuning "half beams" where tuning 2 is not set
 // me_inproc.c: J. Dowell, UNM, 2015 Aug 31
 //   .1 Added support for ADP, precession of RA/dec coordinates from J200 to EoD, 
 //      support for different gain values for the two tunings in a beam.  There are
