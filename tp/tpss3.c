@@ -286,7 +286,9 @@
       printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
       sscanf(data,"%ld",&(obs[nobs].OBS_FREQ2));
       printf("...converts to %ld\n",obs[nobs].OBS_FREQ2);
-      if ( ( obs[nobs].OBS_FREQ2<219130984 ) || ( obs[nobs].OBS_FREQ2>1928352663 ) ) {   
+      if ( obs[nobs].OBS_FREQ2 == 0 ) {
+        printf("[%d/%d] WARNING: OBS_FREQ2 is zero, this will be a half beam observation\n",MT_TPSS,getpid());
+      } else if ( ( obs[nobs].OBS_FREQ2<219130984 ) || ( obs[nobs].OBS_FREQ2>1928352663 ) ) {   
         printf("[%d/%d] FATAL: OBS_FREQ2 out of range\n",MT_TPSS,getpid());  
         return;
         }

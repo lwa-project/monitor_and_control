@@ -29,7 +29,11 @@
 
 #include "mt.h"
 
-#define TPSS_FORMAT_VERSION 5            /* version of MCS0030 used here */
+#ifdef ADP
+#define TPSS_FORMAT_VERSION 6            /* version of MCS0030 used here - ADP */
+#else
+#define TPSS_FORMAT_VERSION 5            /* version of MCS0030 used here - DP */
+#endif
 #define MAX_SDF_LINE_LENGTH 4096
 #define MAX_SDF_NOTE_LENGTH 32
 #define MAX_NUMBER_OF_OBSERVATIONS 150
@@ -363,7 +367,7 @@ int main ( int narg, char *argv[] ) {
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_FREQ2<219130984) ) {
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_FREQ2 != 0 && obs[n].OBS_FREQ2<219130984) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
       return;
       }
@@ -378,7 +382,7 @@ int main ( int narg, char *argv[] ) {
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_BW>7) ) {
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_BW>8) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
       return;
       }
@@ -390,12 +394,16 @@ int main ( int narg, char *argv[] ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
       return;
       }
-#endif
-#ifdef USE_ADP
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_BW>=8) ) {
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_BW>7) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
+      return;
+      }
+#endif
+#ifdef USE_ADP
+    if ( (obs[n].OBS_MODE==LWA_OM_TBN      ) && (SESSION_DRX_BEAM>-1) ) {
+      printf("[%d/%d] FATAL: SESSION_DRX_BEAM>-1 when obs[%d].OBS_MODE is TBN\n",MT_TPSS,getpid(),n);
       return;
       }
 #else
@@ -413,7 +421,7 @@ int main ( int narg, char *argv[] ) {
   b_DRX_requested = 0;
   for (n=1;n<=nobs;n++) {
     if ( (obs[n].OBS_MODE==LWA_OM_TBN      )   ) b_TB_requested = 1;
-    if ( (obs[n].OBS_MODE==LWA_OM_TBF      ) ||
+    if ( (obs[n].OBS_MODE==LWA_OM_TBF      ) || 
          (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) || 
          (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
          (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
@@ -423,6 +431,8 @@ int main ( int narg, char *argv[] ) {
     printf("[%d/%d] FATAL: Sessions cannot mix TBN with other observing modes\n",MT_TPSS,getpid(),n);
     return;
     }
+    
+  if (b_TB_requested) SESSION_DRX_BEAM=ME_MAX_NDPOUT;
 #else
   /* check to make sure that session doesn't mix TBW/TBN with other observing modes */
   b_TB_requested = 0;
@@ -532,15 +542,8 @@ int main ( int narg, char *argv[] ) {
        }
 
     } else {                 /* No particular DRX output has been requested  */
-#ifdef USE_ADP
-      if ( obs[1].OBS_MODE != LWA_OM_TBN ) {
-         printf("[%d/%d] FATAL: SESSION_DRX_BEAM not specified\n",MT_TPSS,getpid());
-         return;
-         }
-#else
       printf("[%d/%d] FATAL: SESSION_DRX_BEAM not specified\n",MT_TPSS,getpid());
       return;
-#endif
 
       //if (b_DRX_requested) { /* and DRX-dependent mode(s) have been requested */
       //  /* check each beam output, select best */
@@ -956,6 +959,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpss.c J. Dowell, UNM, 2016 Aug 25
+//   .1 Addes support for single tuning "half beams" where tuning 2 is not set
 // tpss.c: S.W. Ellingson, Virginia Tech, 2014 Mar 10
 //   .1 Added BDM command; added OBS_BDM keyword
 // tpss.c: S.W. Ellingson, Virginia Tech, 2013 Jan 28

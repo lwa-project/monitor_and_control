@@ -684,7 +684,8 @@ int main ( int narg, char *argv[] ) {
 
 #ifdef USE_ADP
         for ( i=0; i<ME_MAX_NDPOUT; i++ ) {
-          if (i<ME_MAX_NDPOUT)              { sprintf(st1," Beam #%d",i+1);                     }
+          if (i<ME_MAX_NDPOUT-1)              { sprintf(st1," Beam #%d",i+1);                     }
+          if (i>ME_MAX_NDPOUT-2)              { sprintf(st1," TBN ");         }
           if ( sc.DPO[i].iDR > 0 ) { 
               sprintf(st2," DR%1d %1d",sc.DPO[i].iDR,s.eDRStat[sc.DPO[i].iDR-1]); 
               //printf("<%1d>",s.eDRStat[sc.DPO[i].iDR]); 
