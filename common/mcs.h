@@ -703,7 +703,7 @@ float LWA_f4_swap( float x ) {
 #define ME_MAX_NSEP 512
 #define ME_MAX_SEPID_LENGTH 25
 #define ME_MAX_SEPCABL_LENGTH 25
-#define ME_MAX_NARB 33
+#define ME_MAX_NARB 32
 #define ME_MAX_NARBCH 16
 #define ME_MAX_ARBID_LENGTH 10
 #define ME_MAX_NROACH 16
@@ -711,11 +711,11 @@ float LWA_f4_swap( float x ) {
 #define ME_MAX_ROACHID_LENGTH 10
 #define ME_MAX_NSERVER 7
 #define ME_MAX_SERVERID_LENGTH 10
-#define ME_MAX_NDR 1
+#define ME_MAX_NDR 2
 #define ME_MAX_DRID_LENGTH 10
 #define ME_MAX_NPWRPORT 50
 #define ME_MAX_SSNAME_LENGTH 3 /* for codes used for PWR_NAME */
-#define ME_MAX_NDPOUT 1 /* ADP outputs; 1 because of how things are tied together */
+#define ME_MAX_NDPOUT 2 /* ADP outputs; 1 for beams, 1 for everything else */
 #else
 #define ME_SSMIF_FORMAT_VERSION 7
 #define ME_MAX_NSTD 260
@@ -809,7 +809,7 @@ void LWA_saybeamtype( int mode, char *ssc ) {
   } /* LWA_saybeamtype() */
 
 int LWA_dpoavail( 
-  signed short int dpo,            /* DP/ADP output: numbered 1 through 5 (5 is TBW/TBN) for DP; 1 for ADP */
+  signed short int dpo,            /* DP/ADP output: numbered 1 through 5 (5 is TBW/TBN) for DP; 1 or 2 for ADP */
   struct timeval t0,  /* start time */
   long int d,         /* duration (ms) */
   char *path,         /* path to mess.dat, no trailing slash */
@@ -1504,6 +1504,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// Aug 25, 2016: Updated the ADP-based stations to support two data recorders
 // Sep 11, 2015: Updated various structures and limits for ADP-based stations
 // Jul 14, 2015: Added new SID and CMDs for the Advanced Digital Processor (ADP)
 // Mar 10, 2014: Added BDM command; added OBS_BDM keyword to osf_ struct

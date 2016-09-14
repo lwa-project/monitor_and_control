@@ -474,11 +474,11 @@ int main ( int narg, char *argv[] ) {
       err = mesi(NULL,"DR1","RPT","OP-TYPE",    "today","+11",  &reference);
       //err = mesi(NULL,"DR1","RPT","SYN",        "today","+12",  &reference);
 
-#ifndef USE_ADP
       err = mesi(NULL,"DR2","RPT","SUMMARY",    "today","+20",  &reference);
       err = mesi(NULL,"DR2","RPT","OP-TYPE",    "today","+21",  &reference);
       //err = mesi(NULL,"DR2","RPT","SYN",        "today","+22",  &reference);
 
+#ifndef USE_ADP
       err = mesi(NULL,"DR3","RPT","SUMMARY",    "today","+30",  &reference);
       err = mesi(NULL,"DR3","RPT","OP-TYPE",    "today","+31",  &reference);
       //err = mesi(NULL,"DR3","RPT","SYN",        "today","+32",  &reference);
@@ -574,6 +574,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_exec.c: J. Dowell, UNM, 2016 Aug 25
+//  .1 Added support for a second data recorder for ADP-based stations
 // me_exec.c: J. Dowell, UNM, 2015 Aug 28
 //  .1: Added a call to save the meelog.txt file on shutdown, added support for ADP
 // me_exec.c: S.W. Ellingson, Virginia Tech, 2014 Feb 10
