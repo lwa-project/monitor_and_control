@@ -213,7 +213,7 @@ main ( int narg, char *argv[] ) {
 //=== HISTORY ======================================================================
 //==================================================================================
 // ms_mdre.c: J. Dowell, UNM, 2015 Aug 10
-//   .1: Added support for signed int and unsigneg long int representations
+//   .1: Added support for signed int and unsigned long int representations
 // ms_mdre.c: S.W. Ellingson, Virginia Tech, 2009 Aug 16
 //   .1: Dealing with unprintable fields -- integers now get printed
 // ms_mdre.c: S.W. Ellingson, Virginia Tech, 2009 Aug 15

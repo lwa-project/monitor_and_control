@@ -63,6 +63,14 @@ main ( int narg, char *argv[] ) {
     unsigned char b[4];
     } i4u;
   union {
+    signed int i;
+    unsigned char b[4];
+    } i4s;
+  union {
+    unsigned long int i;
+    unsigned char b[8];
+    } i8u;
+  union {
     float f;
     unsigned char b[4];
     } f4;
@@ -149,13 +157,43 @@ main ( int narg, char *argv[] ) {
       i4u.b[3]=record.val[3];
       sprintf(record.val,"%u\0",i4u.i); /* overwrite in human-readable representation */  
       }
-    if (!strncmp(record.type_dbm,"f4",2)) {  /* if the format is "f4" */
-      f4.b[0]=record.val[0];           /* unpack the bytes into a union structure */
-      f4.b[1]=record.val[1];
-      f4.b[2]=record.val[2];
-      f4.b[3]=record.val[3];
-      sprintf(record.val,"%f\0",f4.f); /* overwrite in human-readable representation */    
+    if (!strncmp(record.type_dbm,"i4s",3)) {  /* if the format is "i4s" */   
+      //printf("[%s/%d] Not expecting to see i4s as a type_dbm.  Treating as raw.\n",ME,getpid());
+      //strcpy(record.val,"@@@@\0");              /* just print "@@@@" instead */
+      i4s.b[0]=record.val[0];           /* unpack the bytes into a union structure */
+      i4s.b[1]=record.val[1];
+      i4s.b[2]=record.val[2];
+      i4s.b[3]=record.val[3];
+      sprintf(record.val,"%i\0",i4s.i); /* overwrite in human-readable representation */  
       }
+    if (!strncmp(record.type_dbm,"i8u",3)) {  /* if the format is "i8u" */   
+      //printf("[%s/%d] Not expecting to see i8u as a type_dbm.  Treating as raw.\n",ME,getpid());
+      //strcpy(record.val,"@@@@@@@@\0");              /* just print "@@@@@@@@" instead */
+      i8u.b[0]=record.val[0];           /* unpack the bytes into a union structure */
+      i8u.b[1]=record.val[1];
+      i8u.b[2]=record.val[2];
+      i8u.b[3]=record.val[3];
+      i8u.b[4]=record.val[4];
+      i8u.b[5]=record.val[5];
+      i8u.b[6]=record.val[6];
+      i8u.b[7]=record.val[7];
+      sprintf(record.val,"%lu\0",i8u.i); /* overwrite in human-readable representation */  
+      }
+    if (!strncmp(record.type_dbm,"f4",2)) {  /* if the format is "f4" */
+        if (!strncmp(record.type_dbm,"f4r",3)) {  /* if the format is "f4r" (same as f4, but big-endian) */
+          f4.b[3]=record.val[0];           /* unpack the bytes into a union structure */
+          f4.b[2]=record.val[1];
+          f4.b[1]=record.val[2];
+          f4.b[0]=record.val[3];
+          sprintf(record.val,"%f\0",f4.f); /* overwrite in human-readable representation */    
+          } else {
+          f4.b[0]=record.val[0];           /* unpack the bytes into a union structure */
+          f4.b[1]=record.val[1];
+          f4.b[2]=record.val[2];
+          f4.b[3]=record.val[3];
+          sprintf(record.val,"%f\0",f4.f); /* overwrite in human-readable representation */    
+          }
+        }
 
     //printf("%d|%s|%s|%s|%s|",
     //  record.eType,
@@ -193,6 +231,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mdr.c: J. Dowell, UNM, 2015 Dec 9
+//   .1: Added support for signed int and unsigned long int representations
 // ms_mdr.c: S.W. Ellingson, Virginia Tech, 2009 Aug 16
 //   .1: Dealing with unprintable fields -- now integers get printed
 // ms_mdr.c: S.W. Ellingson, Virginia Tech, 2009 Aug 15
