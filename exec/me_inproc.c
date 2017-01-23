@@ -202,7 +202,7 @@ int me_beamspec( char *cs_filename,
     sprintf(data,"");
     if (action.len>0) fread( data, action.len, 1, fp );
 
-    if ((action.sid==LWA_SID_DP_) && (action.cid==LWA_CMD_BAM)) {
+    if ((action.sid==LWA_SID_DP_ || action.sid==LWA_SID_ADP) && (action.cid==LWA_CMD_BAM)) {
 
       if (data[2]!=99) { /* ASCII 99 ("c") denotes custom beams -- those are already dealt with */
         m++;
