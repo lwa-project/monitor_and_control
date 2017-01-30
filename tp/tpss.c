@@ -29,7 +29,7 @@
 
 #include "mt.h"
 
-#ifdef ADP
+#ifdef USE_ADP
 #define TPSS_FORMAT_VERSION 6            /* version of MCS0030 used here - ADP */
 #else
 #define TPSS_FORMAT_VERSION 5            /* version of MCS0030 used here - DP */
