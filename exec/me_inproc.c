@@ -1825,6 +1825,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c J. Dowell, UNM 2017 Apr 20
+//   .1 Added a five second lag between a DRX command at the associated TBF command
 // me_inproc.c J. Dowell, UNM 2016 Aug 25
 //   .1 Added support for single tuning "half beams" where tuning 2 is not set
 // me_inproc.c: J. Dowell, UNM, 2015 Aug 31

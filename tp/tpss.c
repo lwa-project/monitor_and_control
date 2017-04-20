@@ -460,7 +460,7 @@ int main ( int narg, char *argv[] ) {
     if (obs[n].OBS_MODE==LWA_OM_TBF) {
       t_tbw = ( obs[n].OBS_TBF_SAMPLES / 196000 ) +1; /* convert samples to ms */
       t_tbw *= TBF_INVERSE_DUTY_CYCLE;                /* account for read-out time after triggering (~100:1) */
-      t_tbf += 5000;                                  /* account for the buffer fill lag */
+      t_tbw += 5000;                                  /* account for the buffer fill lag */
       obs[n].OBS_DUR = t_tbw;
       printf("[%d/%d] Computed obs[%d].OBS_DUR = %ld [ms] for this TBF observation\n",MT_TPSS,getpid(),n,obs[n].OBS_DUR);
       }
@@ -961,8 +961,10 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpcc.c J. Dowell, UNM, 2017 Apr 20
+//   .1 Changed the duration of TBF recordings to reflect what ADP can do
 // tpss.c J. Dowell, UNM, 2016 Aug 25
-//   .1 Addes support for single tuning "half beams" where tuning 2 is not set
+//   .1 Added support for single tuning "half beams" where tuning 2 is not set
 // tpss.c: S.W. Ellingson, Virginia Tech, 2014 Mar 10
 //   .1 Added BDM command; added OBS_BDM keyword
 // tpss.c: S.W. Ellingson, Virginia Tech, 2013 Jan 28
