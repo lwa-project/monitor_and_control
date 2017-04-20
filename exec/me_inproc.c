@@ -1001,12 +1001,12 @@ int main ( int narg, char *argv[] ) {
                 /* Define the tuning mask to use */
                 tuning_mask = (unsigned long int) 1 << (64-(2*(osf.SESSION_DRX_BEAM-1)+1));
 
-                /* Build up the TBW command */
-                LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 );
+                /* Build up the TBF command */
+                LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+5000 );	// TBF needs a bit for the ADP buffers to flush
                 cs[ncs].action.bASAP = 0;                   
                 cs[ncs].action.sid = LWA_SID_ADP;  
                 cs[ncs].action.cid = LWA_CMD_TBF;  
-                sprintf( cs[ncs].data, "16 %ld %u %lu", t0, osf2.OBS_TBF_SAMPLES, tuning_mask );
+                sprintf( cs[ncs].data, "8 %ld %u %lu", t0, osf2.OBS_TBF_SAMPLES, tuning_mask );
                 cs[ncs].action.len = strlen(cs[ncs].data)+1; 
                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                 ncs++;
