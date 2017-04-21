@@ -145,7 +145,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
         sscanf(data,"%ld",&(obs[nobs].OBS_TBF_SAMPLES));
         printf("...converts to %ld\n",obs[nobs].OBS_TBF_SAMPLES);
-        if ( (obs[nobs].OBS_TBF_SAMPLES>12000000) ) {   
+        if ( (obs[nobs].OBS_TBF_SAMPLES>392000000) ) {   
           printf("[%d/%d] FATAL: OBS_TBF_SAMPLES out of range\n",MT_TPSS,getpid());  
           return;
           }
