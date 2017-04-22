@@ -865,12 +865,20 @@ int main ( int narg, char *argv[] ) {
                 fcloseall();
                 return;
                 }
-                
+
+#ifdef USE_ADP                
+              if ((osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) && (osf.OBS_MODE != LWA_OM_TBF)) {
+                  dr_length_ms = ssf.SESSION_DUR; /* beam obs are recorded contiguously in one session */
+                } else {
+                  dr_length_ms = osf.OBS_DUR; /* each TBN/TBF observation is a separate recording */ 
+                }
+#else
               if (osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) {
                   dr_length_ms = ssf.SESSION_DUR; /* beam obs are recorded contiguously in one session */
                 } else {
-                  dr_length_ms = osf.OBS_DUR; /* each TBN/TBW/TBF observation is a separate recording */ 
+                  dr_length_ms = osf.OBS_DUR; /* each TBN/TBW observation is a separate recording */ 
                 }
+#endif
               sprintf(dr_format,""); 
               switch (osf.OBS_MODE) {
                 case LWA_OM_TRK_RADEC: 
