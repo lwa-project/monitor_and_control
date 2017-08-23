@@ -130,6 +130,7 @@ int main ( int narg, char *argv[] ) {
   for ( i=0; i<ME_MAX_SESSION_QUEUE_LENGTH; i++ ) {
     me_initialize_session_queue_entry( &sq, i );
     }
+  me_session_queue_write(sq);
   me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "Session queue initialized", sq_ptr, 0 );  
 
 
@@ -574,6 +575,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_exec.c: J. Dowell, UNM, 2017 Aug 23
+//  .1 Added support for flushing the mesq.dat file on restart
 // me_exec.c: J. Dowell, UNM, 2016 Aug 25
 //  .1 Added support for a second data recorder for ADP-based stations
 // me_exec.c: J. Dowell, UNM, 2015 Aug 28
