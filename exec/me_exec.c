@@ -130,7 +130,7 @@ int main ( int narg, char *argv[] ) {
   for ( i=0; i<ME_MAX_SESSION_QUEUE_LENGTH; i++ ) {
     me_initialize_session_queue_entry( &sq, i );
     }
-  me_session_queue_write(sq);
+  me_session_queue_write(&sq);
   me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "Session queue initialized", sq_ptr, 0 );  
 
 
