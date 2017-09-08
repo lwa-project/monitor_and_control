@@ -329,12 +329,12 @@
       printf("...converts to %d\n",obs[nobs].OBS_BW);
 #ifdef USE_ADP
       if ( obs[nobs].OBS_MODE == LWA_OM_TBN ) {
-         if ( ( obs[nobs].OBS_BW<1 ) || ( obs[nobs].OBS_BW>7 ) ) { 		## TODO: Update this when possible
+         if ( ( obs[nobs].OBS_BW<1 ) || ( obs[nobs].OBS_BW>7 ) ) { 		// TODO: Update this when possible
             printf("[%d/%d] FATAL: Invalid OBS_BW\n",MT_TPSS,getpid());
             return;
             }
        } else {
-          if ( ( obs[nobs].OBS_BW<1 ) || ( obs[nobs].OBS_BW>6 ) ) { 		## TODO: Update this when possible
+          if ( ( obs[nobs].OBS_BW<1 ) || ( obs[nobs].OBS_BW>6 ) ) { 		// TODO: Update this when possible
             printf("[%d/%d] FATAL: Invalid OBS_BW\n",MT_TPSS,getpid());
             return;
             }
