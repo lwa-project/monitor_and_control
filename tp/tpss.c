@@ -429,7 +429,7 @@ int main ( int narg, char *argv[] ) {
          (obs[n].OBS_MODE==LWA_OM_STEPPED  )   ) b_DRX_requested = 1;
     }
   if ( b_TB_requested && b_DRX_requested ) {
-    printf("[%d/%d] FATAL: Sessions cannot mix TBN with other observing modes\n",MT_TPSS,getpid(),n);
+    printf("[%d/%d] FATAL: Sessions cannot mix TBN with other observing modes\n",MT_TPSS,getpid());
     return;
     }
     
