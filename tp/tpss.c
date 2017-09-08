@@ -961,7 +961,9 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
-// tpcc.c J. Dowell, UNM, 2017 Apr 20
+// tpss.c J. Dowell, UNM, 2017 Sep 8
+//   .1 Changed the tuning and bandwidth limits to match what ADP can currently do
+// tpss.c J. Dowell, UNM, 2017 Apr 20
 //   .1 Changed the duration of TBF recordings to reflect what ADP can do
 // tpss.c J. Dowell, UNM, 2016 Aug 25
 //   .1 Added support for single tuning "half beams" where tuning 2 is not set

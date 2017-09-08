@@ -120,10 +120,17 @@
         printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
         sscanf(data,"%ld",&(obs[nobs].OBS_STP_FREQ1[k]));
         printf("...converts to %ld\n",obs[nobs].OBS_STP_FREQ1[k]);
+#ifdef USE_ADP
+        if ( ( obs[nobs].OBS_STP_FREQ1[k]<123809006 ) || ( obs[nobs].OBS_STP_FREQ1[k]>2037918156 ) ) {   
+          printf("[%d/%d] FATAL: OBS_STP_FREQ1[%d] out of range\n",MT_TPSS,getpid(),k);  
+          return;
+          }
+#else
         if ( ( obs[nobs].OBS_STP_FREQ1[k]<219130984 ) || ( obs[nobs].OBS_STP_FREQ1[k]>1928352663 ) ) {   
           printf("[%d/%d] FATAL: OBS_STP_FREQ1[%d] out of range\n",MT_TPSS,getpid(),k);  
           return;
           }
+#endif
         strcpy(data,"");   
         break;
       case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
@@ -151,12 +158,21 @@
         printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
         sscanf(data,"%ld",&(obs[nobs].OBS_STP_FREQ2[k]));
         printf("...converts to %ld\n",obs[nobs].OBS_STP_FREQ2[k]);
+#ifdef USE_ADP
+        if ( obs[nobs].OBS_STP_FREQ2[k] == 0 ) {
+          printf("[%d/%d] WARNING: OBS_STP_FREQ2[%d] is zero, this will be a half beam step",MT_TPSS,getpid(),k);
+	   } else if ( ( obs[nobs].OBS_STP_FREQ2[k]<123809006 ) || ( obs[nobs].OBS_STP_FREQ2[k]>2037918156 ) ) {   
+          printf("[%d/%d] FATAL: OBS_STP_FREQ2[%d] out of range\n",MT_TPSS,getpid(),k);  
+          return;
+          }
+#else
         if ( obs[nobs].OBS_STP_FREQ2[k] == 0 ) {
           printf("[%d/%d] WARNING: OBS_STP_FREQ2[%d] is zero, this will be a half beam step",MT_TPSS,getpid(),k);
 	   } else if ( ( obs[nobs].OBS_STP_FREQ2[k]<219130984 ) || ( obs[nobs].OBS_STP_FREQ2[k]>1928352663 ) ) {   
           printf("[%d/%d] FATAL: OBS_STP_FREQ2[%d] out of range\n",MT_TPSS,getpid(),k);  
           return;
           }
+#endif
         strcpy(data,"");   
         break;
       case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
