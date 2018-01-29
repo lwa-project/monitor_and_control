@@ -14,7 +14,7 @@
 
 //#include "LWA_MCS.h"
 
-#define MY_NAME "ms_makeMIB_ADP (v.20150817.1)"
+#define MY_NAME "ms_makeMIB_ADP (v.20180129.1)"
 #define ME "11" 
 
 main ( int narg, char *argv[] ) {
@@ -139,7 +139,7 @@ main ( int narg, char *argv[] ) {
 
   fprintf(fp,"B 8 		BOARD_STAT		NUL	NUL	NUL\n");
   for ( i=0; i<16; i++ ) {
-    fprintf(fp,"B 8.%d\t\tBOARD%d		NUL	NUL	NUL\n",i+1);
+    fprintf(fp,"B 8.%d\t\tBOARD%d		NUL	NUL	NUL\n",i+1,i+1);
     fprintf(fp,"V 8.%d.1\t\tBOARD%d_STAT 		0 	i8ur 	i8ur\n",i+1,i+1); 
     fprintf(fp,"V 8.%d.2\t\tBOARD%d_TEMP_MIN 		0 	f4r 	f4r\n",i+1,i+1); 
     fprintf(fp,"V 8.%d.3\t\tBOARD%d_TEMP_MAX 		0 	f4r 	f4r\n",i+1,i+1); 
@@ -165,7 +165,7 @@ main ( int narg, char *argv[] ) {
   
   fprintf(fp,"B 12 		SERVER_STAT		NUL	NUL	NUL\n");
   for ( i=0; i<7; i++ ) {
-    fprintf(fp,"B 12.%d\t\tSERVER%d		NUL	NUL	NUL\n",i+1);
+    fprintf(fp,"B 12.%d\t\tSERVER%d		NUL	NUL	NUL\n",i+1,i+1);
     fprintf(fp,"V 12.%d.1\t\tSERVER%d_STAT 		0 	i8ur 	i8ur\n",i+1,i+1); 
     fprintf(fp,"V 12.%d.2\t\tSERVER%d_TEMP_MIN 		0 	f4r 	f4r\n",i+1,i+1); 
     fprintf(fp,"V 12.%d.3\t\tSERVER%d_TEMP_MAX 		0 	f4r 	f4r\n",i+1,i+1); 
@@ -185,6 +185,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_makeMIB_ADP.c: J. Dowell, UNM, 2018 Jan 29
+//   .1: Fixed a bug in the BOARD_STAT and SERVER_STAT sections
 // ms_makeMIB_ADP.c: J. Dowell, UNM, 2015 Aug 17
 //   .1: Initial version
 
