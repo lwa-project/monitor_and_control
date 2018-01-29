@@ -630,12 +630,14 @@ int me_action(
                 eErr = ME_ACTION_ERR_MESI_FAILED;  
 
                 /* 121204 Kludge to prevent MCS/Exec shutdown when MCS/Sch says "Insufficient advance notice" */
-                if (err==8) {
-                  err=MESI_ERR_OK;
+                /* 180129 Tweak to the kludge to also reset the eErr variable */
+                if (err==MESI_ERR_REJECTED) {
+                  err = MESI_ERR_OK;
                   sprintf(longmsg,"121204 kludge: downgrading above from FATAL to WARNING");
                   bDone = 0;
                   me_log( fpl, ME_LOG_SCOPE_SESSION, ME_LOG_TYPE_SCH_CMD, longmsg, sq, i );
                   printf("[%d/%d] %s\n",ME_ME_C,getpid(), longmsg );
+                  eErr = ME_ACTION_ERR_OK;
                   }
 
               } else {

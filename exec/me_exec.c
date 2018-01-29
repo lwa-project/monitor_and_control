@@ -575,6 +575,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_exec.c  J. Dowell, UNM, 2018 Jan 28
+//  .1 Revisited the 121204 me_exec_1.c kludge to try and keep MCS/exec running by adjusting eErr
 // me_exec.c: J. Dowell, UNM, 2017 Aug 23
 //  .1 Added support for flushing the mesq.dat file on restart
 // me_exec.c: J. Dowell, UNM, 2016 Aug 25
