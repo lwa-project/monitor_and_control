@@ -29,7 +29,7 @@
 //#include "LWA_MCS.h" 
 #include "mcs.h"
 
-#define MY_NAME "ms_mdre_ip (v.20150810.1)"
+#define MY_NAME "ms_mdre_ip (v.20180129.1)"
 #define ME "16" 
 
 main ( int narg, char *argv[] ) {
@@ -129,7 +129,7 @@ main ( int narg, char *argv[] ) {
 
   /* create a connection queue */
   i = listen(server_sockfd,
-             5 );           /* backlog */
+             32 );           /* backlog */
   if (i == -1) {
     printf("[%s] FATAL: listen() failed\n",ME);
     perror("ms_exec");
@@ -324,6 +324,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mdre_ip.c: J. Dowell, UNM, 2018 Jan 29
+//   .1: Increased the queue size for listen()
 // ms_mdre_ip.c: J. Dowell, UNM, 2015 Aug 10
 //   .1: Added support for signed int and unsigneg long int representations
 // ms_mdre_ip.c: S.W. Ellingson, Virginia Tech, 2010 Oct 16

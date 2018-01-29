@@ -34,7 +34,7 @@
 #include <arpa/inet.h>  /* for network sockets */
 #include <fcntl.h>      /* for F_GETFL, other possibly other stuff */
 
-#define MY_NAME "ms_exec (v.20110208.1)"
+#define MY_NAME "ms_exec (v.20180129.1)"
 #define ME "2" 
 
 //#include "LWA_MCS.h"
@@ -224,7 +224,7 @@ main ( int narg, char *argv[] ) {
 
   /* create a connection queue */
   i = listen(server_sockfd,
-             5 );           /* backlog */
+             32 );           /* backlog */
   if (i == -1) {
     printf("[%s] FATAL: listen() failed\n",ME);
     perror("ms_exec");
@@ -736,6 +736,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_exec.c: J. Dowell, UNM, 2018 Jan 29
+//   .1: Increased the queue size for listen()
 // ms_exec.c: S.W. Ellingson, Virginia Tech, 2011 Apr 12
 //   .1: Changed LWA_mse_log to include a line counting argument
 // ms_exec.c: S.W. Ellingson, Virginia Tech, 2011 Feb 08

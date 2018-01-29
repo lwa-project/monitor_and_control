@@ -233,7 +233,7 @@ int main ( int narg, char *argv[] ) {
 
   /* create a connection queue */
   i = listen(server_sockfd,
-             5 );           /* backlog */
+             32 );           /* backlog */
   if (i == -1) {
     printf("[%d/%d] FATAL: me_exec: listen() failed\n",ME_ME_C,getpid());
     perror("me_exec");
@@ -575,8 +575,9 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
-// me_exec.c  J. Dowell, UNM, 2018 Jan 28
+// me_exec.c  J. Dowell, UNM, 2018 Jan 29
 //  .1 Revisited the 121204 me_exec_1.c kludge to try and keep MCS/exec running by adjusting eErr
+//  .2 Increased the queue size for listen()
 // me_exec.c: J. Dowell, UNM, 2017 Aug 23
 //  .1 Added support for flushing the mesq.dat file on restart
 // me_exec.c: J. Dowell, UNM, 2016 Aug 25
