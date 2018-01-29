@@ -1506,7 +1506,7 @@
   /* reading ROACH_ID[] */
   for ( iDP1=0; iDP1<s.nRoach; iDP1++ ) {
 
-    sprintf(keyword,"ROACH_ID[%d]",iDP1+1,k+1); sprintf(s.sRoachID[iDP1],"UNK");
+    sprintf(keyword,"ROACH_ID[%d]",iDP1+1); sprintf(s.sRoachID[iDP1],"UNK");
     while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
     switch (i) {
       case MERS_PL_KEYWORD_MATCH: 
@@ -1529,7 +1529,7 @@
   /* reading ROACH_SLOT[] */
   for ( iDP1=0; iDP1<s.nRoach; iDP1++ ) {
 
-    sprintf(keyword,"ROACH_SLOT[%d]",iDP1+1,k+1); sprintf(s.sRoachSlot[iDP1],"UNK");
+    sprintf(keyword,"ROACH_SLOT[%d]",iDP1+1); sprintf(s.sRoachSlot[iDP1],"UNK");
     while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
     switch (i) {
       case MERS_PL_KEYWORD_MATCH: 
@@ -1713,7 +1713,7 @@
   /* reading SERVER_SLOT[] */
   for ( iDP2=0; iDP2<s.nServer; iDP2++ ) {
 
-    sprintf(keyword,"SERVER_SLOT[%d]",iDP2+1,k+1); sprintf(s.sServerSlot[iDP2],"UNK");
+    sprintf(keyword,"SERVER_SLOT[%d]",iDP2+1); sprintf(s.sServerSlot[iDP2],"UNK");
     while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
     switch (i) {
       case MERS_PL_KEYWORD_MATCH: 
