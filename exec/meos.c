@@ -250,7 +250,7 @@ int meos (
 #ifdef USE_ADP
   /* if TBF, now tell ADP to start. */
   if (!strncmp(mode,"TBF",3)) {
-    sprintf(data,"16 0 %d %lu",nsamp,tuning_mask);
+    sprintf(data,"16 0 %ld %lu",nsamp,tuning_mask);
     err = mesi( NULL, "ADP", "TBF", data, "today", "asap", &reference );
     if (err!=MESI_ERR_OK) {
       printf("[%d/%d] FATAL: mesi(NULL,'ADP','TBF',...) returned code %d\n",ME_MEOS,getpid(),err);  

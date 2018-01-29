@@ -114,6 +114,8 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
   struct timeval tv;          /* from sys/time.h; included via me.h */
   struct timezone tz;
 
+  unsigned char i1u1;
+  signed char i1s1;
   unsigned short int i2u1, i2u2, i2u3;
   signed short int i2s1, i2s2;
   unsigned int i4u1, i4u2;
@@ -357,15 +359,15 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          i4s1 = 0;
          i8u1 = 0;
          i2s1 = 0;
-         i2s2 = 0;
-         sscanf(data,"%i %lu %hu %hhu",&i4s1,&i8u1,&i2s1,&i2s2);
+         i1u1 = 0;
+         sscanf(data,"%i %lu %hi %hhu",&i4s1,&i8u1,&i2s1,&i1u1);
          //printf("[%d/%d] COR args COR_NAVG=%i, DRX_TUNING_MASK=%lu, COR_GAIN=%hu, sub_slot=%hhu\n",ME_MESI,getpid(),i4s1,i8u1,i2s1,i2s2);
          
          i4s.i = i4s1; c.data[ 0]=i4s.b[3]; c.data[ 1]=i4s.b[2]; c.data[ 2]=i4s.b[1]; c.data[ 3]=i4s.b[0];
          i8u.i = i8u1; c.data[ 4]=i8u.b[7]; c.data[ 5]=i8u.b[6]; c.data[ 6]=i8u.b[5]; c.data[ 7]=i8u.b[4];
                        c.data[ 8]=i8u.b[3]; c.data[ 9]=i8u.b[2]; c.data[10]=i8u.b[1]; c.data[11]=i8u.b[0];
          i2s.i = i2s1; c.data[12]=i2s.b[1]; c.data[13]=i2s.b[0];
-         i2s.i = i2s2; c.data[14]=i2s.b[0];
+                       c.data[14]=i1u1;
          
          c.datalen=15;
          
