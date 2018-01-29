@@ -579,6 +579,8 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// msei.c: J. Dowell, UNM, 2018 Jan 29
+//   .1: Cleaned up a few compiler warnings for ADP-based systems
 // msei.c: J. Dowell, UNM, 2015 Sep 15
 //   .1: Added STP as a valid command for DP/ADP
 // msei.c: J. Dowell, UNM, 2015 Sep 14

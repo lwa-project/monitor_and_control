@@ -379,6 +379,8 @@ int meos (
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// meos.c: J. Dowell, UNM, 2018 Jan 29
+//   .1: Cleaned up a few compiler warnings for ADP-based systems
 // meos.c: J. Dowell, UNM, 2015 Sep 11
 //   .1: Modified for the new ADP TBF command
 // meos.c: S.W. Ellingson, Virginia Tech, 2011 Mar 25
