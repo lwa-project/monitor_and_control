@@ -45,12 +45,12 @@ void me_action_cmd_msg( char *msg,
 void me_initialize_session_queue_entry( struct me_session_queue_struct *sq, int i) {
   sq->eState[i] = MESQ_STATE_NOT_USED;
   sq->iCurrentObs[i] = 0;
-  sprintf(sq->sFilename[i],"");
+  strcpy(sq->sFilename[i],"");
   sq->fpc[i] = NULL;
   sq->ncr[i] = 0;
   sq->oc[i] = ME_OC_OK;
-  sprintf(sq->ocs[i],"");
-  sprintf(sq->ssf[i].PROJECT_ID,"");
+  strcpy(sq->ocs[i],"");
+  strcpy(sq->ssf[i].PROJECT_ID,"");
   sq->ssf[i].SESSION_ID = 0;
   sq->ssf[i].SESSION_NOBS = 0;
   /* not bothering to initialize the remaining sq->ssf[] members since only the above are */
@@ -434,7 +434,7 @@ int me_action(
        
         /* read a command from the session command script file */
         fread( &action, sizeof(struct me_action_struct), 1, sq->fpc[i] );
-        sprintf(data,"");
+        strcpy(data,"");
         if (action.len>0) fread( data, action.len, 1, sq->fpc[i] );
                  //printf("\n ftell()=%ld\n",ftell(sq->fpc[i]));
         //printf("\n *** action.bASAP=%d, action.sid=%d, action.cid=%d, action.len=%d, data=<%s> \n\n",action.bASAP, action.sid, action.cid, action.len, data );
@@ -909,12 +909,12 @@ int me_init_sdm( struct ssmif_struct s,
 
   gettimeofday(&tv,NULL);
 
-  sdm->station.summary = LWA_SIDSUM_BOOTING; sprintf(sdm->station.info,""); sdm->station.tv = tv; /* station */
-  sdm->shl.summary     = LWA_SIDSUM_UNK;     sprintf(sdm->shl.info,    ""); sdm->shl.tv     = tv; /* SHL */
-  sdm->asp.summary     = LWA_SIDSUM_UNK;     sprintf(sdm->asp.info,    ""); sdm->asp.tv     = tv; /* ASP */
-  sdm->dp.summary      = LWA_SIDSUM_UNK;     sprintf(sdm->dp.info,     ""); sdm->dp.tv      = tv; /* DP */
+  sdm->station.summary = LWA_SIDSUM_BOOTING; strcpy(sdm->station.info,""); sdm->station.tv = tv; /* station */
+  sdm->shl.summary     = LWA_SIDSUM_UNK;     strcpy(sdm->shl.info,    ""); sdm->shl.tv     = tv; /* SHL */
+  sdm->asp.summary     = LWA_SIDSUM_UNK;     strcpy(sdm->asp.info,    ""); sdm->asp.tv     = tv; /* ASP */
+  sdm->dp.summary      = LWA_SIDSUM_UNK;     strcpy(sdm->dp.info,     ""); sdm->dp.tv      = tv; /* DP */
   for (i=0;i<ME_MAX_NDR;i++) {
-    sdm->dr[i].summary = LWA_SIDSUM_UNK; sprintf(sdm->dr[i].info,  ""); sdm->dr[i].tv   = tv; /* DR# */
+    sdm->dr[i].summary = LWA_SIDSUM_UNK; strcpy(sdm->dr[i].info,""); sdm->dr[i].tv   = tv; /* DR# */
     }
 
   for (i=0;i<ME_MAX_NFEE;i++) { sdm->ssss.eFEEStat[i] = s.iFEEStat[i]; } /* FEE_STAT[] */

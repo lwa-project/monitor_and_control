@@ -14,7 +14,7 @@
 
 #include "me.h"
 
-#define MY_NAME "me_init (v.20150828.1)"
+#define MY_NAME "me_init (v.20180129.1)"
 
 main ( int narg, char *argv[] ) {
 
@@ -214,12 +214,12 @@ main ( int narg, char *argv[] ) {
   gettimeofday(&tv,NULL);
 
   /* SUMMARY variables */
-  sdm.station.summary = LWA_SIDSUM_BOOTING; sprintf(sdm.station.info,""); sdm.station.tv = tv; /* station */
-  sdm.shl.summary     = LWA_SIDSUM_UNK;     sprintf(sdm.shl.info,    ""); sdm.shl.tv     = tv; /* SHL */
-  sdm.asp.summary     = LWA_SIDSUM_UNK;     sprintf(sdm.asp.info,    ""); sdm.asp.tv     = tv; /* ASP */
-  sdm.dp.summary      = LWA_SIDSUM_UNK;     sprintf(sdm.dp.info,     ""); sdm.dp.tv      = tv; /* DP */
+  sdm.station.summary = LWA_SIDSUM_BOOTING; strcpy(sdm.station.info,""); sdm.station.tv = tv; /* station */
+  sdm.shl.summary     = LWA_SIDSUM_UNK;     strcpy(sdm.shl.info,    ""); sdm.shl.tv     = tv; /* SHL */
+  sdm.asp.summary     = LWA_SIDSUM_UNK;     strcpy(sdm.asp.info,    ""); sdm.asp.tv     = tv; /* ASP */
+  sdm.dp.summary      = LWA_SIDSUM_UNK;     strcpy(sdm.dp.info,     ""); sdm.dp.tv      = tv; /* DP */
   for (i=0;i<ME_MAX_NDR;i++) {
-    sdm.dr[i].summary = LWA_SIDSUM_UNK; sprintf(sdm.dr[i].info,  ""); sdm.dr[i].tv   = tv; /* DR# */
+    sdm.dr[i].summary = LWA_SIDSUM_UNK; strcpy(sdm.dr[i].info,""); sdm.dr[i].tv   = tv; /* DR# */
     }
 
   /* setting all STAT variables to "not installed" */
@@ -337,6 +337,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_init.c: J. Dowell, UNM, 2018 Jan 29
+//   .1 Cleaned up a few compiler warnings
 // me_init.c: J. Dowell, UNM, 2015 Aug 28
 //   .1 Updated for ADP.
 // me_init.c: S.W. Ellingson, Virginia Tech, 2012 Jul 05

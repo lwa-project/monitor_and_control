@@ -298,7 +298,7 @@ int main ( int narg, char *argv[] ) {
   /*****************************************************************************/
   gettimeofday(&tv,NULL);
   sdm.station.summary = LWA_SIDSUM_WARNING; /* as a reminder we're running blind */ 
-  sprintf(sdm.station.info,""); 
+  strcpy(sdm.station.info,""); 
   sdm.station.tv = tv; 
   me_sdm_write( &sdm );
   me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_sdm_write() completed", sq_ptr, 0 );
@@ -527,7 +527,7 @@ int main ( int narg, char *argv[] ) {
   /* update sdm */
   gettimeofday(&tv,NULL);
   sdm.station.summary = LWA_SIDSUM_SHUTDWN; 
-  sprintf(sdm.station.info,""); 
+  strcpy(sdm.station.info,""); 
   sdm.station.tv = tv; 
   me_sdm_write( &sdm );
   me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_sdm_write() completed", sq_ptr, 0 );

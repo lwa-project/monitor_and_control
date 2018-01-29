@@ -73,7 +73,7 @@ void me_sc_init( struct sc_struct *sc ) {
       sc->Stand[i].Ant[k].RPD.iStat = 0;
       sc->Stand[i].Ant[k].SEP.i = -1;
       sc->Stand[i].Ant[k].SEP.iStat = 0;
-      sprintf(sc->Stand[i].Ant[k].SEP.sID,"");
+      strcpy(sc->Stand[i].Ant[k].SEP.sID,"");
       sc->Stand[i].Ant[k].ARX.i = -1;
       sc->Stand[i].Ant[k].ARX.c = -1;
       sc->Stand[i].Ant[k].ARX.iStat = 0;

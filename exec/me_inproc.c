@@ -199,7 +199,7 @@ int me_beamspec( char *cs_filename,
   while( fread( &action, sizeof(struct me_action_struct), 1, fp ) > 0 ) {
  
     /* read the rest of the action */
-    sprintf(data,"");
+    strcpy(data,"");
     if (action.len>0) fread( data, action.len, 1, fp );
 
     if ((action.sid==LWA_SID_DP_ || action.sid==LWA_SID_ADP) && (action.cid==LWA_CMD_BAM)) {
@@ -618,7 +618,7 @@ int main ( int narg, char *argv[] ) {
           cs[ncs].action.sid = LWA_SID_MCS;           /* first command is always directed to MCS */
           cs[ncs].action.cid = LWA_CMD_ESF;           /* end session as failure */
           cs[ncs].action.len = 0;                     /* no additional bytes */
-          sprintf(cs[ncs].data,"");
+          strcpy(cs[ncs].data,"");
           me_inproc_cmd_log( fpl, &(cs[ncs]), 0 ); /* write log msg explaining command */
           ncs++;
 
@@ -777,7 +777,7 @@ int main ( int narg, char *argv[] ) {
               break;
             }
           cs[ncs].action.len = 0;                     /* no additional bytes */
-          sprintf(cs[ncs].data,""); 
+          strcpy(cs[ncs].data,""); 
           if ( (i==1) || (eD!=0) ) {
             me_inproc_cmd_log( fpl, &(cs[ncs]), 0 ); /* write log msg explaining command */
             ncs++;
@@ -829,7 +829,7 @@ int main ( int narg, char *argv[] ) {
             cs[ncs].action.sid = LWA_SID_MCS;  
             cs[ncs].action.cid = LWA_CMD_OBS; 
             cs[ncs].action.len = 0;
-            sprintf(cs[ncs].data,""); 
+            strcpy(cs[ncs].data,""); 
             me_inproc_cmd_log( fpl, &(cs[ncs]), 0 ); /* write log msg explaining command */
             ncs++;
 
@@ -887,7 +887,7 @@ int main ( int narg, char *argv[] ) {
                   dr_length_ms = osf.OBS_DUR; /* each TBN/TBW observation is a separate recording */ 
                 }
 #endif
-              sprintf(dr_format,""); 
+              strcpy(dr_format,""); 
               switch (osf.OBS_MODE) {
                 case LWA_OM_TRK_RADEC: 
                 case LWA_OM_TRK_SOL:   
@@ -1718,7 +1718,7 @@ int main ( int narg, char *argv[] ) {
             cs[ncs].action.sid = LWA_SID_MCS;  
             cs[ncs].action.cid = LWA_CMD_OBE; 
             cs[ncs].action.len = 0;
-            sprintf(cs[ncs].data,""); 
+            strcpy(cs[ncs].data,""); 
             me_inproc_cmd_log( fpl, &(cs[ncs]), 0 ); /* write log msg explaining command */
             ncs++;
             }
@@ -1826,7 +1826,7 @@ int main ( int narg, char *argv[] ) {
           cs[ncs].action.sid = LWA_SID_MCS;           /* first command is always directed to MCS */
           cs[ncs].action.cid = LWA_CMD_ESN;           /* end session normally */
           cs[ncs].action.len = 0;                     /* no additional bytes */
-          sprintf(cs[ncs].data,"");
+          strcpy(cs[ncs].data,"");
           me_inproc_cmd_log( fpl, &(cs[ncs]), 0 ); /* write log msg explaining command */
           ncs++;
           
@@ -1918,6 +1918,7 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 // me_inproc.c: J. Dowell, UNM, 2018 Jan 29
 //   .1 Added state for DRX commands so that unnecesary commands are not sent
+//   .2 Cleaned up a few compiler warnings
 // me_inproc.c: J. Dowell, UNM 2017 Apr 20
 //   .1 Added a five second lag between a DRX command at the associated TBF command
 // me_inproc.c: J. Dowell, UNM 2016 Aug 25
