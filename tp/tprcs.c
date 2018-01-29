@@ -54,7 +54,7 @@ int main ( int narg, char *argv[] ) {
   while( fread( &action, sizeof(struct me_action_struct), 1, fp ) > 0 ) {
  
     /* read the rest of the action */
-    sprintf(data,"");
+    strcpy(data,"");
     if (action.len>0) fread( data, action.len, 1, fp );
 
     LWA_timeval( &(action.tv), &mjd, &mpm ); /* convert timeval to (mjd,mpm) */
@@ -85,6 +85,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tprcs.c: J. Dowell, UNM, 2018 Jan 29
+//   .1 Cleaned up a few compiler warnings
 // tprcs.c: S.W. Ellingson, Virginia Tech, 2011 December 16
 //   .1: Initial version, using tpsdm as a starting point
 // tpsdm.c: S.W. Ellingson, Virginia Tech, 2011 April 05

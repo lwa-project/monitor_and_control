@@ -18,7 +18,7 @@
     }
   s.iFormatVersion = ME_SSMIF_FORMAT_VERSION;
 
-  strcpy(keyword,"STATION_ID"); sprintf(s.sStationID,"");
+  strcpy(keyword,"STATION_ID"); strcpy(s.sStationID,"");
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
   switch (i) {
     case MERS_PL_KEYWORD_MATCH:    
@@ -1817,7 +1817,7 @@
   /* reading DP1_ID[] */
   for ( iDP1=0; iDP1<s.nDP1; iDP1++ ) {
 
-    sprintf(keyword,"DP1_ID[%d]",iDP1+1,k+1); sprintf(s.sDP1ID[iDP1],"UNK");
+    sprintf(keyword,"DP1_ID[%d]",iDP1+1); sprintf(s.sDP1ID[iDP1],"UNK");
     while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
     switch (i) {
       case MERS_PL_KEYWORD_MATCH: 
@@ -1840,7 +1840,7 @@
   /* reading DP1_SLOT[] */
   for ( iDP1=0; iDP1<s.nDP1; iDP1++ ) {
 
-    sprintf(keyword,"DP1_SLOT[%d]",iDP1+1,k+1); sprintf(s.sDP1Slot[iDP1],"UNK");
+    sprintf(keyword,"DP1_SLOT[%d]",iDP1+1); sprintf(s.sDP1Slot[iDP1],"UNK");
     while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
     switch (i) {
       case MERS_PL_KEYWORD_MATCH: 
@@ -2024,7 +2024,7 @@
   /* reading DP2_SLOT[] */
   for ( iDP2=0; iDP2<s.nDP2; iDP2++ ) {
 
-    sprintf(keyword,"DP2_SLOT[%d]",iDP2+1,k+1); sprintf(s.sDP2Slot[iDP2],"UNK");
+    sprintf(keyword,"DP2_SLOT[%d]",iDP2+1); sprintf(s.sDP2Slot[iDP2],"UNK");
     while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
     switch (i) {
       case MERS_PL_KEYWORD_MATCH: 

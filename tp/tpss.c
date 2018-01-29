@@ -98,7 +98,7 @@ int tpss_parse_line(
       strcpy(line,data);
     }
 
-  sprintf(data,"\0"); /* initialize "data" */
+  strcpy(data,""); /* initialize "data" */
 
   if (strlen(line)>MAX_SDF_LINE_LENGTH) {
     //printf("tpss_parse_line = %d\n",TPSS_PL_OVERLONG_LINE);
@@ -447,7 +447,7 @@ int main ( int narg, char *argv[] ) {
          (obs[n].OBS_MODE==LWA_OM_STEPPED  )   ) b_DRX_requested = 1;
     }
   if ( b_TB_requested && b_DRX_requested ) {
-    printf("[%d/%d] FATAL: Sessions cannot mix TBW/TBN with other observing modes\n",MT_TPSS,getpid(),n);
+    printf("[%d/%d] FATAL: Sessions cannot mix TBW/TBN with other observing modes\n",MT_TPSS,getpid());
     return;
     }
     
@@ -939,7 +939,7 @@ int main ( int narg, char *argv[] ) {
     }
   printf("[%d/%d] Moved SDF, SSF, and OSFs to directory '%s'\n",MT_TPSS,getpid(),mbox);   
 
-  sprintf(data,"");
+  strcpy(data,"");
 
   //sprintf(data,"%s%s",data,sdfname);
   //sprintf(data,"%s\n%s",data,ssfname);
@@ -961,6 +961,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpss.c: J. Dowell, UNM, 2018 Jan 29
+//   .1 Cleaned up a few compiler warnings
 // tpss.c J. Dowell, UNM, 2017 Sep 8
 //   .1 Changed the tuning and bandwidth limits to match what ADP can currently do
 // tpss.c J. Dowell, UNM, 2017 Apr 20

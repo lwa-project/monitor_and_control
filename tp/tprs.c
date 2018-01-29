@@ -69,7 +69,7 @@ int mers_parse_line(
       strcpy(line,data);
     }
 
-  sprintf(data,"\0"); /* initialize "data" */
+  strcpy(data,""); /* initialize "data" */
 
   //if (bVerbose) printf("[%d/%d] mers_parse_line: line='%s'\n",MT_TPRS,getpid(),line);
 
@@ -231,6 +231,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tprs.c: J. Dowell, UNM, 2018 Jan 29
+//   .1 Cleaned up a few compiler warnings
 // tprs.c: S.W. Ellingson, Virginia Tech, 2011 Apr 05
 //   .1: Added additional "settings" keywords
 // tprs.c: S.W. Ellingson, Virginia Tech, 2011 Mar 29

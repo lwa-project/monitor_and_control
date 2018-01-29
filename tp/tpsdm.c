@@ -690,7 +690,7 @@ int main ( int narg, char *argv[] ) {
               sprintf(st2," DR%1d %1d",sc.DPO[i].iDR,s.eDRStat[sc.DPO[i].iDR-1]); 
               //printf("<%1d>",s.eDRStat[sc.DPO[i].iDR]); 
             } else {
-              sprintf(st2,"");
+              strcpy(st2,"");
             }
           printf("%1d %1d |%s |%s\n",
                   i+1, 
@@ -715,7 +715,7 @@ int main ( int narg, char *argv[] ) {
               sprintf(st2," DR%1d %1d",sc.DPO[i].iDR,s.eDRStat[sc.DPO[i].iDR-1]); 
               //printf("<%1d>",s.eDRStat[sc.DPO[i].iDR]); 
             } else {
-              sprintf(st2,"");
+              strcpy(st2,"");
             }
           printf("%1d %1d |%s |%s\n",
                   i+1, 
@@ -776,6 +776,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpsdm.c: J. Dowell, UNM, 2018 Jan 29
+//   .1 Cleaned up a few compiler warnings
 // tpsdm.c: J. Dowell, UNM, 2015 Sep 11
 //   .1: Updated for ADP-based stations
 // tpsdm.c: S.W. Ellingson, Virginia Tech, 2011 April 05

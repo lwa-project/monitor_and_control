@@ -221,7 +221,7 @@ int main ( int narg, char *argv[] ) {
   fprintf(fp,"PROJECT_REMPO  (none)\n");
   fprintf(fp,"\n");
   fprintf(fp,"SESSION_ID     1\n");
-  fprintf(fp,"SESSION_TITLE  tpms-generated SDF\n",sMode);
+  fprintf(fp,"SESSION_TITLE  tpms-generated SDF\n");
   fprintf(fp,"SESSION_REMPI  (none)\n");
   fprintf(fp,"SESSION_REMPO  (none)\n");
 
@@ -299,8 +299,8 @@ int main ( int narg, char *argv[] ) {
       break; 
     case LWA_OM_STEPPED:
       fprintf(fp,"OBS_BW           %d\n",iBW);
-      fprintf(fp,"OBS_STP_N        1\n",fRA);
-      fprintf(fp,"OBS_STP_RADEC    0\n",fRA);
+      fprintf(fp,"OBS_STP_N        1\n");
+      fprintf(fp,"OBS_STP_RADEC    0\n");
       fprintf(fp,"OBS_STP_C1[1]    %6.3f\n",fAz);
       fprintf(fp,"OBS_STP_C2[1]    %6.3f\n",fEl);
       fprintf(fp,"OBS_STP_T[1]     %ld\n",iDur);
@@ -323,6 +323,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpms.c: J. Dowell, UNM, 2018 Jan 29
+//   .1 Cleaned up a few compiler warnings
 // tpms.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07
 //   .1: Adding TRK_SOL and TRK_JOV
 // tpms.c: S.W. Ellingson, Virginia Tech, 2012 September 29
