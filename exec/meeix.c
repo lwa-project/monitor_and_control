@@ -31,7 +31,7 @@ int main ( int narg, char *argv[] ) {
   char args[ME_MAX_COMMAND_LINE_LENGTH];
   int eResult;
 
-  sprintf(args,"\0");
+  strcpy(args,"");
 
   /* processing command line arguments */
 
@@ -64,6 +64,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// meeix.c: J. Dowell, UNM, 2018 Jan 29
+//   .1 Cleaned up a few compiler warnings
 // meeix.c: S.W. Ellingson, Virginia Tech, 2014 Feb 10
 //   .1: adding "STP" command
 // meeix.c: S.W. Ellingson, Virginia Tech, 2011 March 09

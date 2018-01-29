@@ -37,7 +37,7 @@ int meei( char *cmd, char *args ) {
   //gettimeofday( &tv, NULL ); 
   
   /* initialize c.args[] to be an empty string */
-  sprintf(c.args,'\0');
+  strcpy(c.args,"");
 
   c.cmd = ME_CMD_NUL;
   if (strlen(cmd)<3) {
@@ -90,6 +90,8 @@ int meei( char *cmd, char *args ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// meei.c: J. Dowell, UNM, 2018 Jan 29
+//   .1 Cleaned up a few compiler warnings
 // meei.c: S.W. Ellingson, Virginia Tech, 2014 Feb 10
 //   .1: adding STP command
 // meei.c: S.W. Ellingson, Virginia Tech, 2011 March 09
