@@ -201,22 +201,22 @@ main ( int narg, char *argv[] ) {
                                              /* do nothing; fine the way it is */
       }    
     if (!strncmp(record.type_dbm,"r",1)) {   /* if the field is not printable... */
-      strcpy(record.val,"@...\0");           /* just print "@" instead */
+      strcpy(record.val,"@...");           /* just print "@" instead */
       }
     if (!strncmp(record.type_dbm,"i1u",3)) {  /* if the format is "i1u" */    
       i2u.b[0]=record.val[0];           /* unpack the bytes into a union structure */
       i2u.b[1]=0;
-      sprintf(record.val,"%hu\0",i2u.i); /* overwrite in human-readable representation */ 
+      sprintf(record.val,"%hu",i2u.i); /* overwrite in human-readable representation */ 
       }
     if (!strncmp(record.type_dbm,"i2u",3)) {  /* if the format is "i2u" */ 
       if (!strncmp(record.type_dbm,"i2ur",4)) {  /* if the format is "i2ur" (same as i2u, but big-endian) */
         i2u.b[1]=record.val[0];           /* unpack the bytes into a union structure */
         i2u.b[0]=record.val[1];
-        sprintf(record.val,"%hu\0",i2u.i); /* overwrite in human-readable representation */ 
+        sprintf(record.val,"%hu",i2u.i); /* overwrite in human-readable representation */ 
         } else {  
         i2u.b[0]=record.val[0];           /* unpack the bytes into a union structure */
         i2u.b[1]=record.val[1];
-        sprintf(record.val,"%hu\0",i2u.i); /* overwrite in human-readable representation */ 
+        sprintf(record.val,"%hu",i2u.i); /* overwrite in human-readable representation */ 
         }
       }
     if (!strncmp(record.type_dbm,"i4u",3)) {  /* if the format is "i4u" */   
@@ -225,13 +225,13 @@ main ( int narg, char *argv[] ) {
         i4u.b[2]=record.val[1];
         i4u.b[1]=record.val[2];
         i4u.b[0]=record.val[3];
-        sprintf(record.val,"%u\0",i4u.i); /* overwrite in human-readable representation */  
+        sprintf(record.val,"%u",i4u.i); /* overwrite in human-readable representation */  
         } else {
         i4u.b[0]=record.val[0];           /* unpack the bytes into a union structure */
         i4u.b[1]=record.val[1];
         i4u.b[2]=record.val[2];
         i4u.b[3]=record.val[3];
-        sprintf(record.val,"%u\0",i4u.i); /* overwrite in human-readable representation */  
+        sprintf(record.val,"%u",i4u.i); /* overwrite in human-readable representation */  
         }
       }
     if (!strncmp(record.type_dbm,"f4",2)) {  /* if the format is "f4" */
@@ -240,13 +240,13 @@ main ( int narg, char *argv[] ) {
         f4.b[2]=record.val[1];
         f4.b[1]=record.val[2];
         f4.b[0]=record.val[3];
-        sprintf(record.val,"%f\0",f4.f); /* overwrite in human-readable representation */    
+        sprintf(record.val,"%f",f4.f); /* overwrite in human-readable representation */    
         } else {
         f4.b[0]=record.val[0];           /* unpack the bytes into a union structure */
         f4.b[1]=record.val[1];
         f4.b[2]=record.val[2];
         f4.b[3]=record.val[3];
-        sprintf(record.val,"%f\0",f4.f); /* overwrite in human-readable representation */    
+        sprintf(record.val,"%f",f4.f); /* overwrite in human-readable representation */    
         }
       }
 
@@ -296,9 +296,11 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_md2t.c: J. Dowell, UNM, 2018 Jan 29
+//   .1: Cleaned up a few complier warnings
 // ms_md2t.c: S.W. Ellingson, Virginia Tech, 2011 Mar 19
-//   .1 Discovered/fixed "close()" used in place of "fclose()"; didn't matter previously; 
-//      evidently recent changes to mcs.h caused this to be important
+//   .1: Discovered/fixed "close()" used in place of "fclose()"; didn't matter previously; 
+//       evidently recent changes to mcs.h caused this to be important
 // ms_md2t.c: S.W. Ellingson, Virginia Tech, 2010 May 25
 //   .1: Branched from ms_mdr.c
 // ms_mdr.c: S.W. Ellingson, Virginia Tech, 2009 Aug 16

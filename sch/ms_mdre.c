@@ -31,7 +31,7 @@
 //#include "LWA_MCS.h" 
 #include "mcs.h"
 
-#define MY_NAME "ms_mdre (v.20150810.1)"
+#define MY_NAME "ms_mdre (v.20180129.1)"
 #define ME "9" 
 
 main ( int narg, char *argv[] ) {
@@ -122,51 +122,51 @@ main ( int narg, char *argv[] ) {
 
   /* Decide how to show record.val: This depends on record.type_dbm: */
   if (!strncmp(record.type_dbm,"NUL",3)) { /* if the format is "NUL" (e.g., branch entries)... */
-    strcpy(record.val,"NUL\0");            /* print "NUL" for value */
+    strcpy(record.val,"NUL");            /* print "NUL" for value */
     }
   if (!strncmp(record.type_dbm,"a",1)) { 
                                            /* do nothing; fine the way it is */
     }    
   if (!strncmp(record.type_dbm,"r",1)) {   /* if the field is not printable... */
-    strcpy(record.val,"@...\0");           /* just print "@" instead */
+    strcpy(record.val,"@...");           /* just print "@" instead */
     }
   if (!strncmp(record.type_dbm,"i1u",3)) {  /* if the format is "i1u" */
     //i1u.b = record.val[0];           /* unpack the bytes into a union structure */
-    //sprintf(record.val,"%c\0",i1u.i); /* overwrite in human-readable representation */    
+    //sprintf(record.val,"%c",i1u.i); /* overwrite in human-readable representation */    
     //printf("[%s/%d] Not expecting to see i1u as a type_dbm.  Treating as raw.\n",ME,getpid());
-    //strcpy(record.val,"@\0");              /* just print "@" instead */
+    //strcpy(record.val,"@");              /* just print "@" instead */
     i2u.b[0]=record.val[0];           /* unpack the bytes into a union structure */
     i2u.b[1]=0;
-    sprintf(record.val,"%hu\0",i2u.i); /* overwrite in human-readable representation */ 
+    sprintf(record.val,"%hu",i2u.i); /* overwrite in human-readable representation */ 
     }
   if (!strncmp(record.type_dbm,"i2u",3)) {  /* if the format is "i2u" */   
     //printf("[%s/%d] Not expecting to see i2u as a type_dbm.  Treating as raw.\n",ME,getpid());
-    //strcpy(record.val,"@@\0");              /* just print "@@" instead */
+    //strcpy(record.val,"@@");              /* just print "@@" instead */
     i2u.b[0]=record.val[0];           /* unpack the bytes into a union structure */
     i2u.b[1]=record.val[1];
-    sprintf(record.val,"%hu\0",i2u.i); /* overwrite in human-readable representation */ 
+    sprintf(record.val,"%hu",i2u.i); /* overwrite in human-readable representation */ 
     }
   if (!strncmp(record.type_dbm,"i4u",3)) {  /* if the format is "i4u" */   
     //printf("[%s/%d] Not expecting to see i4u as a type_dbm.  Treating as raw.\n",ME,getpid());
-    //strcpy(record.val,"@@@@\0");              /* just print "@@@@" instead */
+    //strcpy(record.val,"@@@@");              /* just print "@@@@" instead */
     i4u.b[0]=record.val[0];           /* unpack the bytes into a union structure */
     i4u.b[1]=record.val[1];
     i4u.b[2]=record.val[2];
     i4u.b[3]=record.val[3];
-    sprintf(record.val,"%u\0",i4u.i); /* overwrite in human-readable representation */  
+    sprintf(record.val,"%u",i4u.i); /* overwrite in human-readable representation */  
     }
   if (!strncmp(record.type_dbm,"i4s",3)) {  /* if the format is "i4s" */   
     //printf("[%s/%d] Not expecting to see i4s as a type_dbm.  Treating as raw.\n",ME,getpid());
-    //strcpy(record.val,"@@@@\0");              /* just print "@@@@" instead */
+    //strcpy(record.val,"@@@@");              /* just print "@@@@" instead */
     i4s.b[0]=record.val[0];           /* unpack the bytes into a union structure */
     i4s.b[1]=record.val[1];
     i4s.b[2]=record.val[2];
     i4s.b[3]=record.val[3];
-    sprintf(record.val,"%i\0",i4s.i); /* overwrite in human-readable representation */  
+    sprintf(record.val,"%i",i4s.i); /* overwrite in human-readable representation */  
     }
   if (!strncmp(record.type_dbm,"i8u",3)) {  /* if the format is "i8u" */   
     //printf("[%s/%d] Not expecting to see i8u as a type_dbm.  Treating as raw.\n",ME,getpid());
-    //strcpy(record.val,"@@@@@@@@\0");              /* just print "@@@@@@@@" instead */
+    //strcpy(record.val,"@@@@@@@@");              /* just print "@@@@@@@@" instead */
     i8u.b[0]=record.val[0];           /* unpack the bytes into a union structure */
     i8u.b[1]=record.val[1];
     i8u.b[2]=record.val[2];
@@ -175,7 +175,7 @@ main ( int narg, char *argv[] ) {
     i8u.b[5]=record.val[5];
     i8u.b[6]=record.val[6];
     i8u.b[7]=record.val[7];
-    sprintf(record.val,"%lu\0",i8u.i); /* overwrite in human-readable representation */  
+    sprintf(record.val,"%lu",i8u.i); /* overwrite in human-readable representation */  
     }
   if (!strncmp(record.type_dbm,"f4",2)) {  /* if the format is "f4" */
       if (!strncmp(record.type_dbm,"f4r",3)) {  /* if the format is "f4r" (same as f4, but big-endian) */
@@ -183,13 +183,13 @@ main ( int narg, char *argv[] ) {
         f4.b[2]=record.val[1];
         f4.b[1]=record.val[2];
         f4.b[0]=record.val[3];
-        sprintf(record.val,"%f\0",f4.f); /* overwrite in human-readable representation */    
+        sprintf(record.val,"%f",f4.f); /* overwrite in human-readable representation */    
         } else {
         f4.b[0]=record.val[0];           /* unpack the bytes into a union structure */
         f4.b[1]=record.val[1];
         f4.b[2]=record.val[2];
         f4.b[3]=record.val[3];
-        sprintf(record.val,"%f\0",f4.f); /* overwrite in human-readable representation */    
+        sprintf(record.val,"%f",f4.f); /* overwrite in human-readable representation */    
         }
       }
 
@@ -212,6 +212,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mdre.c: J. Dowell, UNM, 2018 Jan 29
+//   .1: Cleaned up a few complier warnings
 // ms_mdre.c: J. Dowell, UNM, 2015 Aug 10
 //   .1: Added support for signed int and unsigned long int representations
 // ms_mdre.c: S.W. Ellingson, Virginia Tech, 2009 Aug 16
