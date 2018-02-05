@@ -1324,32 +1324,30 @@ int main ( int narg, char *argv[] ) {
                     /* Must be sent in first 80% of slot N-2 */
                     cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2;
                     cs[ncs].action.tv.tv_usec = 20000; /* staggering send times for DP commands by 10 ms */
-                    cs[ncs].action.bASAP = 0;      
+                    cs[ncs].action.bASAP = 0;
+                    cs[ncs].action.sid = LWA_SID_ADP;  
+                    cs[ncs].action.cid = LWA_CMD_BAM; 
                     sprintf( cs[ncs].data, "%hd %s %s %hd %ld",
-                                    2*(osf.SESSION_DRX_BEAM-1)+1, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                    osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(1) (uint8 DRX_BEAM)
                                         dfile,
                                            gfile,
                                               2*(osf.SESSION_DRX_BEAM-1)+1, 
                                                  t0);
-                    
-                    cs[ncs].action.sid = LWA_SID_ADP;  
-                    cs[ncs].action.cid = LWA_CMD_BAM; 
                     cs[ncs].action.len = strlen(cs[ncs].data)+1; 
                     me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                     ncs++;
                     
                     cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2;
                     cs[ncs].action.tv.tv_usec = 30000; /* staggering send times for DP commands by 10 ms */
-                    cs[ncs].action.bASAP = 0;      
+                    cs[ncs].action.bASAP = 0;
+                    cs[ncs].action.sid = LWA_SID_ADP;  
+                    cs[ncs].action.cid = LWA_CMD_BAM; 
                     sprintf( cs[ncs].data, "%hd %s %s %hd %ld",
-                                    2*(osf.SESSION_DRX_BEAM-1)+2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                    osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(1) (uint8 DRX_BEAM)
                                         dfile,
                                            gfile,
                                               2*(osf.SESSION_DRX_BEAM-1)+2, 
                                                  t0);
-            
-                    cs[ncs].action.sid = LWA_SID_ADP;  
-                    cs[ncs].action.cid = LWA_CMD_BAM; 
                     cs[ncs].action.len = strlen(cs[ncs].data)+1; 
                     me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                     ncs++; 
@@ -1357,15 +1355,14 @@ int main ( int narg, char *argv[] ) {
                     /* Must be sent in first 80% of slot N-2 */
                     cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2;
                     cs[ncs].action.tv.tv_usec = 20000; /* staggering send times for DP commands by 10 ms */
-                    cs[ncs].action.bASAP = 0;      
+                    cs[ncs].action.bASAP = 0;
+                    cs[ncs].action.sid = LWA_SID_DP_;  
+                    cs[ncs].action.cid = LWA_CMD_BAM; 
                     sprintf( cs[ncs].data, "%hd %s %s %ld",
                                     osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                         dfile,
                                            gfile,
                                               t0);
-              
-                    cs[ncs].action.sid = LWA_SID_DP_;  
-                    cs[ncs].action.cid = LWA_CMD_BAM; 
                     cs[ncs].action.len = strlen(cs[ncs].data)+1; 
                     me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                     ncs++; 
@@ -1649,7 +1646,7 @@ int main ( int narg, char *argv[] ) {
               cs[ncs].action.sid = LWA_SID_ADP;  
               cs[ncs].action.cid = LWA_CMD_BAM; 
               sprintf( cs[ncs].data, "%hd %s %s %d %ld",
-                                      2*(osf.SESSION_DRX_BEAM-1)+1, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                      osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(1) (uint8 DRX_BEAM)
                                           dfile,
                                              gfile,
                                                 2*(osf.SESSION_DRX_BEAM-1)+1, 
@@ -1665,7 +1662,7 @@ int main ( int narg, char *argv[] ) {
               cs[ncs].action.sid = LWA_SID_ADP;  
               cs[ncs].action.cid = LWA_CMD_BAM; 
               sprintf( cs[ncs].data, "%hd %s %s %d %ld",
-                                      2*(osf.SESSION_DRX_BEAM-1)+2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                      osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(1) (uint8 DRX_BEAM)
                                           dfile,
                                              gfile,
                                                 2*(osf.SESSION_DRX_BEAM-1)+2, 
@@ -1916,6 +1913,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: J. Dowell, UNM, 2018 Feb 5
+//   .1 Fixed a BAM command problem for ADP-based stations
 // me_inproc.c: J. Dowell, UNM, 2018 Jan 29
 //   .1 Added state for DRX commands so that unnecesary commands are not sent
 //   .2 Cleaned up a few compiler warnings
