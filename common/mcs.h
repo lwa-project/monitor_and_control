@@ -17,7 +17,7 @@
 /* Uncomment the following to command ADP instead   */ 
 /* of DP.                                           */
 /****************************************************/
-//#define USE_ADP /* Use the new ADP at LWA-SV
+//#define USE_ADP /* Use the new ADP at LWA-SV */
 
 
 /*****************************************************/
