@@ -479,11 +479,11 @@ int main ( int narg, char *argv[] ) {
       err = mesi(NULL,"DR2","RPT","OP-TYPE",    "today","+21",  &reference);
       //err = mesi(NULL,"DR2","RPT","SYN",        "today","+22",  &reference);
 
-#ifndef USE_ADP
       err = mesi(NULL,"DR3","RPT","SUMMARY",    "today","+30",  &reference);
       err = mesi(NULL,"DR3","RPT","OP-TYPE",    "today","+31",  &reference);
       //err = mesi(NULL,"DR3","RPT","SYN",        "today","+32",  &reference);
 
+#ifndef USE_ADP
       err = mesi(NULL,"DR4","RPT","SUMMARY",    "today","+40",  &reference);
       err = mesi(NULL,"DR4","RPT","OP-TYPE",    "today","+41",  &reference);
       //err = mesi(NULL,"DR4","RPT","SYN",        "today","+42",  &reference);
@@ -575,7 +575,9 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
-// me_exec.c  J. Dowell, UNM, 2018 Jan 29
+// me_exec.c: J. Dowell, UNM, 2018 Feb 13
+//  .1 Added support for a thrid data recorder for ADP-based stations
+// me_exec.c: J. Dowell, UNM, 2018 Jan 29
 //  .1 Revisited the 121204 me_exec_1.c kludge to try and keep MCS/exec running by adjusting eErr
 //  .2 Increased the queue size for listen()
 // me_exec.c: J. Dowell, UNM, 2017 Aug 23

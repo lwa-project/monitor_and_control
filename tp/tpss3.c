@@ -334,7 +334,7 @@
             return;
             }
        } else {
-          if ( ( obs[nobs].OBS_BW<1 ) || ( obs[nobs].OBS_BW>6 ) ) { 		// TODO: Update this when possible
+          if ( ( obs[nobs].OBS_BW<1 ) || ( obs[nobs].OBS_BW>7 ) ) { 		
             printf("[%d/%d] FATAL: Invalid OBS_BW\n",MT_TPSS,getpid());
             return;
             }

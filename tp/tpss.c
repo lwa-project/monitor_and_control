@@ -403,6 +403,10 @@ int main ( int narg, char *argv[] ) {
       }
 #endif
 #ifdef USE_ADP
+    if ( (obs[n].OBS_MODE==LWA_OM_TBF      ) && (SESSION_DRX_BEAM!=1) ) {
+      printf("[%d/%d] FATAL: SESSION_DRX_BEAM!=1 when obs[%d].OBS_MODE is TBF\n",MT_TPSS,getpid(),n);
+      return;
+      }
     if ( (obs[n].OBS_MODE==LWA_OM_TBN      ) && (SESSION_DRX_BEAM>-1) ) {
       printf("[%d/%d] FATAL: SESSION_DRX_BEAM>-1 when obs[%d].OBS_MODE is TBN\n",MT_TPSS,getpid(),n);
       return;
@@ -961,6 +965,9 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpss.c: J. Dowell, UNM, 2018 Feb 13
+//   .1 Added a check to force TBF to run on beam one at ADP-based stations
+//   .2 Increased the DRX/TBF bandwidth code limit to 7
 // tpss.c: J. Dowell, UNM, 2018 Jan 29
 //   .1 Cleaned up a few compiler warnings
 // tpss.c J. Dowell, UNM, 2017 Sep 8

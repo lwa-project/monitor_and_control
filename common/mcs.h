@@ -711,11 +711,11 @@ float LWA_f4_swap( float x ) {
 #define ME_MAX_ROACHID_LENGTH 10
 #define ME_MAX_NSERVER 7
 #define ME_MAX_SERVERID_LENGTH 10
-#define ME_MAX_NDR 2
+#define ME_MAX_NDR 3
 #define ME_MAX_DRID_LENGTH 10
 #define ME_MAX_NPWRPORT 50
 #define ME_MAX_SSNAME_LENGTH 3 /* for codes used for PWR_NAME */
-#define ME_MAX_NDPOUT 2 /* ADP outputs; 1 for beams, 1 for everything else */
+#define ME_MAX_NDPOUT 3 /* ADP outputs; 1,2 for beams, 3 for TBN */
 #else
 #define ME_SSMIF_FORMAT_VERSION 7
 #define ME_MAX_NSTD 260
@@ -1504,6 +1504,8 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// Feb 18, 2018: Updated the ADP-based stations to support for a second beam and 
+//               three data recorders
 // Aug 25, 2016: Updated the ADP-based stations to support two data recorders
 // Sep 11, 2015: Updated various structures and limits for ADP-based stations
 // Jul 14, 2015: Added new SID and CMDs for the Advanced Digital Processor (ADP)
