@@ -1790,7 +1790,7 @@ int main ( int narg, char *argv[] ) {
                  cs[ncs].action.sid = LWA_SID_ADP;  
                  cs[ncs].action.cid = LWA_CMD_STP; 
                  sprintf( cs[ncs].data, "BEAM%d",
-                                      2*(osf.SESSION_DRX_BEAM-1)+1); //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                      osf.SESSION_DRX_BEAM); //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                  cs[ncs].action.len = strlen(cs[ncs].data)+1;
                  me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                  ncs++;
@@ -1799,19 +1799,6 @@ int main ( int narg, char *argv[] ) {
                    last_drx_freq1 = 0;
                    last_drx_bw1 = 0;
                    last_drx_gain1 = -1;
-                   }
-
-                 cs[ncs].action.tv.tv_sec  = cs[ncs-1].action.tv.tv_sec;
-                 cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec + 20000;
-                 cs[ncs].action.sid = LWA_SID_ADP;  
-                 cs[ncs].action.cid = LWA_CMD_STP; 
-                 sprintf( cs[ncs].data, "BEAM%d",
-                                      2*(osf.SESSION_DRX_BEAM-1)+2); //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
-                 cs[ncs].action.len = strlen(cs[ncs].data)+1;
-                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
-                 ncs++;
-                 esnTimeAdjust += 20000;
-                 if( osf.SESSION_DRX_BEAM == 1 ) {
                    last_drx_freq2 = 0;
                    last_drx_bw2 = 0;
                    last_drx_gain2 = -1;
@@ -1934,6 +1921,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: J. Dowell, UNM, 2018 Feb 21
+//   .1 Fixed an ADP-based station problem where too many 'STP BEAM#' commands are sent
 // me_inproc.c: J. Dowell, UNM, 2018 Feb 13
 //   .1 Added support for a second beam for ADP-based stations
 // me_inproc.c: J. Dowell, UNM, 2018 Feb 5
