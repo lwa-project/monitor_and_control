@@ -14,9 +14,9 @@
 
 #include "me.h"
 
-#define MY_NAME "me_init (v.20180129.1)"
+#define MY_NAME "me_init (v.20180222.1)"
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/
@@ -59,7 +59,7 @@ main ( int narg, char *argv[] ) {
   /* process command line arguments */
   if (narg<2) {
     printf("[%d/%d] me_init: FATAL: flagset not specified\n",ME_INIT,getpid());
-    return;
+    return 1;
     }
   sscanf(argv[1],"%lu",&flagset);
   //printf("[%d/%d] Input: flagset='%lu'\n",ME_INIT,getpid(),flagset);
@@ -126,7 +126,7 @@ main ( int narg, char *argv[] ) {
   //  printf("[%d/%d] me_init: FATAL: transfer of 'default.gf' from TP failed.\n",ME_INIT,getpid());
   //  me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: FATAL: transfer of 'default.gf' from TP failed.", sq_ptr, 0 );
   //  fclose(fpl);
-  //  return;
+  //  return 1;
   //  }
   ///* now move this on to scheduler */
   //if (!bFlg_NoSch) {
@@ -149,7 +149,7 @@ main ( int narg, char *argv[] ) {
     printf("[%d/%d] me_init: FATAL: transfer of 'default.gft' from TP failed.\n",ME_INIT,getpid());
     me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: FATAL: transfer of 'default.gft' from TP failed.", sq_ptr, 0 );
     fclose(fpl);
-    return;
+    return 1;
     }
 
   /*==========================*/
@@ -164,7 +164,7 @@ main ( int narg, char *argv[] ) {
     case -1: /* error */
       printf("[%d/%d] me_init: FATAL: fork for ./me_tpcom failed\n",ME_INIT,getpid());
       me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: FATAL: fork for ./me_tpcom failed", sq_ptr, 0 );
-      return;
+      return 1;
       break;
     case 0: /* fork() succeeded; we are now in the child process */
       err = execl("./me_tpcom","me_tpcom",NULL); /* launch me_tpcom */
@@ -173,7 +173,7 @@ main ( int narg, char *argv[] ) {
         printf("[%d/%d] me_init: FATAL: failed to execl() ./me_tpcom\n",ME_INIT,getpid()); 
         me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: FATAL: failed to execl() ./me_tpcom", sq_ptr, 0 );
         }     
-      return;
+      return 2;
       break; 
     default: /* fork() succeeded; we are now in the parent process */
       break;
@@ -191,7 +191,7 @@ main ( int narg, char *argv[] ) {
     case -1: /* error */
       printf("[%d/%d] me_init: FATAL: fork for ./me_inproc failed\n",ME_INIT,getpid());
       me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: FATAL: fork for ./me_inproc failed", sq_ptr, 0 );
-      return;
+      return 1;
       break;
     case 0: /* fork() succeeded; we are now in the child process */
       err = execl("./me_inproc","me_inproc",NULL); /* launch me_inproc */
@@ -200,7 +200,7 @@ main ( int narg, char *argv[] ) {
         printf("[%d/%d] me_init: FATAL: failed to execl() ./me_inproc\n",ME_INIT,getpid()); 
         me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: FATAL: failed to execl() ./me_inproc", sq_ptr, 0 );
         }     
-      return;
+      return 2;
       break; 
     default: /* fork() succeeded; we are now in the parent process */
       break;
@@ -312,14 +312,14 @@ main ( int narg, char *argv[] ) {
   switch (me_exec_pid) {
     case -1: /* error */
       printf("[%d/%d] FATAL: fork for ./me_exec failed\n",ME_INIT,getpid());
-      return;
+      return 1;
     case 0: /* fork() succeeded; we are now in the child process */
       err = execl("./me_exec","me_exec",sFlagset,sMeTpcomPid,sMeInprocPid,NULL); /* launch me_exec */
       /* if we get to this point then we failed to launch */
       if (err==-1) {
         printf("[%d/%d] me_init: FATAL: failed to execl('./me_exec',...)\n",ME_INIT,getpid()); 
         }     
-      return;
+      return 2;
       break; 
     default: /* fork() succeeded; we are now in the parent process */
       break;
@@ -331,12 +331,14 @@ main ( int narg, char *argv[] ) {
   /* say goodbye */
   printf("[%d/%d] me_init: I'm done. Exiting normally.\n",ME_INIT,getpid());  
 
-  return;
+  return 0;
   } /* main() */
 
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_init.c: J. Dowell, UNM, 2018 Feb 22
+//   .1 Updated the exit code so that we know if me_init was successful or not
 // me_init.c: J. Dowell, UNM, 2018 Jan 29
 //   .1 Cleaned up a few compiler warnings
 // me_init.c: J. Dowell, UNM, 2015 Aug 28

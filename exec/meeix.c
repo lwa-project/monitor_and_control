@@ -39,7 +39,7 @@ int main ( int narg, char *argv[] ) {
       sscanf(argv[1],"%3s",cmd);
     } else {
       printf("[%d/%d] FATAL: cmd not provided\n",ME_MEEIX,getpid());
-      return;
+      return 4;
     } 
 
   if (strncmp(cmd,"STP",3)==0) { 
@@ -49,7 +49,7 @@ int main ( int narg, char *argv[] ) {
         memcpy(args,argv[2],strlen(argv[2])+1);
       } else {
         printf("[%d/%d] FATAL: args for 'STP' command not provided\n",ME_MEEIX,getpid());
-        return;
+        return 4;
       } 
     }
 
@@ -58,14 +58,16 @@ int main ( int narg, char *argv[] ) {
   eResult = meei(cmd,args);
   printf("[%d/%d] meei() returned code %d\n",ME_MESIX,getpid(),eResult);
   
-  return 0;
+  return eResult;
   } /* main() */
 
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// meeix.c: J. Dowell, UNM, 2018 Feb 22
+//   .1: Changed the exit code to reflect what the call to meei() returns
 // meeix.c: J. Dowell, UNM, 2018 Jan 29
-//   .1 Cleaned up a few compiler warnings
+//   .1: Cleaned up a few compiler warnings
 // meeix.c: S.W. Ellingson, Virginia Tech, 2014 Feb 10
 //   .1: adding "STP" command
 // meeix.c: S.W. Ellingson, Virginia Tech, 2011 March 09
