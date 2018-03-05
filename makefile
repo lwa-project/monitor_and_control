@@ -24,6 +24,10 @@ install:
 	$(MAKE) -C exec install
 	$(MAKE) -C tp install
 
+.PHONY: install-services
+install-services:
+	$(MAKE) -C services install
+
 .PHONY: clean
 clean:
 	$(MAKE) -C sch clean
