@@ -1158,7 +1158,7 @@ int main ( int narg, char *argv[] ) {
                   cs[ncs].action.sid = LWA_SID_ADP;  
                   cs[ncs].action.cid = LWA_CMD_DRX; 
                   sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
-                                  2*(osf.SESSION_DRX_BEAM-1)+1, //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
+                                  1, //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
                                         (4.563480616e-02)*(osf.OBS_FREQ1), /* center freq in Hz */
                                               osf.OBS_BW,                  /* 0-8 */
                                                   gain1);                  /* 0-15 */
@@ -1181,7 +1181,7 @@ int main ( int narg, char *argv[] ) {
                   cs[ncs].action.sid = LWA_SID_ADP;  
                   cs[ncs].action.cid = LWA_CMD_DRX; 
                   sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
-                                  2*(osf.SESSION_DRX_BEAM-1)+2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                  2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                         (4.563480616e-02)*(osf.OBS_FREQ2), /* center freq in Hz */
                                               osf.OBS_BW,                  /* 0-8 */
                                                   gain2);                  /* 0-15 */
@@ -1334,7 +1334,7 @@ int main ( int narg, char *argv[] ) {
                                     osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(1) (uint8 DRX_BEAM)
                                         dfile,
                                            gfile,
-                                              2*(osf.SESSION_DRX_BEAM-1)+1, 
+                                              1, 
                                                  t0);
                     cs[ncs].action.len = strlen(cs[ncs].data)+1; 
                     me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
@@ -1349,7 +1349,7 @@ int main ( int narg, char *argv[] ) {
                                     osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(1) (uint8 DRX_BEAM)
                                         dfile,
                                            gfile,
-                                              2*(osf.SESSION_DRX_BEAM-1)+2, 
+                                              2, 
                                                  t0);
                     cs[ncs].action.len = strlen(cs[ncs].data)+1; 
                     me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
@@ -1502,7 +1502,7 @@ int main ( int narg, char *argv[] ) {
                 cs[ncs].action.sid = LWA_SID_ADP;  
                 cs[ncs].action.cid = LWA_CMD_DRX; 
                 sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
-                                2*(osf.SESSION_DRX_BEAM-1)+1, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                1, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                       (4.563480616e-02)*(osfs.OBS_STP_FREQ1), /* center freq in Hz */
                                             osf.OBS_BW,                       /* 0-8 */
                                                 gain1);                       /* 0-15 */
@@ -1526,7 +1526,7 @@ int main ( int narg, char *argv[] ) {
                 cs[ncs].action.sid = LWA_SID_ADP;  
                 cs[ncs].action.cid = LWA_CMD_DRX; 
                 sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
-                                2*(osf.SESSION_DRX_BEAM-1)+2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
+                                2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                       (4.563480616e-02)*(osfs.OBS_STP_FREQ2), /* center freq in Hz */
                                             osf.OBS_BW,                       /* 0-8 */
                                                 gain2);                       /* 0-15 */
@@ -1666,7 +1666,7 @@ int main ( int narg, char *argv[] ) {
                                       osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(1) (uint8 DRX_BEAM)
                                           dfile,
                                              gfile,
-                                                2*(osf.SESSION_DRX_BEAM-1)+1, 
+                                                1, 
                                                    t0);
               cs[ncs].action.len = strlen(cs[ncs].data)+1;
               me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
@@ -1682,7 +1682,7 @@ int main ( int narg, char *argv[] ) {
                                       osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(1) (uint8 DRX_BEAM)
                                           dfile,
                                              gfile,
-                                                2*(osf.SESSION_DRX_BEAM-1)+2, 
+                                                2, 
                                                    t0);
               cs[ncs].action.len = strlen(cs[ncs].data)+1;
               me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
@@ -1921,6 +1921,9 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: J. Dowell, UNM, 2018 Mar 5
+//   .1 Cleaned up a few more dual beam ADP related problems that caused BAM commands
+//      to be malformed
 // me_inproc.c: J. Dowell, UNM, 2018 Feb 21
 //   .1 Fixed an ADP-based station problem where too many 'STP BEAM#' commands are sent
 // me_inproc.c: J. Dowell, UNM, 2018 Feb 13
