@@ -1149,9 +1149,9 @@ int main ( int narg, char *argv[] ) {
 //                             ebw  	     Bandwidth setting 1..8 (unit8 DRX_BW)
 //                             gain          0..15                  (uint16 DRX_GAIN)
 //     NOTE: BEAM 1 is the master beam and the only beam that sets the tuning frequencies
-                if ( (osf.OBS_FREQ1 != last_drx_freq1) || \
-                     (osf.OBS_BW != last_drx_bw1) || \
-                     (gain1 != last_drx_gain1) && \
+                if ( ( (osf.OBS_FREQ1 != last_drx_freq1) || \
+                       (osf.OBS_BW != last_drx_bw1) || \
+                       (gain1 != last_drx_gain1) ) && \
                      (osf.SESSION_DRX_BEAM == 1) ) {
                   LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
                   cs[ncs].action.bASAP = 0;
@@ -1174,8 +1174,8 @@ int main ( int narg, char *argv[] ) {
                 if ( (osf.OBS_FREQ2 != 0) && \
                      ( (osf.OBS_FREQ2 != last_drx_freq2) || \
                        (osf.OBS_BW != last_drx_bw2) || \
-                       (gain2 != last_drx_gain2) && \
-                       (osf.SESSION_DRX_BEAM == 1) ) ) {
+                       (gain2 != last_drx_gain2) ) && \
+                     (osf.SESSION_DRX_BEAM == 1) ) {
                   LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 ); /* staggering send times for DP commands by 10 ms */
                   cs[ncs].action.bASAP = 0;                   
                   cs[ncs].action.sid = LWA_SID_ADP;  
@@ -1487,9 +1487,9 @@ int main ( int narg, char *argv[] ) {
               /* NOTE: BEAM 1 is the master beam and the only beam that sets 
                * the tuning frequencies */
               
-              if ( (osfs.OBS_STP_FREQ1 != last_drx_freq1) || \
-                   (osf.OBS_BW != last_drx_bw1) || \
-                   (gain1 != last_drx_gain1) && \
+              if ( ( (osfs.OBS_STP_FREQ1 != last_drx_freq1) || \
+                     (osf.OBS_BW != last_drx_bw1) || \
+                     (gain1 != last_drx_gain1) ) && \
                    (osf.SESSION_DRX_BEAM == 1) ) {
                 LWA_timeval( &tv, &mjd, &mpm ); /* get MJD and MPM for start of this step */
                 t0 = mpm % 1000;                /* number of ms beyond a second boundary */
@@ -1518,8 +1518,8 @@ int main ( int narg, char *argv[] ) {
               if ( (osfs.OBS_STP_FREQ2 != 0) && \
                    ( (osfs.OBS_STP_FREQ2 != last_drx_freq2) || \
                      (osf.OBS_BW != last_drx_bw2) || \
-                     (gain2 != last_drx_gain2) && \
-                     (osf.SESSION_DRX_BEAM == 1) ) ) {
+                     (gain2 != last_drx_gain2) ) && \
+                   (osf.SESSION_DRX_BEAM == 1) ) {
                 cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
                 cs[ncs].action.tv.tv_usec = 10000;         /* staggering send times for DP commands by 10 ms */
                 cs[ncs].action.bASAP = 0;    
