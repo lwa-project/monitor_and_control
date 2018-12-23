@@ -965,6 +965,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpss.c: J. Dowell, UNM, 2018 Dec 22
+//   .1 Tweaked the TBW duration calculation since DP is now faster
 // tpss.c: J. Dowell, UNM, 2018 Feb 13
 //   .1 Added a check to force TBF to run on beam one at ADP-based stations
 //   .2 Increased the DRX/TBF bandwidth code limit to 7
