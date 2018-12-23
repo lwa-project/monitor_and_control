@@ -41,7 +41,7 @@
 #define MAX_STP_N 1024              /* max number of steps in a stepped-mode observation */
 #define MAX_BEAM_DELAY 65535        /* max value that OBS_BEAM_DELAY[][] can have */
 #define TBF_INVERSE_DUTY_CYCLE  150 /* assumed ratio of TBF read-out time to TBF dump time */
-#define TBW_INVERSE_DUTY_CYCLE 5000 /* assumed ratio of TBW read-out time to TBW acquisition time */
+#define TBW_INVERSE_DUTY_CYCLE 2500 /* assumed ratio of TBW read-out time to TBW acquisition time */
 #define MIN_OBS_STEP_LENGTH 5       /* minimum number of milliseconds in an observation step */
 
 
@@ -474,7 +474,7 @@ int main ( int narg, char *argv[] ) {
   for (n=1;n<=nobs;n++) {
     if (obs[n].OBS_MODE==LWA_OM_TBW) {
       t_tbw = ( obs[n].OBS_TBW_SAMPLES / 196000 ) +1; /* convert samples to ms */
-      t_tbw *= TBW_INVERSE_DUTY_CYCLE;         /* account for read-out time after triggering (~1000:1) */
+      t_tbw *= TBW_INVERSE_DUTY_CYCLE;         /* account for read-out time after triggering (~500:1) */
       obs[n].OBS_DUR = t_tbw; /* convert samples to ms */
       printf("[%d/%d] Computed obs[%d].OBS_DUR = %ld [ms] for this TBW observation\n",MT_TPSS,getpid(),n,obs[n].OBS_DUR);
       }
