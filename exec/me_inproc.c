@@ -998,32 +998,69 @@ int main ( int narg, char *argv[] ) {
                 //if (osf2.OBS_TBF_GAIN==-1) { osf2.OBS_TBF_GAIN = s.settings.tbf_gain; }
                 ///* if SSMIF also leaves it up MCS, set this to 6 */ 
                 if (osf2.OBS_TBF_GAIN==-1) { osf2.OBS_TBF_GAIN = 6; }
-                //osf2.OBS_TBF_GAIN = 6; /* FIXME */
+                
+                /* Unpack the osf2.OBS_TBF_GAIN value to allow two */
+                /* different gains to be used with DP.             */
+                /* Updated: 2015 Aug 31                            */
+                if (osf2.OBS_TBF_GAIN < 16 ) {
+                   gain1 = osf2.OBS_TBF_GAIN;
+                   gain2 = osf2.OBS_TBF_GAIN;
+                } else {
+                   gain1 = (osf2.OBS_TBF_GAIN >> 4) & 0xF;
+                   gain2 = osf2.OBS_TBF_GAIN & 0xF;
+                }
                 
                 /* TBF needs a DRX command to set things up */
+                /** Tuning 1 **/
                 if ( (osf.OBS_FREQ1 != last_drx_freq1) || \
                      (osf.OBS_BW != last_drx_bw1) || \
-                     (osf2.OBS_TBF_GAIN != last_drx_gain1) ) {
+                     (gain1 != last_drx_gain1) ) {
                   LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
                   cs[ncs].action.bASAP = 0;
                   cs[ncs].action.sid = LWA_SID_ADP;  
                   cs[ncs].action.cid = LWA_CMD_DRX; 
                   sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
-                                  2*(osf.SESSION_DRX_BEAM-1)+1, //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
+                                  1, //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
                                         (4.563480616e-02)*(osf.OBS_FREQ1), /* center freq in Hz */
                                               osf.OBS_BW,                  /* 0-8 */
-                                                  osf2.OBS_TBF_GAIN);      /* 0-15 */
+                                                  gain1);                  /* 0-15 */
                   cs[ncs].action.len = strlen(cs[ncs].data)+1; 
                   me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                   ncs++;
                   last_drx_freq1 = osf.OBS_FREQ1;
                   last_drx_bw1 = osf.OBS_BW;
-                  last_drx_gain1 = osf2.OBS_TBF_GAIN;
+                  last_drx_gain1 = gain1;
+                  }
+                
+                /** Tuning 2 - if needed **/
+                if ( (osf.OBS_FREQ2 != 0) && \
+                     ( (osf.OBS_FREQ2 != last_drx_freq2) || \
+                       (osf.OBS_BW != last_drx_bw2) || \
+                       (gain2 != last_drx_gain2) ) && \
+                     (osf.SESSION_DRX_BEAM == 1) ) {
+                  LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 ); /* staggering send times for DP commands by 10 ms */
+                  cs[ncs].action.bASAP = 0;                   
+                  cs[ncs].action.sid = LWA_SID_ADP;  
+                  cs[ncs].action.cid = LWA_CMD_DRX; 
+                  sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
+                                  2, //tuning 2..NUM_TUNINGS(2) (uint8 DRX_TUNING)
+                                        (4.563480616e-02)*(osf.OBS_FREQ2), /* center freq in Hz */
+                                              osf.OBS_BW,                  /* 0-8 */
+                                                  gain2);                  /* 0-15 */
+                  cs[ncs].action.len = strlen(cs[ncs].data)+1;
+                  me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+                  ncs++;
+                  last_drx_freq2 = osf.OBS_FREQ2;
+                  last_drx_bw2 = osf.OBS_BW;
+                  last_drx_gain2 = gain2;
                   }
                 
                 /* Define the tuning mask to use */
-                tuning_mask = (unsigned long int) 1 << (64-(2*(osf.SESSION_DRX_BEAM-1)+1));
-
+                tuning_mask = (unsigned long int) 1;
+                if( osf.OBS_FREQ2 != 0) {
+                  tuning_mask = (unsigned long int) 3;   // (1<<0) | (1<<1)
+                }
+                
                 /* Build up the TBF command */
                 LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+5000 );	// TBF needs a bit for the ADP buffers to flush
                 cs[ncs].action.bASAP = 0;                   
@@ -1921,6 +1958,9 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: J. Dowlel, UNM, 2019 Jan 25
+//   .1 Fixed the TBF command so that the correct tuning mask is set.  Also, added
+//      sending the second DRX command to set the second tuning if needed.
 // me_inproc.c: J. Dowell, UNM, 2018 Mar 5
 //   .1 Cleaned up a few more dual beam ADP related problems that caused BAM commands
 //      to be malformed
