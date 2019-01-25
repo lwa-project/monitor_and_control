@@ -464,6 +464,9 @@ int main ( int narg, char *argv[] ) {
     if (obs[n].OBS_MODE==LWA_OM_TBF) {
       t_tbw = ( obs[n].OBS_TBF_SAMPLES / 196000 ) +1; /* convert samples to ms */
       t_tbw *= TBF_INVERSE_DUTY_CYCLE;                /* account for read-out time after triggering (~100:1) */
+      if( obs[n].OBS_FREQ2 != 0 ) {
+        t_tbw *= 2;                                   /* account for the second tuning, if used */
+        }
       t_tbw += 5000;                                  /* account for the buffer fill lag */
       obs[n].OBS_DUR = t_tbw;
       printf("[%d/%d] Computed obs[%d].OBS_DUR = %ld [ms] for this TBF observation\n",MT_TPSS,getpid(),n,obs[n].OBS_DUR);
@@ -965,6 +968,9 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpss.c: J. Dowell, UNM, 2019 Jan 25
+//   .1 Updated the TBF time calculation to take into account whether or not two
+//      tunings are being used
 // tpss.c: J. Dowell, UNM, 2018 Dec 22
 //   .1 Tweaked the TBW duration calculation since DP is now faster
 // tpss.c: J. Dowell, UNM, 2018 Feb 13
