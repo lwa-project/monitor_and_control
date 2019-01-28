@@ -968,6 +968,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpss.c: J. Dowell, UNM, 2019 Jan 28
+//   .1 Allow OBS_ASP_FLT to go up to 5 for ADP-based systems
 // tpss.c: J. Dowell, UNM, 2019 Jan 25
 //   .1 Updated the TBF time calculation to take into account whether or not two
 //      tunings are being used
