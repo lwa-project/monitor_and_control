@@ -351,15 +351,36 @@ int main ( int narg, char *argv[] ) {
       return;
       }
 #ifdef USE_ADP
-    if ( ( obs[n].OBS_MODE==LWA_OM_TBF ) && ( obs[n].OBS_FREQ1<109565492 ) ) {
+    if ( ( obs[n].OBS_MODE==LWA_OM_TBF ) && ( obs[n].OBS_FREQ1<123809006 ) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TBF\n",MT_TPSS,getpid(),n);
       return;
       }
 #endif
+#ifdef USE_ADP
+    if ( ( obs[n].OBS_MODE==LWA_OM_TBN ) && ( obs[n].OBS_FREQ1<65739295 ) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TBN\n",MT_TPSS,getpid(),n);
+      return;
+      }
+#else
     if ( ( obs[n].OBS_MODE==LWA_OM_TBN ) && ( obs[n].OBS_FREQ1<109565492 ) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TBN\n",MT_TPSS,getpid(),n);
       return;
       }
+#endif
+#ifdef USE_ADP
+    if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ) && (obs[n].OBS_FREQ1<123809006) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
+      return;
+      }
+    if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_FREQ2 != 0 && obs[n].OBS_FREQ2<123809006) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
+      return;
+      }
+#else
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ) && (obs[n].OBS_FREQ1<219130984) ) {
@@ -372,6 +393,7 @@ int main ( int narg, char *argv[] ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
       return;
       }
+#endif
 #ifdef USE_ADP
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
@@ -968,6 +990,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpss.c: J. Dowell, UNM, 2019 Feb 12
+//   .1 Made the frequency validation consistent across all of tpss
 // tpss.c: J. Dowell, UNM, 2019 Jan 28
 //   .1 Allow OBS_ASP_FLT to go up to 5 for ADP-based systems
 // tpss.c: J. Dowell, UNM, 2019 Jan 25
