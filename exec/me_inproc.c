@@ -1964,8 +1964,8 @@ int main ( int narg, char *argv[] ) {
 //=== HISTORY ======================================================================
 //==================================================================================
 // me_inproc.c: J. Dowell, UNM, 2019 Feb 25
-//   .1 Moved the ADP DRX commands forward by two seconds to deal with an internal 
-//      ADP delay
+//   .1 Moved the ADP DRX and TBN commands forward by two seconds to deal with an 
+//      internal ADP delay
 // me_inproc.c: J. Dowell, UNM, 2019 Jan 25
 //   .1 Fixed the TBF command so that the correct tuning mask is set.  Also, added
 //      sending the second DRX command to set the second tuning if needed.
