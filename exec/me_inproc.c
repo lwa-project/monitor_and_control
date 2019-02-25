@@ -1016,6 +1016,7 @@ int main ( int narg, char *argv[] ) {
                      (osf.OBS_BW != last_drx_bw1) || \
                      (gain1 != last_drx_gain1) ) {
                   LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
+                  cs[ncs].action.tv.tv_sec -= 2; /* Must be sent in slot N-2 */
                   cs[ncs].action.bASAP = 0;
                   cs[ncs].action.sid = LWA_SID_ADP;  
                   cs[ncs].action.cid = LWA_CMD_DRX; 
@@ -1039,6 +1040,7 @@ int main ( int narg, char *argv[] ) {
                        (gain2 != last_drx_gain2) ) && \
                      (osf.SESSION_DRX_BEAM == 1) ) {
                   LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 ); /* staggering send times for DP commands by 10 ms */
+                  cs[ncs].action.tv.tv_sec -= 2; /* Must be sent in slot N-2 */
                   cs[ncs].action.bASAP = 0;                   
                   cs[ncs].action.sid = LWA_SID_ADP;  
                   cs[ncs].action.cid = LWA_CMD_DRX; 
@@ -1191,6 +1193,7 @@ int main ( int narg, char *argv[] ) {
                        (gain1 != last_drx_gain1) ) && \
                      (osf.SESSION_DRX_BEAM == 1) ) {
                   LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
+                  cs[ncs].action.tv.tv_sec -= 2; /* Must be sent in slot N-2 */
                   cs[ncs].action.bASAP = 0;
                   cs[ncs].action.sid = LWA_SID_ADP;  
                   cs[ncs].action.cid = LWA_CMD_DRX; 
@@ -1214,6 +1217,7 @@ int main ( int narg, char *argv[] ) {
                        (gain2 != last_drx_gain2) ) && \
                      (osf.SESSION_DRX_BEAM == 1) ) {
                   LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 ); /* staggering send times for DP commands by 10 ms */
+                  cs[ncs].action.tv.tv_sec -= 2; /* Must be sent in slot N-2 */
                   cs[ncs].action.bASAP = 0;                   
                   cs[ncs].action.sid = LWA_SID_ADP;  
                   cs[ncs].action.cid = LWA_CMD_DRX; 
@@ -1958,7 +1962,10 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
-// me_inproc.c: J. Dowlel, UNM, 2019 Jan 25
+// me_inproc.c: J. Dowell, UNM, 2019 Feb 25
+//   .1 Moved the ADP DRX commands forward by two seconds to deal with an internal 
+//      ADP delay
+// me_inproc.c: J. Dowell, UNM, 2019 Jan 25
 //   .1 Fixed the TBF command so that the correct tuning mask is set.  Also, added
 //      sending the second DRX command to set the second tuning if needed.
 // me_inproc.c: J. Dowell, UNM, 2018 Mar 5
