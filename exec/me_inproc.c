@@ -1538,7 +1538,7 @@ int main ( int narg, char *argv[] ) {
                 t0 /= 10; if (t0>99) t0=99;     /* now in subslots */                  
               
                 /* here's the DRX command setting FREQ1: */
-                cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
+                cs[ncs].action.tv.tv_sec  = tv.tv_sec - 4; /* Must be sent in first 80% of slot N-4 */
                 cs[ncs].action.tv.tv_usec = 0; 
                 cs[ncs].action.bASAP = 0; 
                 cs[ncs].action.sid = LWA_SID_ADP;  
@@ -1562,7 +1562,7 @@ int main ( int narg, char *argv[] ) {
                      (osf.OBS_BW != last_drx_bw2) || \
                      (gain2 != last_drx_gain2) ) && \
                    (osf.SESSION_DRX_BEAM == 1) ) {
-                cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
+                cs[ncs].action.tv.tv_sec  = tv.tv_sec - 4; /* Must be sent in first 80% of slot N-4 */
                 cs[ncs].action.tv.tv_usec = 10000;         /* staggering send times for DP commands by 10 ms */
                 cs[ncs].action.bASAP = 0;    
                 cs[ncs].action.sid = LWA_SID_ADP;  
@@ -1963,6 +1963,9 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: J. Dowell, UNM, 2019 Mar 4
+//   .1 Applied the 2019 Feb 25 change to the DRX command timing for ADP to STEPPED
+//      mode observations as well
 // me_inproc.c: J. Dowell, UNM, 2019 Feb 25
 //   .1 Moved the ADP DRX and TBN commands forward by two seconds to deal with an 
 //      internal ADP delay
