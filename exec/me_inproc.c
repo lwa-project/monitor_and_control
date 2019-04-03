@@ -1491,7 +1491,7 @@ int main ( int narg, char *argv[] ) {
 
           /* If this is a STEPPED-mode observation, deal with DRX gain setting */  
           if ( (osf.OBS_MODE==LWA_OM_STEPPED) && (eD==0) ) {               
-            if (osf2.OBS_DRX_GAIN<1) { osf2.OBS_DRX_GAIN = 6; }
+            if (osf2.OBS_DRX_GAIN<0) { osf2.OBS_DRX_GAIN = 6; }
             
             /* Unpack the osf2.OBS_DRX_GAIN value to allow two */
             /* different gains to be used with DP.             */
@@ -1963,6 +1963,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: J. Dowell, UNM, 2019 Apr 3
+//   .1 Fixed a bug in STEPPED observations where a OBS_DRX_GAIN of 0 was ignored
 // me_inproc.c: J. Dowell, UNM, 2019 Mar 4
 //   .1 Applied the 2019 Feb 25 change to the DRX command timing for ADP to STEPPED
 //      mode observations as well
