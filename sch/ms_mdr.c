@@ -26,6 +26,7 @@
 #include <string.h>
 #include <fcntl.h> /* needed for O_READONLY; perhaps other things */
 #include <gdbm-ndbm.h>
+#include <byteswap.h>
 
 //#include "LWA_MCS.h" 
 #include "mcs.h"
@@ -55,9 +56,21 @@ main ( int narg, char *argv[] ) {
   char display[33];
 
   union {
+    unsigned char i;
+    unsigned char b[1];
+    } i1u;
+  union {
+    signed char i;
+    unsigned char b[1];
+    } i1s;
+  union {
     unsigned short int i;
     unsigned char b[2];
     } i2u;
+  union {
+    signed short int i;
+    unsigned char b[2];
+    } i2s;
   union {
     unsigned int i;
     unsigned char b[4];
@@ -71,9 +84,17 @@ main ( int narg, char *argv[] ) {
     unsigned char b[8];
     } i8u;
   union {
+    signed long int i;
+    unsigned char b[8];
+    } i8s;
+  union {
     float f;
     unsigned char b[4];
     } f4;
+  union {
+    double f;
+    unsigned char b[8];
+    } f8;
 
   /*======================================*/
   /*=== Initialize: Command line stuff ===*/
@@ -133,20 +154,32 @@ main ( int narg, char *argv[] ) {
       strcpy(record.val,"@...");           /* just print "@" instead */
       }
     if (!strncmp(record.type_dbm,"i1u",3)) {  /* if the format is "i1u" */    
-      //printf("[%s/%d] Not expecting to see i1u as a type_dbm.  Treating as raw.\n",ME,getpid());
-      //strcpy(record.val,"@");              /* just print "@" instead */
-      //i1u.b=record.val[0];           /* unpack the bytes into a union structure */
-      //sprintf(record.val,"%hu",i1u.i); /* overwrite in human-readable representation */ 
-      i2u.b[0]=record.val[0];           /* unpack the bytes into a union structure */
-      i2u.b[1]=0;
-      sprintf(record.val,"%hu",i2u.i); /* overwrite in human-readable representation */ 
+      i1u.b[0]=record.val[0];           /* unpack the bytes into a union structure */
+      sprintf(record.val,"%hhu",i1u.i); /* overwrite in human-readable representation */ 
+      }
+    if (!strncmp(record.type_dbm,"i1s",3)) {  /* if the format is "i1s" */    
+      i1s.b[0]=record.val[0];           /* unpack the bytes into a union structure */
+      sprintf(record.val,"%hhi",i1s.i); /* overwrite in human-readable representation */ 
       }
     if (!strncmp(record.type_dbm,"i2u",3)) {  /* if the format is "i2u" */   
       //printf("[%s/%d] Not expecting to see i2u as a type_dbm.  Treating as raw.\n",ME,getpid());
       //strcpy(record.val,"@@");              /* just print "@@" instead */
       i2u.b[0]=record.val[0];           /* unpack the bytes into a union structure */
       i2u.b[1]=record.val[1];
+      if (!strncmp(record.type_dbm,"i2ur",4)) {
+        i2u.i = bswap_16(i2u.i);
+        }
       sprintf(record.val,"%hu",i2u.i); /* overwrite in human-readable representation */ 
+      }
+    if (!strncmp(record.type_dbm,"i2s",3)) {  /* if the format is "i2s" */   
+      //printf("[%s/%d] Not expecting to see i2s as a type_dbm.  Treating as raw.\n",ME,getpid());
+      //strcpy(record.val,"@@");              /* just print "@@" instead */
+      i2s.b[0]=record.val[0];           /* unpack the bytes into a union structure */
+      i2s.b[1]=record.val[1];
+      if (!strncmp(record.type_dbm,"i2sr",4)) {
+        i2s.i = bswap_16(i2s.i);
+        }
+      sprintf(record.val,"%hi",i2s.i); /* overwrite in human-readable representation */ 
       }
     if (!strncmp(record.type_dbm,"i4u",3)) {  /* if the format is "i4u" */   
       //printf("[%s/%d] Not expecting to see i4u as a type_dbm.  Treating as raw.\n",ME,getpid());
@@ -155,6 +188,9 @@ main ( int narg, char *argv[] ) {
       i4u.b[1]=record.val[1];
       i4u.b[2]=record.val[2];
       i4u.b[3]=record.val[3];
+      if (!strncmp(record.type_dbm,"i4ur",4)) {
+        i4u.i = bswap_32(i4u.i);
+        }
       sprintf(record.val,"%u",i4u.i); /* overwrite in human-readable representation */  
       }
     if (!strncmp(record.type_dbm,"i4s",3)) {  /* if the format is "i4s" */   
@@ -164,6 +200,9 @@ main ( int narg, char *argv[] ) {
       i4s.b[1]=record.val[1];
       i4s.b[2]=record.val[2];
       i4s.b[3]=record.val[3];
+      if (!strncmp(record.type_dbm,"i4sr",4)) {
+        i4s.i = bswap_32(i4s.i);
+        }
       sprintf(record.val,"%i",i4s.i); /* overwrite in human-readable representation */  
       }
     if (!strncmp(record.type_dbm,"i8u",3)) {  /* if the format is "i8u" */   
@@ -177,23 +216,51 @@ main ( int narg, char *argv[] ) {
       i8u.b[5]=record.val[5];
       i8u.b[6]=record.val[6];
       i8u.b[7]=record.val[7];
+      if (!strncmp(record.type_dbm,"i8ur",4)) {
+        i8u.i = bswap_64(i8u.i);
+        }
       sprintf(record.val,"%lu",i8u.i); /* overwrite in human-readable representation */  
       }
-    if (!strncmp(record.type_dbm,"f4",2)) {  /* if the format is "f4" */
-        if (!strncmp(record.type_dbm,"f4r",3)) {  /* if the format is "f4r" (same as f4, but big-endian) */
-          f4.b[3]=record.val[0];           /* unpack the bytes into a union structure */
-          f4.b[2]=record.val[1];
-          f4.b[1]=record.val[2];
-          f4.b[0]=record.val[3];
-          sprintf(record.val,"%f",f4.f); /* overwrite in human-readable representation */    
-          } else {
-          f4.b[0]=record.val[0];           /* unpack the bytes into a union structure */
-          f4.b[1]=record.val[1];
-          f4.b[2]=record.val[2];
-          f4.b[3]=record.val[3];
-          sprintf(record.val,"%f",f4.f); /* overwrite in human-readable representation */    
-          }
+    if (!strncmp(record.type_dbm,"i8s",3)) {  /* if the format is "i8s" */   
+      //printf("[%s/%d] Not expecting to see i8s as a type_dbm.  Treating as raw.\n",ME,getpid());
+      //strcpy(record.val,"@@@@@@@@");              /* just print "@@@@@@@@" instead */
+      i8s.b[0]=record.val[0];           /* unpack the bytes into a union structure */
+      i8s.b[1]=record.val[1];
+      i8s.b[2]=record.val[2];
+      i8s.b[3]=record.val[3];
+      i8s.b[4]=record.val[4];
+      i8s.b[5]=record.val[5];
+      i8s.b[6]=record.val[6];
+      i8s.b[7]=record.val[7];
+      if (!strncmp(record.type_dbm,"i8sr",4)) {
+        i8s.i = bswap_64(i8s.i);
         }
+      sprintf(record.val,"%lu",i8s.i); /* overwrite in human-readable representation */  
+      }
+    if (!strncmp(record.type_dbm,"f4",2)) {  /* if the format is "f4" */
+      f4.b[0]=record.val[0];           /* unpack the bytes into a union structure */
+      f4.b[1]=record.val[1];
+      f4.b[2]=record.val[2];
+      f4.b[3]=record.val[3];
+      if (!strncmp(record.type_dbm,"f4r",3)) {  /* if the format is "f4r" (same as f4, but big-endian) */
+        f4.f = bswap_32(f4.f);
+        }
+      sprintf(record.val,"%f",f4.f); /* overwrite in human-readable representation */    
+      }
+    if (!strncmp(record.type_dbm,"f8",2)) {  /* if the format is "f8" */
+      f8.b[0]=record.val[0];           /* unpack the bytes into a union structure */
+      f8.b[1]=record.val[1];
+      f8.b[2]=record.val[2];
+      f8.b[3]=record.val[3];
+      f8.b[4]=record.val[4];
+      f8.b[5]=record.val[5];
+      f8.b[6]=record.val[6];
+      f8.b[7]=record.val[7];
+      if (!strncmp(record.type_dbm,"f8r",3)) {  /* if the format is "f8r" (same as f8, but big-endian) */
+        f8.f = bswap_64(f8.f);
+        }
+      sprintf(record.val,"%f",f8.f); /* overwrite in human-readable representation */    
+      }
 
     //printf("%d|%s|%s|%s|%s|",
     //  record.eType,
@@ -231,6 +298,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mdr.c: J. Dowell, UNM, 2019 Oct 29
+//   .1 Made the code "type complete"
 // ms_mdr.c: J. Dowell, UNM, 2018 Jan 29
 //   .1: Cleaned up a few complier warnings
 // ms_mdr.c: J. Dowell, UNM, 2015 Dec 9

@@ -20,6 +20,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <gdbm-ndbm.h>
+#include <byteswap.h>
 
 //#include "LWA_MCS.h" 
 #include "mcs.h"
@@ -57,19 +58,47 @@ main ( int narg, char *argv[] ) {
   int result;
 
   struct timezone tz; /* from sys/time.h; included in LWA_MCS.h */
-
+  
+  union {
+    unsigned char i;
+    unsigned char b[1];
+    } i1u;
+  union {
+    signed char i;
+    unsigned char b[1];
+    } i1s;
   union {
     unsigned short int i;
     unsigned char b[2];
     } i2u;
   union {
+    signed short int i;
+    unsigned char b[2];
+    } i2s;
+  union {
     unsigned int i;
     unsigned char b[4];
     } i4u;
   union {
+    signed int i;
+    unsigned char b[4];
+    } i4s;
+  union {
+    unsigned long int i;
+    unsigned char b[8];
+    } i8u;
+  union {
+    signed long int i;
+    unsigned char b[8];
+    } i8s;
+  union {
     float f;
     unsigned char b[4];
     } f4;
+  union {
+    double f;
+    unsigned char b[8];
+    } f8;
 
   /*==================*/
   /*=== Initialize ===*/
@@ -184,31 +213,100 @@ main ( int narg, char *argv[] ) {
       /* nothing to do; just let it remain "\0" */ 
       }
     if (!strncmp(type_dbm,"i1u",3)) {        /* save as a uint8 */
-      ///* just let it remain "\0" */ 
-      //printf("[%s] Not expecting to see i1u as a type_dbm.  Doing nothing.\n",ME);
-      sscanf(val,"%hu",&(i2u.i));   /* get as an unsigned short int */
-      record.val[0] = i2u.b[0];     /* raw-write low-order byte into the string array */
+      sscanf(val,"%hhu",&(i1u.i));   /* get as an unsigned char */
+      record.val[0] = i1u.b[0];     /* raw-write low-order byte into the string array */
+      }
+    if (!strncmp(type_dbm,"i1s",3)) {        /* save as a int8 */
+      sscanf(val,"%hhi",&(i1s.i));   /* get as an signed char */
+      record.val[0] = i1s.b[0];     /* raw-write low-order byte into the string array */
       }
     if (!strncmp(type_dbm,"i2u",3)) {        /* save as a uint16 */
-      sscanf(val,"%hu",&(i2u.i));   /* get as a unit16 */
+      sscanf(val,"%hu",&(i2u.i));   /* get as a uint16 */
+      if (!strncmp(type_dbm,"i2ur",4)) {
+        i2u.i = bswap_16(i2u.i);
+        }
       record.val[0] = i2u.b[0];    /* raw-write into the string array */
       record.val[1] = i2u.b[1];
       }
+    if (!strncmp(type_dbm,"i2s",3)) {        /* save as a int16 */
+      sscanf(val,"%hi",&(i2s.i));   /* get as a int16 */
+      if (!strncmp(type_dbm,"i2sr",4)) {
+        i2s.i = bswap_16(i2s.i);
+        }
+      record.val[0] = i2s.b[0];    /* raw-write into the string array */
+      record.val[1] = i2s.b[1];
+      }
     if (!strncmp(type_dbm,"i4u",3)) {        /* save as a uint32 */
-      ///* just let it remain "\0" */ 
-      //printf("[%s] Not expecting to see i4u as a type_dbm.  Doing nothing.\n",ME);
       sscanf(val,"%u",&(i4u.i));   /* get as a unit32 */
+      if (!strncmp(type_dbm,"i4ur",4)) {
+        i4u.i = bswap_32(i4u.i);
+        }
       record.val[0] = i4u.b[0];    /* raw-write into the string array */
       record.val[1] = i4u.b[1];
       record.val[2] = i4u.b[2];
       record.val[3] = i4u.b[3];
       }
+    if (!strncmp(type_dbm,"i4s",3)) {        /* save as a int32 */
+      sscanf(val,"%i",&(i4s.i));   /* get as a int32 */
+      if (!strncmp(type_dbm,"i4sr",4)) {
+        i4s.i = bswap_32(i4s.i);
+        }
+      record.val[0] = i4s.b[0];    /* raw-write into the string array */
+      record.val[1] = i4s.b[1];
+      record.val[2] = i4s.b[2];
+      record.val[3] = i4s.b[3];
+      }
+    if (!strncmp(type_dbm,"i8u",3)) {        /* save as a uint64 */
+      sscanf(val,"%lu",&(i8u.i));   /* get as a uint64 */
+      if (!strncmp(type_dbm,"i8ur",4)) {
+        i8u.i = bswap_64(i8u.i);
+        }
+      record.val[0] = i8u.b[0];    /* raw-write into the string array */
+      record.val[1] = i8u.b[1];
+      record.val[2] = i8u.b[2];
+      record.val[3] = i8u.b[3];
+      record.val[4] = i8u.b[4];
+      record.val[5] = i8u.b[5];
+      record.val[6] = i8u.b[6];
+      record.val[7] = i8u.b[7];
+      }
+    if (!strncmp(type_dbm,"i8s",3)) {        /* save as a int64 */
+      sscanf(val,"%li",&(i8s.i));   /* get as a int64 */
+      if (!strncmp(type_dbm,"i8sr",4)) {
+        i8s.i = bswap_64(i8s.i);
+        }
+      record.val[0] = i8s.b[0];    /* raw-write into the string array */
+      record.val[1] = i8s.b[1];
+      record.val[2] = i8s.b[2];
+      record.val[3] = i8s.b[3];
+      record.val[4] = i8s.b[4];
+      record.val[5] = i8s.b[5];
+      record.val[6] = i8s.b[6];
+      record.val[7] = i8s.b[7];
+      }
     if (!strncmp(type_dbm,"f4",2)) {         /* save as a float32 */
       sscanf(val,"%f",&(f4.f));   /* get as a float32 */
+      if (!strncmp(type_dbm,"f4r",3)) {
+        f4.f = bswap_32(f4.f);
+        }
       record.val[0] = f4.b[0];    /* raw-write into the string array */
       record.val[1] = f4.b[1];
       record.val[2] = f4.b[2];
       record.val[3] = f4.b[3];
+      }
+    if (!strncmp(type_dbm,"f8",2)) {         /* save as a float64 */
+      sscanf(val,"%lf",&(f8.f));   /* get as a float64 */
+      if (!strncmp(type_dbm,"f8r",3)) {
+        f8.f = bswap_64(f8.f);
+        }
+      record.val[0] = f8.b[0];    /* raw-write into the string array */
+      record.val[1] = f8.b[1];
+      record.val[2] = f8.b[2];
+      record.val[3] = f8.b[3];
+      record.val[4] = f8.b[4];
+      record.val[5] = f8.b[5];
+      record.val[6] = f8.b[6];
+      record.val[7] = f8.b[7];
       }
 
     gettimeofday(&record.last_change,&tz); 
@@ -303,6 +401,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// dat2dbm.c: J. Dowell, UNM, 2019 Oct 29
+//   .1 Made the code "type complete"
 // dat2dbm.c: S.W. Ellingson, Virginia Tech, 2011 Mar 19
 //   .1 Discovered/fixed "close()" used in place of "fclose()"; didn't matter
 //      previously; evidently recent changes to mcs.h caused this to be important
