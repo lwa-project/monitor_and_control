@@ -93,10 +93,12 @@ main ( int narg, char *argv[] ) {
     } i8s;
   union {
     float f;
+    unsigned int i;
     unsigned char b[4];
     } f4;
   union {
     double f;
+    unsigned long int i;
     unsigned char b[8];
     } f8;
 
@@ -287,7 +289,7 @@ main ( int narg, char *argv[] ) {
     if (!strncmp(type_dbm,"f4",2)) {         /* save as a float32 */
       sscanf(val,"%f",&(f4.f));   /* get as a float32 */
       if (!strncmp(type_dbm,"f4r",3)) {
-        f4.f = bswap_32(f4.f);
+        f4.i = bswap_32(f4.i);
         }
       record.val[0] = f4.b[0];    /* raw-write into the string array */
       record.val[1] = f4.b[1];
@@ -297,7 +299,7 @@ main ( int narg, char *argv[] ) {
     if (!strncmp(type_dbm,"f8",2)) {         /* save as a float64 */
       sscanf(val,"%lf",&(f8.f));   /* get as a float64 */
       if (!strncmp(type_dbm,"f8r",3)) {
-        f8.f = bswap_64(f8.f);
+        f8.i = bswap_64(f8.i);
         }
       record.val[0] = f8.b[0];    /* raw-write into the string array */
       record.val[1] = f8.b[1];

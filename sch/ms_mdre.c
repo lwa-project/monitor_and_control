@@ -88,10 +88,12 @@ main ( int narg, char *argv[] ) {
     } i8s;
   union {
     float f;
+    unsigned int i;
     unsigned char b[4];
     } f4;
   union {
     double f;
+    unsigned long int i;
     unsigned char b[8];
     } f8;
 
@@ -229,7 +231,7 @@ main ( int narg, char *argv[] ) {
     f4.b[2]=record.val[2];
     f4.b[3]=record.val[3];
     if (!strncmp(record.type_dbm,"f4r",3)) {  /* if the format is "f4r" (same as f4, but big-endian) */
-      f4.f = bswap_32(f4.f);
+      f4.i = bswap_32(f4.i);
       }
     sprintf(record.val,"%f",f4.f); /* overwrite in human-readable representation */    
     }
@@ -243,7 +245,7 @@ main ( int narg, char *argv[] ) {
       f8.b[6]=record.val[6];
       f8.b[7]=record.val[7];
       if (!strncmp(record.type_dbm,"f8r",3)) {  /* if the format is "f8r" (same as f8, but big-endian) */
-        f8.f = bswap_64(f8.f);
+        f8.i = bswap_64(f8.i);
         }
       sprintf(record.val,"%f",f8.f); /* overwrite in human-readable representation */    
       }
