@@ -498,23 +498,14 @@ int me_action(
                   /* save ASP MIB as it exists at start of observation */
 
                   #ifdef ME_SCP2CP /*see me.h */
-                      sprintf(cmd, "cp %s/ASP.pag sinbox/%s_%04u_ASP_begin.pag",
+                      sprintf(cmd, "cp %s/ASP.gdb sinbox/%s_%04u_ASP_begin.gdb",
                               LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
                   #else
-                      sprintf(cmd, "scp %s:%s/ASP.pag sinbox/%s_%04u_ASP_begin.pag",
+                      sprintf(cmd, "scp %s:%s/ASP.gdb sinbox/%s_%04u_ASP_begin.gdb",
                               LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
                   #endif
                   system(cmd);
-
-                  #ifdef ME_SCP2CP /*see me.h */
-                      sprintf(cmd, "cp %s/ASP.dir sinbox/%s_%04u_ASP_begin.dir",
-                              LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
-                  #else
-                      sprintf(cmd, "scp %s:%s/ASP.dir sinbox/%s_%04u_ASP_begin.dir",
-                              LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
-                  #endif
-                  system(cmd);
-
+                  
                   break;
                 case LWA_CMD_OBE:
 
@@ -529,23 +520,14 @@ int me_action(
                   /* save ASP MIB as it exists at end of observation */
 
                   #ifdef ME_SCP2CP /*see me.h */
-                      sprintf(cmd, "cp %s/ASP.pag sinbox/%s_%04u_ASP_end.pag",
+                      sprintf(cmd, "cp %s/ASP.gdb sinbox/%s_%04u_ASP_end.gdb",
                               LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
                     #else
-                      sprintf(cmd, "scp %s:%s/ASP.pag sinbox/%s_%04u_ASP_end.pag",
+                      sprintf(cmd, "scp %s:%s/ASP.gdb sinbox/%s_%04u_ASP_end.gdb",
                               LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
                     #endif
                   system(cmd);
-
-                  #ifdef ME_SCP2CP /*see me.h */
-                      sprintf(cmd, "cp %s/ASP.dir sinbox/%s_%04u_ASP_end.dir",
-                              LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
-                    #else  
-                      sprintf(cmd, "scp %s:%s/ASP.dir sinbox/%s_%04u_ASP_end.dir",
-                              LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR,sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
-                    #endif
-                  system(cmd);
-
+                  
                   /* write the metadata file */
                   sprintf(filename,"sinbox/%s_%04u_metadata.txt",sq->ssf[i].PROJECT_ID,sq->ssf[i].SESSION_ID);
                   fp = fopen(filename,"a"); /* note we are appending */

@@ -1,6 +1,6 @@
 // ms_mu.c: S.W. Ellingson, Virginia Tech, 2010 May 30
 // ---
-// COMPILE: gcc -o ms_mu -I/usr/include/gdbm ms_mu.c -lgdbm_compat -lgdbm
+// COMPILE: gcc -o ms_mu -I/usr/include/gdbm ms_mu.c -lgdbm
 // In Ubuntu, needed to install package libgdbm-dev
 // ---
 // COMMAND LINE: ms_mu <subsystem> <period>
@@ -33,7 +33,7 @@
 
 #include <string.h>
 #include <fcntl.h> /* needed for O_READONLY; perhaps other things */
-#include <gdbm-ndbm.h>
+#include <gdbm.h>
 
 //#include "LWA_MCS.h" 
 #include "mcs.h"
@@ -42,7 +42,7 @@
 #define MAX_UPDATES_PER_SEC 30 /* do no more than this many updates in a row */
                                /* then sleep for 1 second */
 
-#define MY_NAME "ms_mu (v.20100530.1)"
+#define MY_NAME "ms_mu (v.20191030.1)"
 #define ME "14" 
 
 main ( int narg, char *argv[] ) {
@@ -56,7 +56,7 @@ main ( int narg, char *argv[] ) {
  
   /* dbm-related variables */
   char dbm_filename[256];
-  DBM *dbm_ptr;
+  GDBM_FILE dbm_ptr;
   struct dbm_record record;
   datum datum_key;
   datum datum_data;
@@ -119,15 +119,12 @@ main ( int narg, char *argv[] ) {
   /* while MCS/Scheduler is running */
 
   /* make copy of the MIB; same root filename but with "_temp" added */
-  sprintf(cmd_line,"cp %s.dir %s_%d.dir",dbm_filename,dbm_filename,getpid());
+  sprintf(cmd_line,"cp %s.gdb %s_%d.gdb",dbm_filename,dbm_filename,getpid());
   printf("[%s/%d] system(%s)\n",ME,getpid(),cmd_line);
   system(cmd_line);
-  sprintf(cmd_line,"cp %s.pag %s_%d.pag",dbm_filename,dbm_filename,getpid());
-  printf("[%s/%d] system(%s)\n",ME,getpid(),cmd_line);
-  system(cmd_line);
-
+  
   /* now use *this* copy of MIB */
-  sprintf(dbm_filename,"%s_%d",argv[1],getpid()); 
+  sprintf(dbm_filename,"%s_%d.gdb",argv[1],getpid()); 
 
   //printf("[%s/%d] <%s>\n",ME,getpid(),dbm_filename);
   //exit(EXIT_SUCCESS);
@@ -139,21 +136,23 @@ main ( int narg, char *argv[] ) {
   while (!bDone) {
 
     /* Open dbm file */
-    dbm_ptr = dbm_open(dbm_filename, O_RDONLY);
+    dbm_ptr = gdbm_open(dbm_filename, 0, GDBM_READER, 0, NULL);
     if (!dbm_ptr) {
-      printf("[%s/%d] FATAL: Failed to open dbm <%s>\n",ME,getpid(),dbm_filename);
+      printf("[%s/%d] FATAL: Failed to open dbm <%s> - %s\n",ME,getpid(),dbm_filename,gdbm_strerror(gdbm_errno));
+      sprintf(cmd_line,"rm %s",dbm_filename);
+      system(cmd_line);
       exit(EXIT_FAILURE);
       }
 
     /* === Read dbm record-by-record === */
     for (
-             datum_key = dbm_firstkey(dbm_ptr);
+             datum_key = gdbm_firstkey(dbm_ptr);
              datum_key.dptr;
-             datum_key = dbm_nextkey(dbm_ptr)
+             datum_key = gdbm_nextkey(dbm_ptr,datum_key)
           ) {
 
       /* read next line */
-      datum_data = dbm_fetch(dbm_ptr,datum_key);
+      datum_data = gdbm_fetch(dbm_ptr,datum_key);
 
       memcpy( &record, datum_data.dptr, datum_data.dsize );
 
@@ -206,7 +205,7 @@ main ( int narg, char *argv[] ) {
       } /* for () */
 
     /* Close dbm file */
-    dbm_close(dbm_ptr);
+    gdbm_close(dbm_ptr);
 
     if (period==0) { 
         bDone=1; 
@@ -221,13 +220,10 @@ main ( int narg, char *argv[] ) {
   /*======================================*/
 
   /* delete _temp copy of the MIB */
-  sprintf(cmd_line,"rm %s.dir",dbm_filename);
+  sprintf(cmd_line,"rm %s",dbm_filename);
   printf("[%s/%d] system(%s)\n",ME,getpid(),cmd_line);
   system(cmd_line);
-  sprintf(cmd_line,"rm %s.pag",dbm_filename);
-  printf("[%s/%d] system(%s)\n",ME,getpid(),cmd_line);
-  system(cmd_line);
-
+  
   //printf("[%s/%d] exit(EXIT_SUCCESS)\n",ME,getpid());
   exit(EXIT_SUCCESS);
   } /* main() */
@@ -236,6 +232,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mu.c: J. Dowell, UNM, 2019 Oct 30
+//   .1 Convert to using normal GDBM for the database
 // ms_mu.c: S.W. Ellingson, Virginia Tech, 2010 May 30
 //   .1: Excluding DP FIR-related MIB entries
 // ms_mu.c: S.W. Ellingson, Virginia Tech, 2010 May 28

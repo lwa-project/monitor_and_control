@@ -12,12 +12,12 @@
 
 
 int LWA_mibupdate_ASP( 
-                      DBM *dbm_ptr,    /* pointer to an open dbm file */
-                      int cid,         /* command, so handler knows how to deal with it */ 
-                                       /* Note: should not be PNG, RPT, or SHT! */
-                      char *cmdata,    /* the DATA field from the *command* message */
-                      char *r_comment, /* R-COMMENT */
-                      int  datalen     /* number of significant bytes in "r_comment" */
+                      GDBM_FILE dbm_ptr,  /* pointer to an open dbm file */
+                      int cid,            /* command, so handler knows how to deal with it */ 
+                                          /* Note: should not be PNG, RPT, or SHT! */
+                      char *cmdata,       /* the DATA field from the *command* message */
+                      char *r_comment,    /* R-COMMENT */
+                      int  datalen        /* number of significant bytes in "r_comment" */
                      ) {
   /* This is the handler for the SHL subsystem. */
   int eMIBerror = LWA_MIBERR_OK;
@@ -137,6 +137,8 @@ int LWA_mibupdate_ASP(
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mcic_ASP.c: J. Dowell, UNM, 2019 Oct 30
+//   .1 Convert to using normal GDBM for the database
 // ms_mcic_ASP.c: S.W. Ellingson, Virginia Tech, 2009 Aug 06
 //   initial version
 

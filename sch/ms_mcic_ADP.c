@@ -10,7 +10,7 @@
 
 
 int LWA_mibupdate_ADP( 
-                      DBM *dbm_ptr,              /* pointer to an open dbm file */
+                      GDBM_FILE dbm_ptr,         /* pointer to an open dbm file */
                       int cid,                   /* command, so handler knows how to deal with it */ 
                                                  /* Note: should not be PNG, RPT, or SHT! */
                       char           *cmdata,    /* the DATA field from the *command* message */
@@ -406,6 +406,8 @@ int LWA_mibupdate_ADP(
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mcic_ADP.c: J. Dowell, UNM, 2019 Oct 30
+//   .1 Convert to using normal GDBM for the database
 // ms_mcic_ADP.c: J. Dowell, UNM, 15 Aug 10
 //   initial version
 

@@ -1,6 +1,6 @@
 // ms_mdr.c: S.W. Ellingson, Virginia Tech, 2009 Aug 16
 // ---
-// COMPILE: gcc -o ms_mdr -I/usr/include/gdbm ms_mdr.c -lgdbm_compat -lgdbm
+// COMPILE: gcc -o ms_mdr -I/usr/include/gdbm ms_mdr.c -lgdbm
 // In Ubuntu, needed to install package libgdbm-dev
 // ---
 // COMMAND LINE: ms_mdr <subsystem>
@@ -25,13 +25,13 @@
 
 #include <string.h>
 #include <fcntl.h> /* needed for O_READONLY; perhaps other things */
-#include <gdbm-ndbm.h>
+#include <gdbm.h>
 #include <byteswap.h>
 
 //#include "LWA_MCS.h" 
 #include "mcs.h"
 
-#define MY_NAME "ms_mdr (v.20180129.1)"
+#define MY_NAME "ms_mdr (v.20191030.1)"
 #define ME "8" 
 
 main ( int narg, char *argv[] ) {
@@ -42,7 +42,7 @@ main ( int narg, char *argv[] ) {
 
   /* dbm-related variables */
   char dbm_filename[256];
-  DBM *dbm_ptr;
+  GDBM_FILE dbm_ptr;
   struct dbm_record record;
   datum datum_key;
   datum datum_data;
@@ -122,21 +122,21 @@ main ( int narg, char *argv[] ) {
   /*======================================*/
 
   /* Open dbm file */
-  dbm_ptr = dbm_open(dbm_filename, O_RDONLY);
+  dbm_ptr = gdbm_open(dbm_filename, 0, GDBM_READER, 0, NULL);
   if (!dbm_ptr) {
-    printf("[%s/%d] FATAL: Failed to open dbm <%s>\n",ME,getpid(),dbm_filename);
+    printf("[%s/%d] FATAL: Failed to open dbm <%s> - %s\n",ME,getpid(),dbm_filename,gdbm_strerror(gdbm_errno));
     exit(EXIT_FAILURE);
     }
 
   /* === Read dbm record-by-record === */
   for (
-           datum_key = dbm_firstkey(dbm_ptr);
+           datum_key = gdbm_firstkey(dbm_ptr);
            datum_key.dptr;
-           datum_key = dbm_nextkey(dbm_ptr)
+           datum_key = gdbm_nextkey(dbm_ptr,datum_key)
         ) {
 
     /* read next line */
-    datum_data = dbm_fetch(dbm_ptr,datum_key);
+    datum_data = gdbm_fetch(dbm_ptr,datum_key);
 
     memcpy( &record, datum_data.dptr, datum_data.dsize );
 
@@ -290,7 +290,7 @@ main ( int narg, char *argv[] ) {
     } /* for () */
 
   /* Close dbm file */
-  dbm_close(dbm_ptr);
+  gdbm_close(dbm_ptr);
 
   printf("[%s/%d] exit(EXIT_SUCCESS)\n",ME,getpid());
   exit(EXIT_SUCCESS);
@@ -300,6 +300,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mdr.c: J. Dowell, UNM, 2019 Oct 30
+//   .1 Convert to using normal GDBM for the database
 // ms_mdr.c: J. Dowell, UNM, 2019 Oct 29
 //   .1 Made the code "type complete"
 // ms_mdr.c: J. Dowell, UNM, 2018 Jan 29

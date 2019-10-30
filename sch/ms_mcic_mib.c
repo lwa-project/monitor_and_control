@@ -12,7 +12,7 @@
 /* ======================================================================= */
 /* ======================================================================= */
 int LWA_dbm_fetch( 
-                  DBM *dbm_ptr,              /* pointer to an open dbm file */
+                  GDBM_FILE dbm_ptr,         /* pointer to an open dbm file */
                   char *label,               /* key */
                   struct dbm_record *record  /* (output) record for that key */                   
                  ) {
@@ -24,7 +24,7 @@ int LWA_dbm_fetch(
   strncpy(key,label,MIB_LABEL_FIELD_LENGTH);
   datum_key.dptr   = (void *) key;
   datum_key.dsize  = strlen(key);
-  datum_data = dbm_fetch(dbm_ptr,datum_key);
+  datum_data = gdbm_fetch(dbm_ptr,datum_key);
   if (datum_data.dptr) {
       memcpy( record, datum_data.dptr, datum_data.dsize );
     } else { 
@@ -39,7 +39,7 @@ int LWA_dbm_fetch(
 /* ======================================================================= */
 /* ======================================================================= */
 int LWA_dbm_store( 
-                  DBM *dbm_ptr,              /* pointer to an open dbm file */
+                  GDBM_FILE dbm_ptr,         /* pointer to an open dbm file */
                   char *label,               /* key */
                   struct dbm_record *record  /* (output) record for that key */                    
                  ) {
@@ -58,7 +58,7 @@ int LWA_dbm_store(
   datum_data.dptr  = (void *) record;
   datum_data.dsize = sizeof(struct dbm_record); 
     
-  result = dbm_store( dbm_ptr, datum_key, datum_data, DBM_REPLACE);
+  result = gdbm_store( dbm_ptr, datum_key, datum_data, GDBM_REPLACE);
   if (result != 0) {
     eMIBerror = eMIBerror | LWA_MIBERR_CANTSTORE;
     printf("[%s/%d] LWA_dbm_store() failed; label=<%s>\n",ME,getpid(),label);
@@ -72,12 +72,12 @@ int LWA_dbm_store(
 /* ======================================================================= */
 /* ======================================================================= */
 int LWA_mibupdate_RPT( 
-                      DBM *dbm_ptr,    /* pointer to an open dbm file */
-                      char *cmdata,    /* the DATA field from the *command* message */
-                                       /* For RPT, this should be a MIB label */
-                      char *r_comment, /* R-COMMENT */
-                                       /* For RPT, this should be the returned value */
-                      int datalen      /* number of significant bytes in r_comment, or -1 if a string */
+                      GDBM_FILE dbm_ptr,  /* pointer to an open dbm file */
+                      char *cmdata,       /* the DATA field from the *command* message */
+                                          /* For RPT, this should be a MIB label */
+                      char *r_comment,    /* R-COMMENT */
+                                          /* For RPT, this should be the returned value */
+                      int datalen         /* number of significant bytes in r_comment, or -1 if a string */
                      ) {
   /* This is the handler for the RPT command.  (Same for all subsytems) */
 
@@ -134,7 +134,7 @@ int mib_update(
   /* Will always update SUMMARY.  */
   /* Other things get updated if eAccept = LWA_MSELOG_TP_SUCCESS or LWA_MSELOG_TP_DONE_UNK */
 
-  DBM *dbm_ptr;
+  GDBM_FILE dbm_ptr;
   struct dbm_record record;
 
   int eMIBerror = LWA_MIBERR_OK; /* returned value; see LWA_MIBERR_* in LWA_MCS.h */
@@ -149,11 +149,11 @@ int mib_update(
   //printf("[%s/%d] mib_update() rcvd: dbm_filename=<%s> \n",ME,getpid(),dbm_filename);
 
   /* Open dbm file */
-  dbm_ptr = dbm_open(dbm_filename, O_RDWR); /* open for both read and write */
+  dbm_ptr = gdbm_open(dbm_filename, 512, GDBM_WRITER, 0, NULL); /* open for both read and write */
   if (!dbm_ptr) { /* failed to open database */
 
       eMIBerror = LWA_MIBERR_CANTOPEN;
-      printf("[%s/%d] mib_update() failed to open dbm <%s>\n",ME,getpid(),dbm_filename);
+      printf("[%s/%d] mib_update() failed to open dbm <%s> - %s\n",ME,getpid(),dbm_filename,gdbm_strerror(gdbm_errno));
 
     } else { /* successfully opened database */
 
@@ -250,7 +250,7 @@ int mib_update(
         } /* if ( (eAccept */
 
       /* Close dbm file */
-      dbm_close(dbm_ptr);
+      gdbm_close(dbm_ptr);
           
     } /* if (!dbm_ptr) */
 
@@ -261,6 +261,8 @@ int mib_update(
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mcic_mib.c: J. Dowell, UNM, 2019 Oct 30
+//   .1 Convert to using normal GDBM for the database
 // ms_mcic_mib.c: J. Dowell, UNM, 2015 Aug 10
 //   adding MCS-ADP ("ADP") support
 // ms_mcic_mib.c: S.W. Ellingson, Virginia Tech, 2010 Jun 07

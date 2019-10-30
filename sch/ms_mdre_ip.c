@@ -1,6 +1,6 @@
 // ms_mdre_ip.c: S.W. Ellingson, Virginia Tech, 2010 Oct 16
 // ---
-// COMPILE:  gcc -o ms_mdre_ip -I/usr/include/gdbm ms_mdre_ip.c -lgdbm_compat -lgdbm 
+// COMPILE:  gcc -o ms_mdre_ip -I/usr/include/gdbm ms_mdre_ip.c -lgdbm 
 // In Ubuntu, needed to install package libgdbm-dev
 // ---
 // COMMAND LINE: ./ms_mdre_ip
@@ -18,7 +18,7 @@
 
 #include <string.h>
 #include <fcntl.h> /* needed for O_READONLY, F_GETFL; perhaps other things */
-#include <gdbm-ndbm.h>
+#include <gdbm.h>
 #include <byteswap.h>
 
 /* additional stuff related to sockets */
@@ -30,7 +30,7 @@
 //#include "LWA_MCS.h" 
 #include "mcs.h"
 
-#define MY_NAME "ms_mdre_ip (v.20180129.2)"
+#define MY_NAME "ms_mdre_ip (v.20191030.1)"
 #define ME "16" 
 
 main ( int narg, char *argv[] ) {
@@ -41,7 +41,7 @@ main ( int narg, char *argv[] ) {
 
   /* dbm-related variables */
   char dbm_filename[256];
-  DBM *dbm_ptr;
+  GDBM_FILE dbm_ptr;
   struct dbm_record record;
   datum datum_key;
   datum datum_data;
@@ -196,13 +196,13 @@ main ( int narg, char *argv[] ) {
       //printf("> label='%s'\n",label);   
 
        /* Open dbm file and look for entry */
-      dbm_ptr = dbm_open(dbm_filename, O_RDONLY);
+      dbm_ptr = gdbm_open(dbm_filename, 0, GDBM_READER, 0, NULL);
 
       if (!dbm_ptr) { /* not able to open dbm file */
 
           //printf("[%s/%d] FATAL: Failed to open dbm <%s>. eError=%d\n",ME,getpid(),dbm_filename,eError);
           eError = 1;
-          sprintf(c.val,"Err: Failed to open dbm");
+          sprintf(c.val,"Err: Failed to open dbm - %s",gdbm_strerror(gdbm_errno));
           //c.last_change = 0;
 
         } else { /* able to open dbm file.  Look for label... */
@@ -210,7 +210,7 @@ main ( int narg, char *argv[] ) {
           sprintf(key,"%s",label);
           datum_key.dptr = key;
           datum_key.dsize = strlen(key);
-          datum_data = dbm_fetch(dbm_ptr,datum_key);
+          datum_data = gdbm_fetch(dbm_ptr,datum_key);
           if (datum_data.dptr) {
               //printf("[%s/%d] Found it. eError=%d.\n", ME, getpid(),eError);
               memcpy( &record, datum_data.dptr, datum_data.dsize );
@@ -223,7 +223,7 @@ main ( int narg, char *argv[] ) {
             }
 
           /* Close dbm file */
-          dbm_close(dbm_ptr);
+          gdbm_close(dbm_ptr);
 
         } /* if (!dbm_ptr) */
 
@@ -317,8 +317,8 @@ main ( int narg, char *argv[] ) {
           f4.b[2]=record.val[2];
           f4.b[3]=record.val[3];
           if (!strncmp(record.type_dbm,"f4r",3)) {  /* if the format is "f4r" (same as f4, but big-endian) */
-            f4.i = bswap_32(f4.i);    
-            }
+             f4.i = bswap_32(f4.i);    
+          }
           sprintf(record.val,"%f",f4.f); /* overwrite in human-readable representation */    
           }
         if (!strncmp(record.type_dbm,"f8",2)) {  /* if the format is "f8" */
@@ -381,6 +381,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mdre_ip.c: J. Dowell, UNM, 2019 Oct 30
+//   .1 Convert to using normal GDBM for the database
 // ms_mdre_ip.c: J. Dowell, UNM, 2019 Oct 29
 //   .1 Made the code "type complete"
 // ms_mdre_ip.c: J. Dowell, UNM, 2018 Jan 29

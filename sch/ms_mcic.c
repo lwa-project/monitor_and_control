@@ -1,6 +1,6 @@
 // ms_mcic.c: J. Dowell, UNM, 2015 Sep 14
 // ---
-// COMPILE: gcc -o ms_mcic -I/usr/include/gdbm ms_mcic.c -lgdbm_compat -lgdbm
+// COMPILE: gcc -o ms_mcic -I/usr/include/gdbm ms_mcic.c -lgdbm
 // In Ubuntu, needed to install package libgdbm-dev
 // ---
 // COMMAND LINE: ms_mcic <subsystem>
@@ -26,7 +26,7 @@
 
 #include <string.h>
 #include <fcntl.h>
-#include <gdbm-ndbm.h>
+#include <gdbm.h>
 
 #include <sys/msg.h>
 
@@ -34,7 +34,7 @@
 
 #include "mcs.h"
 
-#define MY_NAME "ms_mcic (v.20150914.1)"
+#define MY_NAME "ms_mcic (v.20191030.1)"
 #define ME "6" 
 
 /* Things that should eventually be obtained from a .h file */
@@ -56,7 +56,7 @@ main ( int narg, char *argv[] ) {
 
   /* dbm-related variables */
   char dbm_filename[256];
-  DBM *dbm_ptr;
+  GDBM_FILE dbm_ptr;
   struct dbm_record record;
   datum datum_key;
   datum datum_data;
@@ -167,9 +167,9 @@ main ( int narg, char *argv[] ) {
   /* Open, get ip_address, tx_port, rx_port */
 
   /* Open dbm file */
-  dbm_ptr = dbm_open(dbm_filename, O_RDONLY);
+  dbm_ptr = gdbm_open(dbm_filename, 0, GDBM_READER, 0, NULL);
   if (!dbm_ptr) {
-    printf("[%s/%d] FATAL: Failed to open dbm <%s>\n",ME,getpid(),dbm_filename);
+    printf("[%s/%d] FATAL: Failed to open dbm <%s> - %s\n",ME,getpid(),dbm_filename,gdbm_strerror(gdbm_errno));
     exit(EXIT_FAILURE);
     }
 
@@ -178,7 +178,7 @@ main ( int narg, char *argv[] ) {
   sprintf(key,"MCH_IP_ADDRESS");
   datum_key.dptr = key;
   datum_key.dsize = strlen(key);
-  datum_data = dbm_fetch(dbm_ptr,datum_key);
+  datum_data = gdbm_fetch(dbm_ptr,datum_key);
   if (datum_data.dptr) {
       memcpy( &record, datum_data.dptr, datum_data.dsize );
       strncpy(ip_address,record.val,15);
@@ -191,7 +191,7 @@ main ( int narg, char *argv[] ) {
   sprintf(key,"MCH_TX_PORT");
   datum_key.dptr = key;
   datum_key.dsize = strlen(key);
-  datum_data = dbm_fetch(dbm_ptr,datum_key);
+  datum_data = gdbm_fetch(dbm_ptr,datum_key);
   if (datum_data.dptr) {
       memcpy( &record, datum_data.dptr, datum_data.dsize );
       sscanf(record.val,"%d",&tx_port);
@@ -204,7 +204,7 @@ main ( int narg, char *argv[] ) {
   sprintf(key,"MCH_RX_PORT");
   datum_key.dptr = key;
   datum_key.dsize = strlen(key);
-  datum_data = dbm_fetch(dbm_ptr,datum_key);
+  datum_data = gdbm_fetch(dbm_ptr,datum_key);
   if (datum_data.dptr) {
       memcpy( &record, datum_data.dptr, datum_data.dsize );
       sscanf(record.val,"%d",&rx_port);
@@ -214,7 +214,7 @@ main ( int narg, char *argv[] ) {
     }
 
   /* Close dbm file */
-  dbm_close(dbm_ptr);
+  gdbm_close(dbm_ptr);
 
 
   /*======================================================*/
@@ -816,6 +816,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mcic.c: J. Dowell, UNM, 2019 Oct 30
+//   .1 Convert to using normal GDBM for the database
 // ms_mcic.c: J. Dowell, UNM, 2015 Sep 13
 //   .1: Updated for ADP
 // ms_mcic.c: S.W. Ellingson, Virginia Tech, 2012 Jul 06

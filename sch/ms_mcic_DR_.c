@@ -10,12 +10,12 @@
 
 
 int LWA_mibupdate_DR_( 
-                      DBM *dbm_ptr,    /* pointer to an open dbm file */
-                      int cid,         /* command, so handler knows how to deal with it */ 
-                                       /* Note: should not be PNG, RPT, or SHT! */
-                      char *cmdata,    /* the DATA field from the *command* message */
-                      char *r_comment, /* R-COMMENT */
-                      int  datalen     /* number of significant bytes in "r_comment" */
+                      GDBM_FILE dbm_ptr,  /* pointer to an open dbm file */
+                      int cid,            /* command, so handler knows how to deal with it */ 
+                                          /* Note: should not be PNG, RPT, or SHT! */
+                      char *cmdata,       /* the DATA field from the *command* message */
+                      char *r_comment,    /* R-COMMENT */
+                      int  datalen        /* number of significant bytes in "r_comment" */
                      ) {
   /* This is the handler for the DR1, DR2, DR3, DR4, and DR5 subsystems. */
 
@@ -149,6 +149,8 @@ int LWA_mibupdate_DR_(
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mcic_DR_.c: J. Dowell, UNM, 2019 Oct 30
+//   .1 Convert to using normal GDBM for the database
 // ms_mcic_DR_.c: S.W. Ellingson, Virginia Tech, 2012 Feb 16
 //   added rudimentary support for SPC command
 // ms_mcic_DR_.c: S.W. Ellingson, Virginia Tech, 2010 Aug 10

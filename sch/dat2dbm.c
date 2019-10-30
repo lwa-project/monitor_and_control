@@ -1,6 +1,6 @@
 // dat2dbm.c: S.W. Ellingson, Virginia Tech, 2011 Mar 19
 // ---
-// COMPILE: gcc -o dat2dbm -I/usr/include/gdbm dat2dbm.c -lgdbm_compat -lgdbm
+// COMPILE: gcc -o dat2dbm -I/usr/include/gdbm dat2dbm.c -lgdbm
 // In Ubuntu, needed to install package libgdbm-dev
 // ---
 // COMMAND LINE: dat2dbm <MIB_init_file> <ip_address> <tx-port> <rx-port>
@@ -19,13 +19,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
-#include <gdbm-ndbm.h>
+#include <gdbm.h>
 #include <byteswap.h>
 
 //#include "LWA_MCS.h" 
 #include "mcs.h"
 
-#define MY_NAME "dat2dbm (v.20110319.1)"
+#define MY_NAME "dat2dbm (v.20191030.1)"
 #define ME "5" 
 
 main ( int narg, char *argv[] ) {
@@ -50,7 +50,7 @@ main ( int narg, char *argv[] ) {
 
   /* dbm-related variables */
   char dbm_filename[256];
-  DBM *dbm_ptr;
+  GDBM_FILE dbm_ptr;
   struct dbm_record record;
   datum datum_key;
   datum datum_data;
@@ -58,7 +58,7 @@ main ( int narg, char *argv[] ) {
   int result;
 
   struct timezone tz; /* from sys/time.h; included in LWA_MCS.h */
-  
+
   union {
     unsigned char i;
     unsigned char b[1];
@@ -158,14 +158,15 @@ main ( int narg, char *argv[] ) {
   /* Construct filename for dbm file */
   memset( dbm_filename,'\0',sizeof(dbm_filename)); /* avoids problem with next line: */  
   strncpy(dbm_filename,dat_filename,3);
+  strncpy(dbm_filename+3,".gdb",5);
   //printf("|%s|\n",dbm_filename);
 
   /* Open dbm file */
-  dbm_ptr = dbm_open(dbm_filename, O_RDWR | O_CREAT | O_TRUNC, 0666);
+  dbm_ptr = gdbm_open(dbm_filename, 512, GDBM_NEWDB, 0666, NULL);
   /*                                        ^-- create if it doesn't already exist */
   /*                                                  ^-- zero it if it does already exit */
   if (!dbm_ptr) {
-    printf("[%s] FATAL: Failed to open database\n",ME);
+    printf("[%s] FATAL: Failed to open database - %s\n",ME,gdbm_strerror(gdbm_errno));
     exit(EXIT_FAILURE);
     }
 
@@ -321,9 +322,9 @@ main ( int narg, char *argv[] ) {
     datum_data.dptr  = (void *) &record;
     datum_data.dsize = sizeof(struct dbm_record); 
 
-    result = dbm_store( dbm_ptr, datum_key, datum_data, DBM_REPLACE);
+    result = gdbm_store( dbm_ptr, datum_key, datum_data, GDBM_REPLACE);
     if (result != 0) {
-      printf("[%s] FATAL: dbm_store failed on key <%s>\n",ME,label);
+      printf("[%s] FATAL: gdbm_store failed on key <%s>\n",ME,label);
       exit(EXIT_FAILURE);
       }
 
@@ -349,9 +350,9 @@ main ( int narg, char *argv[] ) {
   datum_key.dsize  = strlen(label);
   datum_data.dptr  = (void *) &record;
   datum_data.dsize = sizeof(struct dbm_record); 
-  result = dbm_store( dbm_ptr, datum_key, datum_data, DBM_REPLACE);
+  result = gdbm_store( dbm_ptr, datum_key, datum_data, GDBM_REPLACE);
   if (result != 0) {
-    printf("[%s] FATAL: dbm_store failed to store ip_address <%s>\n",ME,ip_address);
+    printf("[%s] FATAL: gdbm_store failed to store ip_address <%s>\n",ME,ip_address);
     exit(EXIT_FAILURE);
     }
 
@@ -368,9 +369,9 @@ main ( int narg, char *argv[] ) {
   datum_key.dsize  = strlen(label);
   datum_data.dptr  = (void *) &record;
   datum_data.dsize = sizeof(struct dbm_record); 
-  result = dbm_store( dbm_ptr, datum_key, datum_data, DBM_REPLACE);
+  result = gdbm_store( dbm_ptr, datum_key, datum_data, GDBM_REPLACE);
   if (result != 0) {
-    printf("[%s] FATAL: dbm_store failed to store tx_port <%d>\n",ME,tx_port);
+    printf("[%s] FATAL: gdbm_store failed to store tx_port <%d>\n",ME,tx_port);
     exit(EXIT_FAILURE);
     }
 
@@ -387,14 +388,14 @@ main ( int narg, char *argv[] ) {
   datum_key.dsize  = strlen(label);
   datum_data.dptr  = (void *) &record;
   datum_data.dsize = sizeof(struct dbm_record); 
-  result = dbm_store( dbm_ptr, datum_key, datum_data, DBM_REPLACE);
+  result = gdbm_store( dbm_ptr, datum_key, datum_data, GDBM_REPLACE);
   if (result != 0) {
-    printf("[%s] FATAL: dbm_store failed to store rx_port <%d>\n",ME,rx_port);
+    printf("[%s] FATAL: gdbm_store failed to store rx_port <%d>\n",ME,rx_port);
     exit(EXIT_FAILURE);
     }
 
   /* Close dbm file */
-  dbm_close(dbm_ptr);
+  gdbm_close(dbm_ptr);
 
   printf("[%s] exit(EXIT_SUCCESS)\n",ME); 
   exit(EXIT_SUCCESS);
@@ -403,6 +404,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// dat2dbm.c: J. Dowell, UNM, 2019 Oct 30
+//   .1 Convert to using normal GDBM for the database
 // dat2dbm.c: J. Dowell, UNM, 2019 Oct 29
 //   .1 Made the code "type complete"
 // dat2dbm.c: S.W. Ellingson, Virginia Tech, 2011 Mar 19

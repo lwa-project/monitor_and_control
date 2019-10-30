@@ -1,6 +1,6 @@
 // ms_mdre.c: S.W. Ellingson, Virginia Tech, 2009 Aug 16
 // ---
-// COMPILE: gcc -o ms_mdre -I/usr/include/gdbm ms_mdr.c -lgdbm_compat -lgdbm
+// COMPILE: gcc -o ms_mdre -I/usr/include/gdbm ms_mdr.c -lgdbm
 // In Ubuntu, needed to install package libgdbm-dev
 // ---
 // COMMAND LINE: ms_mdre <subsystem> <MIB_label>
@@ -26,13 +26,13 @@
 
 #include <string.h>
 #include <fcntl.h> /* needed for O_READONLY; perhaps other things */
-#include <gdbm-ndbm.h>
+#include <gdbm.h>
 #include <byteswap.h>
 
 //#include "LWA_MCS.h" 
 #include "mcs.h"
 
-#define MY_NAME "ms_mdre (v.20180129.1)"
+#define MY_NAME "ms_mdre (v.20191030.1)"
 #define ME "9" 
 
 main ( int narg, char *argv[] ) {
@@ -43,7 +43,7 @@ main ( int narg, char *argv[] ) {
 
   /* dbm-related variables */
   char dbm_filename[256];
-  DBM *dbm_ptr;
+  GDBM_FILE dbm_ptr;
   struct dbm_record record;
   datum datum_key;
   datum datum_data;
@@ -125,16 +125,16 @@ main ( int narg, char *argv[] ) {
   /*======================================*/
 
   /* Open dbm file */
-  dbm_ptr = dbm_open(dbm_filename, O_RDONLY);
+  dbm_ptr = gdbm_open(dbm_filename, 0, GDBM_READER, 0, NULL);
   if (!dbm_ptr) {
-    printf("[%s/%d] FATAL: Failed to open dbm <%s>\n",ME,getpid(),dbm_filename);
+    printf("[%s/%d] FATAL: Failed to open dbm <%s> - %s\n",ME,getpid(),dbm_filename,gdbm_strerror(gdbm_errno));
     exit(EXIT_FAILURE);
     }
 
   sprintf(key,"%s",label);
   datum_key.dptr = key;
   datum_key.dsize = strlen(key);
-  datum_data = dbm_fetch(dbm_ptr,datum_key);
+  datum_data = gdbm_fetch(dbm_ptr,datum_key);
   if (datum_data.dptr) {
       memcpy( &record, datum_data.dptr, datum_data.dsize );
       //strncpy(ip_address,record.val,15);
@@ -259,7 +259,7 @@ main ( int narg, char *argv[] ) {
   printf("%02d%02d%02d %02d:%02d:%02d\n", (tm->tm_year)-100, (tm->tm_mon)+1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
 
   /* Close dbm file */
-  dbm_close(dbm_ptr);
+  gdbm_close(dbm_ptr);
 
   //printf("[%s/%d] exit(EXIT_SUCCESS)\n",ME,getpid());
   exit(EXIT_SUCCESS);
@@ -269,6 +269,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mdre.c: J. Dowell, UNM, 2019 Oct 30
+//   .1 Convert to using normal GDBM for the database
 // ms_mdre.c: J. Dowell, UNM, 2019 Oct 29
 //   .1 Made the code "type complete"
 // ms_mdre.c: J. Dowell, UNM, 2018 Jan 29

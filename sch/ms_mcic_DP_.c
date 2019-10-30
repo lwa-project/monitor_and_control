@@ -10,7 +10,7 @@
 
 
 int LWA_mibupdate_DP_( 
-                      DBM *dbm_ptr,              /* pointer to an open dbm file */
+                      GDBM_FILE dbm_ptr,         /* pointer to an open dbm file */
                       int cid,                   /* command, so handler knows how to deal with it */ 
                                                  /* Note: should not be PNG, RPT, or SHT! */
                       char           *cmdata,    /* the DATA field from the *command* message */
@@ -310,6 +310,8 @@ int LWA_mibupdate_DP_(
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mcic_DP_.c: J. Dowell, UNM, 2019 Oct 30
+//   .1 Convert to using normal GDBM for the database
 // ms_mcic_DP_.c: S.W. Ellingson, Virginia Tech, 2010 May 31
 //   added MIB updating in response to accepted TBW and TBN commands
 // ms_mcic_DP_.c: S.W. Ellingson, Virginia Tech, 2010 May 25
