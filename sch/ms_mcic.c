@@ -152,7 +152,7 @@ main ( int narg, char *argv[] ) {
   /* Process command line arguments */
   if (narg>1) { 
       printf("[%s/%d] %s specified\n",ME,getpid(),argv[1]);
-      sprintf(dbm_filename,"%s",argv[1]);
+      sprintf(dbm_filename,"%s.gdb",argv[1]);
     } else {
       printf("[%s/%d] FATAL: subsystem not specified\n",ME,getpid());
       exit(EXIT_FAILURE);

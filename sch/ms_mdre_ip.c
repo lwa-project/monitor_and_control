@@ -189,7 +189,7 @@ main ( int narg, char *argv[] ) {
       read(client_sockfd,&c,sizeof(struct LWA_mib_entry));
 
       /* figure out what we need from this */
-      sprintf(dbm_filename,"%s",c.ss); /* dbm_filename is the TLA-subsystem identifier */
+      sprintf(dbm_filename,"%s.gdb",c.ss); /* dbm_filename is the TLA-subsystem identifier */
       sprintf(label,"%s",c.label);     /* and the label is the label... */
 
       //printf("> dbm_filename='%s'\n",dbm_filename);
