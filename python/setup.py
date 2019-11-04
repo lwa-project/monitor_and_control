@@ -32,6 +32,11 @@ def _parse_header(filename):
                 inside = True
                 if name in defines:
                     valid = True
+            elif line.startswith('#ifndef'):
+                _, name = line.split(None, 1)
+                inside = True
+                if name not in defines:
+                    valid = True
             elif line.startswith('#endif'):
                 inside = False
                 valid = False
