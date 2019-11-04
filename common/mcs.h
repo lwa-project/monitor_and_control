@@ -641,7 +641,7 @@ unsigned int LWA_i4u_swap( unsigned int x ) {
   return i4u.i;
   }
   
-unsigned int LWA_i4s_swap( signed int x ) {
+signed int LWA_i4s_swap( signed int x ) {
   /* changes endianness of an signed int */
   unsigned char c;
   union {
@@ -654,7 +654,7 @@ unsigned int LWA_i4s_swap( signed int x ) {
   return i4s.i;
   }
 
-unsigned int LWA_i8u_swap( unsigned long int x ) {
+unsigned long int LWA_i8u_swap( unsigned long int x ) {
   /* changes endianness of an unsigned long int */
   unsigned char c;
   union {
@@ -667,6 +667,21 @@ unsigned int LWA_i8u_swap( unsigned long int x ) {
   c = i8u.b[2]; i8u.b[2] = i8u.b[5]; i8u.b[5] = c;
   c = i8u.b[3]; i8u.b[3] = i8u.b[4]; i8u.b[4] = c;
   return i8u.i;
+  }
+
+signed long int LWA_i8u_swap( signed long int x ) {
+  /* changes endianness of an signed long int */
+  unsigned char c;
+  union {
+    signed long int i;
+    unsigned char b[8];
+    } i8s;
+  i8s.i = x;
+  c = i8s.b[0]; i8s.b[0] = i8s.b[7]; i8s.b[7] = c;
+  c = i8s.b[1]; i8s.b[1] = i8s.b[6]; i8s.b[6] = c;
+  c = i8s.b[2]; i8s.b[2] = i8s.b[5]; i8s.b[5] = c;
+  c = i8s.b[3]; i8s.b[3] = i8s.b[4]; i8s.b[4] = c;
+  return i8s.i;
   }
   
 float LWA_f4_swap( float x ) {
@@ -682,6 +697,20 @@ float LWA_f4_swap( float x ) {
   return f4.f;
   }
 
+double LWA_f8_swap( double x ) {
+  /* changes endianness of a double (assumes 8 bytes) */
+  unsigned char c;
+  union {
+    double f;
+    unsigned char b[8];
+    } f8;
+  f8.f = x;
+  c = f8.b[0]; f8.b[0] = f8.b[7]; f8.b[7] = c;
+  c = f8.b[1]; f8.b[1] = f8.b[6]; f8.b[6] = c;
+  c = f8.b[2]; f8.b[2] = f8.b[5]; f8.b[5] = c;
+  c = f8.b[3]; f8.b[3] = f8.b[4]; f8.b[4] = c;
+  return f8.f;
+  }
 
 /*====================================================*/
 /*=== MCS/Exec stuff =================================*/
