@@ -351,7 +351,7 @@ int main ( int narg, char *argv[] ) {
       return;
       }
 #ifdef USE_ADP
-    if ( ( obs[n].OBS_MODE==LWA_OM_TBF ) && ( obs[n].OBS_FREQ1<123809006 ) ) {
+    if ( ( obs[n].OBS_MODE==LWA_OM_TBF ) && ( obs[n].OBS_FREQ1<222417950 ) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TBF\n",MT_TPSS,getpid(),n);
       return;
       }
@@ -370,13 +370,13 @@ int main ( int narg, char *argv[] ) {
 #ifdef USE_ADP
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ) && (obs[n].OBS_FREQ1<123809006) ) {
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ) && (obs[n].OBS_FREQ1<222417950) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
       return;
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_FREQ2 != 0 && obs[n].OBS_FREQ2<123809006) ) {
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_FREQ2 != 0 && obs[n].OBS_FREQ2<222417950) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
       return;
       }
@@ -405,7 +405,7 @@ int main ( int narg, char *argv[] ) {
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_BW>8) ) {
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_BW>7) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
       return;
       }
@@ -990,6 +990,9 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpss.c: J. Dowell, UNM, 2019 Dec 4
+//   .1 Fixed a typo in the ADP TBN upper tuning limit and updated the ADP DRX 
+//      tuning limits for the new 19.8 MHz mode
 // tpss.c: J. Dowell, UNM, 2019 Feb 12
 //   .1 Made the frequency validation consistent across all of tpss
 // tpss.c: J. Dowell, UNM, 2019 Jan 28

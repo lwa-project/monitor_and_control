@@ -235,19 +235,19 @@
       printf("...converts to %ld\n",obs[nobs].OBS_FREQ1);
 #ifdef USE_ADP
       if ( obs[nobs].OBS_MODE == LWA_OM_TBN ) {
-         if ( ( obs[nobs].OBS_FREQ1<65739295 ) || ( obs[nobs].OBS_FREQ1>20379181557 ) ) {   
+         if ( ( obs[nobs].OBS_FREQ1<65739295 ) || ( obs[nobs].OBS_FREQ1>2037918156 ) ) {   
             printf("[%d/%d] FATAL: OBS_FREQ1 out of range\n",MT_TPSS,getpid());  
             return;
             }
       } else {
-         if ( ( obs[nobs].OBS_FREQ1<123809006 ) || ( obs[nobs].OBS_FREQ1>2037918156 ) ) {   
+         if ( ( obs[nobs].OBS_FREQ1<222417950 ) || ( obs[nobs].OBS_FREQ1>1928352663 ) ) {   
             printf("[%d/%d] FATAL: OBS_FREQ1 out of range\n",MT_TPSS,getpid());  
             return;
             }
          }
 #else
       if ( obs[nobs].OBS_MODE == LWA_OM_TBN ) {
-         if ( ( obs[nobs].OBS_FREQ1<109565492 ) || ( obs[nobs].OBS_FREQ1>20379181557 ) ) {   
+         if ( ( obs[nobs].OBS_FREQ1<109565492 ) || ( obs[nobs].OBS_FREQ1>2037918156 ) ) {   
             printf("[%d/%d] FATAL: OBS_FREQ1 out of range\n",MT_TPSS,getpid());  
             return;
             }
@@ -288,7 +288,7 @@
 #ifdef USE_ADP
       if ( obs[nobs].OBS_FREQ2 == 0 ) {
         printf("[%d/%d] WARNING: OBS_FREQ2 is zero, this will be a half beam observation\n",MT_TPSS,getpid());
-      } else if ( ( obs[nobs].OBS_FREQ2<123809006 ) || ( obs[nobs].OBS_FREQ2>2037918156 ) ) {   
+      } else if ( ( obs[nobs].OBS_FREQ2<222417950 ) || ( obs[nobs].OBS_FREQ2>1928352663 ) ) {   
         printf("[%d/%d] FATAL: OBS_FREQ2 out of range\n",MT_TPSS,getpid());  
         return;
         }
