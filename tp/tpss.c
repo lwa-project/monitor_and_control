@@ -990,6 +990,9 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpss.c: J. Dowell, UNM, 2019 Dec 6
+//   .1 Fixed a bug where the frequency limits in tpss4.c did not match those 
+//      in tpss3.c
 // tpss.c: J. Dowell, UNM, 2019 Dec 4
 //   .1 Fixed a typo in the ADP TBN upper tuning limit and updated the ADP DRX 
 //      tuning limits for the new 19.8 MHz mode
