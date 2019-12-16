@@ -840,9 +840,9 @@ int main ( int narg, char *argv[] ) {
             /* ====================== */
             
 #ifdef USE_ADP
-            /* for ADP output 1, 2 (beams) we do this once; i.e., one recording per session */
+            /* for ADP output 1, 2, 3 (beams) we do this once; i.e., one recording per session */
             /* for ADP output 1 (TBF) output we do a new recording for each observation */
-            /* for ADP output 3 (TBN) output we do a new recording for each observation */
+            /* for ADP output 4 (TBN) output we do a new recording for each observation */
             if ( ( (osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) && (osf.OBS_MODE != LWA_OM_TBF) && (i==1) ) || 
                  ( (osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) && (osf.OBS_MODE == LWA_OM_TBF) ) ||
                  (  osf.SESSION_DRX_BEAM==ME_MAX_NDPOUT           )   ) {
@@ -1963,6 +1963,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: J. Dowell, UNM, 2019 Dec 16
+//   .1 Documentation update for ADP-based stations
 // me_inproc.c: J. Dowell, UNM, 2019 Apr 3
 //   .1 Fixed a bug in STEPPED observations where a OBS_DRX_GAIN of 0 was ignored
 // me_inproc.c: J. Dowell, UNM, 2019 Mar 4

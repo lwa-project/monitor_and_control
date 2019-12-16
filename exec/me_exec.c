@@ -483,11 +483,11 @@ int main ( int narg, char *argv[] ) {
       err = mesi(NULL,"DR3","RPT","OP-TYPE",    "today","+31",  &reference);
       //err = mesi(NULL,"DR3","RPT","SYN",        "today","+32",  &reference);
 
-#ifndef USE_ADP
       err = mesi(NULL,"DR4","RPT","SUMMARY",    "today","+40",  &reference);
       err = mesi(NULL,"DR4","RPT","OP-TYPE",    "today","+41",  &reference);
       //err = mesi(NULL,"DR4","RPT","SYN",        "today","+42",  &reference);
 
+#ifndef USE_ADP
       err = mesi(NULL,"DR5","RPT","SUMMARY",    "today","+50",  &reference);
       err = mesi(NULL,"DR5","RPT","OP-TYPE",    "today","+51",  &reference);
       //err = mesi(NULL,"DR5","RPT","SYN",        "today","+52",  &reference);
@@ -575,10 +575,12 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_exec.c: J. Dowell, UNM, 2019 Dec 16
+//  .1 Added support for a fourth data recorder for ADP-based stations
 // me_exec.c: J. Dowell, UNM, 2019 Oct 30
-//   .1 Convert to using normal GDBM for the database
+//  .1 Convert to using normal GDBM for the database
 // me_exec.c: J. Dowell, UNM, 2018 Feb 13
-//  .1 Added support for a thrid data recorder for ADP-based stations
+//  .1 Added support for a third data recorder for ADP-based stations
 // me_exec.c: J. Dowell, UNM, 2018 Jan 29
 //  .1 Revisited the 121204 me_exec_1.c kludge to try and keep MCS/exec running by adjusting eErr
 //  .2 Increased the queue size for listen()

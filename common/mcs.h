@@ -721,7 +721,7 @@ double LWA_f8_swap( double x ) {
 /**************************************/
 
 #ifdef USE_ADP
-#define ME_SSMIF_FORMAT_VERSION 8
+#define ME_SSMIF_FORMAT_VERSION 9
 #define ME_MAX_NSTD 256
 #define ME_MAX_NFEE 256
 #define ME_MAX_FEEID_LENGTH 10
@@ -740,11 +740,11 @@ double LWA_f8_swap( double x ) {
 #define ME_MAX_ROACHID_LENGTH 10
 #define ME_MAX_NSERVER 7
 #define ME_MAX_SERVERID_LENGTH 10
-#define ME_MAX_NDR 3
+#define ME_MAX_NDR 4
 #define ME_MAX_DRID_LENGTH 10
 #define ME_MAX_NPWRPORT 50
 #define ME_MAX_SSNAME_LENGTH 3 /* for codes used for PWR_NAME */
-#define ME_MAX_NDPOUT 3 /* ADP outputs; 1,2 for beams, 3 for TBN */
+#define ME_MAX_NDPOUT 4 /* ADP outputs; 1,2,3 for beams, 4 for TBN */
 #else
 #define ME_SSMIF_FORMAT_VERSION 7
 #define ME_MAX_NSTD 260
@@ -1533,7 +1533,9 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
-// Feb 18, 2018: Updated the ADP-based stations to support for a second beam and 
+// Dec 16, 2019: Updated the ADP-based stations to support a third beam and
+//               four data recorders
+// Feb 18, 2018: Updated the ADP-based stations to support a second beam and
 //               three data recorders
 // Aug 25, 2016: Updated the ADP-based stations to support two data recorders
 // Sep 11, 2015: Updated various structures and limits for ADP-based stations
