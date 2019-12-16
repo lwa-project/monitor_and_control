@@ -669,7 +669,7 @@ unsigned long int LWA_i8u_swap( unsigned long int x ) {
   return i8u.i;
   }
 
-signed long int LWA_i8u_swap( signed long int x ) {
+signed long int LWA_i8s_swap( signed long int x ) {
   /* changes endianness of an signed long int */
   unsigned char c;
   union {
