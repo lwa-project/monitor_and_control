@@ -172,7 +172,7 @@ setup(
     version              = "0.1",
     description          = "LWA MCS interface module", 
     long_description     = "Module for interacting with the LWA MCS softare",
-    url                  = "https://fornax.phys.unm.edu/lwa/trac/", 
+    url                  = "https://github.com/lwa-project/monitor_and_control/", 
     author               = "Jayce Dowell",
     author_email         = "jdowell@unm.edu",
     license              = 'GPL',
