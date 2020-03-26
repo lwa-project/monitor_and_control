@@ -18,11 +18,16 @@ exec:
 tp:
 	$(MAKE) -C tp
 
+.PHONY: python
+python:
+	$(MAKE) -C python
+
 .PHONY: install
 install:
 	$(MAKE) -C sch install
 	$(MAKE) -C exec install
 	$(MAKE) -C tp install
+	$(MAKE) -C python install
 
 .PHONY: install-services
 install-services:
@@ -33,3 +38,4 @@ clean:
 	$(MAKE) -C sch clean
 	$(MAKE) -C exec clean
 	$(MAKE) -C tp clean
+	$(MAKE) -C python clean
