@@ -1,3 +1,6 @@
+PYBUILDFLAGS   ?=
+PYINSTALLFLAGS ?=
+
 .PHONY: all
 all: build
 
