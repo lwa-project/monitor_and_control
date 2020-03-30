@@ -11,10 +11,10 @@ from setuptools import setup, Extension, Distribution, find_packages
 
 def _parse_header(filename):
     defines = {}
-    
+
     with open(filename, 'r') as fh:
-        inside = False
-        valid = False
+        valid = [True,]
+
         for line in fh:
             line = line.strip()
             if line.startswith('#define'):
@@ -25,21 +25,23 @@ def _parse_header(filename):
                     value = 'True'
                 value = value.split('//', 1)[0]
                 value = value.split('/*', 1)[0]
-                if (not inside) or (inside and valid):
+                if all(valid):
                     defines[name] = value
             elif line.startswith('#ifdef'):
                 _, name = line.split(None, 1)
-                inside = True
+                valid.append(False)
                 if name in defines:
-                    valid = True
+                    valid[-1] = True
             elif line.startswith('#ifndef'):
                 _, name = line.split(None, 1)
-                inside = True
+                valid.append(False)
                 if name not in defines:
-                    valid = True
+                    valid[-1] = True
+            elif line.startswith('#else'):
+                valid[-1] = not valid[-1]
             elif line.startswith('#endif'):
-                inside = False
-                valid = False
+                valid.pop()
+
     return defines
                 
 
@@ -70,6 +72,8 @@ def write_config_info():
     commands = {}
     subsystems = {}
     addresses = {}
+    is_adp = False
+    max_ndr = 0
     for name in defines_lwa:
         value = _convert(defines_lwa[name])
         if name.startswith('LWA_CMD_'):
@@ -94,6 +98,10 @@ def write_config_info():
                 addresses[name][1] = value
             except KeyError:
                 addresses[name] = ['', value]
+        elif name.startswith('USE_ADP'):
+            is_adp = bool(bool)
+        elif name.startswith('ME_MAX_NDR'):
+            max_ndr = value
     addresses['MSE2'][0] = addresses['MSE'][0]
     
     ## me.h
@@ -108,11 +116,17 @@ def write_config_info():
             
     # Write        
     with open('lwa_mcs/config.py', 'w') as fh:
-        fh.write("__all__ = ['SOCKET_TIMEOUT', 'SCH_PATH', 'EXC_PATH', 'TP_PATH',\n")
+        fh.write("__all__ = ['IS_ADP', 'MAX_NDR',\n")
+        fh.write("           'SOCKET_TIMEOUT', 'SCH_PATH', 'EXC_PATH', 'TP_PATH',\n")
         fh.write("           'ADDRESSES',\n")
         fh.write("           'SUBSYSTEMS', 'SUBSYSTEM_IDS',\n")
         fh.write("           'COMMANDS', 'COMMAND_IDS',\n")
         fh.write("           'EXC_COMMANDS', 'EXC_COMMAND_IDS']\n")
+        
+        fh.write("\n\n")
+        
+        fh.write("IS_ADP = %s\n" % is_adp)
+        fh.write("MAX_NDR = %s\n" % max_ndr)
         
         fh.write("\n\n")
         
@@ -133,7 +147,7 @@ def write_config_info():
         fh.write("}\n")
         
         fh.write("\n\n")
-        
+
         fh.write("SUBSYSTEMS = {\n")
         for name,value in sorted(subsystems.items(), key=lambda x: x[1]):
             fh.write("              '%s': %s,\n" % (name, value))
