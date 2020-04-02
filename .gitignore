@@ -4,7 +4,6 @@
 # Python stuff
 *.pyc
 
-python/lwa_mcs/config.py
 python/build/
 python/dist/
 python/lwa_mcs.egg-info/

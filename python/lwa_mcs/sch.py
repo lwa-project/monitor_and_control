@@ -9,11 +9,11 @@ import socket
 import struct
 import subprocess
 
-from lwa_mcs.config import ADDRESSES, SOCKET_TIMEOUT, SUBSYSTEMS, COMMANDS
+from lwa_mcs.config import ADDRESSES, SOCKET_TIMEOUT
+from lwa_mcs._mcs import subsystem_to_sid, command_to_cid
 from lwa_mcs import mib
 
-__version__ = "0.1"
-__revision__ = "$Rev$"
+__version__ = "0.2"
 __all__ = ['COMMAND_STRUCT', 'get_pids', 'is_running', 'get_active_subsystems',
            'send_subsystem_command']
 
@@ -87,13 +87,13 @@ def send_subsystem_command(ss, cmd="RPT", data="SUMMARY"):
     
     # Convert the subsystem name to an MCS ID code
     try:
-        sid = SUBSYSTEMS[ss.upper()]
+        sid = subsystem_to_sid(ss.upper())
     except KeyError:
         raise ValueError("Unknown subsystem ID: %s" % ss)
         
     # Convert the command name to a MCS ID code
     try:
-        cid = COMMANDS[cmd.upper()]
+        cid = command_to_cid(cmd.upper())
     except KeyError:
         raise ValueError("Unknown command: %s" % cmd)
         
