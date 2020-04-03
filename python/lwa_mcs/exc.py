@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from lwa_mcs.config import ADDRESSES, SOCKET_TIMEOUT, EXC_COMMANDS
 from lwa_mcs.utils import mjdmpm_to_datetime
 from lwa_mcs.sch import send_subsystem_command
+from lwa_mcs._mcs import execcmd_to_eid, eid_to_execcmd
 
 __version__ = "0.2"
 __all__ = ['COMMAND_STRUCT', 'get_pids', 'is_is_active', 'send_command', 'get_queue', 'cancel_observation']
@@ -57,7 +58,7 @@ def send_command(cmd, data=""):
     
     # Convert the command name to a MCS ID code
     try:
-        cid = EXC_COMMANDS[cmd.upper()]
+        eid = execcmd_to_eid(md.upper())
     except KeyError:
         raise ValueError("Unknown command: %s" % cmd)
         
@@ -67,7 +68,7 @@ def send_command(cmd, data=""):
         sock.connect(ADDRESSES['MEE'])
         sock.settimeout(SOCKET_TIMEOUT)
         
-        mcscmd = COMMAND_STRUCT.pack(cid, data)
+        mcscmd = COMMAND_STRUCT.pack(eid, data)
         sock.sendall(mcscmd)
         response = sock.recv(COMMAND_STRUCT.size)
         response = COMMAND_STRUCT.unpack(response)
@@ -80,7 +81,7 @@ def send_command(cmd, data=""):
     # Wait a bit...
     time.sleep(0.2)
     
-    return False if response[0] < EXC_COMMANDS['NUL'] else True
+    return False if eid_to_execcmd(response[0]) == 'ERR' else True
 
 
 def get_queue():
