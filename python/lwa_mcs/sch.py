@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module for controlling MCS scheduler and executive via UDP packets.
+Module for controlling MCS scheduler via UDP packets.
 """
 
 import time

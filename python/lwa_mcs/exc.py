@@ -13,10 +13,10 @@ from datetime import datetime, timedelta
 
 from lwa_mcs.config import ADDRESSES, SOCKET_TIMEOUT, EXC_COMMANDS
 from lwa_mcs.utils import mjdmpm_to_datetime
+from lwa_mcs.sch import send_subsystem_command
 
-__version__ = "0.1"
-__revision__ = "$Rev$"
-__all__ = ['COMMAND_STRUCT', 'get_pids', 'is_running', 'send_command', 'get_queue']
+__version__ = "0.2"
+__all__ = ['COMMAND_STRUCT', 'get_pids', 'is_is_active', 'send_command', 'get_queue', 'cancel_observation']
 
 
 COMMAND_STRUCT = struct.Struct('i256s')
@@ -41,9 +41,9 @@ def get_pids():
     return pids
 
 
-def is_running():
+def is_is_active():
     """
-    Determine if MCS/sch should be considered operational.
+    Determine if MCS/exec should be considered operational.
     """
     
     pids = get_pids()
@@ -75,7 +75,7 @@ def send_command(cmd, data=""):
         sock.close()
     except Exception as e:
         print str(e)
-        raise RuntimeError("MCS/exec - me_exec does not appear to be running")
+        raise RuntimeError("MCS/exec - me_exec does not appear to be is_active")
         
     # Wait a bit...
     time.sleep(0.2)
@@ -128,3 +128,34 @@ def get_queue():
         raise RuntimeError("Cannot parse the 'mesq.dat' file")
         
     return queue
+
+
+def cancel_observation(project_id, session_id, stop_dr=True):
+    """
+    Cancel a scheduled observation.
+    """
+    
+    # Get the exec queue and make sure we can even do this
+    queue = get_queue()
+    if (project_id, session_id) not in list(queue.keys()):
+        raise RuntimeError("Project %s, sesison %i is scheduled" % (project_id, session_id))
+        
+    # It's at least scheduled.  Is it is_active?
+    now = datetime.utcnow()
+    beam, start, stop = queue[(project_id, session_id)]
+    if now >= start and now < stop:
+        is_active = True
+    else:
+        is_active = False
+        
+    # Cancel it
+    cancelled = send_command("STP", "%s %i" % (project_id, session_id))
+    if not cancelled:
+        raise RuntimError("Cannot cancel observation")
+    else:
+        if is_active and stop_dr:
+            ## Also stop the data recorder
+            tag = send_subsystem_command("DR%i" % beam, "RPT" "OP-TAG")
+            stopped = send_subsystem_command("DR%i" % beam, "STP", tag)
+            
+    return True
