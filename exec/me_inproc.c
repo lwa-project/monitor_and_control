@@ -683,8 +683,9 @@ int main ( int narg, char *argv[] ) {
           fprintf(fpl,"  osf.OBS_MODE = %hu ('%s')\n",osf.OBS_MODE,ssc);
           switch (osf.OBS_MODE) {
             case LWA_OM_TRK_RADEC:
+            case LWA_OM_TRK_NULL: 
             case LWA_OM_TRK_SOL:   
-            case LWA_OM_TRK_JOV:   
+            case LWA_OM_TRK_JOV: 
               eD=0;
               break;
             case LWA_OM_STEPPED:
@@ -889,7 +890,8 @@ int main ( int narg, char *argv[] ) {
 #endif
               strcpy(dr_format,""); 
               switch (osf.OBS_MODE) {
-                case LWA_OM_TRK_RADEC: 
+                case LWA_OM_TRK_RADEC:
+                case LWA_OM_TRK_NULL:
                 case LWA_OM_TRK_SOL:   
                 case LWA_OM_TRK_JOV:   
                 case LWA_OM_STEPPED:   
@@ -944,9 +946,11 @@ int main ( int narg, char *argv[] ) {
                      sprintf(cs[ncs].data,"%6ld %9ld %9ld %s",osf.OBS_START_MJD,osf.OBS_START_MPM,dr_length_ms,osf.SESSION_SPC); // no leading zeros
                    }
                    
-                 cs[ncs].action.len = strlen(cs[ncs].data)+1;
-                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
-                 ncs++;
+                 if (osf.OBS_MODE != LWA_OM_TRK_NULL) {
+                   cs[ncs].action.len = strlen(cs[ncs].data)+1;
+                   me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+                   ncs++;
+                 }
                  
                  /* barcode query (only for the first observation) */
                  if ( i==1 ) {
@@ -1151,6 +1155,7 @@ int main ( int narg, char *argv[] ) {
                 break; /* LWA_OM_TBN */ 
 
               case LWA_OM_TRK_RADEC:
+              case LWA_OM_TRK_NULL:
               case LWA_OM_TRK_SOL:
               case LWA_OM_TRK_JOV:
 
@@ -1334,6 +1339,7 @@ int main ( int narg, char *argv[] ) {
                       dec = osf.OBS_DEC;
                       break;
                     case LWA_OM_TRK_RADEC:
+                    case LWA_OM_TRK_NULL:
                       ra = osf.OBS_RA;
                       dec = osf.OBS_DEC;
                       me_precess( mjd, mpm, &ra, &dec );
@@ -1823,6 +1829,7 @@ int main ( int narg, char *argv[] ) {
                  last_drx_gain1 = -1;
 #endif
               case LWA_OM_TRK_RADEC:
+              case LWA_OM_TRK_NULL:
               case LWA_OM_TRK_SOL:
               case LWA_OM_TRK_JOV:
               case LWA_OM_STEPPED:
@@ -1963,6 +1970,9 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: J. Dowell, UNM, 2020 Apr 6
+//   .1 Added support for TRK_NULL which is like TRK_RADEC but doesn't record any
+//      data
 // me_inproc.c: J. Dowell, UNM, 2019 Dec 16
 //   .1 Documentation update for ADP-based stations
 // me_inproc.c: J. Dowell, UNM, 2019 Apr 3

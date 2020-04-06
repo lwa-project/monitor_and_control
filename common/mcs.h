@@ -781,6 +781,7 @@ double LWA_f8_swap( double x ) {
 #define LWA_OM_TBN       6
 #define LWA_OM_DIAG1     7
 #define LWA_OM_TBF       8
+#define LWA_OM_TRK_NULL  9
 
 int LWA_getmode( char *ssc ) {
   /* ssc is a string from which to determine mode */
@@ -794,6 +795,7 @@ int LWA_getmode( char *ssc ) {
   if (!strncmp(ssc,"TBN"      ,3)) mode = LWA_OM_TBN;
   if (!strncmp(ssc,"DIAG1"    ,5)) mode = LWA_OM_DIAG1;
   if (!strncmp(ssc,"TBF"      ,3)) mode = LWA_OM_TBF;
+  if (!strncmp(ssc,"TRK_NULL" ,8)) mode = LWA_OM_TRK_NULL;
   return mode;
   } /* LWA_getmode() */
 
@@ -809,6 +811,7 @@ void LWA_saymode( unsigned short int mode, char *ssc ) {
   if (mode==LWA_OM_TBN      ) strcpy(ssc,"TBN");
   if (mode==LWA_OM_DIAG1    ) strcpy(ssc,"DIAG1");
   if (mode==LWA_OM_TBF      ) strcpy(ssc,"TBF");
+  if (mode==LWA_OM_TRK_NULL ) strcpy(ssc,"TRK_NULL");
   return;
   } /* LWA_saymode() */
 
@@ -1533,6 +1536,8 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// Apr 06, 2020: Added a new TRK_NULL mode that works like TRK_RADEC but doesn't 
+///              record any data
 // Dec 16, 2019: Updated the ADP-based stations to support a third beam and
 //               four data recorders
 // Feb 18, 2018: Updated the ADP-based stations to support a second beam and
