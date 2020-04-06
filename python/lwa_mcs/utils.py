@@ -2,18 +2,54 @@
 Module with various utilties to help with working with MCS.
 """
 
+import re
 import math
 import pytz
+import subprocess
 from datetime import datetime timedelta
 
 from lwa_mcs._mcs import get_current_time
+from lw_mcs.config import STATION_TZ
 
-__version__ = "0.2"
-__all__ = ['get_current_mjdmpm', 'mjdmpm_to_datetime', 'datetime_to_mjdmpm', 'schedule_at_command']
+__version__ = "0.3"
+__all__ = ['get_uptime', 'get_current_mjdmpm', 'mjdmpm_to_datetime', 'datetime_to_mjdmpm',
+           'get_at_queue', 'get_at_command', 'schedule_at_command']
 
 
-UTC = pytz.utc
-MST = pytz.timezone('America/Denver')
+_UTC = pytz.utc
+
+
+def get_uptime():
+    """
+    Determine and return the current uptime in minutes.
+    """
+    
+    # Create a regular expresion to help us parse the uptime command
+    upre = re.compile('up ((?P<days>\d+) day(s)?,)?\s*((?P<hours>\d+)\:)?(?P<minutes>\d+)( min(ute(s)?)?)?,')
+    
+    # Run the command and see if we have something that looks right
+    line = subprocess.check_output(['uptime'])
+    mtch = upre.search(line)
+    if mtch is None:
+        raise RuntimeError("Could not determine the current uptime")
+    
+    # Convert the uptime to minutes
+    uptime = 0
+    try:
+        uptime += int(mtch.group('days'), 10)*24*60
+    except (TypeError, ValueError):
+        pass
+    try:
+        uptime += int(mtch.group('hours'), 10)*60
+    except (TypeError, ValueError):
+        pass
+    try:
+        uptime += int(mtch.group('minutes'), 10)
+    except (TypeError, ValueError):
+        pass
+        
+    # Done
+    return uptime
 
 
 def get_current_mjdmpm():
@@ -67,7 +103,65 @@ def datetime_to_mjdmpm(dt):
     return (mjd, mpm)
 
 
-def schedule_at_command(execution_time, command, system_tz=MST):
+def get_at_queue():
+    """
+    Read in the current 'at' queue and return a dictionary of id, time pairs
+    """
+    
+    queue = {}
+    
+    # Run atq to get the current list of commands
+    atlist = subprocess.Popen(['/usr/bin/atq',], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output,error = atlist.communicate()
+    output = output.split('\n')
+    
+    # Loop over the output
+    for line in output:
+        if len(line) < 3:
+            continue
+            
+        ## Parse the line
+        fields = line.split()
+        id = int(fields[0], 10)
+        dt = datetime.strptime(' '.join(fields[1:6]), '%a %b %d %H:%M:%S %Y')
+        
+        ## The 'at' queue uses the system time zone which is currently set 
+        ## to 'US/Mountain'
+        dt = STATION_TZ.localize(dt)
+        dt = dt.astimezone(_UTC)
+        
+        ## Append
+        queue[id] = dt
+        
+    return queue
+
+
+def get_at_command(id):
+    """
+    For the specified 'at' command, figure out what is happening.
+    """
+    
+    # Run at to information about the specified command
+    atdetail = subprocess.Popen(['/usr/bin/at', '-c', str(id)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output,error = atdetail.communicate()
+    output = output.split('\n')
+    
+    toExecute = []
+    inCommand = 2048
+    for line in output:
+        inCommand -= 1
+        if inCommand <= 0:
+            toExecute.append(line)
+            
+        if line.find("echo 'Execution directory inaccessible' >&2") != -1:
+            inCommand = 3
+            
+    toExecute = '\n'.join(toExecute)
+    
+    return toExecute
+
+
+def schedule_at_command(execution_time, command):
     """
     Simple function to schedule a command to run at the provided time using
     the 'at' command.  The job ID is returned as an integer.  This function 
@@ -90,9 +184,9 @@ def schedule_at_command(execution_time, command, system_tz=MST):
         execution_time = datetime.utcfromtimestamp(execution_time)
     ## Has the execution time already had a time zone assigned to it?
     elif execution_time.tzinfo is None:
-        execution_time = UTC.localize(execution_time)
+        execution_time = _UTC.localize(execution_time)
     ## Convert to the systems's timezone	
-    execution_time = execution_time.astimezone(system_tz)
+    execution_time = execution_time.astimezone(STATION_TZ)
 
     # Command processing
     # Read the command and figure out the working directory to use
