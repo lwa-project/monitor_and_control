@@ -6,18 +6,15 @@ Module for controlling MCS executive via UDP packets.
 
 import os
 import time
-import socket
-import struct
 import subprocess
 from datetime import datetime, timedelta
 
-from lwa_mcs.config import ADDRESSES, SOCKET_TIMEOUT, EXC_COMMANDS
 from lwa_mcs.utils import mjdmpm_to_datetime
 from lwa_mcs.sch import send_subsystem_command
-from lwa_mcs._mcs import execcmd_to_eid, eid_to_execcmd
+from lwa_mcs._mcs import send_exec_command
 
-__version__ = "0.2"
-__all__ = ['COMMAND_STRUCT', 'get_pids', 'is_is_active', 'send_command', 'get_queue', 'cancel_observation']
+__version__ = "0.3"
+__all__ = ['get_pids', 'is_is_active', 'send_command', 'get_queue', 'cancel_observation']
 
 
 COMMAND_STRUCT = struct.Struct('i256s')
@@ -56,32 +53,13 @@ def send_command(cmd, data=""):
     Use MCS/exec to execute the specified command.
     """
     
-    # Convert the command name to a MCS ID code
-    try:
-        eid = execcmd_to_eid(md.upper())
-    except KeyError:
-        raise ValueError("Unknown command: %s" % cmd)
-        
     # Send the command
-    try:    
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect(ADDRESSES['MEE'])
-        sock.settimeout(SOCKET_TIMEOUT)
-        
-        mcscmd = COMMAND_STRUCT.pack(eid, data)
-        sock.sendall(mcscmd)
-        response = sock.recv(COMMAND_STRUCT.size)
-        response = COMMAND_STRUCT.unpack(response)
-        
-        sock.close()
-    except Exception as e:
-        print str(e)
-        raise RuntimeError("MCS/exec - me_exec does not appear to be is_active")
-        
+    success = send_exec_command(cmd, data)
+    
     # Wait a bit...
     time.sleep(0.2)
     
-    return False if eid_to_execcmd(response[0]) == 'ERR' else True
+    return success
 
 
 def get_queue():

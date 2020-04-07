@@ -8,7 +8,7 @@ import glob
 
 from setuptools import setup, Extension, Distribution, find_packages
 
-ExtensionModules = [Extension('_mcs', ['lwa_mcs/_mcs.c',], include_dirs=['../common/', '../exec/']),]
+ExtensionModules = [Extension('_mcs', ['lwa_mcs/_mcs.c',], include_dirs=['../common/', '../exec/', '/usr/include/gdbm'], extra_link_args=['-lgdbm',])]
 
 setup(
     name                 = "lwa-mcs",

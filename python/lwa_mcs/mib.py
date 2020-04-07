@@ -6,28 +6,14 @@ Module for reading data from the MCS MIB.
 
 import os
 import time
-import socket
 import struct
-try:
-    import anydbm as dbm
-except ImportError:
-    import dbm
 from datetime import datetime, timedelta
 
-from lwa_mcs.config import ADDRESSES, SOCKET_TIMEOUT, SCH_PATH
+from lwa_mcs._mcs import read_mib_ip, read_mib
 
-__version__ = "0.1"
-__revision__ = "$Rev$"
-__all__ = ['MIB_STRUCT', 'read', 'read_from_disk']
+__version__ = "0.2"
+__all__ = ['read', 'read_from_disk']
 
-
-MIB_STRUCT = struct.Struct('4s32s8192sll')
-#  1 ss: subsystem name
-#  2 label: MIB label to interogate
-#  3 val: Value for the MIB label, padded with NULLs
-#  4 tv.tv_sec: epoch seconds
-#  5 tv.tv_usec: fractional remainder in microseconds
-    
 
 def read(ss, label, trim_nulls=True):
     """
@@ -38,25 +24,10 @@ def read(ss, label, trim_nulls=True):
     
     
     # Send the command
-    try:    
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect(ADDRESSES['MSE2'])
-        sock.settimeout(SOCKET_TIMEOUT)
-        
-        mcscmd = MIB_STRUCT.pack(ss.upper(), label.upper(), '', 0, 0)
-        sock.sendall(mcscmd)
-        response = sock.recv(MIB_STRUCT.size)
-        
-        sock.close()
-    except Exception as e:
-        raise RuntimeError("MCS/sch - ms_mdre_ip does not appear to be running")
-        
-    response = MIB_STRUCT.unpack(response)
-    value = response[2]
+    value, ts = read_mib_ip(ss, label)
     if trim_nulls:
         value = value.replace('\x00', '').strip().rstrip()
-    ts = response[3] + response[4]/1e6
-    
+        
     return value, ts
 
 
@@ -70,65 +41,62 @@ def read_from_disk(ss, label, trim_nulls=True):
     t0 = time.time()
     while (time.time() - t0) < 3:
         try:
-            fh = dbm.open(os.path.join(SCH_PATH, "%s.gdb" % ss.upper()), 'ru')
-            mibEntry = label.upper()
+            dtype, value, ts = read_mib(ss, label)
             
-            eType, index, val, typeDBM, typeICD, tv_sec, tv_usec = MIB_STRUCT.unpack(fh[mibEntry])
-            ts = tv_sec + tv_usec/1e6
             d = datetime.utcfromtimestamp(ts)
             if datetime.utcnow() - d <= timedelta(seconds=3):
                 # unsigned and signed char
-                if typeDBM[:3] == 'i1u':
+                if dtype[:3] == 'i1u':
                     value, = struct.unpack('B', val[:1])
-                elif typeDBM[:3] == 'i1s':
+                elif dtype[:3] == 'i1s':
                     value, = struct.unpack('b', val[:1])
                     
                 # unsigned and signed short int
-                elif typeDBM[:3] == 'i2u':
-                    if typeDBM[:4] == 'i2ur':
+                elif dtype[:3] == 'i2u':
+                    if dtype[:4] == 'i2ur':
                         value, = struct.unpack('>H', val[:2])
                     else:
                         value, = struct.unpack('<H', val[:2])
-                elif typeDBM[:3] == 'i2s':
-                    if typeDBM[:4] == 'i2sr':
+                elif dtype[:3] == 'i2s':
+                    if dtype[:4] == 'i2sr':
                         value, = struct.unpack('>h', val[:2])
                     else:
                         value, = struct.unpack('@h', val[:2])
                         
                 # unsigned and signed int
-                elif typeDBM[:3] == 'i4u':
-                    if typeDBM[:4] == 'i4ur':
+                elif dtype[:3] == 'i4u':
+                    if dtype[:4] == 'i4ur':
                         value, = struct.unpack('>I', val[:4])
                     else:
                         value, = struct.unpack('@I', val[:4])
-                elif typeDBM[:3] == 'i4s':
-                    if typeDBM[:4] == 'i4sr':
+                elif dtype[:3] == 'i4s':
+                    if dtype[:4] == 'i4sr':
                         value, = struct.unpack('>i', val[:4])
                     else:
                         value, = struct.unpack('@i', val[:4])
                         
                 # unsigned and signed long int
-                elif typeDBM[:3] == 'i8u':
-                    if typeDBM[:4] == 'i8ur':
+                elif dtype[:3] == 'i8u':
+                    if dtype[:4] == 'i8ur':
                         value, = struct.unpack('>Q', val[:8])
                     else:
                         value, = struct.unpack('@Q', val[:8])
-                elif typeDBM[:3] == 'i8s':
-                    if typeDBM[:4] == 'i8sr':
+                elif dtype[:3] == 'i8s':
+                    if dtype[:4] == 'i8sr':
                         value, = struct.unpack('>q', val[:8])
                     else:
                         value, = struct.unpack('@q', val[:8])
                         
                 # float
-                elif typeDBM[:2] == 'f4':
-                    if typeDBM[:3] == 'f4r':
+                elif dtype[:2] == 'f4':
+                    if dtype[:3] == 'f4r':
                         value, = struct.unpack('>f', val[:4])
                     else:
                         value, = struct.unpack('@f', val[:4])
                         
                 # double
-                elif typeDBM[:2] == 'f8':
-                    if typeDBM[:3] == 'f8r':
+                elif dtype[:2] == 'f8':
+                    if dtype[:3] == 'f8r':
                         value, = struct.unpack('>d', val[:8])
                     else:
                         value, = struct.unpack('@d', val[:8])

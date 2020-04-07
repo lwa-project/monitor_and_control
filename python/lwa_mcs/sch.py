@@ -5,32 +5,14 @@ Module for controlling MCS scheduler via UDP packets.
 """
 
 import time
-import socket
-import struct
 import subprocess
 
-from lwa_mcs.config import ADDRESSES, SOCKET_TIMEOUT
-from lwa_mcs._mcs import subsystem_to_sid, command_to_cid
 from lwa_mcs import mib
+from lwa_mcs._mcs import send_sch_command
 
-__version__ = "0.2"
-__all__ = ['COMMAND_STRUCT', 'get_pids', 'is_running', 'get_active_subsystems',
+__version__ = "0.3"
+__all__ = ['get_pids', 'is_running', 'get_active_subsystems',
            'send_subsystem_command']
-
-
-COMMAND_STRUCT = struct.Struct('lliilliii256si')
-#  1 sid: subsystem ID
-#  2 ref: reference number
-#  3 cid: command ID
-#  4 scheduled? 1 = "do as close as possible to time in tv
-#  5 tv.tv_sec: epoch seconds
-#  6 tv.tv_usec: fractional remainder in microseconds
-#  7 response: see LWA_MSELOG_TP_*
-#  8 eSummary: see LWA_SIDSUM_*
-#  9 eMIBerror: > 0 on error; see LWA_MIBERR_*
-# 10 DATA on way out, R-COMMENT on way back
-# 11 datalen: -1 for (printable) string; 0 for zero-len;
-#    otherwise number of significant bytes
 
 
 def get_pids():
@@ -85,35 +67,9 @@ def send_subsystem_command(ss, cmd="RPT", data="SUMMARY"):
     ID is returned.
     """
     
-    # Convert the subsystem name to an MCS ID code
-    try:
-        sid = subsystem_to_sid(ss.upper())
-    except KeyError:
-        raise ValueError("Unknown subsystem ID: %s" % ss)
-        
-    # Convert the command name to a MCS ID code
-    try:
-        cid = command_to_cid(cmd.upper())
-    except KeyError:
-        raise ValueError("Unknown command: %s" % cmd)
-        
     # Send the command
-    try:    
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect(ADDRESSES['MSE'])
-        sock.settimeout(SOCKET_TIMEOUT)
-        
-        t = time.time()
-        tv_sec, tv_usec = long(t), long((t % 1) * 1e6)
-        mcscmd = COMMAND_STRUCT.pack(sid, 0, cid, 0, tv_sec, tv_usec, 0, 0, 0, data, -1)
-        sock.sendall(mcscmd)
-        response = sock.recv(COMMAND_STRUCT.size)
-        response = COMMAND_STRUCT.unpack(response)
-        
-        sock.close()
-    except Exception as e:
-        raise RuntimeError("MCS/sch - ms_mdre_ip does not appear to be running")
-        
+    ref, success = send_sch_command(ss, cmd, data)
+    
     # Wait a bit...
     time.sleep(0.2)
     
@@ -135,6 +91,6 @@ def send_subsystem_command(ss, cmd="RPT", data="SUMMARY"):
                 value = None
     else:
         # Otherwise return the reference ID
-        value = response[1]
+        value = rref
         
     return value

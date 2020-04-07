@@ -3,6 +3,10 @@
 #include "me.h"
 
 #include <stdio.h>
+#include <gdbm.h>
+#include <sys/socket.h>
+#include <netinet/in.h> /* for network sockets */
+#include <arpa/inet.h>  /* for network sockets */
 
 #if PY_MAJOR_VERSION >= 3
     #define PyInt_FromLong PyLong_FromLong
@@ -55,174 +59,276 @@ PyDoc_STRVAR(get_current_time_doc, \
 "Get the current time as two-element tuple of MJD and MPM");
 
 
-static PyObject *subsystem_to_sid(PyObject *self, PyObject *args, PyObject *kwds) {
-    char *input;
-    int result;
-    if(!PyArg_ParseTuple(args, "s", &input)) {
+static PyObject *send_sch_command(PyObject *self, PyObject *args, PyObject *kwds) {
+    char *subsystem, *command, *data;
+    PyObject *output;
+    if(!PyArg_ParseTuple(args, "sss", &subsystem, &command, &data)) {
         PyErr_Format(PyExc_RuntimeError, "Invalid parameters");
         goto fail;
     }
     
-    result = LWA_getsid(input);
-    if( result == 0 ) {
+    struct LWA_cmd_struct cmd; 
+
+    struct timeval tv;  /* from sys/time.h; included via LWA_MCS.h */
+    struct timezone tz;
+    
+    int sockfd, result;   
+    struct sockaddr_in address; /* for network sockets */
+    struct timeval timeout;      
+    timeout.tv_sec = LWA_PTQ_TIMEOUT;
+    timeout.tv_usec = 0;
+    
+    sockfd = socket(             /* create socket */
+                    AF_INET,     /* domain; network sockets */
+                    SOCK_STREAM, /* type (TCP-like) */
+                    0);          /* protocol (normally 0) */
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = inet_addr(LWA_IP_MSE);
+    address.sin_port = htons(LWA_PORT_MSE);
+    setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(struct timeval));
+    setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(struct timeval));
+    
+    /* connect socket to server's socket */
+    result = connect( sockfd, (struct sockaddr *) &address, sizeof(address));
+    if (result==-1) {
+        close(sockfd);
+        PyErr_Format(PyExc_RuntimeError, "MCS/sch - ms_exec does not appear to be running");
+        goto fail;
+    }
+
+    memset(&cmd, 0, sizeof(struct LWA_cmd_struct));
+    if ( !( cmd.sid = LWA_getsid(subsystem) ) ) {
+        close(sockfd);
+        PyErr_Format(PyExc_ValueError, "Invalid subsystem name");
+        goto fail;
+    }
+    if ( !(cmd.cid = LWA_getcmd(command) ) ) {
+        close(sockfd);
+        PyErr_Format(PyExc_ValueError, "Invalid command name");
+        goto fail;
+    }
+    gettimeofday(&cmd.tv, &tz);
+    strcpy(cmd.data, data); /* changed in reply */
+    cmd.datalen = -1;
+    write(sockfd, &cmd, sizeof(struct LWA_cmd_struct));
+    read(sockfd, &cmd, sizeof(struct LWA_cmd_struct));
+    
+    output = Py_BuildValue("(ii)", cmd.ref, cmd.bAccept);
+    close(sockfd);
+    return output;
+
+fail:
+    return NULL;
+}
+
+PyDoc_STRVAR(send_sch_command_doc, \
+"Given a subsystem name, command name, and a command data string, send the\n\
+command to ms_exec for processing and return a two-element tuple of the command\n\
+reference ID and whether or not it was accepted.");
+
+
+static PyObject *read_mib_ip(
+    PyObject *self, PyObject *args, PyObject *kwds) {
+    char *subsystem, *label;
+    PyObject *output;
+    if(!PyArg_ParseTuple(args, "ss", &subsystem, &label)) {
+        PyErr_Format(PyExc_RuntimeError, "Invalid parameters");
+        goto fail;
+    }
+    
+    struct LWA_mib_entry record;
+    struct timeval tv;
+    
+    float ts;
+    
+    int sockfd, result;   
+    struct sockaddr_in address; /* for network sockets */
+    struct timeval timeout;      
+    timeout.tv_sec = LWA_PTQ_TIMEOUT;
+    timeout.tv_usec = 0;
+    
+    sockfd = socket(             /* create socket */
+                    AF_INET,     /* domain; network sockets */
+                    SOCK_STREAM, /* type (TCP-like) */
+                    0);          /* protocol (normally 0) */
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = inet_addr(LWA_IP_MSE);
+    address.sin_port = htons(LWA_PORT_MSE2);
+    setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(struct timeval));
+    setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(struct timeval));
+    
+    /* connect socket to server's socket */
+    result = connect( sockfd, (struct sockaddr *) &address, sizeof(address));
+    if (result==-1) {
+        close(sockfd);
+        PyErr_Format(PyExc_RuntimeError, "MCS/sch - ms_mdre_ip does not appear to be running");
+        goto fail;
+    }
+
+    memset(&record, 0, sizeof(struct LWA_mib_entry));
+    strcpy(record.ss, subsystem);
+    strcpy(record.label, label);
+    write(sockfd, &record, sizeof(struct LWA_mib_entry));
+    read(sockfd, &record, sizeof(struct LWA_mib_entry));
+    
+    tv = record.last_change;
+    ts = tv.tv_sec + tv.tv_usec/1e6;
+    output = Py_BuildValue("(s#f)", record.val, MIB_LABEL_FIELD_LENGTH, ts);
+    close(sockfd);
+    return output;
+
+fail:
+    return NULL;
+} 
+
+PyDoc_STRVAR(read_mib_ip_doc, \
+"Given a subsystem name and a MIB label, read the MIB from the ms_mdre_ip\n\
+interface and return a two-element tuple of the undecoded value itself,\n\
+and the timestamp of when the value was last updated.\n\
+\n\
+.. note:\n\
+    The value itself may be null padded");
+      
+
+static PyObject *read_mib(PyObject *self, PyObject *args, PyObject *kwds) {
+    char *subsystem, *mib_label;
+    PyObject *output;
+    if(!PyArg_ParseTuple(args, "ss", &subsystem, &mib_label)) {
+        PyErr_Format(PyExc_RuntimeError, "Invalid parameters");
+        goto fail;
+    }
+    
+    /* dbm-related variables */
+    char dbm_filename[256];
+    GDBM_FILE dbm_ptr;
+    struct dbm_record record;
+    datum datum_key;
+    datum datum_data;
+    
+    char label[MIB_LABEL_FIELD_LENGTH];     /* this is the key for dbm */
+    char key[MIB_LABEL_FIELD_LENGTH];
+    struct timeval tv;  /* from sys/time.h; included via LWA_MCS.h */
+    
+    float ts;
+    
+    /* Go! */
+    sprintf(dbm_filename, "%s/%s.gdb", LWA_SCH_SCP_DIR, subsystem);
+    dbm_ptr = gdbm_open(dbm_filename, 0, GDBM_READER, 0, NULL);
+    if (!dbm_ptr) {
         PyErr_Format(PyExc_ValueError, "Invalid subsystem name");
         goto fail;
     }
     
-    return Py_BuildValue("i", result);
+    sprintf(key, "%s", mib_label);
+    datum_key.dptr = key;
+    datum_key.dsize = strlen(key);
+    datum_data = gdbm_fetch(dbm_ptr,datum_key);
+    if (datum_data.dptr) {
+        memcpy( &record, datum_data.dptr, datum_data.dsize );
+    } else {
+        gdbm_close(dbm_ptr);
+        PyErr_Format(PyExc_ValueError, "Invalid MIB label");
+        goto fail;
+    }
+    tv = record.last_change;
+    ts = tv.tv_sec + tv.tv_usec/1e6;
+    
+    output = Py_BuildValue("(ss#f)", record.type_dbm, record.val, MIB_LABEL_FIELD_LENGTH, ts);
+    gdbm_close(dbm_ptr);
+    return output;
     
 fail:
     return NULL;
 }
 
-PyDoc_STRVAR(subsystem_to_sid_doc, \
-"Convert a subsystem name to a subsystem ID");
+PyDoc_STRVAR(read_mib_doc, \
+"Given a subsystem name and a MIB label, read the MIB from disk and\n\
+and return a three-element tuple of the value encoding, the undecoded\n\
+value itself, and the timestamp of when the value was last updated.\n\
+\n\
+.. note:\n\
+    The value itself may be null padded");
 
-static PyObject *sid_to_subsystem(PyObject *self, PyObject *args, PyObject *kwds) {
-    int input;
-    char *result;
-    if(!PyArg_ParseTuple(args, "i", &input)) {
+
+static PyObject *send_exec_command(PyObject *self, PyObject *args, PyObject *kwds) {
+    char *command, *data;
+    int status;
+    PyObject *output;
+    if(!PyArg_ParseTuple(args, "ss", &command, &data)) {
         PyErr_Format(PyExc_RuntimeError, "Invalid parameters");
         goto fail;
     }
     
-    result = LWA_sid2str(input);
-    if( !strcmp("XXX", result) ) {
-        PyErr_Format(PyExc_ValueError, "Invalid subsystem ID");
+    struct me_cmd_struct cmd;
+    
+    int sockfd, result;   
+    struct sockaddr_in address; /* for network sockets */
+    struct timeval timeout;      
+    timeout.tv_sec = LWA_PTQ_TIMEOUT;
+    timeout.tv_usec = 0;
+    
+    sockfd = socket(             /* create socket */
+                    AF_INET,     /* domain; network sockets */
+                    SOCK_STREAM, /* type (TCP-like) */
+                    0);          /* protocol (normally 0) */
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = inet_addr(LWA_IP_MEE);
+    address.sin_port = htons(LWA_PORT_MEE);
+    setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(struct timeval));
+    setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(struct timeval));
+    
+    /* connect socket to server's socket */
+    result = connect( sockfd, (struct sockaddr *) &address, sizeof(address));
+    if (result==-1) {
+        close(sockfd);
+        PyErr_Format(PyExc_RuntimeError, "MCS/exec - me_exec does not appear to be running");
         goto fail;
     }
     
-    return Py_BuildValue("s", result);
-
-fail:
-        return NULL;
-}
-
-PyDoc_STRVAR(sid_to_subsystem_doc, \
-"Convert a subsystem ID to a subsystem name");
-
-
-static PyObject *command_to_cid(PyObject *self, PyObject *args, PyObject *kwds) {
-    char *input;
-    int result;
-    if(!PyArg_ParseTuple(args, "s", &input)) {
-        PyErr_Format(PyExc_RuntimeError, "Invalid parameters");
-        goto fail;
-    }
-    
-    result = LWA_getcmd(input);
-    if( result == 0 ) {
+    memset(&cmd, 0, sizeof(struct LWA_cmd_struct));
+    if( !strcmp("NUL", command) ) {
+        cmd.cmd = ME_CMD_NUL;
+    } else if( !strcmp("SHT", command) ) {
+        cmd.cmd = ME_CMD_SHT;
+    } else if( !strcmp("STP", command) ) {
+        cmd.cmd = ME_CMD_STP;
+    } else {
+        close(sockfd);
         PyErr_Format(PyExc_ValueError, "Invalid command name");
         goto fail;
     }
+    strcpy(cmd.args, data);
+    write(sockfd, &cmd, sizeof(struct me_cmd_struct));
+    read(sockfd, &cmd, sizeof(struct me_cmd_struct));
     
-    return Py_BuildValue("i", result);
-    
+    status = 1;
+    if( cmd.cmd < ME_CMD_NUL ) {
+        status = 0;
+    }
+    output = Py_BuildValue("i", status);
+    close(sockfd);
+    return output;
+
 fail:
     return NULL;
 }
 
-PyDoc_STRVAR(command_to_cid_doc, \
-"Convert a command name to a command ID");
-
-static PyObject *cid_to_command(PyObject *self, PyObject *args, PyObject *kwds) {
-    int input;
-    char *result;
-    if(!PyArg_ParseTuple(args, "i", &input)) {
-        PyErr_Format(PyExc_RuntimeError, "Invalid parameters");
-        goto fail;
-    }
+PyDoc_STRVAR(send_exec_command_doc, \
+"Given an MCS/exec command name and command argument data, send the command\n\
+to me_exec for processing and return whether or not the command was accepted.");
     
-    result = LWA_cmd2str(input);
-    if( !strcmp("XXX", result) ) {
-        PyErr_Format(PyExc_ValueError, "Invalid subsystem ID");
-        goto fail;
-    }
-    
-    return Py_BuildValue("s", result);
-    
-fail:
-        return NULL;
-}
-
-PyDoc_STRVAR(cid_to_command_doc, \
-"Convert a command ID to a command name");
-
-
-static PyObject *execcmd_to_eid(PyObject *self, PyObject *args, PyObject *kwds) {
-    char *input;
-    int result;
-    if(!PyArg_ParseTuple(args, "s", &input)) {
-        PyErr_Format(PyExc_RuntimeError, "Invalid parameters");
-        goto fail;
-    }
-    
-    if( !strcmp("ERR", input) ) {
-        result = ME_CMD_ERR;
-    } else if( !strcmp("NUL", input) ) {
-        result = ME_CMD_NUL;
-    } else if( !strcmp("SHT", input) ) {
-        result = ME_CMD_SHT;
-    } else if( !strcmp("STP", input) ) {
-        result = ME_CMD_STP;
-    } else { 
-        PyErr_Format(PyExc_ValueError, "Invalid exec command name");
-        goto fail;
-    }
-    
-    return Py_BuildValue("i", result);
-    
-fail:
-    return NULL;
-}
-
-PyDoc_STRVAR(execcmd_to_eid_doc, \
-"Convert an exec command name to an exec command ID");
-
-static PyObject *eid_to_execcmd(PyObject *self, PyObject *args, PyObject *kwds) {
-    int input;
-    char *result;
-    if(!PyArg_ParseTuple(args, "i", &input)) {
-        PyErr_Format(PyExc_RuntimeError, "Invalid parameters");
-        goto fail;
-    }
-    
-    if( input == ME_CMD_ERR ) {
-        strcpy(result, "ERR");
-    } else if( input == ME_CMD_NUL ) {
-        strcpy(result, "NUL");
-    } else if( input == ME_CMD_SHT ) {
-        strcpy(result, "SHT");
-    } else if( input == ME_CMD_STP ) {
-        strcpy(result, "STP");
-    } else {
-        PyErr_Format(PyExc_ValueError, "Invalid subsystem ID");
-        goto fail;
-    }
-    
-    return Py_BuildValue("s", result);
-    
-fail:
-        return NULL;
-}
-
-PyDoc_STRVAR(eid_to_execcmd_doc, \
-"Convert an exec command ID to an exec command name");
-
 
 /*
   Module Setup - Function Definitions and Documentation
 */
 
 static PyMethodDef McsMethods[] = {
-    {"get_current_time", (PyCFunction) get_current_time, METH_VARARGS, get_current_time_doc},
-    {"subsystem_to_sid", (PyCFunction) subsystem_to_sid, METH_VARARGS, subsystem_to_sid_doc},
-    {"sid_to_subsystem", (PyCFunction) sid_to_subsystem, METH_VARARGS, sid_to_subsystem_doc},
-    {"command_to_cid",   (PyCFunction) command_to_cid,   METH_VARARGS, command_to_cid_doc  },
-    {"cid_to_command",   (PyCFunction) cid_to_command,   METH_VARARGS, cid_to_command_doc  },
-    {"execcmd_to_eid",   (PyCFunction) execcmd_to_eid,   METH_VARARGS, execcmd_to_eid_doc  },
-    {"eid_to_execcmd",   (PyCFunction) eid_to_execcmd,   METH_VARARGS, eid_to_execcmd_doc  },
-    {NULL,               NULL,                           0,            NULL                }
+    {"get_current_time",  (PyCFunction) get_current_time,  METH_VARARGS, get_current_time_doc },
+    {"send_sch_command",  (PyCFunction) send_sch_command,  METH_VARARGS, send_sch_command_doc },
+    {"read_mib_ip",       (PyCFunction) read_mib_ip,       METH_VARARGS, read_mib_ip_doc      },
+    {"read_mib",          (PyCFunction) read_mib,          METH_VARARGS, read_mib_doc         },
+    {"send_exec_command", (PyCFunction) send_exec_command, METH_VARARGS, send_exec_command_doc},
+    {NULL,                NULL,                            0,            NULL                 }
 };
 
 PyDoc_STRVAR(mcs_doc, \
@@ -244,7 +350,7 @@ MOD_INIT(_mcs) {
     }
     
     // Version information
-    PyModule_AddObject(m, "__version__", PyString_FromString("0.1"));
+    PyModule_AddObject(m, "__version__", PyString_FromString("0.3"));
     
     // Constants
 #ifdef USE_ADP
@@ -254,29 +360,18 @@ MOD_INIT(_mcs) {
 #endif
     PyModule_AddObject(m, "MAX_NDR", PyInt_FromLong(ME_MAX_NDR));
     
-    PyModule_AddObject(m, "SOCKET_TIMEOUT", PyFloat_FromDouble(5.0));
-    
     PyModule_AddObject(m, "SCH_PATH", PyString_FromString(LWA_SCH_SCP_DIR));
-    
-    PyModule_AddObject(m, "MSE_ADDRESS", PyString_FromString(LWA_IP_MSE));
-    PyModule_AddObject(m, "MSE_PORT", PyInt_FromLong(LWA_PORT_MSE));
-    PyModule_AddObject(m, "MSE2_ADDRESS", PyString_FromString(LWA_IP_MSE));
-    PyModule_AddObject(m, "MSE2_PORT", PyInt_FromLong(LWA_PORT_MSE2));
-    PyModule_AddObject(m, "MEE_ADDRESS", PyString_FromString(LWA_IP_MEE));
-    PyModule_AddObject(m, "MEE_PORT", PyInt_FromLong(LWA_PORT_MEE));
     
     // Function listings
     all = PyList_New(0);
     PyList_Append(all, PyString_FromString("IS_ADP"));
     PyList_Append(all, PyString_FromString("MAX_NDR"));
-    PyList_Append(all, PyString_FromString("SOCKET_TIMEOUT"));
+    PyList_Append(all, PyString_FromString("SCH_PATH"));
     PyList_Append(all, PyString_FromString("get_current_time"));
-    PyList_Append(all, PyString_FromString("subsystem_to_sid"));
-    PyList_Append(all, PyString_FromString("sid_to_subsystem"));
-    PyList_Append(all, PyString_FromString("command_to_cid"));
-    PyList_Append(all, PyString_FromString("cid_to_command"));
-    PyList_Append(all, PyString_FromString("execcmd_to_eid"));
-    PyList_Append(all, PyString_FromString("eid_to_execcmd"));
+    PyList_Append(all, PyString_FromString("send_sch_command"));
+    PyList_Append(all, PyString_FromString("read_mib_ip"));
+    PyList_Append(all, PyString_FromString("read_mib"));
+    PyList_Append(all, PyString_FromString("send_exec_command"));
     PyModule_AddObject(m, "__all__", all);
 
     return MOD_SUCCESS_VAL(m);
