@@ -109,7 +109,7 @@ def get_queue():
     return queue
 
 
-def cancel_observation(project_id, session_id, stop_dr=True):
+def cancel_observation(project_id, session_id, stop_dr=True, remove_metadata=True):
     """
     Cancel a scheduled observation.
     """
@@ -132,9 +132,15 @@ def cancel_observation(project_id, session_id, stop_dr=True):
     if not cancelled:
         raise RuntimError("Cannot cancel observation")
     else:
-        if is_active and stop_dr:
-            ## Also stop the data recorder
-            tag = send_subsystem_command("DR%i" % beam, "RPT" "OP-TAG")
-            stopped = send_subsystem_command("DR%i" % beam, "STP", tag)
-            
+        if is_active:
+            if stop_dr:
+                ## Also stop the data recorder
+                tag = send_subsystem_command("DR%i" % beam, "RPT" "OP-TAG")
+                stopped = send_subsystem_command("DR%i" % beam, "STP", tag)
+            if remove_metadata:
+                try:
+                    os.unlink(os.path.join(TP_PATH, 'mbox', "%s_%04i.tgz" % (project_id, session_id)))
+                except OSError:
+                    pass
+                    
     return True
