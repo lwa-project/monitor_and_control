@@ -683,12 +683,13 @@ int main ( int narg, char *argv[] ) {
           fprintf(fpl,"  osf.OBS_MODE = %hu ('%s')\n",osf.OBS_MODE,ssc);
           switch (osf.OBS_MODE) {
             case LWA_OM_TRK_RADEC:
-            case LWA_OM_TRK_NULL: 
+            case LWA_OM_TRK_NOOP: 
             case LWA_OM_TRK_SOL:   
             case LWA_OM_TRK_JOV: 
               eD=0;
               break;
             case LWA_OM_STEPPED:
+            case LWA_OM_STEPPED_NOOP:
 #ifdef USE_ADP
             case LWA_OM_TBF:
 #else
@@ -891,10 +892,11 @@ int main ( int narg, char *argv[] ) {
               strcpy(dr_format,""); 
               switch (osf.OBS_MODE) {
                 case LWA_OM_TRK_RADEC:
-                case LWA_OM_TRK_NULL:
+                case LWA_OM_TRK_NOOP:
                 case LWA_OM_TRK_SOL:   
                 case LWA_OM_TRK_JOV:   
                 case LWA_OM_STEPPED:   
+                case LWA_OM_STEPPED_NOOP:
                   sprintf(dr_format,"DRX_FILT_%1hu",osf.OBS_BW); 
                   break;
 #ifdef USE_ADP
@@ -946,7 +948,7 @@ int main ( int narg, char *argv[] ) {
                      sprintf(cs[ncs].data,"%6ld %9ld %9ld %s",osf.OBS_START_MJD,osf.OBS_START_MPM,dr_length_ms,osf.SESSION_SPC); // no leading zeros
                    }
                    
-                 if (osf.OBS_MODE != LWA_OM_TRK_NULL) {
+                 if (LWA_isnoop(osf.OBS_MODE) == 0) {
                    cs[ncs].action.len = strlen(cs[ncs].data)+1;
                    me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                    ncs++;
@@ -1155,7 +1157,7 @@ int main ( int narg, char *argv[] ) {
                 break; /* LWA_OM_TBN */ 
 
               case LWA_OM_TRK_RADEC:
-              case LWA_OM_TRK_NULL:
+              case LWA_OM_TRK_NOOP:
               case LWA_OM_TRK_SOL:
               case LWA_OM_TRK_JOV:
 
@@ -1339,7 +1341,7 @@ int main ( int narg, char *argv[] ) {
                       dec = osf.OBS_DEC;
                       break;
                     case LWA_OM_TRK_RADEC:
-                    case LWA_OM_TRK_NULL:
+                    case LWA_OM_TRK_NOOP:
                       ra = osf.OBS_RA;
                       dec = osf.OBS_DEC;
                       me_precess( mjd, mpm, &ra, &dec );
@@ -1431,6 +1433,7 @@ int main ( int narg, char *argv[] ) {
                 break; /* LWA_OM_TRK_RADEC */ 
 
               case LWA_OM_STEPPED:
+              case LWA_OM_STEPPED_NOOP:
                 /* this is done in a separate pass */
                 break;
 
@@ -1496,7 +1499,7 @@ int main ( int narg, char *argv[] ) {
           m = fread( &osf, sizeof(struct osf_struct), 1, fpo ); /* this also reloads osf.* */
 
           /* If this is a STEPPED-mode observation, deal with DRX gain setting */  
-          if ( (osf.OBS_MODE==LWA_OM_STEPPED) && (eD==0) ) {               
+          if ( (osf.OBS_MODE==LWA_OM_STEPPED || osf.OBS_MODE==LWA_OM_STEPPED_NOOP) && (eD==0) ) {               
             if (osf2.OBS_DRX_GAIN<0) { osf2.OBS_DRX_GAIN = 6; }
             
             /* Unpack the osf2.OBS_DRX_GAIN value to allow two */
@@ -1829,10 +1832,11 @@ int main ( int narg, char *argv[] ) {
                  last_drx_gain1 = -1;
 #endif
               case LWA_OM_TRK_RADEC:
-              case LWA_OM_TRK_NULL:
+              case LWA_OM_TRK_NOOP:
               case LWA_OM_TRK_SOL:
               case LWA_OM_TRK_JOV:
               case LWA_OM_STEPPED:
+              case LWA_OM_STEPPED_NOOP:
 #ifdef USE_ADP
                  cs[ncs].action.tv.tv_sec  = cs[ncs-1].action.tv.tv_sec;
                  cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec + 20000;
@@ -1970,6 +1974,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: J. Dowell, UNM, 2020 Apr 7
+//   .1 Changed TRK_NULL to TRK_NOOP and added a STEPPED_NOOP mode
 // me_inproc.c: J. Dowell, UNM, 2020 Apr 6
 //   .1 Added support for TRK_NULL which is like TRK_RADEC but doesn't record any
 //      data

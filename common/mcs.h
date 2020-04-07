@@ -773,29 +773,32 @@ double LWA_f8_swap( double x ) {
 #endif
 
 /* defined observing modes (MCS0030) */
-#define LWA_OM_TRK_RADEC 1
-#define LWA_OM_TRK_SOL   2
-#define LWA_OM_TRK_JOV   3
-#define LWA_OM_STEPPED   4
-#define LWA_OM_TBW       5
-#define LWA_OM_TBN       6
-#define LWA_OM_DIAG1     7
-#define LWA_OM_TBF       8
-#define LWA_OM_TRK_NULL  9
+#define LWA_OM_TRK_RADEC    1
+#define LWA_OM_TRK_SOL      2
+#define LWA_OM_TRK_JOV      3
+#define LWA_OM_STEPPED      4
+#define LWA_OM_TBW          5
+#define LWA_OM_TBN          6
+#define LWA_OM_DIAG1        7
+#define LWA_OM_TBF          8
+#define LWA_OM_TRK_NOOP     9
+#define LWA_OM_STEPPED_NOOP 10
 
 int LWA_getmode( char *ssc ) {
   /* ssc is a string from which to determine mode */
   /* returns the LWA observing mode ("LWA_OM_"), or 0 if there is an error */
   unsigned short int mode = 0;
-  if (!strncmp(ssc,"TRK_RADEC",9)) mode = LWA_OM_TRK_RADEC;
-  if (!strncmp(ssc,"TRK_SOL"  ,7)) mode = LWA_OM_TRK_SOL;
-  if (!strncmp(ssc,"TRK_JOV"  ,7)) mode = LWA_OM_TRK_JOV;
-  if (!strncmp(ssc,"STEPPED"  ,7)) mode = LWA_OM_STEPPED;
-  if (!strncmp(ssc,"TBW"      ,3)) mode = LWA_OM_TBW;
-  if (!strncmp(ssc,"TBN"      ,3)) mode = LWA_OM_TBN;
-  if (!strncmp(ssc,"DIAG1"    ,5)) mode = LWA_OM_DIAG1;
-  if (!strncmp(ssc,"TBF"      ,3)) mode = LWA_OM_TBF;
-  if (!strncmp(ssc,"TRK_NULL" ,8)) mode = LWA_OM_TRK_NULL;
+  if (!strncmp(ssc,"TRK_RADEC"    ,9 )) mode = LWA_OM_TRK_RADEC;
+  if (!strncmp(ssc,"TRK_NOOP"     ,8 )) mode = LWA_OM_TRK_NOOP;
+  if (!strncmp(ssc,"TRK_SOL"      ,7 )) mode = LWA_OM_TRK_SOL;
+  if (!strncmp(ssc,"TRK_JOV"      ,7 )) mode = LWA_OM_TRK_JOV;
+  if (!strncmp(ssc,"STEPPED_NOOP" ,12)) mode = LWA_OM_STEPPED_NOOP;
+  if (!strncmp(ssc,"STEPPED"      ,7 )) mode = LWA_OM_STEPPED;
+  if (!strncmp(ssc,"TBW"          ,3 )) mode = LWA_OM_TBW;
+  if (!strncmp(ssc,"TBN"          ,3 )) mode = LWA_OM_TBN;
+  if (!strncmp(ssc,"DIAG1"        ,5 )) mode = LWA_OM_DIAG1;
+  if (!strncmp(ssc,"TBF"          ,3 )) mode = LWA_OM_TBF;
+  
   return mode;
   } /* LWA_getmode() */
 
@@ -803,17 +806,27 @@ void LWA_saymode( unsigned short int mode, char *ssc ) {
   /* mode is one of LWA_OM_* */
   /* ssc is the associated text description */
   strcpy(ssc,"");
-  if (mode==LWA_OM_TRK_RADEC) strcpy(ssc,"TRK_RADEC");
-  if (mode==LWA_OM_TRK_SOL  ) strcpy(ssc,"TRK_SOL");
-  if (mode==LWA_OM_TRK_JOV  ) strcpy(ssc,"TRK_JOV");
-  if (mode==LWA_OM_STEPPED  ) strcpy(ssc,"STEPPED");
-  if (mode==LWA_OM_TBW      ) strcpy(ssc,"TBW");
-  if (mode==LWA_OM_TBN      ) strcpy(ssc,"TBN");
-  if (mode==LWA_OM_DIAG1    ) strcpy(ssc,"DIAG1");
-  if (mode==LWA_OM_TBF      ) strcpy(ssc,"TBF");
-  if (mode==LWA_OM_TRK_NULL ) strcpy(ssc,"TRK_NULL");
+  if (mode==LWA_OM_TRK_RADEC   ) strcpy(ssc,"TRK_RADEC");
+  if (mode==LWA_OM_TRK_NOOP    ) strcpy(ssc,"TRK_NOOP");
+  if (mode==LWA_OM_TRK_SOL     ) strcpy(ssc,"TRK_SOL");
+  if (mode==LWA_OM_TRK_JOV     ) strcpy(ssc,"TRK_JOV");
+  if (mode==LWA_OM_STEPPED     ) strcpy(ssc,"STEPPED");
+  if (mode==LWA_OM_STEPPED_NOOP) strcpy(ssc,"STEPPED_NOOP");
+  if (mode==LWA_OM_TBW         ) strcpy(ssc,"TBW");
+  if (mode==LWA_OM_TBN         ) strcpy(ssc,"TBN");
+  if (mode==LWA_OM_DIAG1       ) strcpy(ssc,"DIAG1");
+  if (mode==LWA_OM_TBF         ) strcpy(ssc,"TBF");
+  
   return;
   } /* LWA_saymode() */
+
+int LWA_isnoop( unsigned short int mode) {
+  /* mode is one of LWA_OM_* */
+  /* returns whether or not the mode is NoOp - one that does not record */
+  int noop = 0;
+  if (mode==LWA_OM_TRK_NOOP    ) noop = 1;
+  if (mode==LWA_OM_STEPPED_NOOP) noop = 1;
+  } /* LWA_isnoop() */
 
 /* defined beam types (MCS0030) */
 #define LWA_BT_SIMPLE            1
@@ -1536,6 +1549,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// Apr 07, 2020: Changed TRK_NULL to TRK_NOOP and added a STEPPED_NOOP
 // Apr 06, 2020: Added a new TRK_NULL mode that works like TRK_RADEC but doesn't 
 ///              record any data
 // Dec 16, 2019: Updated the ADP-based stations to support a third beam and

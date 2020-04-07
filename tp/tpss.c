@@ -173,7 +173,7 @@ int main ( int narg, char *argv[] ) {
 
   int b_TB_requested=0;
   int b_DRX_requested=0;
-  int b_NULL_requested=0;
+  int b_NOOP_requested=0;
 
   int err;
   char msg[1024];
@@ -283,7 +283,7 @@ int main ( int narg, char *argv[] ) {
     #include "tpss3.c" /* code to read/parse keywords pertaining to observation */
     obs[nobs].OBS_STP_N = 0;     
     obs[nobs].OBS_STP_RADEC = 0;
-    if (obs[nobs].OBS_MODE==LWA_OM_STEPPED) {
+    if (obs[nobs].OBS_MODE==LWA_OM_STEPPED || obs[nobs].OBS_MODE==LWA_OM_STEPPED) {
       #include "tpss4.c" /* code to read/parse keywords pertaining to observation in STEPPED mode */
       }
     #include "tpss5.c" /* code to read/parse optional keywords */
@@ -315,7 +315,7 @@ int main ( int narg, char *argv[] ) {
 
   /* For STEPPED-mode observations, we need to compute obs[].OBS_DUR */
   for (n=1;n<=nobs;n++) {
-    if (obs[n].OBS_MODE==LWA_OM_STEPPED) { 
+    if (obs[n].OBS_MODE==LWA_OM_STEPPED || obs[n].OBS_MODE==LWA_OM_STEPPED_NOOP) { 
       obs[n].OBS_DUR = 0;
       for ( i=1; i<=obs[n].OBS_STP_N; i++ ) { obs[n].OBS_DUR += obs[n].OBS_STP_T[i]; }          
       }  
@@ -348,7 +348,7 @@ int main ( int narg, char *argv[] ) {
       }
 #endif
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_NULL )   ) && (obs[n].OBS_RA<0) ) {
+           (obs[n].OBS_MODE==LWA_OM_TRK_NOOP )   ) && (obs[n].OBS_RA<0) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_RA<0 when mode is TRK_RADEC\n",MT_TPSS,getpid(),n);
       return;
       }
@@ -371,14 +371,14 @@ int main ( int narg, char *argv[] ) {
 #endif
 #ifdef USE_ADP
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_NULL ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_NOOP ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_FREQ1<222417950) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
       return;
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_NULL ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_NOOP ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_FREQ2 != 0 && obs[n].OBS_FREQ2<222417950) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
@@ -386,14 +386,14 @@ int main ( int narg, char *argv[] ) {
       }
 #else
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_NULL ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_NOOP ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_FREQ1<219130984) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
       return;
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_NULL ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_NOOP ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ) && (obs[n].OBS_FREQ2 != 0 && obs[n].OBS_FREQ2<219130984) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
@@ -402,7 +402,7 @@ int main ( int narg, char *argv[] ) {
 #endif
 #ifdef USE_ADP
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_NULL ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_NOOP ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
            (obs[n].OBS_MODE==LWA_OM_TBF      ) ||
@@ -411,7 +411,7 @@ int main ( int narg, char *argv[] ) {
       return;
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_NULL ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_NOOP ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_BW>7) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
@@ -419,7 +419,7 @@ int main ( int narg, char *argv[] ) {
       }
 #else
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_NULL ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_NOOP ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
            (obs[n].OBS_MODE==LWA_OM_TBN      ) ) && (obs[n].OBS_BW<=0) ) {
@@ -427,7 +427,7 @@ int main ( int narg, char *argv[] ) {
       return;
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_NULL ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_NOOP ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_BW>7) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
@@ -457,13 +457,14 @@ int main ( int narg, char *argv[] ) {
   b_TB_requested = 0;
   b_DRX_requested = 0;
   for (n=1;n<=nobs;n++) {
-    if ( (obs[n].OBS_MODE==LWA_OM_TBN      )   ) b_TB_requested = 1;
-    if ( (obs[n].OBS_MODE==LWA_OM_TBF      ) || 
-         (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
-         (obs[n].OBS_MODE==LWA_OM_TRK_NULL ) || 
-         (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-         (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
-         (obs[n].OBS_MODE==LWA_OM_STEPPED  )   ) b_DRX_requested = 1;
+    if ( (obs[n].OBS_MODE==LWA_OM_TBN         )   ) b_TB_requested = 1;
+    if ( (obs[n].OBS_MODE==LWA_OM_TBF         ) || 
+         (obs[n].OBS_MODE==LWA_OM_TRK_RADEC   ) ||
+         (obs[n].OBS_MODE==LWA_OM_TRK_NOOP    ) || 
+         (obs[n].OBS_MODE==LWA_OM_TRK_SOL     ) ||
+         (obs[n].OBS_MODE==LWA_OM_TRK_JOV     ) ||
+         (obs[n].OBS_MODE==LWA_OM_STEPPED     ) ||
+         (obs[n].OBS_MODE==LWA_OM_STEPPED_NOOP)   ) b_DRX_requested = 1;
     }
   if ( b_TB_requested && b_DRX_requested ) {
     printf("[%d/%d] FATAL: Sessions cannot mix TBN with other observing modes\n",MT_TPSS,getpid());
@@ -476,13 +477,14 @@ int main ( int narg, char *argv[] ) {
   b_TB_requested = 0;
   b_DRX_requested = 0;
   for (n=1;n<=nobs;n++) {
-    if ( (obs[n].OBS_MODE==LWA_OM_TBW      ) || 
-         (obs[n].OBS_MODE==LWA_OM_TBN      )   ) b_TB_requested = 1;
-    if ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) || 
-         (obs[n].OBS_MODE==LWA_OM_TRK_NULL ) ||
-         (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-         (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
-         (obs[n].OBS_MODE==LWA_OM_STEPPED  )   ) b_DRX_requested = 1;
+    if ( (obs[n].OBS_MODE==LWA_OM_TBW         ) || 
+         (obs[n].OBS_MODE==LWA_OM_TBN         )   ) b_TB_requested = 1;
+    if ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC   ) || 
+         (obs[n].OBS_MODE==LWA_OM_TRK_NOOP    ) ||
+         (obs[n].OBS_MODE==LWA_OM_TRK_SOL     ) ||
+         (obs[n].OBS_MODE==LWA_OM_TRK_JOV     ) ||
+         (obs[n].OBS_MODE==LWA_OM_STEPPED     ) ||
+         (obs[n].OBS_MODE==LWA_OM_STEPPED_NOOP)   ) b_DRX_requested = 1;
     }
   if ( b_TB_requested && b_DRX_requested ) {
     printf("[%d/%d] FATAL: Sessions cannot mix TBW/TBN with other observing modes\n",MT_TPSS,getpid());
@@ -492,19 +494,20 @@ int main ( int narg, char *argv[] ) {
   if (b_TB_requested) SESSION_DRX_BEAM=ME_MAX_NDPOUT;
 #endif
   
-  /* check to make sure that session doesn't mix TRK_NULL with other beamforming modes */
+  /* check to make sure that session doesn't mix TRK_NOOP with other beamforming modes */
   b_DRX_requested = 0;
-  b_NULL_requested = 0;
+  b_NOOP_requested = 0;
   for (n=1;n<=nobs;n++) {
-    if ( (obs[n].OBS_MODE==LWA_OM_TRK_NULL )   ) b_NULL_requested = 1;
-    if ( (obs[n].OBS_MODE==LWA_OM_TBF      ) || 
-         (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) || 
-         (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-         (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
-         (obs[n].OBS_MODE==LWA_OM_STEPPED  )   ) b_DRX_requested = 1;
+    if ( (obs[n].OBS_MODE==LWA_OM_TRK_NOOP    ) ||
+         (obs[n].OBS_MODE==LWA_OM_STEPPED_NOOP)   ) b_NOOP_requested = 1;
+    if ( (obs[n].OBS_MODE==LWA_OM_TBF         ) || 
+         (obs[n].OBS_MODE==LWA_OM_TRK_RADEC   ) || 
+         (obs[n].OBS_MODE==LWA_OM_TRK_SOL     ) ||
+         (obs[n].OBS_MODE==LWA_OM_TRK_JOV     ) ||
+         (obs[n].OBS_MODE==LWA_OM_STEPPED     )   ) b_DRX_requested = 1;
     }
-  if ( b_NULL_requested && b_DRX_requested ) {
-    printf("[%d/%d] FATAL: Sessions cannot mix NULL with other beamforming modes\n",MT_TPSS,getpid());
+  if ( b_NOOP_requested && b_DRX_requested ) {
+    printf("[%d/%d] FATAL: Sessions cannot mix NOOP with other beamforming modes\n",MT_TPSS,getpid());
     return;
     }
     
@@ -711,7 +714,7 @@ int main ( int narg, char *argv[] ) {
     fprintf(fp,"OBS_BW %d\n",    obs[n].OBS_BW);
     fprintf(fp,"OBS_BW+ %s\n",   obs[n].OBS_BWp);
 
-    if (obs[n].OBS_MODE==LWA_OM_STEPPED) {
+    if (obs[n].OBS_MODE==LWA_OM_STEPPED || obs[n].OBS_MODE==LWA_OM_STEPPED_NOOP) {
 
       fprintf(fp,"OBS_STP_N %ld\n",obs[n].OBS_STP_N);
       fprintf(fp,"OBS_STP_RADEC %d\n",obs[n].OBS_STP_RADEC);
@@ -748,7 +751,7 @@ int main ( int narg, char *argv[] ) {
 
         } /* for m */
 
-      } /* if (obs[n].OBS_MODE==LWA_OM_STEPPED) */
+      } /* if (obs[n].OBS_MODE==LWA_OM_STEPPED || obs[n].OBS_MODE==LWA_OM_STEPPED_NOOP) */
 
     fprintf(fp,"\n");
     for (m=1;m<=LWA_MAX_NSTD;m++) {
@@ -1018,6 +1021,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpcc.s: J. Dowell, UNM, 2020 Apr 7
+//   .1 Changed TRK_NULL to TRK_NOOP and added a STEPPED_NOOP mode
 // tpss.c: J. Dowell, UNM, 2020 Apr 6
 //   .1 Added support for TRK_NULL which is like TRK_RADEC but doesn't record any
 //      data
