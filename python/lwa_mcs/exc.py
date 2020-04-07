@@ -14,7 +14,7 @@ from lwa_mcs.sch import send_subsystem_command
 from lwa_mcs._mcs import send_exec_command
 
 __version__ = "0.3"
-__all__ = ['get_pids', 'is_is_active', 'send_command', 'get_queue', 'cancel_observation']
+__all__ = ['get_pids', 'is_running', 'send_command', 'get_queue', 'cancel_observation']
 
 
 COMMAND_STRUCT = struct.Struct('i256s')
@@ -39,7 +39,7 @@ def get_pids():
     return pids
 
 
-def is_is_active():
+def is_running():
     """
     Determine if MCS/exec should be considered operational.
     """
