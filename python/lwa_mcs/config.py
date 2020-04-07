@@ -30,10 +30,19 @@ ADDRESSES = {
 
 
 # Station time zone for 'at' commands
-try:
-    ## Can be overridden with the value in ~/.lwa_mcs/timezone
-    with open(os.path.join(os.path.expanduser('~'), '.lwa_mcs', 'timezone'), 'r') as fh:
-        STATION_TZ = pytz.timezone(fh.read())
-except (OSError, IOError):
-    STATION_TZ = pytz.timezone('America/Denver')
+## Default for New Mexico
+tzname = 'America/Denver'
+if os.path.exists('/etc/timezone'):
+    ## Debian/Ubuntu systems
+    with open('/etc/timezone', 'r') as fh:
+        tzname = fh.read().rstrip()
+elif os.path.exists('/etc/sysconfig/clock'):
+    ## Redhat systems
+    with open('/etc/sysconfig/clock', 'r') as fh:
+        for line in fh:
+            if line.find('ZONE') != -1:
+                _, tzname = line.rstrip().split('=', 1)
+                tzname = tzname.replace('"', '').replace("'", '')
+                break
+STATION_TZ = pytz.timezone(tzname)
 
