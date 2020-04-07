@@ -17,9 +17,6 @@ __version__ = "0.3"
 __all__ = ['get_pids', 'is_running', 'send_command', 'get_queue', 'cancel_observation']
 
 
-COMMAND_STRUCT = struct.Struct('i256s')
-
-
 def get_pids():
     """
     Return a list process IDs for all MCS/exec processes found.

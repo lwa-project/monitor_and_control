@@ -102,7 +102,7 @@ static PyObject *send_sch_command(PyObject *self, PyObject *args, PyObject *kwds
         PyErr_Format(PyExc_ValueError, "Invalid subsystem name");
         goto fail;
     }
-    if ( !(cmd.cid = LWA_getcmd(command) ) ) {
+    if ( !( cmd.cid = LWA_getcmd(command) ) ) {
         close(sockfd);
         PyErr_Format(PyExc_ValueError, "Invalid command name");
         goto fail;
