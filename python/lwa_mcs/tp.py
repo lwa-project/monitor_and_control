@@ -85,6 +85,7 @@ def schedule_sdfs(filenames, max_retries=5, logfile=None, errorfile=None):
     # Submit the files
     ids = {}
     for filename in filenames:
+        filename = os.path.abspath(filename)
         psID = _get_sdf_id(filename)
         if logfile is not None:
             logfile.write("Submitting SDF for %s, session %i\n" % psID)
@@ -98,7 +99,7 @@ def schedule_sdfs(filenames, max_retries=5, logfile=None, errorfile=None):
     scheduled = False
     counter = 0
     while not scheduled:
-        time.sleep(30)
+        time.sleep(max([10, 10+1*(len(filenames)-2)]))
         ## Get the exec queue
         queue = get_exec_queue()
         
