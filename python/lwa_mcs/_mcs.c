@@ -285,7 +285,7 @@ static PyObject *send_exec_command(PyObject *self, PyObject *args, PyObject *kwd
         goto fail;
     }
     
-    memset(&cmd, 0, sizeof(struct LWA_cmd_struct));
+    memset(&cmd, 0, sizeof(struct me_cmd_struct));
     if( !strcmp("NUL", command) ) {
         cmd.cmd = ME_CMD_NUL;
     } else if( !strcmp("SHT", command) ) {
