@@ -9,6 +9,7 @@ import time
 import subprocess
 from datetime import datetime, timedelta
 
+from lwa_mcs.config import TP_PATH
 from lwa_mcs.utils import mjdmpm_to_datetime
 from lwa_mcs.sch import send_subsystem_command
 from lwa_mcs._mcs import send_exec_command
