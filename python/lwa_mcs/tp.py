@@ -9,7 +9,7 @@ import warnings
 import subprocess
 
 from lwa_mcs.config import TP_PATH
-from lwa_mcs.exc import parse_queue
+from lwa_mcs.exc import get_queue as get_exec_queue
 
 __version__ = "0.2"
 __all__ = ['schedule_sdfs', 'get_completed_metadata']
@@ -57,7 +57,7 @@ def schedule_sdfs(filenames, max_retries=5, logfile=None, errorfile=None):
     elif logfile is None:
         pass
     else:
-        warnings.warn("logfile is of unknown type '%s'" % str(type(logfile))), 
+        warnings.warn("logfile is of unknown type '%s'" % str(type(logfile)), 
                       warings.RuntimeWarning)
         logfile = None
     ## stderr
@@ -76,13 +76,14 @@ def schedule_sdfs(filenames, max_retries=5, logfile=None, errorfile=None):
     elif errorfile is None:
         pass
     else:
-        warnings.warn("errorfile is of unknown type '%s'" % str(type(logfile))), 
+        warnings.warn("errorfile is of unknown type '%s'" % str(type(logfile)), 
                       warings.RuntimeWarning)
         errorfile = None
         
     # Submit the files
     ids = {}
     for filename in filenames:
+        filename = os.path.abspath(filename)
         psID = _get_sdf_id(filename)
         if logfile is not None:
             logfile.write("Submitting SDF for %s, session %i\n" % psID)
@@ -96,9 +97,9 @@ def schedule_sdfs(filenames, max_retries=5, logfile=None, errorfile=None):
     scheduled = False
     counter = 0
     while not scheduled:
-        time.sleep(30)
+        time.sleep(max([10, 10+1*(len(filenames)-2)]))
         ## Get the exec queue
-        queue = get_queue()
+        queue = get_exec_queue()
         
         ## Find out what is missing
         missing_files = []

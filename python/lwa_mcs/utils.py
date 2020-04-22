@@ -6,10 +6,10 @@ import re
 import math
 import pytz
 import subprocess
-from datetime import datetime timedelta
+from datetime import datetime, timedelta
 
 from lwa_mcs._mcs import get_current_time
-from lw_mcs.config import STATION_TZ
+from lwa_mcs.config import STATION_TZ
 
 __version__ = "0.3"
 __all__ = ['get_uptime', 'get_current_mjdmpm', 'mjdmpm_to_datetime', 'datetime_to_mjdmpm',
@@ -180,7 +180,7 @@ def schedule_at_command(execution_time, command):
 
     # Time conversion
     ## Does the the execution time look like a time stamp?
-    if isinstance(execution_time), (float, int)):
+    if isinstance(execution_time, (float, int)):
         execution_time = datetime.utcfromtimestamp(execution_time)
     ## Has the execution time already had a time zone assigned to it?
     elif execution_time.tzinfo is None:

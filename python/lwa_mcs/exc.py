@@ -7,6 +7,7 @@ import time
 import subprocess
 from datetime import datetime, timedelta
 
+from lwa_mcs.config import TP_PATH
 from lwa_mcs.utils import mjdmpm_to_datetime
 from lwa_mcs.sch import send_subsystem_command
 from lwa_mcs._mcs import send_exec_command
@@ -127,15 +128,18 @@ def cancel_observation(project_id, session_id, stop_dr=True, remove_metadata=Tru
     if not cancelled:
         raise RuntimError("Cannot cancel observation")
     else:
+        time.sleep(0.5)
+
         if is_active:
             if stop_dr:
                 ## Also stop the data recorder
                 tag = send_subsystem_command("DR%i" % beam, "RPT" "OP-TAG")
                 stopped = send_subsystem_command("DR%i" % beam, "STP", tag)
+        else:
             if remove_metadata:
                 try:
                     os.unlink(os.path.join(TP_PATH, 'mbox', "%s_%04i.tgz" % (project_id, session_id)))
-                except OSError:
+                except OSError as e:
                     pass
                     
     return True

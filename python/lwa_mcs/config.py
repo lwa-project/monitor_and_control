@@ -5,7 +5,7 @@ Module for defining common MCS values.
 import os
 import pytz
 
-from _mcs import IS_ADP, MAX_NDR
+from lwa_mcs._mcs import IS_ADP, MAX_NDR, SCH_PATH
 
 __version__ = '0.4'
 __all__ = ['IS_ADP', 'MAX_NDR', 'SCH_PATH', 'EXC_PATH', 'TP_PATH', 'STATION_TZ']
@@ -14,7 +14,7 @@ __all__ = ['IS_ADP', 'MAX_NDR', 'SCH_PATH', 'EXC_PATH', 'TP_PATH', 'STATION_TZ']
 # Paths
 _BASE_PATH = os.path.dirname(SCH_PATH)
 EXC_PATH = os.path.join(_BASE_PATH, 'exec')
-TP_PATH = os.path.join_BASE_PATH, 'tp')
+TP_PATH = os.path.join(_BASE_PATH, 'tp')
 
 
 # Station time zone for 'at' commands
