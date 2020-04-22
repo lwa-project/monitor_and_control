@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Module for reading data from the MCS MIB.
 """

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Module for controlling MCS scheduler via UDP packets.
 """

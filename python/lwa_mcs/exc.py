@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Module for controlling MCS executive via UDP packets.
 """
@@ -15,9 +13,6 @@ from lwa_mcs._mcs import send_exec_command
 
 __version__ = "0.3"
 __all__ = ['get_pids', 'is_running', 'send_command', 'get_queue', 'cancel_observation']
-
-
-COMMAND_STRUCT = struct.Struct('i256s')
 
 
 def get_pids():
