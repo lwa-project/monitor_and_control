@@ -1,25 +1,19 @@
-# -*- coding: utf-8 -*-
-
 """
 Module for controlling MCS executive via UDP packets.
 """
 
 import os
 import time
-import socket
-import struct
 import subprocess
 from datetime import datetime, timedelta
 
-from lwa_mcs.config import ADDRESSES, SOCKET_TIMEOUT, EXC_COMMANDS
+from lwa_mcs.config import TP_PATH
 from lwa_mcs.utils import mjdmpm_to_datetime
+from lwa_mcs.sch import send_subsystem_command
+from lwa_mcs._mcs import send_exec_command
 
-__version__ = "0.1"
-__revision__ = "$Rev$"
-__all__ = ['COMMAND_STRUCT', 'get_pids', 'is_running', 'send_command', 'get_queue']
-
-
-COMMAND_STRUCT = struct.Struct('i256s')
+__version__ = "0.3"
+__all__ = ['get_pids', 'is_running', 'send_command', 'get_queue', 'cancel_observation']
 
 
 def get_pids():
@@ -28,10 +22,16 @@ def get_pids():
     """
     
     p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE)
-    o, e = p.communicate()
+    output, error = p.communicate()
+    try:
+        output = output.decode('ascii', errors='backslashreplace')
+        error = error.decode('ascii', errors='backslashreplace')
+    except AttributeError:
+        pass
+    output = output.split('\n')
     
     pids = []
-    for line in o.split('\n'):
+    for line in output:
         fields = line.split(None, 10)
         if fields[-1].find('me_inproc') != -1 \
            or fields[-1].find('me_tpcom') != -1 \
@@ -43,7 +43,7 @@ def get_pids():
 
 def is_running():
     """
-    Determine if MCS/sch should be considered operational.
+    Determine if MCS/exec should be considered operational.
     """
     
     pids = get_pids()
@@ -55,32 +55,13 @@ def send_command(cmd, data=""):
     Use MCS/exec to execute the specified command.
     """
     
-    # Convert the command name to a MCS ID code
-    try:
-        cid = EXC_COMMANDS[cmd.upper()]
-    except KeyError:
-        raise ValueError("Unknown command: %s" % cmd)
-        
     # Send the command
-    try:    
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect(ADDRESSES['MEE'])
-        sock.settimeout(SOCKET_TIMEOUT)
-        
-        mcscmd = COMMAND_STRUCT.pack(cid, data)
-        sock.sendall(mcscmd)
-        response = sock.recv(COMMAND_STRUCT.size)
-        response = COMMAND_STRUCT.unpack(response)
-        
-        sock.close()
-    except Exception as e:
-        print str(e)
-        raise RuntimeError("MCS/exec - me_exec does not appear to be running")
-        
+    success = send_exec_command(cmd, data)
+    
     # Wait a bit...
     time.sleep(0.2)
     
-    return False if response[0] < EXC_COMMANDS['NUL'] else True
+    return success
 
 
 def get_queue():
@@ -128,3 +109,43 @@ def get_queue():
         raise RuntimeError("Cannot parse the 'mesq.dat' file")
         
     return queue
+
+
+def cancel_observation(project_id, session_id, stop_dr=True, remove_metadata=True):
+    """
+    Cancel a scheduled observation.
+    """
+    
+    # Get the exec queue and make sure we can even do this
+    queue = get_queue()
+    if (project_id, session_id) not in list(queue.keys()):
+        raise RuntimeError("Project %s, sesison %i is scheduled" % (project_id, session_id))
+        
+    # It's at least scheduled.  Is it is_active?
+    now = datetime.utcnow()
+    beam, start, stop = queue[(project_id, session_id)]
+    if now >= start and now < stop:
+        is_active = True
+    else:
+        is_active = False
+        
+    # Cancel it
+    cancelled = send_command("STP", "%s %i" % (project_id, session_id))
+    if not cancelled:
+        raise RuntimError("Cannot cancel observation")
+    else:
+        time.sleep(0.5)
+
+        if is_active:
+            if stop_dr:
+                ## Also stop the data recorder
+                tag = send_subsystem_command("DR%i" % beam, "RPT" "OP-TAG")
+                stopped = send_subsystem_command("DR%i" % beam, "STP", tag)
+        else:
+            if remove_metadata:
+                try:
+                    os.unlink(os.path.join(TP_PATH, 'mbox', "%s_%04i.tgz" % (project_id, session_id)))
+                except OSError as e:
+                    pass
+                    
+    return True
