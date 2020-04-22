@@ -28,8 +28,12 @@ def get_uptime():
     upre = re.compile('up ((?P<days>\d+) day(s)?,)?\s*((?P<hours>\d+)\:)?(?P<minutes>\d+)( min(ute(s)?)?)?,')
     
     # Run the command and see if we have something that looks right
-    line = subprocess.check_output(['uptime'])
-    mtch = upre.search(line)
+    output = subprocess.check_output(['uptime'])
+    try:
+        output = output.decode('ascii', errors='backslashreplace')
+    except AttributeError:
+        pass
+    mtch = upre.search(output)
     if mtch is None:
         raise RuntimeError("Could not determine the current uptime")
     
@@ -112,7 +116,12 @@ def get_at_queue():
     
     # Run atq to get the current list of commands
     atlist = subprocess.Popen(['/usr/bin/atq',], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output,error = atlist.communicate()
+    output, error = atlist.communicate()
+    try:
+        output = output.decode('ascii', errors='backslashreplace')
+        error = error.decode('ascii', errors='backslashreplace')
+    except AttributeError:
+        pass
     output = output.split('\n')
     
     # Loop over the output
@@ -143,7 +152,12 @@ def get_at_command(id):
     
     # Run at to information about the specified command
     atdetail = subprocess.Popen(['/usr/bin/at', '-c', str(id)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output,error = atdetail.communicate()
+    output, error = atdetail.communicate()
+    try:
+        output = output.decode('ascii', errors='backslashreplace')
+        error = error.decode('ascii', errors='backslashreplace')
+    except AttributeError:
+        pass
     output = output.split('\n')
     
     toExecute = []
@@ -210,6 +224,11 @@ def schedule_at_command(execution_time, command):
                                 cwd=cwd, stderr=subprocess.PIPE)
     ## Execute						
     atco, atce = atc.communicate()
+    try:
+        atco = atco.decode('ascii', errors='backslashreplace')
+        atce = atce.decode('ascii', errors='backslashreplace')
+    except AttributeError:
+        pass  
     ## Interpret the results
     jobInfo = atce.split('\n')[-2]
     jobID = jobInfo.split(None, 2)[1]

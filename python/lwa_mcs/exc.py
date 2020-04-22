@@ -22,10 +22,16 @@ def get_pids():
     """
     
     p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE)
-    o, e = p.communicate()
+    output, error = p.communicate()
+    try:
+        output = output.decode('ascii', errors='backslashreplace')
+        error = error.decode('ascii', errors='backslashreplace')
+    except AttributeError:
+        pass
+    output = output.split('\n')
     
     pids = []
-    for line in o.split('\n'):
+    for line in output:
         fields = line.split(None, 10)
         if fields[-1].find('me_inproc') != -1 \
            or fields[-1].find('me_tpcom') != -1 \
