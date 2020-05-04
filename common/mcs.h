@@ -306,7 +306,7 @@ char *LWA_sid2str( int sid ) {
   } /* LWA_sid2str() */
  
 /* === LWA Command (TYPE) IDs === */
-#define LWA_MAX_CMD  38 /* maximum code; also maximum number of commands */
+#define LWA_MAX_CMD  41 /* maximum code; also maximum number of commands */
 #define LWA_CMD_MCSSHT 0 /* Not a subsystem command.  Directs ms_mcic to shutdown */
 #define LWA_CMD_PNG      1 /* PNG */
 #define LWA_CMD_RPT      2 /* RPT */
