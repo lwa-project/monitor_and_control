@@ -15,4 +15,3 @@ install: build
 .PHONY: clean
 clean:
 	python setup.py clean --all
-	rm -rf lwa_mcs/config.py
