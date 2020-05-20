@@ -5,10 +5,10 @@ Module for defining common MCS values.
 import os
 import pytz
 
-from lwa_mcs._mcs import IS_ADP, MAX_NDR, SCH_PATH
+from lwa_mcs._mcs import IS_ADP, MAX_NDR, SCH_PATH, MCS_TIMEOUT
 
-__version__ = '0.4'
-__all__ = ['IS_ADP', 'MAX_NDR', 'SCH_PATH', 'EXC_PATH', 'TP_PATH', 'STATION_TZ']
+__version__ = '0.5'
+__all__ = ['IS_ADP', 'MAX_NDR', 'SCH_PATH', 'EXC_PATH', 'TP_PATH', 'MCS_TIMEOUT', 'STATION_TZ']
 
 
 # Paths

@@ -7,9 +7,9 @@ import time
 import struct
 from datetime import datetime, timedelta
 
-from lwa_mcs._mcs import read_mib_ip, read_mib
+from lwa_mcs._mcs import read_mib_ip, read_mib, MCS_TIMEOUT
 
-__version__ = "0.2"
+__version__ = "0.3"
 __all__ = ['read', 'read_from_disk']
 
 
@@ -37,7 +37,7 @@ def read_from_disk(ss, label, trim_nulls=True):
     """
     
     t0 = time.time()
-    while (time.time() - t0) < 3:
+    while (time.time() - t0) < MCS_TIMEOUT:
         try:
             dtype, value, ts = read_mib(ss, label)
             

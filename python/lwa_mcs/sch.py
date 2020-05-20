@@ -6,9 +6,9 @@ import time
 import subprocess
 
 from lwa_mcs import mib
-from lwa_mcs._mcs import send_sch_command
+from lwa_mcs._mcs import send_sch_command, MCS_TIMEOUT
 
-__version__ = "0.3"
+__version__ = "0.4"
 __all__ = ['get_pids', 'is_running', 'get_active_subsystems',
            'send_subsystem_command']
 
@@ -86,10 +86,10 @@ def send_subsystem_command(ss, cmd="RPT", data="SUMMARY"):
     if cmd == "RPT":
         # Parse the response if this is a RPT command
         t0 = time.time()
-        while (time.time() - t0) < 3.0:
+        while (time.time() - t0) < MCS_TIMEOUT:
             try:
                 val, ts = mib.read(ss, data)
-                if (time.time() - ts) <= 3.0:
+                if (time.time() - ts) <= MCS_TIMEOUT:
                     value = val
                     break
                 else:

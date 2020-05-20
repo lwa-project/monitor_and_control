@@ -350,7 +350,7 @@ MOD_INIT(_mcs) {
     }
     
     // Version information
-    PyModule_AddObject(m, "__version__", PyString_FromString("0.3"));
+    PyModule_AddObject(m, "__version__", PyString_FromString("0.4"));
     
     // Constants
 #ifdef USE_ADP
@@ -362,11 +362,14 @@ MOD_INIT(_mcs) {
     
     PyModule_AddObject(m, "SCH_PATH", PyString_FromString(LWA_SCH_SCP_DIR));
     
+    PyModule_AddObject(m, "MCS_TIMEOUT", PyInt_FromLong(LWA_PTQ_TIMEOUT));
+    
     // Function listings
     all = PyList_New(0);
     PyList_Append(all, PyString_FromString("IS_ADP"));
     PyList_Append(all, PyString_FromString("MAX_NDR"));
     PyList_Append(all, PyString_FromString("SCH_PATH"));
+    PyList_Append(all, PyString_FromString("MCS_TIMEOUT"));
     PyList_Append(all, PyString_FromString("get_current_time"));
     PyList_Append(all, PyString_FromString("send_sch_command"));
     PyList_Append(all, PyString_FromString("read_mib_ip"));
