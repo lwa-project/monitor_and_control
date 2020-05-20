@@ -139,7 +139,7 @@ static PyObject *read_mib_ip(
     struct LWA_mib_entry record;
     struct timeval tv;
     
-    float ts;
+    double ts;
     
     int sockfd, result;   
     struct sockaddr_in address; /* for network sockets */
@@ -209,7 +209,7 @@ static PyObject *read_mib(PyObject *self, PyObject *args, PyObject *kwds) {
     char key[MIB_LABEL_FIELD_LENGTH];
     struct timeval tv;  /* from sys/time.h; included via LWA_MCS.h */
     
-    float ts;
+    double ts;
     
     /* Go! */
     sprintf(dbm_filename, "%s/%s.gdb", LWA_SCH_SCP_DIR, subsystem);
