@@ -214,6 +214,7 @@ main ( int narg, char *argv[] ) {
           if (datum_data.dptr) {
               //printf("[%s/%d] Found it. eError=%d.\n", ME, getpid(),eError);
               memcpy( &record, datum_data.dptr, datum_data.dsize );
+              free(datum_data.dptr);    // Need to cleanup after a gdbm_fetch
               //strncpy(ip_address,record.val,15);
             } else {
               //printf("[%s/%d] Failed to find label=<%s> in dbm. eError=%d\n", ME, getpid(),label,eError);
