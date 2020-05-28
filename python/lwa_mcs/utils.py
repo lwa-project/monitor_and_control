@@ -2,6 +2,7 @@
 Module with various utilties to help with working with MCS.
 """
 
+import os
 import re
 import math
 import pytz
