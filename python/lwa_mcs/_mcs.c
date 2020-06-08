@@ -225,6 +225,7 @@ static PyObject *read_mib(PyObject *self, PyObject *args, PyObject *kwds) {
     datum_data = gdbm_fetch(dbm_ptr,datum_key);
     if (datum_data.dptr) {
         memcpy( &record, datum_data.dptr, datum_data.dsize );
+        free(datum_data.dptr);
     } else {
         gdbm_close(dbm_ptr);
         PyErr_Format(PyExc_ValueError, "Invalid MIB label");
