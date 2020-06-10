@@ -97,7 +97,7 @@ def send_subsystem_command(ss, cmd="RPT", data="SUMMARY"):
                     time.sleep(0.2)
                     
             except Exception as e:
-                #print str(e)
+                #print(str(e))
                 value = None
     else:
         # Otherwise return the reference ID
