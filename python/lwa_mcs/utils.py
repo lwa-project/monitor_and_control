@@ -198,7 +198,7 @@ def schedule_at_command(execution_time, command):
     if isinstance(execution_time, (float, int)):
         execution_time = datetime.utcfromtimestamp(execution_time)
     ## Has the execution time already had a time zone assigned to it?
-    elif execution_time.tzinfo is None:
+    if execution_time.tzinfo is None:
         execution_time = _UTC.localize(execution_time)
     ## Convert to the systems's timezone	
     execution_time = execution_time.astimezone(STATION_TZ)
