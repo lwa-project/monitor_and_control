@@ -111,7 +111,7 @@ def get_queue():
     return queue
 
 
-def cancel_observation(project_id, session_id, stop_dr=True, remove_metadata=True):
+def cancel_observation(project_id, session_id, stop_dr=True, remove_metadata=False):
     """
     Cancel a scheduled observation.
     """
@@ -119,7 +119,7 @@ def cancel_observation(project_id, session_id, stop_dr=True, remove_metadata=Tru
     # Get the exec queue and make sure we can even do this
     queue = get_queue()
     if (project_id, session_id) not in list(queue.keys()):
-        raise RuntimeError("Project %s, sesison %i is scheduled" % (project_id, session_id))
+        raise RuntimeError("Project %s, sesison %i is not scheduled" % (project_id, session_id))
         
     # It's at least scheduled.  Is it is_active?
     now = datetime.utcnow()
@@ -139,7 +139,7 @@ def cancel_observation(project_id, session_id, stop_dr=True, remove_metadata=Tru
         if is_active:
             if stop_dr:
                 ## Also stop the data recorder
-                tag = send_subsystem_command("DR%i" % beam, "RPT" "OP-TAG")
+                tag = send_subsystem_command("DR%i" % beam, "RPT", "OP-TAG")
                 stopped = send_subsystem_command("DR%i" % beam, "STP", tag)
         else:
             if remove_metadata:

@@ -101,6 +101,6 @@ def send_subsystem_command(ss, cmd="RPT", data="SUMMARY"):
                 value = None
     else:
         # Otherwise return the reference ID
-        value = rref
+        value = ref
         
     return value
