@@ -111,7 +111,7 @@ def get_queue():
     return queue
 
 
-def cancel_observation(project_id, session_id, stop_dr=True, remove_metadata=False):
+def cancel_observation(project_id, session_id, stop_dr=True, remove_metadata=True):
     """
     Cancel a scheduled observation.
     """
