@@ -1,5 +1,5 @@
 PYBUILDFLAGS   ?=
-PYINSTALLFLAGS ?=
+PYINSTALLFLAGS ?= --user
 
 .PHONY: all
 all: build
@@ -10,7 +10,7 @@ build: ../common/mcs.h setup.py lwa_mcs/*.py Makefile
 
 .PHONY: install
 install: build
-	python setup.py install $(PYINSTALLFLAGS)
+	pip install . $(PYINSTALLFLAGS)
 
 .PHONY: clean
 clean:
