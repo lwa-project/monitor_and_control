@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
+#include <math.h>
 #include <sys/time.h>
 
 #include <sys/types.h>
@@ -121,6 +122,13 @@ int msgreplay(FILE *msqid, const void *msgp, size_t msgsz, int mqtid) {
                 break;
             }
         }
+    }
+    
+    /* Brief status report */
+    float complete = 100.0 * ftell(msqid) / (650*1024);
+    complete = round(complete);
+    if( ((int) complete % 10) == 0 ) {
+        printf("[%s/%d] INFO: %s is %.0f%% complete\n", ME, getpid(), LWA_sid2str(msg.sid), complete);
     }
     
     /* If we found something, send it back to the main thread so that it can be logged */

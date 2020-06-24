@@ -61,7 +61,7 @@ ms_mon: ms_mon.c ../common/mcs.h
 	$(CC) $(CFLAGS) -o ms_mon ms_mon.c $(LDFLAGS)
 
 ms_replay: ms_replay.c ../common/mcs.h ms_exec_log.c
-	$(CC) $(CFLAGS) -o ms_replay ms_replay.c $(LD_FLAGS)
+	$(CC) $(CFLAGS) -o ms_replay ms_replay.c -lm $(LD_FLAGS)
 
 ms_mdre_replay: ms_mdre_replay.c ../common/mcs.h
 	$(CC) $(CFLAGS) -o ms_mdre_replay ms_mdre_replay.c $(LDFLAGS)
