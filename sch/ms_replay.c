@@ -47,7 +47,7 @@
 int msgreplay(FILE *msqid, const void *msgp, size_t msgsz, int mqtid) {
     struct LWA_cmd_struct msg;
     int i, found;
-    long int ref;
+    long int ref, mjd, mpm;
     int status, sid, cid;
     char line[255], temp[10], data[32];
     
@@ -104,9 +104,11 @@ int msgreplay(FILE *msqid, const void *msgp, size_t msgsz, int mqtid) {
                  || ( (msg.cid == LWA_CMD_RPT) \
                      && (ref == atol(&temp)) ) ) ) {
                 found = 1;
-                msg.bAccept = status;
+                msg.bAccept = LWA_MSELOG_TP_SUCCESS;
+                LWA_time(&mjd, &mpm);
+                LWA_time2tv(&msg.tv, mjd, mpm);
                 msg.eSummary = LWA_SIDSUM_NORMAL;
-                msg.eMIBerror = -1;
+                msg.eMIBerror = LWA_MIBERR_OK;
                 for(i=0; i<LWA_CMD_STRUCT_DATA_FIELD_LENGTH; i++) {
                     if( line[55+i] != '|' && line[55+i] != '\0') {
                         msg.data[i] = line[55+i];
@@ -419,7 +421,7 @@ main ( int narg, char *argv[] ) {
 	           LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, mq_msg.ref, 
                                 mq_msg.bAccept, 
                                 mq_msg.sid, mq_msg.cid, mq_msg.data, mq_msg.datalen, &mselog_line_ctr );
-                   //sprintf(logmsg,"Previous message: bAccept = %d",mq_msg.bAccept);
+                   sprintf(logmsg,"Previous message: bAccept = %d",mq_msg.bAccept);
                    //LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, &mselog_line_ctr );    
                    break;
 
@@ -810,10 +812,10 @@ main ( int narg, char *argv[] ) {
       }         
     }
 
-  /* kill ms_mdre_ip */
-  sprintf(logmsg,"Killing the ms_mdre_ip process");
+  /* kill ms_mdre_replay */
+  sprintf(logmsg,"Killing the ms_mdre_replay process");
   LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
-  system("killall -v ms_mdre_ip > /dev/null 2> /dev/null");
+  system("killall -v ms_mdre_replay > /dev/null 2> /dev/null");
 
   /* announce the end */
   sprintf(logmsg,"ms_replay shutdown complete");
