@@ -85,7 +85,7 @@ int msgreplay(FILE *msqid, const void *msgp, size_t msgsz, int mqtid) {
            Processing of the line:
              if the status is TP_QUEUED or TP_SEND and we are dealing with a RPT
              -> save the reference number
-             if the status is TP_SUCCESS or higher and it is either not a RPT
+             else if the status is TP_SUCCESS or higher and it is either not a RPT
              or it is RPT and we have the right reference
              -> save the response to the message
         */ 
@@ -262,8 +262,9 @@ main ( int narg, char *argv[] ) {
   if (nsid>1) { /* if there is at least one subsystem other than MCS... */
     mqrid = msgget( (key_t) MQ_MS_KEY, 0666 | IPC_CREAT );
     if (mqrid==-1) {
-      sprintf(logmsg,"WARNING: Message queue setup failed with code %d",mqrid);
+      sprintf(logmsg,"FATAL: Message queue setup failed with code %d",mqrid);
       LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
+      exit(EXIT_FAILURE);
       }  
     }
 
