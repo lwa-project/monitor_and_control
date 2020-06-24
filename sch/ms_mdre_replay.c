@@ -219,6 +219,13 @@ main ( int narg, char *argv[] ) {
                         break;
                     }
                 }
+                /* catch for binary temperatures (the most common "@4" in the logs) */
+                if( strncmp(c.val, "@4", 2) == 0 ) {
+                    c.val[0] = '7';  c.val[1] = '8';
+                    c.val[2] = '.';
+                    c.val[3] = '3';  c.val[4] = '5';
+                    c.val[5] = '\0';
+                }
                 break;
             }
         }
