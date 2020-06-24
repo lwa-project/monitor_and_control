@@ -21,7 +21,7 @@ def get_pids():
     Return a list process IDs for all MCS/exec processes found.
     """
     
-    p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE)
+    p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
     try:
         output = output.decode('ascii', errors='backslashreplace')
