@@ -17,6 +17,7 @@ sch/ms_md2t
 sch/ms_mdr
 sch/ms_mdre
 sch/ms_mdre_ip
+sch/ms_mdre_replay
 sch/ms_mon
 sch/ms_mu
 sch/ms_replay
