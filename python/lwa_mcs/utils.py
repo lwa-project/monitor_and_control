@@ -219,10 +219,10 @@ def schedule_at_command(execution_time, command):
         echoc = subprocess.Popen(['/bin/echo', 'python %s' % (command,)], stdout=subprocess.PIPE)
         echoc.wait()
         atc = subprocess.Popen(['/usr/bin/at',  "%s" % execution_time.strftime("%H:%M %m/%d/%Y")], 
-                                cwd=cwd, stdin=echoc.stdout, stderr=subprocess.PIPE)
+                                cwd=cwd, stdin=echoc.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     else:
         atc = subprocess.Popen(['/usr/bin/at', "%s" % execution_time.strftime("%H:%M %m/%d/%Y"), "-f", name], 
-                                cwd=cwd, stderr=subprocess.PIPE)
+                                cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     ## Execute						
     atco, atce = atc.communicate()
     try:
