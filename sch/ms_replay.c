@@ -23,6 +23,7 @@
 #include <math.h>
 #include <sys/time.h>
 
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
 //#include <sys/wait.h>
@@ -45,7 +46,7 @@
 
 #define LWA_REPLAY_MSELOG_FILENAME "replay_mselog.txt"
 
-int msgreplay(FILE *msqid, const void *msgp, size_t msgsz, int mqtid) {
+int msgreplay(FILE *msqid, const void *msgp, size_t msgsz, int mqtid, size_t rpsz) {
     struct LWA_cmd_struct msg;
     int i, found;
     long int ref, mjd, mpm;
@@ -125,7 +126,7 @@ int msgreplay(FILE *msqid, const void *msgp, size_t msgsz, int mqtid) {
     }
     
     /* Brief status report */
-    float complete = 100.0 * ftell(msqid) / (650*1024);
+    float complete = 100.0 * ftell(msqid) / rpsz;
     complete = round(complete);
     if( ((int) complete % 10) == 0 ) {
         printf("[%s/%d] INFO: %s is %.0f%% complete\n", ME, getpid(), LWA_sid2str(msg.sid), complete);
@@ -160,6 +161,7 @@ main ( int narg, char *argv[] ) {
 
   int mqrid;
   FILE* mqtid[LWA_MAX_SID+1];
+  size_t rpsz;
   struct LWA_cmd_struct mq_msg; //was: struct mq_struct mq_msg;
   
   int n;
@@ -289,7 +291,11 @@ main ( int narg, char *argv[] ) {
        exit(EXIT_FAILURE);
        }
     }
-
+  
+  /* Get the replay log size */
+  struct stat st;
+  stat(&replaylog[0], &st);
+  rpsz = st.st_size;
 
   /* set up sockets interface for communicating with MCS/Exec and others... */ 
   server_sockfd = socket(             /* create socket */
@@ -733,7 +739,7 @@ main ( int narg, char *argv[] ) {
         }
       mq_msg.datalen    = task[tqp].datalen;               
       
-      if ( msgreplay(mqtid[task[tqp].sid], (void *)&mq_msg, LWA_msz(), mqrid) == -1 ) {
+      if ( msgreplay(mqtid[task[tqp].sid], (void *)&mq_msg, LWA_msz(), mqrid, rpsz)== -1 ) {
 
           sprintf(logmsg,"FATAL: Could not msgreplay()");
 	  LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, task[tqp].ref, 
