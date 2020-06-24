@@ -19,6 +19,7 @@ sch/ms_mdre
 sch/ms_mdre_ip
 sch/ms_mon
 sch/ms_mu
+sch/ms_replay
 sch/msei
 ## executive
 exec/me_exec
