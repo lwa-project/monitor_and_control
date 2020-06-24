@@ -65,7 +65,10 @@ ms_replay: ms_replay.c ../common/mcs.h ms_exec_log.c
 
 ms_mdre_replay: ms_mdre_replay.c ../common/mcs.h
 	$(CC) $(CFLAGS) -o ms_mdre_replay ms_mdre_replay.c $(LDFLAGS)
-	
+
+ms_init_replay: ms_init_replay.c ../common/mcs.h
+	$(CC) $(CFLAGS) -o ms_init_replay ms_init_replay.c $(LDFLAGS)
+
 .PHONY: install
 install:
 	install -d ../../sch ../../sch/cfiles ../../sch/dfiles ../../sch/gfiles
