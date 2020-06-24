@@ -173,7 +173,7 @@ static PyObject *read_mib_ip(
     
     tv = record.last_change;
     ts = tv.tv_sec + tv.tv_usec/1e6;
-    output = Py_BuildValue("(s#f)", record.val, MIB_LABEL_FIELD_LENGTH, ts);
+    output = Py_BuildValue("(s#f)", record.val, MIB_VAL_FIELD_LENGTH, ts);
     close(sockfd);
     return output;
 
@@ -234,7 +234,7 @@ static PyObject *read_mib(PyObject *self, PyObject *args, PyObject *kwds) {
     tv = record.last_change;
     ts = tv.tv_sec + tv.tv_usec/1e6;
     
-    output = Py_BuildValue("(ss#f)", record.type_dbm, record.val, MIB_LABEL_FIELD_LENGTH, ts);
+    output = Py_BuildValue("(ss#f)", record.type_dbm, record.val, MIB_VAL_FIELD_LENGTH, ts);
     gdbm_close(dbm_ptr);
     return output;
     
