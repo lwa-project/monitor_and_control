@@ -44,74 +44,95 @@
 
 #define LWA_REPLAY_MSELOG_FILENAME "replay_mselog.txt"
 
-int msgreplay(int msqid, const void *msgp, size_t msgsz, FILE* rpl, int mqtid) {
+int msgreplay(FILE *msqid, const void *msgp, size_t msgsz, int mqtid) {
     struct LWA_cmd_struct msg;
-    char line[255], s[1], sid[3], cmd[3], data[32];
+    int i, found;
+    long int ref;
+    int status, sid, cid;
+    char line[255], temp[10], data[32];
+    
+    /* Copy the message over */
     memcpy(&msg, msgp, sizeof(msg));
     
-    char ref[10];
-    int j;
+    /* If this is a RPT, find out what MIB entry we are looking for */
     if( msg.cid == LWA_CMD_RPT ) {
-        for(j=0; j<31; j++) {
-            if( msg.data[j] != '|' && msg.data[j] != '\0') {
-                data[j] = msg.data[j];
-                data[j+1] = '\0';
-            } else {
+        strncpy(&data, &msg.data, 31);
+        data[31] = '\0';
+        //printf("Looking for '%s'\n", data);
+    }
+    
+    /* Read through the file until we find what we are looking for */
+    found = 0;
+    while(fgets(&line, sizeof(line), msqid) != NULL) {
+        /* Basic unpak to get the queuing status, subsystem ID, and command ID */
+        strncpy(&temp, &(line[45]), 1);
+        temp[1] = '\0';
+        status = atoi(&temp);
+        strncpy(&temp, &(line[47]), 3);
+        temp[3] = '\0';
+        sid = LWA_getsid(&temp);
+        strncpy(&temp, &(line[51]), 3);
+        temp[3] = '\0';
+        cid = LWA_getcmd(&temp);
+        
+        /* Ignore lines that don't have the right subsystem or command */
+        if( ( (sid != msg.sid) \
+              || (cid != msg.cid) ) ) {
+            continue;
+        }
+        
+        /*
+           Processing of the line:
+             if the status is TP_QUEUED or TP_SEND and we are dealing with a RPT
+             -> save the reference number
+             if the status is TP_SUCCESS or higher and it is either not a RPT
+             or it is RPT and we have the right reference
+             -> save the response to the message
+        */ 
+        if( ( (status < LWA_MSELOG_TP_SUCCESS ) \
+             && (msg.cid == LWA_CMD_RPT) \
+             && (strncmp(data, &(line[55]), strlen(data)) == 0) ) ) {
+            strncpy(&temp, &(line[35]), 9);
+            temp[9] = '\0';
+            ref = atol(&temp);
+            //printf("Found '%s' at '%s'\n", data, ref);
+        } else {
+            strncpy(&temp, &(line[35]), 9);
+            temp[9] = '\0';
+            
+            if( ( (msg.cid != LWA_CMD_RPT) \
+                 || ( (msg.cid == LWA_CMD_RPT) \
+                     && (ref == atol(&temp)) ) ) ) {
+                found = 1;
+                msg.bAccept = status;
+                msg.eSummary = LWA_SIDSUM_NORMAL;
+                msg.eMIBerror = -1;
+                for(i=0; i<LWA_CMD_STRUCT_DATA_FIELD_LENGTH; i++) {
+                    if( line[55+i] != '|' && line[55+i] != '\0') {
+                        msg.data[i] = line[55+i];
+                        msg.data[i+1] = '\0';
+                    } else {
+                        break;
+                    }
+                }
+                msg.datalen = -1;   // Always a string
                 break;
             }
         }
-        printf("Looking for '%s'\n", data);
     }
     
-    int i, status, found = 0;
-    while(fgets(&line, sizeof(line), rpl) != NULL) {
-        strncpy(&s,   &(line[45]), 1);
-        status = s[0] - '0';
-        strncpy(&sid, &(line[47]), 3);
-        strncpy(&cmd, &(line[51]), 3);
-        
-        if( ( (status < LWA_MSELOG_TP_SUCCESS ) \
-             && (strncmp(sid, LWA_sid2str(msg.sid), 3) == 0) \
-             && (strncmp(cmd, LWA_cmd2str(msg.cid), 3) == 0) \
-             && (msg.cid == LWA_CMD_RPT) \
-             && (strncmp(data, &(line[55]), strlen(data)) == 0) ) ) {
-            strncpy(&ref, &(line[35]), 9);
-            printf("Found '%s' at '%s'\n", data, ref);
-        } else if( ( (status >= LWA_MSELOG_TP_SUCCESS) \
-                    && (strncmp(sid, LWA_sid2str(msg.sid), 3) == 0) \
-                    && (strncmp(cmd, LWA_cmd2str(msg.cid), 3) == 0) \
-                    && ( (msg.cid != LWA_CMD_RPT) \
-                        || ( (msg.cid == LWA_CMD_RPT) \
-                            && (strncmp(ref, &(line[35]), 9) == 0) ) ) ) ) {
-            found = 1;
-            msg.bAccept = s[0] - '0';
-            msg.eSummary = LWA_SIDSUM_NORMAL;
-            msg.eMIBerror = -1;
-            for(i=0; i<LWA_CMD_STRUCT_DATA_FIELD_LENGTH; i++) {
-                if( line[55+i] != '|' && line[55+i] != '\0') {
-                    msg.data[i] = line[55+i];
-                    msg.data[i+1] = '\0';
-                } else {
-                    break;
-                }
-            }
-            msg.datalen = -1;
-            break;
-        }
-    }
-    
+    /* If we found something, send it back to the main thread so that it can be logged */
     if( found ) {
-        printf("found = '%s'\n", msg.data);
-        if ( msgsnd(mqtid, (void *)&msg, LWA_msz(), 0) == -1 ) {
+        //printf("found = '%s'\n", msg.data);
+        if( msgsnd(mqtid, (void *)&msg, LWA_msz(), 0) == -1 ) {
             printf("[%s/%d] WARNING: Could not msgsnd()\n",ME,getpid());
+            return -1;
         }
         return 0;
     } else {
         return -1;
     }
 }
-
-
 
 main ( int narg, char *argv[] ) {
 
@@ -128,12 +149,9 @@ main ( int narg, char *argv[] ) {
   int sid_candidate;
 
   int mqrid;
-  int mqtid[LWA_MAX_SID+1];
+  FILE* mqtid[LWA_MAX_SID+1];
   struct LWA_cmd_struct mq_msg; //was: struct mq_struct mq_msg;
-  key_t mqtkey;       /* key for transmit message queue */
   
-  FILE* fpr[LWA_MAX_SID+1];
-
   int n;
 
   int server_len;
@@ -250,18 +268,15 @@ main ( int narg, char *argv[] ) {
     }
 
 
-  /* Set up transmit message queues */
+  /* Set up transmit message queues - which are just the logs to replay */
   for ( n=1; n<nsid; n++ ) { /* start at n=1 since n=0 is MCS (me) */ 
-    mqtkey = MQ_MS_KEY + sid[n];
-    //printf("[%s] mqtkey = %d\n",ME,mqtkey);
-    mqtid[sid[n]] = msgget( mqtkey, 0666 );
-    if (mqtid[sid[n]]==-1) {
-      //perror(" ");
-      sprintf(logmsg,"FATAL: Could not msgget() tx message queue\n");
-      LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
-      //exit(EXIT_FAILURE);
-      } 
-    fpr[sid[n]] = fopen(&replaylog[0], "r");
+    mqtid[sid[n]] = fopen(&replaylog[0], "r");
+    if (mqtid[sid[n]]==NULL) {
+       //perror(" ");
+       sprintf(logmsg,"FATAL: Could not fopen() tx message queue\n");
+       LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
+       exit(EXIT_FAILURE);
+       }
     }
 
 
@@ -707,9 +722,9 @@ main ( int narg, char *argv[] ) {
         }
       mq_msg.datalen    = task[tqp].datalen;               
       
-      if ( msgreplay( mqtid[task[tqp].sid], (void *)&mq_msg, LWA_msz(), fpr[task[tqp].sid], mqrid) == -1 ) {
+      if ( msgreplay(mqtid[task[tqp].sid], (void *)&mq_msg, LWA_msz(), mqrid) == -1 ) {
 
-          sprintf(logmsg,"FATAL: Could not msgsnd()");
+          sprintf(logmsg,"FATAL: Could not msgreplay()");
 	  LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, task[tqp].ref, 
                        LWA_MSELOG_TP_FAIL_EXEC, 
                        task[tqp].sid, task[tqp].cid, task[tqp].data, task[tqp].datalen, &mselog_line_ctr ); 
@@ -788,8 +803,8 @@ main ( int narg, char *argv[] ) {
   /* delete transmit message queues */
   for (i=0;i<nsid;i++) {
     if (sid[i] != LWA_SID_MCS) { /* since MCS has no message queue to itself */
-      msgctl(mqtid[sid[i]],IPC_RMID,0); 
-      sprintf(logmsg,"Deleting tx msg queue for %s",LWA_sid2str(sid[i]));
+      fclose(mqtid[sid[i]]); 
+      sprintf(logmsg,"fclose()-ing tx msg queue for %s",LWA_sid2str(sid[i]));
       LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
       }         
     }
