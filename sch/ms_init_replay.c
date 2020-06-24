@@ -148,7 +148,7 @@ main ( int narg, char *argv[] ) {
   sidsum = 0;
   for (n=0;n<nsid;n++) sidsum += (1 << (sid[n]-1));
   sprintf(sidlist,"%ld",sidsum); 
-  printf("sidlist: <%s>\n",sidlist);
+  //printf("sidlist: <%s>\n",sidlist);
 
   printf("[%s] Launching ms_replay...\n",ME);
 
