@@ -4,6 +4,7 @@ Module with various utilties to help with working with MCS.
 
 import os
 import re
+import sys
 import math
 import pytz
 import subprocess
@@ -216,7 +217,7 @@ def schedule_at_command(execution_time, command):
     # Schedule
     ## Build up the command sequence
     if isPython:
-        echoc = subprocess.Popen(['/bin/echo', 'python %s' % (command,)], stdout=subprocess.PIPE)
+        echoc = subprocess.Popen(['/bin/echo', '%s %s' % (sys.executable, command,)], stdout=subprocess.PIPE)
         echoc.wait()
         atc = subprocess.Popen(['/usr/bin/at',  "%s" % execution_time.strftime("%H:%M %m/%d/%Y")], 
                                 cwd=cwd, stdin=echoc.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
