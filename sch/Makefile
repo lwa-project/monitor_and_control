@@ -5,7 +5,7 @@
 CFLAGS := -I/usr/include/gdbm -I../common 
 LDFLAGS := -lgdbm -lncurses
 
-TARGETS := ms_init dat2dbm ms_mcic ms_exec msei ms_mdr ms_mdre ms_makeMIB_ASP ms_makeMIB_ADP ms_makeMIB_DP ms_makeMIB_DR ms_makeMIB_SHL ms_md2t ms_mb ms_mu ms_mdre_ip ms_mon ms_replay ms_mdre_replay
+TARGETS := ms_init dat2dbm ms_mcic ms_exec msei ms_mdr ms_mdre ms_makeMIB_ASP ms_makeMIB_ADP ms_makeMIB_DP ms_makeMIB_DR ms_makeMIB_SHL ms_md2t ms_mb ms_mu ms_mdre_ip ms_mon ms_replay ms_exec_mdre_replay ms_init_replay
 
 all: $(TARGETS)
 
@@ -60,8 +60,8 @@ ms_mdre_ip: ms_mdre_ip.c ../common/mcs.h
 ms_mon: ms_mon.c ../common/mcs.h 
 	$(CC) $(CFLAGS) -o ms_mon ms_mon.c $(LDFLAGS)
 
-ms_replay: ms_replay.c ../common/mcs.h ms_exec_log.c
-	$(CC) $(CFLAGS) -o ms_replay ms_replay.c -lm $(LD_FLAGS)
+ms_exec_replay: ms_exec_replay.c ../common/mcs.h ms_exec_log.c
+	$(CC) $(CFLAGS) -o ms_exec_replay ms_exec_replay.c -lm $(LD_FLAGS)
 
 ms_mdre_replay: ms_mdre_replay.c ../common/mcs.h
 	$(CC) $(CFLAGS) -o ms_mdre_replay ms_mdre_replay.c $(LDFLAGS)

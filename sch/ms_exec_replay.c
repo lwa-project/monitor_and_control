@@ -1,8 +1,8 @@
-// ms_replay.c: J. Dowell, UNM, 2020 Jun 23
+// ms_exec_replay.c: J. Dowell, UNM, 2020 Jun 23
 // ---
-// COMPILE: gcc -o ms_replay ms_replay.c
+// COMPILE: gcc -o ms_exec_replay ms_replay.c
 // ---
-// COMMAND LINE: ms_replay sidlist replaylog
+// COMMAND LINE: ms_exec_replay sidlist replaylog
 //   sidlist is a base-10 number whose bits in base-2 representation indicate
 //           the presense/absense of a particular subsystem ID.
 //           Set to 0 (="no subsystems") to test without message queue errors
@@ -36,7 +36,7 @@
 #include <arpa/inet.h>  /* for network sockets */
 #include <fcntl.h>      /* for F_GETFL, other possibly other stuff */
 
-#define MY_NAME "ms_replay (v.20200623.1)"
+#define MY_NAME "ms_exec_replay (v.20200623.1)"
 #define ME "2" 
 
 //#include "LWA_MCS.h"
@@ -304,7 +304,7 @@ main ( int narg, char *argv[] ) {
                          0);          /* protocol (normally 0) */
   if (server_sockfd == -1) {
     printf("[%s] FATAL: socket() failed\n",ME);
-    perror("ms_replay");
+    perror("ms_exec_replay");
     sprintf(logmsg,"FATAL: socket() failed\n");
     LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
     exit(EXIT_FAILURE); 
@@ -320,7 +320,7 @@ main ( int narg, char *argv[] ) {
             server_len );
   if (i == -1) {
     printf("[%s] FATAL: bind() failed (see error message below)\n",ME);
-    perror("ms_replay");
+    perror("ms_exec_replay");
     printf("[%s] If message above is ``Address already in use'':\n",ME);
     printf("[%s]   (1) Kill any ms_mcic processes (e.g., $ sh ./ms_shutdown).\n",ME);
     printf("[%s]   (2) Wait a few seconds before trying this again.\n",ME);
@@ -334,7 +334,7 @@ main ( int narg, char *argv[] ) {
              32 );           /* backlog */
   if (i == -1) {
     printf("[%s] FATAL: listen() failed\n",ME);
-    perror("ms_replay");
+    perror("ms_exec_replay");
     sprintf(logmsg,"FATAL: listen() failed\n");
     LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
     exit(EXIT_FAILURE); 
@@ -832,7 +832,7 @@ main ( int narg, char *argv[] ) {
   system("killall -v ms_mdre_replay > /dev/null 2> /dev/null");
 
   /* announce the end */
-  sprintf(logmsg,"ms_replay shutdown complete");
+  sprintf(logmsg,"ms_exec_replay shutdown complete");
   LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );  
   fclose(fpl); /* close log */
  
@@ -843,7 +843,7 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
-// ms_replay.c: J. Dowell, UNM, 2020 Jun 23
+// ms_exec_replay.c: J. Dowell, UNM, 2020 Jun 23
 //   .1: Created from ms_exec.c
 // ms_exec.c: J. Dowell, UNM, 2018 Jan 29
 //   .1: Increased the queue size for listen()

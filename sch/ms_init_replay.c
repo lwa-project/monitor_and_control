@@ -150,20 +150,19 @@ main ( int narg, char *argv[] ) {
   sprintf(sidlist,"%ld",sidsum); 
   //printf("sidlist: <%s>\n",sidlist);
 
-  printf("[%s] Launching ms_replay...\n",ME);
+  printf("[%s] Launching ms_exec_replay...\n",ME);
 
   /* Launch executive */
   ms_exec_pid = fork();               /* create duplicate process */
   switch (ms_exec_pid) {
     case -1: /* error */
-      printf("[%s] FATAL: fork for ms_exec failed\n",ME);
+      printf("[%s] FATAL: fork for ms_exec_replay failed\n",ME);
       exit(EXIT_FAILURE);
     case 0: /* fork() succeeded; we are now in the child process */
-      //err = execl("./ms_exec","ms_exec",NULL); /* launch ms_exec */
-      err = execl("./ms_replay","ms_replay",sidlist,ms_init_filename,NULL); /* launch ms_replay */
+      err = execl("./ms_exec_replay","ms_exec_replay",sidlist,ms_init_filename,NULL); /* launch ms_exec_replay */
       /* if we get to this point then we failed to launch */
       if (err==-1) {
-        printf("[%s] FATAL: failed to exec() ms_replay\n",ME); 
+        printf("[%s] FATAL: failed to exec() ms_exec_replay\n",ME); 
         }     
       exit(EXIT_FAILURE);
       break; 
