@@ -1,6 +1,6 @@
 // ms_exec_replay.c: J. Dowell, UNM, 2020 Jun 23
 // ---
-// COMPILE: gcc -o ms_exec_replay ms_replay.c
+// COMPILE: gcc -o ms_exec_replay ms_exec_replay.c
 // ---
 // COMMAND LINE: ms_exec_replay sidlist replaylog
 //   sidlist is a base-10 number whose bits in base-2 representation indicate

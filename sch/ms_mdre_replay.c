@@ -85,7 +85,7 @@ main ( int narg, char *argv[] ) {
     } 
 
   /* Set up transmit message queues - which are just the logs to replay */
-  for ( i=11; i<LWA_MAX_SID; i++ ) { /* start at n=11 since n=10 is MCS (me) */ 
+  for ( i=11; i<LWA_MAX_SID+1; i++ ) { /* start at n=11 since n=10 is MCS (me) */ 
     fpr[i] = fopen(&replaylog[0], "r");
     if (fpr[i]==NULL) {
        //perror(" ");
