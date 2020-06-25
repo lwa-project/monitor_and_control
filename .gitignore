@@ -5,6 +5,7 @@
 ## scheduler
 sch/dat2dbm
 sch/ms_exec
+sch/ms_exec_replay
 sch/ms_init
 sch/ms_init_replay
 sch/ms_makeMIB_ADP
@@ -21,7 +22,6 @@ sch/ms_mdre_ip
 sch/ms_mdre_replay
 sch/ms_mon
 sch/ms_mu
-sch/ms_replay
 sch/msei
 ## executive
 exec/me_exec
