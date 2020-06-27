@@ -8,8 +8,8 @@ import subprocess
 from lwa_mcs import mib
 from lwa_mcs._mcs import send_sch_command, MCS_TIMEOUT
 
-__version__ = "0.4"
-__all__ = ['get_pids', 'is_running', 'get_active_subsystems',
+__version__ = "0.5"
+__all__ = ['get_pids', 'is_replay', 'is_running', 'get_active_subsystems',
            'send_subsystem_command']
 
 
@@ -32,10 +32,35 @@ def get_pids():
         fields = line.split(None, 10)
         if fields[-1].find('ms_mcic') != -1 \
            or fields[-1].find('ms_exec') != -1 \
-           or fields[-1].find('ms_mdre_ip') != -1:
+           or fields[-1].find('ms_mdre_ip') != -1 \
+           or fields[-1].find('ms_mdre_replay') != -1:
             pids.append(int(fields[1], 10))
             
     return pids
+
+
+def is_replay():
+    """
+    Determine if MCS/sch is running in "replay" mode.
+    """
+    
+    p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output, error = p.communicate()
+    try:
+        output = output.decode('ascii', errors='backslashreplace')
+        error = error.decode('ascii', errors='backslashreplace')
+    except AttributeError:
+        pass
+    output = output.split('\n')
+    
+    pids = []
+    for line in output:
+        fields = line.split(None, 10)
+        if fields[-1].find('ms_exec_replay') != -1 \
+           or fields[-1].find('ms_mdre_replay') != -1:
+            pids.append(int(fields[1], 10))
+            
+    return (len(pids) == 2)
 
 
 def is_running():
@@ -44,7 +69,11 @@ def is_running():
     """
     
     pids = get_pids()
-    return True if len(pids) >= 3 else False
+    min_active = 3
+    if is_replay():
+        min_active = 2
+        
+    return True if len(pids) >= min_active else False
 
 
 def get_active_subsystems():
