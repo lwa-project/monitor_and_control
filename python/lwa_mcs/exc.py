@@ -4,6 +4,7 @@ Module for controlling MCS executive via UDP packets.
 
 import os
 import time
+import pytz
 import subprocess
 from datetime import datetime, timedelta
 
@@ -12,8 +13,11 @@ from lwa_mcs.utils import mjdmpm_to_datetime
 from lwa_mcs.sch import send_subsystem_command
 from lwa_mcs._mcs import send_exec_command
 
-__version__ = "0.3"
+__version__ = "0.4"
 __all__ = ['get_pids', 'is_running', 'send_command', 'get_queue', 'cancel_observation']
+
+
+_UTC = pytz.utc
 
 
 def get_pids():
@@ -33,6 +37,8 @@ def get_pids():
     pids = []
     for line in output:
         fields = line.split(None, 10)
+        if len(fields) != 11:
+            continue
         if fields[-1].find('me_inproc') != -1 \
            or fields[-1].find('me_tpcom') != -1 \
            or fields[-1].find('ms_exec') != -1:
@@ -64,12 +70,15 @@ def send_command(cmd, data=""):
     return success
 
 
-def get_queue():
+def get_queue(tz=None):
     """
     Read in the current observation queue and return its contents as a 
     dictionary.  The dictionary is keyed using a two-element tuple of
     (project ID, session ID) and the values are three-element tuples of
-    (beam, start datetime, stop datetime).
+    (beam, start datetime, stop datetime).  The datetime instances returned
+    are naive UTC times unless the `tz` keyword is set.  If `tz` is set 
+    then the datetimes are converted to timezone-aware instances in the 
+    specified timezone.
     """
     
     queue = {}
@@ -102,6 +111,16 @@ def get_queue():
             dStart -= timedelta(seconds=6)
             dStop  += timedelta(seconds=6)
             
+            ## Deal with the timezone, if needed
+            if tz is not None:
+                ### UTC
+                dStart = _UTC.localize(dStart)
+                dStop  = _UTC.localize(dStop)
+                
+                ### Requested timezone
+                dStart = dStart.astimezone(tz)
+                dStop  = dStop.astimezone(tz)
+                
             ## Append
             queue[(pID,sID)] = (beam,dStart,dStop)
             
@@ -113,7 +132,11 @@ def get_queue():
 
 def cancel_observation(project_id, session_id, stop_dr=True, remove_metadata=True):
     """
-    Cancel a scheduled observation.
+    Cancel a scheduled observation and, optionally, stop the associated DR 
+    recording if it the observation is in progress.  For observations that 
+    are not currently running the `remove_metadata` keyword is used to control
+    whether or not to delete the MCS metadata generated when the observation 
+    is canceled.
     """
     
     # Get the exec queue and make sure we can even do this

@@ -30,6 +30,8 @@ def get_pids():
     pids = []
     for line in output:
         fields = line.split(None, 10)
+        if len(fields) != 11:
+            continue
         if fields[-1].find('ms_mcic') != -1 \
            or fields[-1].find('ms_exec') != -1 \
            or fields[-1].find('ms_mdre_ip') != -1:
@@ -64,6 +66,8 @@ def get_active_subsystems():
     ss = []
     for line in output:
         fields = line.split(None, 10)
+        if len(fields) != 11:
+            continue
         if fields[-1].find('ms_mcic') != -1:
             ss.append(fields[-1].split(None, 1)[-1])
             
