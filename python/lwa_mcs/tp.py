@@ -8,6 +8,11 @@ import time
 import warnings
 import subprocess
 
+try:
+    from io import IOBase
+except ImportError:
+    IOBase = file
+
 from lwa_mcs.config import TP_PATH
 from lwa_mcs.exc import get_queue as get_exec_queue
 
@@ -43,7 +48,7 @@ def schedule_sdfs(filenames, max_retries=5, logfile=None, errorfile=None):
     # Deal with the logging
     ## stdout
     log_is_string = False
-    if type(logfile) == str:
+    if isinstance(logfile, str):
         try:
             fh = open(logfile, 'a')
             logfile = fh
@@ -52,7 +57,7 @@ def schedule_sdfs(filenames, max_retries=5, logfile=None, errorfile=None):
             warnings.warn("Could not open logfile '%s' for appending: %s" % (logfile, str(e)), 
                           warnings.RuntimeWarning)
             logfile = None
-    elif type(logfile) == file:
+    elif isinstance(logfile, IOBase):
         pass
     elif logfile is None:
         pass
@@ -62,7 +67,7 @@ def schedule_sdfs(filenames, max_retries=5, logfile=None, errorfile=None):
         logfile = None
     ## stderr
     err_is_string = False
-    if type(errorfile) == str:
+    if isinstance(errorfile, str):
         try:
             fh = open(errorfile, 'a')
             errorfile = fh
@@ -71,7 +76,7 @@ def schedule_sdfs(filenames, max_retries=5, logfile=None, errorfile=None):
             warnings.warn("Could not open errorfile '%s' for appending: %s" % (logfile, str(e)), 
                           warnings.RuntimeWarning)
             errorfile = None
-    elif type(errorfile) == file:
+    elif isinstance(errorfile, IOBase):
         pass
     elif errorfile is None:
         pass
