@@ -1519,7 +1519,8 @@ int main ( int narg, char *argv[] ) {
             //osfs.OBS_STP_FREQ1 = obs[n].OBS_STP_FREQ1[m];
             //osfs.OBS_STP_FREQ2 = obs[n].OBS_STP_FREQ2[m];
             //osfs.OBS_STP_B     = obs[n].OBS_STP_B[m];
-
+            LWA_timeval( &tv, &mjd, &mpm ); /* get MJD and MPM for start of this step */
+            
             if (eD==0) {
               /*=== BEGIN: STEPPED-mode processing added 120929 ==============================================*/
 
@@ -1533,7 +1534,6 @@ int main ( int narg, char *argv[] ) {
                      (osf.OBS_BW != last_drx_bw1) || \
                      (gain1 != last_drx_gain1) ) && \
                    (osf.SESSION_DRX_BEAM == 1) ) {
-                LWA_timeval( &tv, &mjd, &mpm ); /* get MJD and MPM for start of this step */
                 t0 = mpm % 1000;                /* number of ms beyond a second boundary */
                 t0 /= 10; if (t0>99) t0=99;     /* now in subslots */                  
               
@@ -1584,7 +1584,6 @@ int main ( int narg, char *argv[] ) {
               if ( (osfs.OBS_STP_FREQ1 != last_drx_freq1) || \
                    (osf.OBS_BW != last_drx_bw1) || \
                    (gain1 != last_drx_gain1) ) {
-                LWA_timeval( &tv, &mjd, &mpm ); /* get MJD and MPM for start of this step */
                 t0 = mpm % 1000;                /* number of ms beyond a second boundary */
                 t0 /= 10; if (t0>99) t0=99;     /* now in subslots */                  
                 
@@ -1963,6 +1962,9 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: J. Dowell, UNM, 2020 Sep 29
+//   .1 Fixed a bug in RA/Dec STEPPED mode observations that caused the start time 
+//      of the steps to not be updated correctly
 // me_inproc.c: J. Dowell, UNM, 2019 Dec 16
 //   .1 Documentation update for ADP-based stations
 // me_inproc.c: J. Dowell, UNM, 2019 Apr 3
