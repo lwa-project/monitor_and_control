@@ -24,6 +24,8 @@ setup(
                             'Topic :: Scientific/Engineering :: Astronomy',
                             'Programming Language :: Python :: 2',
                             'Programming Language :: Python :: 2.7',
+                            'Programming Language :: Python :: 3',
+                            'Programming Language :: Python :: 3.6',
                             'Operating System :: POSIX :: Linux'],
     packages             = find_packages(exclude="tests"), 
     scripts              = glob.glob('scripts/*.py'), 

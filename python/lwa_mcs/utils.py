@@ -111,7 +111,8 @@ def datetime_to_mjdmpm(dt):
 
 def get_at_queue():
     """
-    Read in the current 'at' queue and return a dictionary of id, time pairs
+    Read in the current 'at' queue and return a dictionary of id, time pairs.
+    The times that returned are timezone-aware datetime instances.
     """
     
     queue = {}
@@ -149,7 +150,7 @@ def get_at_queue():
 
 def get_at_command(id):
     """
-    For the specified 'at' command, figure out what is happening.
+    For the specified 'at' command ID, figure out what is happening.
     """
     
     # Run at to information about the specified command
@@ -186,8 +187,8 @@ def schedule_at_command(execution_time, command):
 
     Supported execution time formats are:
       * float or integer - UNIX timestamp
-      * naive datetime instance - assumed to be in UTC
-      * aware datetime instance
+      * naive datetime instance that is assumed to be in UTC
+      * timezone-aware datetime instance
 
     Supported commands are:
       * anything that works with the '-f' option of 'at' without arguments
