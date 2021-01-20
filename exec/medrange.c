@@ -30,7 +30,7 @@
 int main ( int narg, char *argv[] ) {
 
   char sSDir[256];
-  float fmhz;
+  float fmhz=74.0;
   float alt, az;
 
   char filename[256];
@@ -80,11 +80,11 @@ int main ( int narg, char *argv[] ) {
   FILE *fpl;
 
   /* parse command line */
-  if (narg<3) {
+  if (narg<2) {
     printf("\n");
-    printf("syntax: $ ./medrange <sdir> <fmhz>\n");
+    printf("syntax: $ ./medrange <sdir> [<fmhz>]\n");
     printf("  <sdir>: relative path (no trailing slash) to ssmif.dat\n");
-    printf("  <fmhz>: center frequency in MHz, used to compute dispersive component of cable delay\n");
+    printf("  <fmhz>: center frequency in MHz, used to compute dispersive component of cable delay, defaults to 74\n");
     printf("example: '$ ./medrange state 74'\n");
     printf("\n");
     return;
@@ -100,9 +100,6 @@ int main ( int narg, char *argv[] ) {
 
   if (narg>2) {
       sscanf(argv[2],"%f",&fmhz);
-    } else {
-      printf("[%d/%d] FATAL: <fmhz> not specified\n",ME_DRANGE,getpid());
-      return;
     }
 
   printf("input <sdir>='%s'\n",sSDir);
