@@ -434,6 +434,31 @@ double angle_sep( double a, double b, double modulo ) {
 
 
 /*************************************************************/
+/*** angle_sep_2d() ******************************************/
+/*************************************************************/
+
+double angle_sep_2d( double az0, double el0, double az1, double el1 ) {
+  /* finds angular distance between points (az0,el0) and (az1,el1) */
+  /* in degrees */
+  double tE, tA, h;
+  az0 *= M_PI/180;  /* to radians */
+  el0 *= M_PI/180;  /* to radians */
+  az1 *= M_PI/180;  /* to radians */
+  el1 *= M_PI/180;  /* to radians */
+
+  /* the Haversine formula */
+  tE = sin((el1-el0)/2);
+  tA = sin((az1-az0)/2);
+  h = tE*tE + cos(el0)*cos(el1)*tA*tA;
+  if( h > 1) { h = 1; }  /* make sure we are in range */
+  h = 2*asin(sqrt(h));
+
+  h *= 180/M_PI;  /* to degrees */
+  return h;
+  }
+
+
+/*************************************************************/
 /*** me_trim() *********************************************/
 /*************************************************************/
 
@@ -1353,7 +1378,7 @@ int main ( int narg, char *argv[] ) {
                   me_point_corr( s.fPCAxisTh, s.fPCAxisPh, s.fPCRot, &alt, &az );                    
 
                   //printf("alt=%f last_alt=%f %f | az=%f last_az=%f %f\n",alt,last_alt,angle_sep(alt,last_alt,360.0),az,last_az,angle_sep(alt,last_alt,360.0));
-                  if ( (angle_sep(alt,last_alt,360.0)>=LWA_RES_DEG) || (angle_sep(az,last_az,360.0)>=LWA_RES_DEG) || bFirst ) {
+                  if ( (angle_sep_2d(az,alt,last_az,last_alt)>=LWA_RES_DEG) || bFirst ) {
 
                     bFirst = 0;
 
@@ -1416,7 +1441,7 @@ int main ( int narg, char *argv[] ) {
                     last_alt = alt;
                     last_az  = az;
 
-                    } /* if ( (angle_sep */
+                    } /* if ( (angle_sep_2d */
 
                   LWA_timeadd(&tv,LWA_REPOINT_CHECK_INTERVAL_SEC*1000);
 
