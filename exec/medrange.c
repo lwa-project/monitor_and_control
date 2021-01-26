@@ -23,6 +23,8 @@
 #define MAX_DP_CH 520      /* number of DP1 channel inputs (per DP ICD) */
 #endif
 
+#define CHK_RES_DEG 1.0
+
 /*==============================================================*/
 /*=== main() ===================================================*/
 /*==============================================================*/
@@ -264,13 +266,13 @@ int main ( int narg, char *argv[] ) {
   /***********************************/
 
   /* setting up for looping */
-  nAlt = floor( 90.0/LWA_RES_DEG)+1; /* need both 0 deg and 90 deg */
-  nAz  = floor(360.0/LWA_RES_DEG);   /* do not need 360 deg (already have 0) */
+  nAlt = floor( 90.0/CHK_RES_DEG)+1; /* need both 0 deg and 90 deg */
+  nAz  = floor(360.0/CHK_RES_DEG);   /* do not need 360 deg (already have 0) */
   //printf("[%d/%d] nAlt = %d, nAz = %d\n",ME_DRANGE,getpid(),nAlt,nAz);
   iAlt = 0; 
-  fAlt = iAlt*LWA_RES_DEG; 
+  fAlt = iAlt*CHK_RES_DEG; 
   iAz = 0;
-  fAz = iAz*LWA_RES_DEG;
+  fAz = iAz*CHK_RES_DEG;
   //printf("[%d/%d] Now computing alt [deg] = ",ME_DRANGE,getpid());
 
   /********************/
@@ -323,10 +325,10 @@ int main ( int narg, char *argv[] ) {
       iAlt++;
       if (iAlt>=nAlt) { bDone = 1; }
       }
-    fAz = iAz*LWA_RES_DEG;
-    fAlt = iAlt*LWA_RES_DEG;
+    fAz = iAz*CHK_RES_DEG;
+    fAlt = iAlt*CHK_RES_DEG;
     //printf("%4.1f ",fAlt); fflush(stdout);
-    if ((90.0-fAlt)<=LWA_RES_DEG) { nAz=1; } /* need only one azimuth for the zenith pointing */
+    if ((90.0-fAlt)<=CHK_RES_DEG) { nAz=1; } /* need only one azimuth for the zenith pointing */
     
     } /* while (!bDone) */
 
@@ -334,6 +336,14 @@ int main ( int narg, char *argv[] ) {
   printf("[%d/%d] <delay min>=%.3f ns or %.0f samples\n", ME_DRANGE, getpid(), dmin*1e9, floor(dmin*FS));
   printf("[%d/%d] <delay max>=%.3f ns or %.0f samples\n", ME_DRANGE, getpid(), dmax*1e9, ceil(dmax*FS));
   printf("[%d/%d] <delay range>=%.3f ns or %.0f samples\n", ME_DRANGE, getpid(), drng*1e9, ceil(drng*FS));
+
+  int smin = (int) (floor(dmin*FS/10)-1)*10;
+  int smax = (int) (ceil(dmax*FS/10)+1)*10;
+  printf("[%d/%d] <sample min>=%d\n", ME_DRANGE, getpid(), smin);
+  if( (smax-smin) > 1000 ) {
+    printf("[%d/%d] FATAL: expected delay range (%d) > 1000\n", ME_DRANGE, getpid(), smax-smin);
+    return 1;
+    }
 
   //printf("\n");
   ////printf("%lu %lu\n",sizeof(unsigned short int),sizeof(ddm));
