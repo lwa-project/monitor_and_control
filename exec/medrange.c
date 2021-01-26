@@ -345,8 +345,13 @@ int main ( int narg, char *argv[] ) {
     return 1;
     }
 
-  //printf("\n");
-  ////printf("%lu %lu\n",sizeof(unsigned short int),sizeof(ddm));
+  sprintf(filename,"%s/mindelay.txt",sSDir);
+  if ((fp=fopen(filename,"wb"))==NULL) {
+    printf("[%d/%d] FATAL: Can't open '%s'\n",ME_DRANGE,getpid(),filename);
+    return;
+    }
+  fprintf(fp, "%i", smin);
+  fclose(fp);
 
   return 0;
   } /* main() */
