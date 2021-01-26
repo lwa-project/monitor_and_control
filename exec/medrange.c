@@ -117,6 +117,10 @@ int main ( int narg, char *argv[] ) {
   fclose(fp);
   //return;
 
+  /* cleanup */
+  sprintf(cmd,"rm -rf %s/mindelay.txt",sDDir);
+  system(cmd);
+
   ///* assemble information about analog signal mapping */
   //eErr = me_sc_MakeASM( s, &sc );
   //if (eErr>0) {
