@@ -181,6 +181,7 @@ main ( int narg, char *argv[] ) {
   datum_data = gdbm_fetch(dbm_ptr,datum_key);
   if (datum_data.dptr) {
       memcpy( &record, datum_data.dptr, datum_data.dsize );
+      free(datum_data.dptr);    // Need to cleanup after a gdbm_fetch
       strncpy(ip_address,record.val,15);
       printf("[%s/%d] IP_ADDRESS <%s>\n", ME, getpid(),ip_address);
     } else {
@@ -194,6 +195,7 @@ main ( int narg, char *argv[] ) {
   datum_data = gdbm_fetch(dbm_ptr,datum_key);
   if (datum_data.dptr) {
       memcpy( &record, datum_data.dptr, datum_data.dsize );
+      free(datum_data.dptr);    // Need to cleanup after a gdbm_fetch
       sscanf(record.val,"%d",&tx_port);
       printf("[%s/%d] TX_PORT = %d\n", ME, getpid(),tx_port);
     } else {
@@ -207,6 +209,7 @@ main ( int narg, char *argv[] ) {
   datum_data = gdbm_fetch(dbm_ptr,datum_key);
   if (datum_data.dptr) {
       memcpy( &record, datum_data.dptr, datum_data.dsize );
+      free(datum_data.dptr);    // Need to cleanup after a gdbm_fetch
       sscanf(record.val,"%d",&rx_port);
       printf("[%s/%d] RX_PORT = %d\n", ME, getpid(),rx_port);
     } else {

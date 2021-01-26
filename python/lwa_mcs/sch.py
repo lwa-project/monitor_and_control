@@ -1,36 +1,16 @@
-# -*- coding: utf-8 -*-
-
 """
-Module for controlling MCS scheduler and executive via UDP packets.
+Module for controlling MCS scheduler via UDP packets.
 """
 
 import time
-import socket
-import struct
 import subprocess
 
-from lwa_mcs.config import ADDRESSES, SOCKET_TIMEOUT, SUBSYSTEMS, COMMANDS
 from lwa_mcs import mib
+from lwa_mcs._mcs import send_sch_command, MCS_TIMEOUT
 
-__version__ = "0.1"
-__revision__ = "$Rev$"
-__all__ = ['COMMAND_STRUCT', 'get_pids', 'is_running', 'get_active_subsystems',
+__version__ = "0.4"
+__all__ = ['get_pids', 'is_running', 'get_active_subsystems',
            'send_subsystem_command']
-
-
-COMMAND_STRUCT = struct.Struct('lliilliii256si')
-#  1 sid: subsystem ID
-#  2 ref: reference number
-#  3 cid: command ID
-#  4 scheduled? 1 = "do as close as possible to time in tv
-#  5 tv.tv_sec: epoch seconds
-#  6 tv.tv_usec: fractional remainder in microseconds
-#  7 response: see LWA_MSELOG_TP_*
-#  8 eSummary: see LWA_SIDSUM_*
-#  9 eMIBerror: > 0 on error; see LWA_MIBERR_*
-# 10 DATA on way out, R-COMMENT on way back
-# 11 datalen: -1 for (printable) string; 0 for zero-len;
-#    otherwise number of significant bytes
 
 
 def get_pids():
@@ -38,12 +18,20 @@ def get_pids():
     Return a list process IDs for all MCS/sch processes found.
     """
     
-    p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE)
-    o, e = p.communicate()
-    
+    p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output, error = p.communicate()
+    try:
+        output = output.decode('ascii', errors='backslashreplace')
+        error = error.decode('ascii', errors='backslashreplace')
+    except AttributeError:
+        pass
+    output = output.split('\n')
+        
     pids = []
-    for line in o.split('\n'):
+    for line in output:
         fields = line.split(None, 10)
+        if len(fields) != 11:
+            continue
         if fields[-1].find('ms_mcic') != -1 \
            or fields[-1].find('ms_exec') != -1 \
            or fields[-1].find('ms_mdre_ip') != -1:
@@ -66,12 +54,20 @@ def get_active_subsystems():
     Return a list of subsystems with active 'ms_mcic' processes.
     """
     
-    p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE)
-    o, e = p.communicate()
+    p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output, error = p.communicate()
+    try:
+        output = output.decode('ascii', errors='backslashreplace')
+        error = error.decode('ascii', errors='backslashreplace')
+    except AttributeError:
+        pass
+    output = output.split('\n')
     
     ss = []
-    for line in o.split('\n'):
+    for line in output:
         fields = line.split(None, 10)
+        if len(fields) != 11:
+            continue
         if fields[-1].find('ms_mcic') != -1:
             ss.append(fields[-1].split(None, 1)[-1])
             
@@ -85,45 +81,19 @@ def send_subsystem_command(ss, cmd="RPT", data="SUMMARY"):
     ID is returned.
     """
     
-    # Convert the subsystem name to an MCS ID code
-    try:
-        sid = SUBSYSTEMS[ss.upper()]
-    except KeyError:
-        raise ValueError("Unknown subsystem ID: %s" % ss)
-        
-    # Convert the command name to a MCS ID code
-    try:
-        cid = COMMANDS[cmd.upper()]
-    except KeyError:
-        raise ValueError("Unknown command: %s" % cmd)
-        
     # Send the command
-    try:    
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect(ADDRESSES['MSE'])
-        sock.settimeout(SOCKET_TIMEOUT)
-        
-        t = time.time()
-        tv_sec, tv_usec = long(t), long((t % 1) * 1e6)
-        mcscmd = COMMAND_STRUCT.pack(sid, 0, cid, 0, tv_sec, tv_usec, 0, 0, 0, data, -1)
-        sock.sendall(mcscmd)
-        response = sock.recv(COMMAND_STRUCT.size)
-        response = COMMAND_STRUCT.unpack(response)
-        
-        sock.close()
-    except Exception as e:
-        raise RuntimeError("MCS/sch - ms_mdre_ip does not appear to be running")
-        
+    ref, success = send_sch_command(ss, cmd, data)
+    
     # Wait a bit...
     time.sleep(0.2)
     
     if cmd == "RPT":
         # Parse the response if this is a RPT command
         t0 = time.time()
-        while (time.time() - t0) < 3.0:
+        while (time.time() - t0) < MCS_TIMEOUT:
             try:
                 val, ts = mib.read(ss, data)
-                if (time.time() - ts) <= 3.0:
+                if (time.time() - ts) <= MCS_TIMEOUT:
                     value = val
                     break
                 else:
@@ -131,10 +101,10 @@ def send_subsystem_command(ss, cmd="RPT", data="SUMMARY"):
                     time.sleep(0.2)
                     
             except Exception as e:
-                #print str(e)
+                #print(str(e))
                 value = None
     else:
         # Otherwise return the reference ID
-        value = response[1]
+        value = ref
         
     return value

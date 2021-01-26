@@ -1,10 +1,56 @@
 # Object files
 *.o
 
+# Executables
+## scheduler
+sch/dat2dbm
+sch/ms_exec
+sch/ms_init
+sch/ms_makeMIB_ADP
+sch/ms_makeMIB_ASP
+sch/ms_makeMIB_DP
+sch/ms_makeMIB_DR
+sch/ms_makeMIB_SHL
+sch/ms_mb
+sch/ms_mcic
+sch/ms_md2t
+sch/ms_mdr
+sch/ms_mdre
+sch/ms_mdre_ip
+sch/ms_mon
+sch/ms_mu
+sch/msei
+## executive
+exec/me_exec
+exec/me_findjov_x
+exec/me_findsol_x
+exec/me_getaltaz_x
+exec/me_getlst_x
+exec/me_init
+exec/me_inproc
+exec/me_mon
+exec/me_point_corr_x
+exec/me_precess_x
+exec/me_tpcom
+exec/mecfg
+exec/medfg
+exec/meeix
+exec/mefsdfg
+exec/megfg
+exec/memdrex
+exec/meosx
+exec/mesix
+## task processor
+tp/tpms
+tp/tprcs
+tp/tprs
+tp/tpsdm
+tp/tpss
+tp/tptc
+
 # Python stuff
 *.pyc
 
-python/lwa_mcs/config.py
 python/build/
 python/dist/
 python/lwa_mcs.egg-info/

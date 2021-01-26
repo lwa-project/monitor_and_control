@@ -155,6 +155,7 @@ main ( int narg, char *argv[] ) {
       datum_data = gdbm_fetch(dbm_ptr,datum_key);
 
       memcpy( &record, datum_data.dptr, datum_data.dsize );
+      free(datum_data.dptr);    // Need to cleanup after a gdbm_fetch
 
       memset( label, '\0', sizeof(label));
       strncpy(label,datum_key.dptr,datum_key.dsize);

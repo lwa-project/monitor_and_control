@@ -434,6 +434,31 @@ double angle_sep( double a, double b, double modulo ) {
 
 
 /*************************************************************/
+/*** angle_sep_2d() ******************************************/
+/*************************************************************/
+
+double angle_sep_2d( double az0, double alt0, double az1, double alt1 ) {
+  /* finds angular distance between points (az0,alt0) and (az1,alt1) */
+  /* in degrees */
+  double tE, tA, h;
+  az0 *= M_PI/180;  /* to radians */
+  alt0 *= M_PI/180;  /* to radians */
+  az1 *= M_PI/180;  /* to radians */
+  alt1 *= M_PI/180;  /* to radians */
+
+  /* the Haversine formula */
+  tE = sin((alt1-alt0)/2);
+  tA = sin((az1-az0)/2);
+  h = tE*tE + cos(alt0)*cos(alt1)*tA*tA;
+  if( h > 1) { h = 1; }  /* make sure we are in range */
+  h = 2*asin(sqrt(h));
+
+  h *= 180/M_PI;  /* to degrees */
+  return h;
+  }
+
+
+/*************************************************************/
 /*** me_trim() *********************************************/
 /*************************************************************/
 
@@ -1361,7 +1386,7 @@ int main ( int narg, char *argv[] ) {
                   me_point_corr( s.fPCAxisTh, s.fPCAxisPh, s.fPCRot, &alt, &az );                    
 
                   //printf("alt=%f last_alt=%f %f | az=%f last_az=%f %f\n",alt,last_alt,angle_sep(alt,last_alt,360.0),az,last_az,angle_sep(alt,last_alt,360.0));
-                  if ( (angle_sep(alt,last_alt,360.0)>=LWA_RES_DEG) || (angle_sep(az,last_az,360.0)>=LWA_RES_DEG) || bFirst ) {
+                  if ( (angle_sep_2d(az,alt,last_az,last_alt)>=LWA_RES_DEG) || bFirst ) {
 
                     bFirst = 0;
 
@@ -1424,7 +1449,7 @@ int main ( int narg, char *argv[] ) {
                     last_alt = alt;
                     last_az  = az;
 
-                    } /* if ( (angle_sep */
+                    } /* if ( (angle_sep_2d */
 
                   LWA_timeadd(&tv,LWA_REPOINT_CHECK_INTERVAL_SEC*1000);
 
@@ -1528,7 +1553,8 @@ int main ( int narg, char *argv[] ) {
             //osfs.OBS_STP_FREQ1 = obs[n].OBS_STP_FREQ1[m];
             //osfs.OBS_STP_FREQ2 = obs[n].OBS_STP_FREQ2[m];
             //osfs.OBS_STP_B     = obs[n].OBS_STP_B[m];
-
+            LWA_timeval( &tv, &mjd, &mpm ); /* get MJD and MPM for start of this step */
+            
             if (eD==0) {
               /*=== BEGIN: STEPPED-mode processing added 120929 ==============================================*/
 
@@ -1542,7 +1568,6 @@ int main ( int narg, char *argv[] ) {
                      (osf.OBS_BW != last_drx_bw1) || \
                      (gain1 != last_drx_gain1) ) && \
                    (osf.SESSION_DRX_BEAM == 1) ) {
-                LWA_timeval( &tv, &mjd, &mpm ); /* get MJD and MPM for start of this step */
                 t0 = mpm % 1000;                /* number of ms beyond a second boundary */
                 t0 /= 10; if (t0>99) t0=99;     /* now in subslots */                  
               
@@ -1593,7 +1618,6 @@ int main ( int narg, char *argv[] ) {
               if ( (osfs.OBS_STP_FREQ1 != last_drx_freq1) || \
                    (osf.OBS_BW != last_drx_bw1) || \
                    (gain1 != last_drx_gain1) ) {
-                LWA_timeval( &tv, &mjd, &mpm ); /* get MJD and MPM for start of this step */
                 t0 = mpm % 1000;                /* number of ms beyond a second boundary */
                 t0 /= 10; if (t0>99) t0=99;     /* now in subslots */                  
                 
@@ -1974,6 +1998,9 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: J. Dowell, UNM, 2020 Sep 29
+//   .1 Fixed a bug in RA/Dec STEPPED mode observations that caused the start time 
+//      of the steps to not be updated correctly
 // me_inproc.c: J. Dowell, UNM, 2020 Apr 7
 //   .1 Changed TRK_NULL to TRK_NOOP and added a STEPPED_NOOP mode
 // me_inproc.c: J. Dowell, UNM, 2020 Apr 6
