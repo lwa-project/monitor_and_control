@@ -1,4 +1,4 @@
-// mefsdfg.c: J. Dowell, UNM, 2015 Aug 28
+// mefsdfg.c: J. Dowell, UNM, 2021 Jan 25
 // ---
 // COMPILE: gcc -o mefsdfg mefsdfg.c -I../common -lm
 // ---
@@ -72,6 +72,7 @@ int main ( int narg, char *argv[] ) {
   double dc[MAX_DP_CH]; /* cable delay [s] for indicated DP channel (numbered here as 0..519 as opposed to 1..520) */
   double d[MAX_DP_CH];  /* total delay [s] for indicated DP channel (numbered here as 0..519 as opposed to 1..520) */
 
+  int smin;
   double dmin;
   int bFlag;
 
@@ -187,6 +188,17 @@ int main ( int narg, char *argv[] ) {
   fread(&s,sizeof(struct ssmif_struct),1,fp);
   fclose(fp);
   //return;
+
+  /* Get the minimum beamformer delay */
+  dmin = +(1e+20);
+  sprintf(filename,"%s/mindelay.txt",sSDir);
+  if ((fp=fopen(filename,"rb"))!=NULL) {
+    fscanf(fp,"d",&smin);
+    fclose(fp);
+    dmin = smin/FS;
+  } else {
+    printf("[%d/%d] WARNING: station-wide minmum delay not found, will search\n", ME_MEFSDFG, getpid());
+    }
 
   ///* assemble information about analog signal mapping */
   //eErr = me_sc_MakeASM( s, &sc );
@@ -394,7 +406,6 @@ int main ( int narg, char *argv[] ) {
       } 
 
     // get d[] from dc[]+dg[]; also, find minimum delay
-    dmin = +(1e+20);
     for ( i=0; i<MAX_DP_CH; i++ ) { /* iterating by DP1-input index (per DP ICD) */
       if ( (px[i]>(FLAG_VAL/2.0)) ||
            (py[i]>(FLAG_VAL/2.0)) ||
@@ -492,6 +503,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// mefsdfg.c: J. Dowell, UNM, 2021 Jan 25
+//   .1: Updated to look for a mindelay.txt file in the same directory as the SSMIF
 // mefsdfg.c: J. Dowell, UNM, 2015 Aug 28
 //   .1: Added support for ADP
 // mefsdfg.c: S.W. Ellingson, Virginia Tech, 2012 Jan 24
