@@ -152,6 +152,17 @@ int main ( int narg, char *argv[] ) {
     return 1;
     }
 
+  /*======================================*/
+  /*== find the mimimum beamformer delay =*/
+  /*======================================*/
+  printf("[%d/%d] me_init: Setting station minimum beamformer delay with ./medrange...\n",ME_INIT,getpid());
+  me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: Setting station minimum beamformer delay with ./medrange...", sq_ptr, 0 );
+  i = system("./medrange state 2> /dev/null");
+  if( i != 0 ) {
+    printf("[%d/%d] me_init: WARNING: failed to set station minimum beamformer delay\n",ME_INIT,getpid());
+    me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: WARNING: failed to set station minimum beamformer delay", sq_ptr, 0 );
+    }
+
   /*==========================*/
   /*=== Launching me_tpcom ===*/
   /*==========================*/
@@ -337,6 +348,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_init.c: J. Dowell, UNM, 2021 Jan 25
+//   .1 Updated to call medrange as part of the setup
 // me_init.c: J. Dowell, UNM, 2018 Feb 22
 //   .1 Updated the exit code so that we know if me_init was successful or not
 // me_init.c: J. Dowell, UNM, 2018 Jan 29
