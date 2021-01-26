@@ -437,19 +437,19 @@ double angle_sep( double a, double b, double modulo ) {
 /*** angle_sep_2d() ******************************************/
 /*************************************************************/
 
-double angle_sep_2d( double az0, double el0, double az1, double el1 ) {
-  /* finds angular distance between points (az0,el0) and (az1,el1) */
+double angle_sep_2d( double az0, double alt0, double az1, double alt1 ) {
+  /* finds angular distance between points (az0,alt0) and (az1,alt1) */
   /* in degrees */
   double tE, tA, h;
   az0 *= M_PI/180;  /* to radians */
-  el0 *= M_PI/180;  /* to radians */
+  alt0 *= M_PI/180;  /* to radians */
   az1 *= M_PI/180;  /* to radians */
-  el1 *= M_PI/180;  /* to radians */
+  alt1 *= M_PI/180;  /* to radians */
 
   /* the Haversine formula */
-  tE = sin((el1-el0)/2);
+  tE = sin((alt1-alt0)/2);
   tA = sin((az1-az0)/2);
-  h = tE*tE + cos(el0)*cos(el1)*tA*tA;
+  h = tE*tE + cos(alt0)*cos(alt1)*tA*tA;
   if( h > 1) { h = 1; }  /* make sure we are in range */
   h = 2*asin(sqrt(h));
 
