@@ -5,7 +5,7 @@
 CFLAGS := -I../common
 LDFLAGS := -lm -lncurses
 
-TARGETS :=  mesix meosx memdrex mecfg medfg megfg me_exec meeix me_init me_tpcom me_inproc me_mon mefsdfg medrange, me_getaltaz_x me_point_corr_x me_findsol_x me_findjov_x me_precess_x me_getlst_x
+TARGETS :=  mesix meosx memdrex mecfg medfg megfg me_exec meeix me_init me_tpcom me_inproc me_mon mefsdfg medrange me_getaltaz_x me_point_corr_x me_findsol_x me_findjov_x me_precess_x me_getlst_x
 
 all: $(TARGETS)
 

@@ -118,7 +118,7 @@ int main ( int narg, char *argv[] ) {
   //return;
 
   /* cleanup */
-  sprintf(cmd,"rm -rf %s/mindelay.txt",sDDir);
+  sprintf(cmd,"rm -rf %s/mindelay.txt",sSDir);
   system(cmd);
 
   ///* assemble information about analog signal mapping */
