@@ -40,7 +40,9 @@ main ( int narg, char *argv[] ) {
   /*=================*/
   
   char replaylog[255];  /* log to replay from */
+  int run_as_loop;
   FILE* fpr[LWA_MAX_SID+1];
+  size_t rpsz;
   
   struct timeval tv;  /* from sys/time.h; included via LWA_MCS.h */
   struct tm *tm;      /* from sys/time.h; included via LWA_MCS.h */
@@ -84,6 +86,15 @@ main ( int narg, char *argv[] ) {
 
     } 
 
+  if (narg>2) {
+    run_as_loop = atoi(argv[2]);
+    } else {
+
+    printf("FATAL: loop flag not provided");
+    exit(EXIT_FAILURE);
+
+    }
+
   /* Set up transmit message queues - which are just the logs to replay */
   for ( i=11; i<LWA_MAX_SID+1; i++ ) { /* start at n=11 since n=10 is MCS (me) */ 
     fpr[i] = fopen(&replaylog[0], "r");
@@ -92,7 +103,11 @@ main ( int narg, char *argv[] ) {
        printf("FATAL: Could not fopen() replay log\n");
        exit(EXIT_FAILURE);
        }
-    }
+   }
+
+   struct stat st;
+   stat(&replaylog[0], &st);
+   rpsz = st.st_size;
     
   /*======================================*/
   /*=== Initialize: IP connection ========*/
@@ -240,6 +255,10 @@ main ( int narg, char *argv[] ) {
         
       } /* if (!(client_sockfd==-1)) {   ...we have a connection... */  
 
+    /* start over if we are at the end and we need to loop */
+    if (run_as_loop && (ftell(fpr[sid]) == rpsz)) {
+      fseek(fpr[sid], 0, 0);
+      }
 
     /* avoiding busy wait */
     usleep(10); /* Go to sleep for 1 microsecond */

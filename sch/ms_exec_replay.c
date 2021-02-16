@@ -46,7 +46,7 @@
 
 #define LWA_REPLAY_MSELOG_FILENAME "replay_mselog.txt"
 
-int msgreplay(FILE *msqid, const void *msgp, size_t msgsz, int mqtid, size_t rpsz) {
+int msgreplay(FILE *msqid, const void *msgp, size_t msgsz, int mqtid, size_t rpsz, int run_as_loop) {
     struct LWA_cmd_struct msg;
     int i, found;
     long int ref, mjd, mpm;
@@ -131,6 +131,11 @@ int msgreplay(FILE *msqid, const void *msgp, size_t msgsz, int mqtid, size_t rps
     if( ((int) complete % 10) == 0 ) {
         printf("[%s/%d] INFO: %s is %.0f%% complete\n", ME, getpid(), LWA_sid2str(msg.sid), complete);
     }
+
+    if (run_as_loop && (ftell(msqid) == rpsz)) {
+       fseek(msqid, 0, 0);
+       printf("[%s/%d] INFO: %s has been reset\n", ME, getpid(), LWA_sid2str(msg.sid));
+       }
     
     /* If we found something, send it back to the main thread so that it can be logged */
     if( found ) {
@@ -155,6 +160,7 @@ main ( int narg, char *argv[] ) {
   int nsid = 0;         /* number of subsystems. initialize to zero */
   int sid[LWA_MAX_SID+1]; /* subsystem IDs; 0..nsid-1 are valid indices */
   char replaylog[255];  /* log to replay from */
+  int run_as_loop;
 
   int test; 
   int sid_candidate;
@@ -223,8 +229,8 @@ main ( int narg, char *argv[] ) {
   LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
 
   /* add log message showing command line used to call me */
-  if (narg>2) {
-    sprintf(logmsg,"Command line: %s %s %s",argv[0],argv[1],argv[2]);
+  if (narg>3) {
+    sprintf(logmsg,"Command line: %s %s %s %s",argv[0],argv[1],argv[2],argv[3]);
     LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
     }
 
@@ -235,7 +241,7 @@ main ( int narg, char *argv[] ) {
   LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
 
   /* Process command line arguments */
-  if (narg>2) { 
+  if (narg>3) { 
     sscanf(argv[1],"%ld",&sidlist);
     //printf("[%s] sidlist = %ld\n",ME,sidlist);
 
@@ -258,9 +264,10 @@ main ( int narg, char *argv[] ) {
     //printf("[%s] nsid=%d\n",ME,nsid);
    
       strcpy(&replaylog[0], argv[2]);
+      run_as_loop = atoi(argv[3]);
     } else {
 
-    sprintf(logmsg,"FATAL: sidlist and/or replaylog not provided");
+    sprintf(logmsg,"FATAL: sidlist, replaylog, and/or loop not provided");
     LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
     exit(EXIT_FAILURE);
 
@@ -739,7 +746,7 @@ main ( int narg, char *argv[] ) {
         }
       mq_msg.datalen    = task[tqp].datalen;               
       
-      if ( msgreplay(mqtid[task[tqp].sid], (void *)&mq_msg, LWA_msz(), mqrid, rpsz)== -1 ) {
+      if ( msgreplay(mqtid[task[tqp].sid], (void *)&mq_msg, LWA_msz(), mqrid, rpsz, run_as_loop)== -1 ) {
 
           sprintf(logmsg,"FATAL: Could not msgreplay()");
 	  LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, task[tqp].ref, 
@@ -759,7 +766,7 @@ main ( int narg, char *argv[] ) {
           tq[tqp]=LWA_MSELOG_TP_SENT;
 
         } /*  */
-
+        
       } /* if (eDone==1) */
 
     if ( (eDone==2) && (eSummary==LWA_SIDSUM_SHUTDWN) ) {

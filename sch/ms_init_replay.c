@@ -35,6 +35,7 @@ main ( int narg, char *argv[] ) {
   /*=================*/
 
   char ms_init_filename[256]; /* command line arguments */
+  char run_as_loop[256];
 
   FILE* fid;
   int bDone;
@@ -78,6 +79,12 @@ main ( int narg, char *argv[] ) {
     else {
     printf("[%s] FATAL: replay_log_filename not provided\n",ME);
     exit(EXIT_FAILURE);
+    }
+
+  sprintf(run_as_loop,"%i",0);
+  if (narg>2) {
+    atoi(argv[2]);
+    sprintf(run_as_loop,"%s",argv[2]);
     } 
 
   /* Set number of subsystems to zero */
@@ -159,7 +166,7 @@ main ( int narg, char *argv[] ) {
       printf("[%s] FATAL: fork for ms_exec_replay failed\n",ME);
       exit(EXIT_FAILURE);
     case 0: /* fork() succeeded; we are now in the child process */
-      err = execl("./ms_exec_replay","ms_exec_replay",sidlist,ms_init_filename,NULL); /* launch ms_exec_replay */
+      err = execl("./ms_exec_replay","ms_exec_replay",sidlist,ms_init_filename,run_as_loop,NULL); /* launch ms_exec_replay */
       /* if we get to this point then we failed to launch */
       if (err==-1) {
         printf("[%s] FATAL: failed to exec() ms_exec_replay\n",ME); 
@@ -179,7 +186,7 @@ main ( int narg, char *argv[] ) {
       printf("[%s] FATAL: fork for ms_mdre_replay failed\n",ME);
       exit(EXIT_FAILURE);
     case 0: /* fork() succeeded; we are now in the child process */
-      err = execl("./ms_mdre_replay","ms_mdre_replay",ms_init_filename,NULL); /* launch ms_exec */
+      err = execl("./ms_mdre_replay","ms_mdre_replay",ms_init_filename,run_as_loop,NULL); /* launch ms_exec */
       /* if we get to this point then we failed to launch */
       if (err==-1) {
         printf("[%s] FATAL: failed to exec() ms_mdre_replay\n",ME); 
