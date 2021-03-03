@@ -192,8 +192,8 @@ int main ( int narg, char *argv[] ) {
   /* Get the minimum beamformer delay */
   dmin = +(1e+20);
   sprintf(filename,"%s/mindelay.txt",sSDir);
-  if ((fp=fopen(filename,"rb"))!=NULL) {
-    fscanf(fp,"d",&smin);
+  if ((fp=fopen(filename,"r"))!=NULL) {
+    fscanf(fp,"%d",&smin);
     fclose(fp);
     dmin = smin/FS;
   } else {
