@@ -1,13 +1,13 @@
-// mefsdfg.c: J. Dowell, UNM, 2021 Jan 25
+// medrange.c: J. Dowell, UNM, 2021 Jan 20
 // ---
-// COMPILE: gcc -o mefsdfg mefsdfg.c -I../common -lm
+// COMPILE: gcc -o medrange medrange.c -I../common -lm
 // ---
 // COMMAND LINE: see help message (in code below)
 // ---
 // REQUIRES: 
 //   mcs.h via me.h
 // ---
-// Generates delay files for DP/ADP
+// Generates the minimum and maximum delays a station will use
 // needs to see state/ssmif.dat
 // See end of this file for history.
 
@@ -23,6 +23,8 @@
 #define MAX_DP_CH 520      /* number of DP1 channel inputs (per DP ICD) */
 #endif
 
+#define CHK_RES_DEG 1.0
+
 /*==============================================================*/
 /*=== main() ===================================================*/
 /*==============================================================*/
@@ -30,11 +32,8 @@
 int main ( int narg, char *argv[] ) {
 
   char sSDir[256];
-  char sDDir[256];
-  float fmhz;
-  int inpm;
+  float fmhz=74.0;
   float alt, az;
-  char listfile[256];  
 
   char filename[256];
   FILE *fp;
@@ -72,38 +71,23 @@ int main ( int narg, char *argv[] ) {
   double dc[MAX_DP_CH]; /* cable delay [s] for indicated DP channel (numbered here as 0..519 as opposed to 1..520) */
   double d[MAX_DP_CH];  /* total delay [s] for indicated DP channel (numbered here as 0..519 as opposed to 1..520) */
 
-  int smin;
-  double dmin;
+  double dmin, dmax, drng;
   int bFlag;
 
   unsigned short int ddc;
   unsigned short int ddf;
   unsigned short int ddm[MAX_DP_CH];
 
-  /* the following used for little- to big-endian conversions */
-  union {
-    unsigned short int i;
-    char b[2];
-    } i2u;
-  char bb;
-
   int bDone=0;
   FILE *fpl;
 
   /* parse command line */
-  if (narg<4) {
+  if (narg<2) {
     printf("\n");
-    printf("syntax: $ ./mefsdfg <sdir> <ddir> <fmhz> <inpm> + possible additional args\n");
+    printf("syntax: $ ./medrange <sdir> [<fmhz>]\n");
     printf("  <sdir>: relative path (no trailing slash) to ssmif.dat\n");
-    printf("  <ddir>: relative path (no trailing slash) to a directory to deposit files\n");
-    printf("          Warning: will delete existing files.\n");
-    printf("  <fmhz>: center frequency in MHz, used to compute dispersive component of cable delay\n");
-    printf("  <inpm>: = 0 means generate a complete set of pointings (lots of files!)\n");
-    printf("          = 1 means next two parameters <alt> <az> are altitude [deg] and azimuth [deg]\n");
-    printf("              for a single pointing\n");
-    printf("          = 2 means next parameter <listfile> is the name of a file containing pointing\n");
-    printf("              directions.  Each line is {alt [deg]} {space} {az [deg]}\n");
-    printf("example: '$ ./mefsdfg state outdir 74 0'\n");
+    printf("  <fmhz>: center frequency in MHz, used to compute dispersive component of cable delay, defaults to 74\n");
+    printf("example: '$ ./medrange state 74'\n");
     printf("\n");
     return;
     }
@@ -111,94 +95,31 @@ int main ( int narg, char *argv[] ) {
   if (narg>1) {
       sprintf(sSDir,"%s",argv[1]);
     } else {
-      printf("[%d/%d] FATAL: <sdir> not specified\n",ME_MEFSDFG,getpid());
+      printf("[%d/%d] FATAL: <sdir> not specified\n",ME_DRANGE,getpid());
       return;
     }
   //printf("input: <sdir>='%s'\n",sSDir);
 
   if (narg>2) {
-      sprintf(sDDir,"%s",argv[2]);
-    } else {
-      printf("[%d/%d] FATAL: <ddir> not specified\n",ME_MEFSDFG,getpid());
-      return;
-    }
-  //printf("input: <ddir>='%s'\n",sDDir);
-
-  if (narg>3) {
-      sscanf(argv[3],"%f",&fmhz);
-    } else {
-      printf("[%d/%d] FATAL: <fmhz> not specified\n",ME_MEFSDFG,getpid());
-      return;
+      sscanf(argv[2],"%f",&fmhz);
     }
 
-  if (narg>4) {
-      sscanf(argv[4],"%d",&inpm);
-    } else {
-      printf("[%d/%d] FATAL: <inpm> not specified\n",ME_MEFSDFG,getpid());
-      return;
-    }
-
-  if (inpm!=2) {
-    printf("input <sdir>='%s'\n",sSDir);
-    printf("input <ddir>='%s'\n",sDDir);
-    printf("input <fmhz>=%f [MHz]\n",fmhz);
-    printf("input <inpm>=%d\n",inpm);
-    }
-
-  switch (inpm) {
-    case 0: /* all pointings */
-      break;
-    case 1: /* one pointing */
-      if (narg>5) {
-          sscanf(argv[5],"%f",&alt);
-        } else {
-          printf("[%d/%d] FATAL: <alt> not specified\n",ME_MEFSDFG,getpid());
-          return;
-        }  
-      if (narg>6) {
-          sscanf(argv[6],"%f",&az);
-        } else {
-          printf("[%d/%d] FATAL: <az> not specified\n",ME_MEFSDFG,getpid());
-          return;
-        }    
-      printf("input <alt>=%f [deg]\n",alt);
-      printf("input <az>=%f [deg]\n",az);
-      break;
-    case 2: /* a list */
-      if (narg>5) {
-          sscanf(argv[5],"%s",listfile);
-        } else {
-          printf("[%d/%d] FATAL: <listfile> not specified\n",ME_MEFSDFG,getpid());
-          return;
-        }  
-      //printf("input <listfile>='%s'\n",listfile);
-      break;
-    default: /* error */
-      printf("[%d/%d] FATAL: <inpm>=%d not valid\n",ME_MEFSDFG,getpid(),inpm);
-      return;
-      break;
-    }
+  printf("input <sdir>='%s'\n",sSDir);
+  printf("input <fmhz>=%f [MHz]\n",fmhz);
 
   /* Get SSMIF */
   sprintf(filename,"%s/ssmif.dat",sSDir);
   if ((fp=fopen(filename,"rb"))==NULL) {
-    printf("[%d/%d] FATAL: Can't open '%s'\n",ME_MEFSDFG,getpid(),filename);
+    printf("[%d/%d] FATAL: Can't open '%s'\n",ME_DRANGE,getpid(),filename);
     return;
     }
   fread(&s,sizeof(struct ssmif_struct),1,fp);
   fclose(fp);
   //return;
 
-  /* Get the minimum beamformer delay */
-  dmin = +(1e+20);
-  sprintf(filename,"%s/mindelay.txt",sSDir);
-  if ((fp=fopen(filename,"r"))!=NULL) {
-    fscanf(fp,"%d",&smin);
-    fclose(fp);
-    dmin = smin/FS;
-  } else {
-    printf("[%d/%d] WARNING: station-wide minmum delay not found, will search\n", ME_MEFSDFG, getpid());
-    }
+  /* cleanup */
+  sprintf(cmd,"rm -rf %s/mindelay.txt",sSDir);
+  system(cmd);
 
   ///* assemble information about analog signal mapping */
   //eErr = me_sc_MakeASM( s, &sc );
@@ -265,14 +186,12 @@ int main ( int narg, char *argv[] ) {
 #endif
 
   /* check for un-determined stand positions */
-  if (inpm!=2) {
-    for ( i=0; i<MAX_DP_CH; i++ ) { /* iterating by DP-input index */
-      if (px[i]>(FLAG_VAL/2.0)) { printf("[%d/%d] px[%d] not computed\n",ME_MEFSDFG,getpid(),i+1); }
-      if (py[i]>(FLAG_VAL/2.0)) { printf("[%d/%d] py[%d] not computed\n",ME_MEFSDFG,getpid(),i+1); }
-      if (pz[i]>(FLAG_VAL/2.0)) { printf("[%d/%d] pz[%d] not computed\n",ME_MEFSDFG,getpid(),i+1); }
-      }
-    } 
-  //printf("[%d/%d] Will continue using only DP input channels 1..%d\n",ME_MEFSDFG,getpid(),imax);
+  for ( i=0; i<MAX_DP_CH; i++ ) { /* iterating by DP-input index */
+    if (px[i]>(FLAG_VAL/2.0)) { printf("[%d/%d] px[%d] not computed\n",ME_DRANGE,getpid(),i+1); }
+    if (py[i]>(FLAG_VAL/2.0)) { printf("[%d/%d] py[%d] not computed\n",ME_DRANGE,getpid(),i+1); }
+    if (pz[i]>(FLAG_VAL/2.0)) { printf("[%d/%d] pz[%d] not computed\n",ME_DRANGE,getpid(),i+1); }
+    }
+  //printf("[%d/%d] Will continue using only DP input channels 1..%d\n",ME_DRANGE,getpid(),imax);
 
   /* diagnostic readback */  
   //for ( i=0; i<ME_MAX_NDP1*ME_MAX_NDP1CH; i++ ) { /* iterating by DP-input index */
@@ -319,12 +238,10 @@ int main ( int narg, char *argv[] ) {
     } /* for i */
 
   /* check for un-determined cables */
-  if (inpm!=2) {
-    for ( i=0; i<MAX_DP_CH; i++ ) { /* iterating by DP-input index */
-      if (dc[i]>(FLAG_VAL/2.0)) { printf("[%d/%d] dc[%d] not computed\n",ME_MEFSDFG,getpid(),i+1); }
-      }
-    } 
-  //printf("[%d/%d] Will continue using only DP input channels 1..%d\n",ME_MEFSDFG,getpid(),imax);
+  for ( i=0; i<MAX_DP_CH; i++ ) { /* iterating by DP-input index */
+    if (dc[i]>(FLAG_VAL/2.0)) { printf("[%d/%d] dc[%d] not computed\n",ME_DRANGE,getpid(),i+1); }
+    }
+  //printf("[%d/%d] Will continue using only DP input channels 1..%d\n",ME_DRANGE,getpid(),imax);
 
   /* diagnostic readback */  
   //for ( i=0; i<ME_MAX_NDP1*ME_MAX_NDP1CH; i++ ) { /* iterating by DP-input index */
@@ -352,42 +269,22 @@ int main ( int narg, char *argv[] ) {
   /* setting up for main loop ********/
   /***********************************/
 
-  /* create destination directory */
-  sprintf(cmd,"mkdir %s 2> /dev/null",sDDir);
-  system(cmd);
-  sprintf(cmd,"rm -rf %s/*",sDDir);
-  system(cmd);
-
-  //return;
-  
   /* setting up for looping */
-  switch (inpm) {
-    case 0: /* all pointings */
-      nAlt = floor( 90.0/LWA_RES_DEG)+1; /* need both 0 deg and 90 deg */
-      nAz  = floor(360.0/LWA_RES_DEG);   /* do not need 360 deg (already have 0) */
-      printf("[%d/%d] nAlt = %d, nAz = %d\n",ME_MEFSDFG,getpid(),nAlt,nAz);
-      iAlt = 0; 
-      fAlt = iAlt*LWA_RES_DEG; 
-      iAz = 0;
-      fAz = iAz*LWA_RES_DEG;
-      printf("[%d/%d] Now computing alt [deg] = ",ME_MEFSDFG,getpid());
-      break;
-    case 1: /* single pointing */
-      fAlt = alt;
-      fAz = az;
-      break;
-    case 2: /*list */
-      if (!(fpl = fopen(listfile,"r"))) {
-        printf("[%d/%d] FATAL: can't open listfile='%s'\n",ME_MEFSDFG,getpid(),listfile);
-        return;
-        }
-      fscanf(fpl,"%f %f",&fAlt,&fAz); 
-      break;
-    }
+  nAlt = floor( 90.0/CHK_RES_DEG)+1; /* need both 0 deg and 90 deg */
+  nAz  = floor(360.0/CHK_RES_DEG);   /* do not need 360 deg (already have 0) */
+  //printf("[%d/%d] nAlt = %d, nAz = %d\n",ME_DRANGE,getpid(),nAlt,nAz);
+  iAlt = 0; 
+  fAlt = iAlt*CHK_RES_DEG; 
+  iAz = 0;
+  fAz = iAz*CHK_RES_DEG;
+  //printf("[%d/%d] Now computing alt [deg] = ",ME_DRANGE,getpid());
 
   /********************/
   /* main loop ********/
   /********************/
+
+  dmin = +(1e+20);
+  dmax = -(1e+20);
 
   bDone = 0;
   while (!bDone) {
@@ -419,81 +316,46 @@ int main ( int narg, char *argv[] ) {
           //d[i] = dc[i]+dg[i];
           d[i] = -(dc[i]+dg[i]);
           if (d[i]<dmin) { dmin=d[i]; }
+          if (d[i]>dmax) { dmax=d[i]; }
 
         }
 
       } 
 
-    // subtract minimum delay from d[]; convert from seconds to sample periods
-    for ( i=0; i<MAX_DP_CH; i++ ) { /* iterating by DP1-input index (per DP ICD) */
-      //if ((iAlt==0)&&(iAz==0)) printf("%3d | %10.3le + %10.3le = %10.3le | %10.3le\n",i,dg[i],dc[i],d[i],d[i]-dmin); 
-      //if ((iAlt+1==nAlt)) printf("%3d | %10.3le + %10.3le = %10.3le | %10.3le\n",i,dg[i],dc[i],d[i],d[i]-dmin); 
-      d[i] -= dmin;
-      d[i] *= FS;
-      }
-
-    // convert d[] to format DP is expecting
-    for ( i=0; i<MAX_DP_CH; i++ ) { /* iterating by DP1-input index (per DP ICD) */
-
-      ddc = (unsigned short int)    d[i];
-      ddf = (unsigned short int) ( (d[i]-ddc)*16 );
-
-      if ( (px[i]>(FLAG_VAL/2.0)) ||
-           (py[i]>(FLAG_VAL/2.0)) ||
-           (pz[i]>(FLAG_VAL/2.0)) ||
-           (dc[i]>(FLAG_VAL/2.0))   ) { ddc=0; ddf=0; }
-
-      //if ((iAlt==0)&&(iAz==0)) printf("%3d | %10.3le + %10.3le => %8.3lf | %4hu %2hu\n",i,dg[i],dc[i],d[i],ddc,ddf);
-
-      /* merge coarse and fine delays into single parameter */
-      ddm[i] = (ddc<<4) + ddf;
-        
-      /* convert to big-endian */
-      i2u.i = ddm[i]; 
-      bb=i2u.b[0]; i2u.b[0]=i2u.b[1]; i2u.b[1]=bb;
-      ddm[i] = i2u.i; 
-
-      }
-
-    // write it
-    sprintf(filename,"%s/%03d_%03d_%04d.df",sDDir,(int)(fmhz*10),(int)(fAlt*10),(int)(fAz*10));
-    //printf("'%s'\n",filename);
-    fp=fopen(filename,"wb");
-    fwrite(ddm,sizeof(ddm),1,fp);
-    fclose(fp);
-
     /* decide next step */
-    switch (inpm) {
-      case 0: /* all pointings */
-        iAz++;
-        if (iAz>=nAz) { 
-          iAz = 0;            
-          iAlt++;
-          if (iAlt>=nAlt) { bDone = 1; }
-          }
-        fAz = iAz*LWA_RES_DEG;
-        fAlt = iAlt*LWA_RES_DEG;
-        printf("%4.1f ",fAlt); fflush(stdout);
-        if ((90.0-fAlt)<=LWA_RES_DEG) { nAz=1; } /* need only one azimuth for the zenith pointing */
-        break;
-      case 1: /* single pointing */
-        bDone = 1;
-        break;
-      case 2: /* list */
-        fscanf(fpl,"%f %f",&fAlt,&fAz); 
-        if (feof(fpl)) {
-          bDone=1;
-          fclose(fpl);
-          }
-        break;
-      default: /* error */
-        break;
-      } /* switch (inpm) */
+    iAz++;
+    if (iAz>=nAz) { 
+      iAz = 0;            
+      iAlt++;
+      if (iAlt>=nAlt) { bDone = 1; }
+      }
+    fAz = iAz*CHK_RES_DEG;
+    fAlt = iAlt*CHK_RES_DEG;
+    //printf("%4.1f ",fAlt); fflush(stdout);
+    if ((90.0-fAlt)<=CHK_RES_DEG) { nAz=1; } /* need only one azimuth for the zenith pointing */
     
     } /* while (!bDone) */
 
-  //printf("\n");
-  ////printf("%lu %lu\n",sizeof(unsigned short int),sizeof(ddm));
+  drng = dmax - dmin;  
+  printf("[%d/%d] <delay min>=%.3f ns or %.0f samples\n", ME_DRANGE, getpid(), dmin*1e9, floor(dmin*FS));
+  printf("[%d/%d] <delay max>=%.3f ns or %.0f samples\n", ME_DRANGE, getpid(), dmax*1e9, ceil(dmax*FS));
+  printf("[%d/%d] <delay range>=%.3f ns or %.0f samples\n", ME_DRANGE, getpid(), drng*1e9, ceil(drng*FS));
+
+  int smin = (int) (floor(dmin*FS/10)-1)*10;
+  int smax = (int) (ceil(dmax*FS/10)+1)*10;
+  printf("[%d/%d] <sample min>=%d\n", ME_DRANGE, getpid(), smin);
+  if( (smax-smin) > 1000 ) {
+    printf("[%d/%d] FATAL: expected delay range (%d) > 1000\n", ME_DRANGE, getpid(), smax-smin);
+    return 1;
+    }
+
+  sprintf(filename,"%s/mindelay.txt",sSDir);
+  if ((fp=fopen(filename,"wb"))==NULL) {
+    printf("[%d/%d] FATAL: Can't open '%s'\n",ME_DRANGE,getpid(),filename);
+    return;
+    }
+  fprintf(fp, "%i", smin);
+  fclose(fp);
 
   return 0;
   } /* main() */
@@ -503,16 +365,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
-// mefsdfg.c: J. Dowell, UNM, 2021 Jan 25
-//   .1: Updated to look for a mindelay.txt file in the same directory as the SSMIF
-// mefsdfg.c: J. Dowell, UNM, 2015 Aug 28
-//   .1: Added support for ADP
-// mefsdfg.c: S.W. Ellingson, Virginia Tech, 2012 Jan 24
-//   .1: Added option to generate outputs for alt/az list file
-// mefsdfg.c: S.W. Ellingson, Virginia Tech, 2012 Jan 10
-//   .1: Added option to generate output for single pointing
-// mefsdfg.c: S.W. Ellingson, Virginia Tech, 2011 April 26
-//   .1: Initial version (used tpsdm.c as a starting point)
+// medrange.c: J. Dowell, UNM, 2021 Jan 20
+//   .1: Copied from mefsdfg.c
 
 
 //==================================================================================
