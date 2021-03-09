@@ -41,6 +41,7 @@
 #define ME_TPCOM   112 /* main() from me_tpcom.c */
 #define ME_INPROC  113 /* main() from me_inproc.c */
 #define ME_MEFSDFG 114 /* main() from mefsdfg.c */
+#define ME_DRANGE  115 /* main() from medrange.c */
 
 #include "mesi.c"
 #include "memdre.c"

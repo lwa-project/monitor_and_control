@@ -197,6 +197,7 @@ int main ( int narg, char *argv[] ) {
         /* moving files into temp directory */
         sprintf(cmd,"mv sinbox/%s_%04d* tpcom/temp/.",om.ssf.PROJECT_ID,om.ssf.SESSION_ID);
         system(cmd);
+        system("cp state/mindelay.txt tpcom/temp/.");
         if (om.ssf.SESSION_INC_SMIB==1) system("cp state/ssmif.dat tpcom/temp/.");
         system("cp state/sdm.dat tpcom/temp/dynamic/.");
         if (om.ssf.SESSION_LOG_EXE==1)  system("cp state/meelog.txt tpcom/temp/dynamic/.");
@@ -247,6 +248,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_tpcom.c: J. Dowell, UNM, 2021 Jan 25
+//   .1: Updated to include the mindelay.txt file
 // me_tpcom.c: S.W. Ellingson, Virginia Tech, 2013 Jul 18
 //   .1: Now adding ASP MIB to output tarball at end of session
 // me_tpcom.c: S.W. Ellingson, Virginia Tech, 2011 Mar 11
