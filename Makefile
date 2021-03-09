@@ -4,7 +4,7 @@
 # ../exec (executables copied to here - Executive)
 # ../tp   (executables copied to here - Task Processor)
 
-all: sch exec tp
+all: sch exec tp python
 
 .PHONY: sch
 sch:
