@@ -167,7 +167,7 @@ main ( int narg, char *argv[] ) {
   /* initialize reference number */
   fpr = fopen(".mcs_reference_id", "r");
   if(fpr) {
-    fscanf(fp, "%ld", &reference);
+    fscanf(fpr, "%ld", &reference);
     fclose(fpr);
     
     printf("[%s] First reference ID will be %ld\n",ME,reference);
@@ -273,8 +273,8 @@ main ( int narg, char *argv[] ) {
   if(fpr == NULL) {
     printf("[%s] WARNING: cannot open reference ID state file for writing\n",ME);
     perror("ms_exec");
-    sprintf(logmsg,"WARNING: cannot open reference ID state file for writing\n"
-    LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr )
+    sprintf(logmsg,"WARNING: cannot open reference ID state file for writing\n");
+    LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
   }
   
   while ( eSummary > LWA_SIDSUM_NULL ) {
