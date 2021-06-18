@@ -74,6 +74,7 @@ main ( int narg, char *argv[] ) {
 
   struct LWA_cmd_struct c;
 
+  FILE *fpr;
   long int reference; /* "REFERENCE" field in MCS common ICD */
 
   int b_valid_sid;
@@ -164,8 +165,24 @@ main ( int narg, char *argv[] ) {
 
 
   /* initialize reference number */
-  reference = 1; /* reference number = 0 reserved for error condition */
-
+  fpr = fopen(".mcs_reference_id", "r");
+  if(fpr) {
+    fscanf(fp, "%ld", &reference);
+    fclose(fpr);
+    
+    printf("[%s] First reference ID will be %ld\n",ME,reference);
+    perror("ms_exec");
+    sprintf(logmsg,"First reference ID will be %ld\n",reference);
+    LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
+  } else {
+    reference = 1; /* reference number = 0 reserved for error condition */
+    
+    printf("[%s] WARNING: no initial reference ID found, using %ld\n",ME,reference);
+    perror("ms_exec");
+    sprintf(logmsg,"WARNING: no initial reference ID found, using %ld\n",reference);
+    LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
+  }
+  
   /* Set up for receiving from message queue */
   if (nsid>1) { /* if there is at least one subsystem other than MCS... */
     mqrid = msgget( (key_t) MQ_MS_KEY, 0666 );
@@ -251,6 +268,15 @@ main ( int narg, char *argv[] ) {
   /*==================*/
   /*==================*/
 
+  /* open the referene ID state file for writing */
+  fpr = fopen(".mcs_reference_id", "w");
+  if(fpr == NULL) {
+    printf("[%s] WARNING: cannot open reference ID state file for writing\n",ME);
+    perror("ms_exec");
+    sprintf(logmsg,"WARNING: cannot open reference ID state file for writing\n"
+    LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr )
+  }
+  
   while ( eSummary > LWA_SIDSUM_NULL ) {
 
     /*=========================================================================*/
@@ -412,6 +438,12 @@ main ( int narg, char *argv[] ) {
                   /* assign reference number */
                   reference += 1;
                   if (reference > LWA_MAX_REFERENCE) reference=1; /* reference=0  used for error flag */
+                  
+                  /* save the reference number */
+                  if(fpr) {
+                    fprintf(fpr, "%ld", reference);
+                    fflush(fpr);
+                  }
 
                   /* push into the task queue */
                   tq[tqfai] = LWA_MSELOG_TP_QUEUED;
@@ -698,6 +730,10 @@ main ( int narg, char *argv[] ) {
 
     } /* while ( eSummary > LWA_SIDSUM_NULL  */
 
+  if(fpr) {
+    fclose(fpr);
+  }
+  
   /*=========================*/
   /*=========================*/
   /*=== END of Main Loop ====*/
@@ -797,13 +833,3 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-
-
-
-
-
-
-
-
-
