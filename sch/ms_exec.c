@@ -441,7 +441,8 @@ main ( int narg, char *argv[] ) {
                   
                   /* save the reference number */
                   if(fpr) {
-                    fprintf(fpr, "%ld", reference);
+                    fseek(fpr, 0, SEEK_SET);
+                    fprintf(fpr, "%9ld", reference);
                     if(reference % 10 == 0) fflush(fpr);
                   }
 
@@ -551,7 +552,8 @@ main ( int narg, char *argv[] ) {
 
           /* save the reference number */
           if(fpr) {
-            fprintf(fpr, "%ld", reference);
+            fseek(fpr, 0, SEEK_SET);
+            fprintf(fpr, "%9ld", reference);
             if(reference % 10 == 0) fflush(fpr);
           }
           
