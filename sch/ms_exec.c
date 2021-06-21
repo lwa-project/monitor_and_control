@@ -743,6 +743,9 @@ main ( int narg, char *argv[] ) {
     } /* while ( eSummary > LWA_SIDSUM_NULL  */
 
   if(fpr) {
+    fseek(fpr, 0, SEEK_SET);
+    fprintf(fpr, "%9ld", reference);
+    fflush(fpr);
     fclose(fpr);
   }
   
