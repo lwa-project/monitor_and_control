@@ -442,7 +442,7 @@ main ( int narg, char *argv[] ) {
                   /* save the reference number */
                   if(fpr) {
                     fprintf(fpr, "%ld", reference);
-                    fflush(fpr);
+                    if(reference % 10 == 0) fflush(fpr);
                   }
 
                   /* push into the task queue */
@@ -549,6 +549,12 @@ main ( int narg, char *argv[] ) {
           if (reference > LWA_MAX_REFERENCE) reference=1; /* reference=0  used for error flag */
           c.ref = reference; 
 
+          /* save the reference number */
+          if(fpr) {
+            fprintf(fpr, "%ld", reference);
+            if(reference % 10 == 0) fflush(fpr);
+          }
+          
           /* push into the task queue */
           tq[tqfai] = LWA_MSELOG_TP_QUEUED;
           task[tqfai].sid        = c.sid;
