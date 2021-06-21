@@ -441,10 +441,12 @@ main ( int narg, char *argv[] ) {
                   
                   /* save the reference number */
                   if(fpr) {
-                    fseek(fpr, 0, SEEK_SET);
-                    fprintf(fpr, "%9ld", reference);
-                    if(reference % 10 == 0) fflush(fpr);
-                  }
+                    if(reference % 10 == 0) {
+                      fseek(fpr, 0, SEEK_SET);
+                      fprintf(fpr, "%9ld", reference);
+                      fflush(fpr);
+                      }
+                    }
 
                   /* push into the task queue */
                   tq[tqfai] = LWA_MSELOG_TP_QUEUED;
@@ -552,10 +554,12 @@ main ( int narg, char *argv[] ) {
 
           /* save the reference number */
           if(fpr) {
-            fseek(fpr, 0, SEEK_SET);
-            fprintf(fpr, "%9ld", reference);
-            if(reference % 10 == 0) fflush(fpr);
-          }
+            if(reference % 10 == 0) {
+              fseek(fpr, 0, SEEK_SET);
+              fprintf(fpr, "%9ld", reference);
+              fflush(fpr);
+              }
+            }
           
           /* push into the task queue */
           tq[tqfai] = LWA_MSELOG_TP_QUEUED;
