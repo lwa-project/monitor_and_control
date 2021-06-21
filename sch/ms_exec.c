@@ -170,16 +170,18 @@ main ( int narg, char *argv[] ) {
     fscanf(fpr, "%ld", &reference);
     fclose(fpr);
     
-    printf("[%s] First reference ID will be %ld\n",ME,reference);
+    if (reference > LWA_MAX_REFERENCE) reference=1; /* reference=0  used for error flag */
+    
+    printf("[%s] Initial reference ID found, will be %ld\n",ME,reference);
     perror("ms_exec");
-    sprintf(logmsg,"First reference ID will be %ld\n",reference);
+    sprintf(logmsg,"Initial reference ID found, will be %ld",reference);
     LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
   } else {
     reference = 1; /* reference number = 0 reserved for error condition */
     
-    printf("[%s] WARNING: no initial reference ID found, using %ld\n",ME,reference);
+    printf("[%s] WARNING: Initial reference ID not found, using %ld\n",ME,reference);
     perror("ms_exec");
-    sprintf(logmsg,"WARNING: no initial reference ID found, using %ld\n",reference);
+    sprintf(logmsg,"WARNING: Initial reference ID not found, using %ld",reference);
     LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
   }
   
