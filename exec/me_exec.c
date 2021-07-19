@@ -459,38 +459,42 @@ int main ( int narg, char *argv[] ) {
       err = mesi(NULL,"DP_","RPT","SUMMARY",    "today","asap",&reference);
       err = mesi(NULL,"DP_","RPT","INFO",       "today","+1",  &reference);
 #endif
+
       err = mesi(NULL,"ASP","RPT","SUMMARY",    "today","+2",  &reference);
-      err = mesi(NULL,"SHL","RPT","SUMMARY",    "today","+3",  &reference);
-      err = mesi(NULL,"SHL","RPT","CURRENT-R1", "today","+4",  &reference);
+      err = mesi(NULL,"ASP","RPT","INFO",       "today","+3",  &reference);
+      
+      err = mesi(NULL,"SHL","RPT","SUMMARY",    "today","+4",  &reference);
+      err = mesi(NULL,"SHL","RPT","INFO",       "today","+5",  &reference);
+      err = mesi(NULL,"SHL","RPT","CURRENT-R1", "today","+6",  &reference);
 #ifdef USE_ADP
-      err = mesi(NULL,"SHL","RPT","CURRENT-R2", "today","+5",  &reference);
-      err = mesi(NULL,"SHL","RPT","CURRENT-R3", "today","+5",  &reference);
-      err = mesi(NULL,"SHL","RPT","CURRENT-R4", "today","+5",  &reference);
+      err = mesi(NULL,"SHL","RPT","CURRENT-R2", "today","+7",  &reference);
+      err = mesi(NULL,"SHL","RPT","CURRENT-R3", "today","+8",  &reference);
+      err = mesi(NULL,"SHL","RPT","CURRENT-R4", "today","+9",  &reference);
 #else
-      err = mesi(NULL,"SHL","RPT","CURRENT-R3", "today","+5",  &reference);
+      err = mesi(NULL,"SHL","RPT","CURRENT-R3", "today","+7",  &reference);
 #endif
-      err = mesi(NULL,"SHL","RPT","TEMPERATURE","today","+6",  &reference);
+      err = mesi(NULL,"SHL","RPT","TEMPERATURE","today","+10",  &reference);
 
-      err = mesi(NULL,"DR1","RPT","SUMMARY",    "today","+10",  &reference);
-      err = mesi(NULL,"DR1","RPT","OP-TYPE",    "today","+11",  &reference);
-      //err = mesi(NULL,"DR1","RPT","SYN",        "today","+12",  &reference);
+      err = mesi(NULL,"DR1","RPT","SUMMARY",    "today","+20",  &reference);
+      err = mesi(NULL,"DR1","RPT","OP-TYPE",    "today","+21",  &reference);
+      //err = mesi(NULL,"DR1","RPT","SYN",        "today","+22",  &reference);
 
-      err = mesi(NULL,"DR2","RPT","SUMMARY",    "today","+20",  &reference);
-      err = mesi(NULL,"DR2","RPT","OP-TYPE",    "today","+21",  &reference);
-      //err = mesi(NULL,"DR2","RPT","SYN",        "today","+22",  &reference);
+      err = mesi(NULL,"DR2","RPT","SUMMARY",    "today","+30",  &reference);
+      err = mesi(NULL,"DR2","RPT","OP-TYPE",    "today","+31",  &reference);
+      //err = mesi(NULL,"DR2","RPT","SYN",        "today","+32",  &reference);
 
-      err = mesi(NULL,"DR3","RPT","SUMMARY",    "today","+30",  &reference);
-      err = mesi(NULL,"DR3","RPT","OP-TYPE",    "today","+31",  &reference);
-      //err = mesi(NULL,"DR3","RPT","SYN",        "today","+32",  &reference);
+      err = mesi(NULL,"DR3","RPT","SUMMARY",    "today","+40",  &reference);
+      err = mesi(NULL,"DR3","RPT","OP-TYPE",    "today","+41",  &reference);
+      //err = mesi(NULL,"DR3","RPT","SYN",        "today","+42",  &reference);
 
-      err = mesi(NULL,"DR4","RPT","SUMMARY",    "today","+40",  &reference);
-      err = mesi(NULL,"DR4","RPT","OP-TYPE",    "today","+41",  &reference);
-      //err = mesi(NULL,"DR4","RPT","SYN",        "today","+42",  &reference);
+      err = mesi(NULL,"DR4","RPT","SUMMARY",    "today","+50",  &reference);
+      err = mesi(NULL,"DR4","RPT","OP-TYPE",    "today","+51",  &reference);
+      //err = mesi(NULL,"DR4","RPT","SYN",        "today","+52",  &reference);
 
 #ifndef USE_ADP
-      err = mesi(NULL,"DR5","RPT","SUMMARY",    "today","+50",  &reference);
-      err = mesi(NULL,"DR5","RPT","OP-TYPE",    "today","+51",  &reference);
-      //err = mesi(NULL,"DR5","RPT","SYN",        "today","+52",  &reference);
+      err = mesi(NULL,"DR5","RPT","SUMMARY",    "today","+60",  &reference);
+      err = mesi(NULL,"DR5","RPT","OP-TYPE",    "today","+61",  &reference);
+      //err = mesi(NULL,"DR5","RPT","SYN",        "today","+62",  &reference);
 #endif
 
       //if (err!=MESI_ERR_OK) {
@@ -606,5 +610,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-
