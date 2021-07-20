@@ -169,7 +169,8 @@ main ( int narg, char *argv[] ) {
   if(fpr) {
     fscanf(fpr, "%ld", &reference);
     fclose(fpr);
-    
+   
+    reference += 10; /* advance by 10 to avoid duplicates */ 
     if (reference > LWA_MAX_REFERENCE) reference=1; /* reference=0  used for error flag */
     
     printf("[%s] Initial reference ID found, will be %ld\n",ME,reference);
