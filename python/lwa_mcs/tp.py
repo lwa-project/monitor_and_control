@@ -108,7 +108,7 @@ def schedule_sdfs(filenames, max_retries=5, logfile=None, errorfile=None):
         
         ## Find out what is missing
         missing_files = []
-        for id in ids.keys():
+        for id,filename in ids.items():
             if id not in list(queue.keys()):
                 missing_files.append((id,filename))
                 
