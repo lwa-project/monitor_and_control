@@ -40,10 +40,15 @@ def _get_sdf_id(filename):
     return pid, sid
 
 
-def schedule_sdfs(filenames, max_retries=5, logfile=None, errorfile=None):
+def schedule_sdfs(filenames, max_retries=5, fast_submit=False, logfile=None, errorfile=None):
     # Figure out the input
     if not isinstance(filenames, list):
         filenames = [filenames,]
+        
+    # Fast submit or not
+    t_sub_wait= 10
+    if fast_submit:
+        t_sub_wait = 5
         
     # Deal with the logging
     ## stdout
@@ -102,7 +107,7 @@ def schedule_sdfs(filenames, max_retries=5, logfile=None, errorfile=None):
     scheduled = False
     counter = 0
     while not scheduled:
-        time.sleep(max([10, 10+1*(len(filenames)-2)]))
+        time.sleep(max([t_sub_wait, t_sub_wait+1*(len(filenames)-2)]))
         ## Get the exec queue
         queue = get_exec_queue()
         
