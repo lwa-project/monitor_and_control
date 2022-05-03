@@ -751,21 +751,21 @@ double LWA_f8_swap( double x ) {
 #ifdef defined(USE_NDP)
 #define ME_SSMIF_FORMAT_VERSION 10
 #if defined(NDP_IS_FULL_STATION)
-#define ME_MAX_NSTD 256
-#define ME_MAX_NFEE 256
-#define ME_MAX_NRPD 512
-#define ME_MAX_NSEP 512
-#define ME_MAX_NARB 32
-#define ME_MAX_NSNAP 8
-#define ME_MAX_NSERVER 9
+#  define ME_MAX_NSTD 256
+#  define ME_MAX_NFEE 256
+#  define ME_MAX_NRPD 512
+#  define ME_MAX_NSEP 512
+#  define ME_MAX_NARB 32
+#  define ME_MAX_NSNAP 8
+#  define ME_MAX_NSERVER 9
 #else
-#define ME_MAX_NSTD 64
-#define ME_MAX_NFEE 64
-#define ME_MAX_NRPD 128
-#define ME_MAX_NSEP 128
-#define ME_MAX_NARB 8
-#define ME_MAX_NSNAP 2
-#define ME_MAX_NSERVER 3
+#  define ME_MAX_NSTD 64
+#  define ME_MAX_NFEE 64
+#  define ME_MAX_NRPD 128
+#  define ME_MAX_NSEP 128
+#  define ME_MAX_NARB 8
+#  define ME_MAX_NSNAP 2
+#  define ME_MAX_NSERVER 3
 #endif
 #define ME_MAX_FEEID_LENGTH 10
 #define ME_MAX_RACK 6
