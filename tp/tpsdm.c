@@ -21,12 +21,15 @@
 #define TPSDM_RPT_RPD  5
 #define TPSDM_RPT_SEP  6
 #define TPSDM_RPT_ARX  7
-#ifdef USE_ADP
-#define TPSDM_RPT_ROACH  8
-#define TPSDM_RPT_SERVER 9
+#if defined(USE_NDP)
+#  define TPSDM_RPT_SNAP  8
+#  define TPSDM_RPT_SERVER 9
+#elif defined(USE_ADP)
+#  define TPSDM_RPT_ROACH  8
+#  define TPSDM_RPT_SERVER 9
 #else
-#define TPSDM_RPT_DP1  8
-#define TPSDM_RPT_DP2  9
+#  define TPSDM_RPT_DP1  8
+#  define TPSDM_RPT_DP2  9
 #endif
 #define TPSDM_RPT_DR  10
 #define TPSDM_RPT_ANA 11
@@ -75,7 +78,10 @@ int main ( int narg, char *argv[] ) {
     printf("          'RPD': List status, other info about cables\n");
     printf("          'SEP': List status, other info about SEP ports\n");
     printf("          'ARX': List status, other info about ARX channels\n");
-#ifdef USE_ADP
+#if defined(USE_NDP)
+    printf("          'SNAP': List status, other info about SNAP channels\n");
+    printf("          'SERVER': List status, other infor about SERVER channels\n");
+#elif defined(USE_ADP)
     printf("          'ROACH': List status, other info about ROACH channels\n");
     printf("          'SERVER': List status, other infor about SERVER channels\n");
 #else
@@ -113,7 +119,10 @@ int main ( int narg, char *argv[] ) {
       if (strncmp(arg,"RPD",3)==0) { eRpt = TPSDM_RPT_RPD; }
       if (strncmp(arg,"SEP",3)==0) { eRpt = TPSDM_RPT_SEP; }
       if (strncmp(arg,"ARX",3)==0) { eRpt = TPSDM_RPT_ARX; }
-#ifdef USE_ADP
+#if defined(USE_NDP)
+      if (strncmp(arg,"SNAP",4)==0)  { eRpt = TPSDM_RPT_SNAP; }
+      if (strncmp(arg,"SERVER",6)==0) { eRpt = TPSDM_RPT_SERVER; }
+#elif defined(USE_ADP)
       if (strncmp(arg,"ROACH",5)==0)  { eRpt = TPSDM_RPT_ROACH; }
       if (strncmp(arg,"SERVER",6)==0) { eRpt = TPSDM_RPT_SERVER; }
 #else
@@ -244,7 +253,10 @@ int main ( int narg, char *argv[] ) {
       printf("N_SEP:   %d\n",s.nSEP);
       printf("N_ARB:   %d\n",s.nARB);
       printf("N_ARBCH: %d\n",s.nARBCH);
-#ifdef USE_ADP
+#if defined(USE_NDP)
+      printf("N_SNAP:   %d\n",s.nSnap);
+      printf("N_SNAPCH: %d\n",s.nSnapCh);
+#elif defined(USE_ADP)
       printf("N_ROACH:   %d\n",s.nRoach);
       printf("N_ROACHCH: %d\n",s.nRoachCh);
 #else
@@ -253,14 +265,16 @@ int main ( int narg, char *argv[] ) {
 #endif
       printf("N_DR:    %d\n",s.nDR);
       printf("MCS_CRA: %d\n",s.eCRA); /* MCS_CRA */  
-#ifdef USE_ADP
+#if defined(USE_NDP) || defined(USE_ADP)
                     printf("TBF_GAIN: %2hd",  s.settings.tbf_gain);
       if (!bStatic) printf(       " | %2hd",sdm.settings.tbf_gain);
       printf("\n");
 #endif
+#if !defined(USE_NDP)
                     printf("TBN_GAIN: %2hd",  s.settings.tbn_gain);
       if (!bStatic) printf(       " | %2hd",sdm.settings.tbn_gain);
       printf("\n");
+#endif
                     printf("DRX_GAIN: %2hd",  s.settings.drx_gain); 
       if (!bStatic) printf(       " | %2hd",sdm.settings.drx_gain); 
       printf("\n");
@@ -438,7 +452,51 @@ int main ( int narg, char *argv[] ) {
       printf("  ARB_IN (label on input connector for this channel on ASP chassis)\n");
       printf("  ARB_OUT (label on output connector for this channel on ASP chassis)\n");
       break;
-#ifdef USE_ADP
+#if defined(USE_NDP)
+    case TPSDM_RPT_SNAP:
+      /* Roach */
+      for (i=0;i<s.nSnap;i++) { 
+        for (j=0;j<s.nSnapCh;j++) {
+          printf( "%2d %2d |",i+1,j+1); 
+          printf( " %1d",s.eSnapStat[i][j]);
+          if (!bStatic) printf( " %1d",sdm.ssss.eSnapStat[i][j]); 
+          printf( " | %3d",s.iSnapAnt[i][j]); /* DP1_ANT[][] */
+          printf( " | %2d %10s %10s",s.eSnapDesi[i],s.sSnapSlot[i],s.sSnapID[i]); /* DP1_DESI[] */ /* DP1_SLOT[] */ /* DP1_ID[] */
+          printf( " | %10s %10s",s.sSnapINR[i][j],s.sSnapINC[i][j]); /* DP1_INR[][] */ /* DP1_INC[][] */
+          printf("\n");
+          } 
+        }
+      printf("key:\n");
+      printf("  SNAP board #\n");
+      printf("  channel # on this board\n");
+      printf("| stat (static)\n");
+      if (!bStatic) printf("  stat (dynamic)\n");
+      printf("| SNAP_ANT (ant# associated with this channel)\n");
+      printf("| SNAP_DESI\n");
+      printf("  SNAP_SLOT\n");
+      printf("  SNAP_ID\n");
+      printf("| SNAP_INR (label on input connector for this channel on DP rack)\n");
+      printf("  SNAP_INC (label on input connector for this channel on DP chassis)\n");
+      break;
+      
+    case TPSDM_RPT_SERVER: /* Server */
+      for (i=0;i<s.nServer;i++) { 
+        printf( "%2d %1d",i+1,s.eServerStat[i]); 
+        if (!bStatic) printf( " %1d",sdm.ssss.eServerStat[i]); 
+        printf(" | %10s %10s %2d\n",
+                   s.sServerID[i],
+                        s.sServerSlot[i],
+                             s.eServerDesi[i] ); 
+        }
+      printf("key:\n");
+      printf("  Server #\n");
+      printf("  stat (static)\n");
+      if (!bStatic) printf("  stat (dynamic)\n");
+      printf("| SERVER_ID\n");
+      printf("  SERVER_SLOT\n");
+      printf("  SERVER_DESI\n");
+      break;
+#elif defined(USE_ADP)
     case TPSDM_RPT_ROACH:
       /* Roach */
       for (i=0;i<s.nRoach;i++) { 
@@ -682,7 +740,30 @@ int main ( int narg, char *argv[] ) {
     case TPSDM_RPT_DPP: /* dpp */
       if (bStatic) {
 
-#ifdef USE_ADP
+#if defined(USE_NDP)
+        for ( i=0; i<ME_MAX_NDPOUT; i++ ) {
+          if (i<ME_MAX_NDPOUT)              { sprintf(st1," Beam #%d",i+1);                     }
+          if ( sc.DPO[i].iDR > 0 ) { 
+              sprintf(st2," DR%1d %1d",sc.DPO[i].iDR,s.eDRStat[sc.DPO[i].iDR-1]); 
+              //printf("<%1d>",s.eDRStat[sc.DPO[i].iDR]); 
+            } else {
+              strcpy(st2,"");
+            }
+          printf("%1d %1d |%s |%s\n",
+                  i+1, 
+                      sc.DPO[i].iStat,
+                           st1,st2    );
+          } /* for i */
+
+        printf("key:\n");
+        printf("  NDP output #\n");
+        printf("  stat (for this path) (static)\n");
+        printf("| 'DP2'                     or 'TBW/TBN'\n");
+        printf("  DP2 board #               or ''\n");
+        printf("  stat (for this DP2 board) or ''\n");
+        printf("| DR_ID (DR associated with this DP output)\n");
+        printf("  stat (for this DR) (static)\n");
+#elif defined(USE_ADP)
         for ( i=0; i<ME_MAX_NDPOUT; i++ ) {
           if (i<ME_MAX_NDPOUT-1)              { sprintf(st1," Beam #%d",i+1);                     }
           if (i>ME_MAX_NDPOUT-2)              { sprintf(st1," TBN ");         }
@@ -776,6 +857,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpsdm.c: J. Dowell, UNM, 2022 May 2
+//   .1 Updated for MCS-NDP
 // tpsdm.c: J. Dowell, UNM, 2018 Jan 29
 //   .1 Cleaned up a few compiler warnings
 // tpsdm.c: J. Dowell, UNM, 2015 Sep 11
@@ -788,5 +871,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

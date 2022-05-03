@@ -42,7 +42,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
         sscanf(data,"%d",&(obs[nobs].OBS_ASP_FLT[n]));
         printf("...converts to %d\n",obs[nobs].OBS_ASP_FLT[n]);
-#ifdef USE_ADP
+#if defined(USE_NDP) || defined(USE_ADP)
         if ( ( obs[nobs].OBS_ASP_FLT[n]<-1 ) || ( obs[nobs].OBS_ASP_FLT[n]>5 ) ) {   
 #else
         if ( ( obs[nobs].OBS_ASP_FLT[n]<-1 ) || ( obs[nobs].OBS_ASP_FLT[n]>3 ) ) {
@@ -140,7 +140,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
 
   } /* for n */
 
-#ifdef USE_ADP
+#if defined(USE_NDP) || defined(USE_ADP)
     sprintf(keyword,"OBS_TBF_SAMPLES");  
     obs[nobs].OBS_TBF_SAMPLES=12000000;  /* default values */
     while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
@@ -262,6 +262,3 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
       case TPSS_PL_KEYWORD_MISMATCH:                                                                               break;
       case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
       }
-
-
-

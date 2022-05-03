@@ -285,7 +285,7 @@
       printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
       sscanf(data,"%ld",&(obs[nobs].OBS_FREQ2));
       printf("...converts to %ld\n",obs[nobs].OBS_FREQ2);
-#ifdef USE_ADP
+#if defined(USE_NDP) || defined(USE_ADP)
       if ( obs[nobs].OBS_FREQ2 == 0 ) {
         printf("[%d/%d] WARNING: OBS_FREQ2 is zero, this will be a half beam observation\n",MT_TPSS,getpid());
       } else if ( ( obs[nobs].OBS_FREQ2<222417950 ) || ( obs[nobs].OBS_FREQ2>1928352663 ) ) {   
@@ -366,4 +366,3 @@
     }
 
   obs[nobs].OBS_STP_N = 0;
-

@@ -81,14 +81,16 @@
     int OBS_ASP_AT1[LWA_MAX_NSTD+1];
     int OBS_ASP_AT2[LWA_MAX_NSTD+1];
     int OBS_ASP_ATS[LWA_MAX_NSTD+1];
-#ifdef USE_ADP
+#if defined(USE_NDP) || defined(USE_ADP)
     long int OBS_TBF_SAMPLES;
     int OBS_TBF_GAIN;
 #else
     int OBS_TBW_BITS;
     long int OBS_TBW_SAMPLES;
 #endif
+#if !defined(USE_NDP)
     int OBS_TBN_GAIN;
+#endif
     int OBS_DRX_GAIN;
     long int ASP_setup_time; // not part of SDF 
     };
@@ -101,4 +103,3 @@
   unsigned long int SESSION_START_MPM=0;
   unsigned long int SESSION_DUR=0;
   unsigned int SESSION_NOBS=0;
-
