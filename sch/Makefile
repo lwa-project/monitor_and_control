@@ -5,7 +5,7 @@
 CFLAGS := -I/usr/include/gdbm -I../common 
 LDFLAGS := -lgdbm -lncurses
 
-TARGETS := ms_init dat2dbm ms_mcic ms_exec msei ms_mdr ms_mdre ms_makeMIB_ASP ms_makeMIB_ADP ms_makeMIB_DP ms_makeMIB_DR ms_makeMIB_SHL ms_md2t ms_mb ms_mu ms_mdre_ip ms_mon
+TARGETS := ms_init dat2dbm ms_mcic ms_exec msei ms_mdr ms_mdre ms_makeMIB_ASP ms_makeMIB_ADP ms_makeMIB_DP ms_makeMIB_DR ms_makeMIB_NDP ms_makeMIB_SHL ms_md2t ms_mb ms_mu ms_mdre_ip ms_mon
 
 all: $(TARGETS)
 
@@ -15,7 +15,7 @@ ms_init: ms_init.c ../common/mcs.h
 dat2dbm: dat2dbm.c ../common/mcs.h
 	$(CC) $(CFLAGS) -o dat2dbm dat2dbm.c $(LDFLAGS)
 
-ms_mcic: ms_mcic.c ../common/mcs.h ms_mcic_mib.c ms_mcic_SHL.c ms_mcic_ASP.c ms_mcic_ADP.c ms_mcic_DP_.c ms_mcic_DR_.c 
+ms_mcic: ms_mcic.c ../common/mcs.h ms_mcic_mib.c ms_mcic_SHL.c ms_mcic_ASP.c ms_mcic_NDP.c ms_mcic_ADP.c ms_mcic_DP_.c ms_mcic_DR_.c 
 	$(CC) $(CFLAGS) -o ms_mcic ms_mcic.c $(LDFLAGS)
 
 ms_exec: ms_exec.c  ../common/mcs.h ms_exec_log.c 
@@ -42,6 +42,9 @@ ms_makeMIB_DP: ms_makeMIB_DP.c
 ms_makeMIB_DR: ms_makeMIB_DR.c 
 	$(CC) $(CFLAGS) -o ms_makeMIB_DR ms_makeMIB_DR.c $(LDFLAGS)
 
+ms_makeMIB_NDP: ms_makeMIB_NDP.c 
+	$(CC) $(CFLAGS) -o ms_makeMIB_NDP ms_makeMIB_NDP.c $(LDFLAGS)
+	
 ms_makeMIB_SHL: ms_makeMIB_SHL.c 
 	$(CC) $(CFLAGS) -o ms_makeMIB_SHL ms_makeMIB_SHL.c $(LDFLAGS)
 
@@ -74,4 +77,3 @@ install:
 .PHONY: clean
 clean:
 	-rm -f $(TARGETS)
-

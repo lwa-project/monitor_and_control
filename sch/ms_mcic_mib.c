@@ -107,7 +107,9 @@ int LWA_mibupdate_RPT(
 /* Each file contains just one function call, "LWA_mibupdate_XXX()" */ 
 #include "ms_mcic_SHL.c" /* LWA_mibupdate_SHL() */
 #include "ms_mcic_ASP.c" /* LWA_mibupdate_ASP() */
-#ifdef USE_ADP
+#if defined(USE_NDP)
+#include "ms_mcic_NDP.c" /* LWA_mibupdate_NDP() */
+#elif defined(USE_ADP)
 #include "ms_mcic_ADP.c" /* LWA_mibupdate_ADP() */
 #else
 #include "ms_mcic_DP_.c" /* LWA_mibupdate_DP_() */
@@ -220,7 +222,11 @@ int mib_update(
               case LWA_SID_ASP:
                 eMIBerror = eMIBerror | LWA_mibupdate_ASP( dbm_ptr, cid, cmdata, r_comment, datalen );                
                 break;
-#ifdef USE_ADP
+#if defined(USE_NDP)
+              case LWA_SID_NDP:
+                eMIBerror = eMIBerror | LWA_mibupdate_NDP( dbm_ptr, cid, cmdata, r_comment, datalen, ref, sent_tv );                
+                break;
+#elif defined(USE_ADP)
               case LWA_SID_ADP:
                 eMIBerror = eMIBerror | LWA_mibupdate_ADP( dbm_ptr, cid, cmdata, r_comment, datalen, ref, sent_tv );                
                 break;
@@ -262,6 +268,8 @@ int mib_update(
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mcic_mib.c: J. Dowell, UNM, 2022 May 2
+//   adding MCS-NDP ("NDP") support
 // ms_mcic_mib.c: J. Dowell, UNM, 2019 Oct 30
 //   .1 Convert to using normal GDBM for the database
 // ms_mcic_mib.c: J. Dowell, UNM, 2015 Aug 10
