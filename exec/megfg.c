@@ -21,10 +21,16 @@
 
 #define ME "megfg"
 
-#ifdef USE_ADP
-#define MAX_STD 256           /* max number of stands */  
+#if defined(USE_NDP)
+#  if defined(NPD_IS_FULL_STATION)
+#    define MAX_STD 256           /* max number of stands */
+#  else
+#    define MAX_STD 64           /* max number of stands */
+#  endif
+#elif defined(USE_ADP)
+#  define MAX_STD 256           /* max number of stands */  
 #else
-#define MAX_STD 260           /* max number of stands */  
+#  define MAX_STD 260           /* max number of stands */  
 #endif
 
 int main( int narg, char *argv[] ) {
@@ -115,6 +121,8 @@ int main( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// megfg.c: J. Dowell, UNM, 2022 May 3
+//   .1: Added support for NDP
 // megfg.c: J. Dowell, UNM, 2015 Aug 28
 //   .1: Added support for ADP
 // megfg.c: S.W. Ellingson, Virginia Tech, 2014 Mar 11
@@ -126,5 +134,3 @@ int main( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

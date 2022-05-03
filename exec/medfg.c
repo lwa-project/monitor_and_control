@@ -22,12 +22,20 @@
 
 #define ME "medfg"
 
-#ifdef USE_ADP
-#define MAX_ANT 512           /* number of antennas ("channels") */  
-#define MAX_COARSE_DELAY 1023 /* maximum coarse delay, in sample periods */
+#if defined(USE_NDP)
+#  if defined(NPD_IS_FULL_STATION)
+#    define MAX_ANT 512           /* number of antennas ("channels") */  
+#    define MAX_COARSE_DELAY 1023 /* maximum coarse delay, in sample periods */
+#  else
+#    define MAX_ANT 128           /* number of antennas ("channels") */  
+#    define MAX_COARSE_DELAY 1023 /* maximum coarse delay, in sample periods */
+#  endif
+#elif defined(USE_ADP)
+#  define MAX_ANT 512           /* number of antennas ("channels") */  
+#  define MAX_COARSE_DELAY 1023 /* maximum coarse delay, in sample periods */
 #else
-#define MAX_ANT 520           /* number of antennas ("channels") */  
-#define MAX_COARSE_DELAY 4095 /* maximum coarse delay, in sample periods */
+#  define MAX_ANT 520           /* number of antennas ("channels") */  
+#  define MAX_COARSE_DELAY 4095 /* maximum coarse delay, in sample periods */
 #endif
 
 int main( int narg, char *argv[] ) {
@@ -106,6 +114,8 @@ int main( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// medfg.c: J. Dowell, UNM, 2022 May 3
+//   .1: Updated for NDP
 // medfg.c: J. Dowell, UNM, 2015 Aug 28
 //   .1: Updated for ADP
 // medfg.c: S.W. Ellingson, Virginia Tech, 2010 Nov 11
@@ -115,5 +125,3 @@ int main( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-
