@@ -710,6 +710,7 @@ int main ( int narg, char *argv[] ) {
             case LWA_OM_TRK_RADEC:
             case LWA_OM_TRK_SOL:   
             case LWA_OM_TRK_JOV:   
+            case LWA_OM_TRK_LUN:   
               eD=0;
               break;
             case LWA_OM_STEPPED:
@@ -917,6 +918,7 @@ int main ( int narg, char *argv[] ) {
                 case LWA_OM_TRK_RADEC: 
                 case LWA_OM_TRK_SOL:   
                 case LWA_OM_TRK_JOV:   
+                case LWA_OM_TRK_LUN:   
                 case LWA_OM_STEPPED:   
                   sprintf(dr_format,"DRX_FILT_%1hu",osf.OBS_BW); 
                   break;
@@ -1178,6 +1180,7 @@ int main ( int narg, char *argv[] ) {
               case LWA_OM_TRK_RADEC:
               case LWA_OM_TRK_SOL:
               case LWA_OM_TRK_JOV:
+              case LWA_OM_TRK_LUN:
 
                 /* DRX trigger time is in units of "subslots" (1/100ths of a second) */
                 t0 = dp_cmd_mpm % 1000; /* number of ms beyond a second boundary */
@@ -1352,9 +1355,14 @@ int main ( int narg, char *argv[] ) {
                       me_findsol( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist );
                       ra = osf.OBS_RA;
                       dec = osf.OBS_DEC;
-	                 break;  
+	                    break;  
                     case LWA_OM_TRK_JOV:
                       me_findjov( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist );
+                      ra = osf.OBS_RA;
+                      dec = osf.OBS_DEC;
+                      break;
+                    case LWA_OM_TRK_LUN:
+                      me_findlun( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist );
                       ra = osf.OBS_RA;
                       dec = osf.OBS_DEC;
                       break;
@@ -1849,6 +1857,7 @@ int main ( int narg, char *argv[] ) {
               case LWA_OM_TRK_RADEC:
               case LWA_OM_TRK_SOL:
               case LWA_OM_TRK_JOV:
+              case LWA_OM_TRK_LUN:
               case LWA_OM_STEPPED:
 #ifdef USE_ADP
                  cs[ncs].action.tv.tv_sec  = cs[ncs-1].action.tv.tv_sec;
@@ -1987,6 +1996,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: J. Dowell, UNM, 2022 Sep 30
+//   .1 Added support for TRK_LUN
 // me_inproc.c: J. Dowell, UNM, 2020 Sep 29
 //   .1 Fixed a bug in RA/Dec STEPPED mode observations that caused the start time 
 //      of the steps to not be updated correctly
@@ -2072,4 +2083,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-

@@ -67,6 +67,9 @@ extern double mjd_hr (double jd);
 extern void ephem_range (double *v, double r);
 extern void radecrange (double *ra, double *dec);
 
+/* ephem_moon.c */
+void moon (double m, double *lam, double *bet, double *rho, double *msp, double *mdp);
+
 /* ephem_nutation.c */
 extern void nutation (double m, double *deps, double *dpsi);
 extern void nut_eq (double m, double *ra, double *dec);
