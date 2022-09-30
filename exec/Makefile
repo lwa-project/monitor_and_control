@@ -55,7 +55,7 @@ me_point_corr_x: me_point_corr_x.o me_point_corr.o
 # Programs that rely on code from PyEphem/XEphem
 #
 
-EPHEM_OBJECTS := ephem_aberration.o ephem_deflect.o ephem_eq_ecl.o ephem_mjd.o ephem_moon.o ephem_nutation.o ephem_obliq.o ephem_parallax.o ephem_precess.o ephem_sphcart.o ephem_sun.o ephem_utc_gst.o ephem_vsop87.o ephem_vsop87_data.o
+EPHEM_OBJECTS := ephem_aberration.o ephem_deflect.o ephem_deltat.o ephem_eq_ecl.o ephem_mjd.o ephem_moon.o ephem_nutation.o ephem_obliq.o ephem_parallax.o ephem_precess.o ephem_sphcart.o ephem_sun.o ephem_utc_gst.o ephem_vsop87.o ephem_vsop87_data.o
 
 me_inproc: me_inproc.o me_getaltaz.o me_point_corr.o me_findsol.o me_findjov.o me_findlun.o me_precess.o  $(EPHEM_OBJECTS) me.h ../common/mcs.h
 	$(CC) -o me_inproc me_inproc.o  me_getaltaz.o me_point_corr.o me_findsol.o me_findjov.o me_findlun.o me_precess.o  $(EPHEM_OBJECTS) $(LDFLAGS)
@@ -83,6 +83,9 @@ ephem_aberration.o: ephem_aberration.c ephem_astro.h
 
 ephem_deflect.o: ephem_deflect.c ephem_astro.h
 	$(CC) $(CFLAGS) -c -o ephem_deflect.o ephem_deflect.c
+
+ephem_deltat.o: ephem_deltat.c ephem_astro.h
+	$(CC) $(CFLAGS) -c -o ephem_deltat.o ephem_deltat.c
 
 ephem_eq_ecl.o: ephem_eq_ecl.c ephem_astro.h
 	$(CC) $(CFLAGS) -c -o ephem_eq_ecl.o ephem_eq_ecl.c

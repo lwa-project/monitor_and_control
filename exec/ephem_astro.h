@@ -54,6 +54,9 @@ extern void ab_eq (double m, double lsn, double *ra, double *dec);
 extern void elongation (double lam, double bet, double lsn, double *el);
 extern void deflect (double mjd1, double lpd, double psi, double rsn, double lsn, double rho, double *ra, double *dec);
 
+/* deltat.c */
+extern double deltat (double m);
+
 /* ephem_eq_ecl.c */
 extern void eq_ecl (double m, double ra, double dec, double *lt,double *lg);
 extern void ecl_eq (double m, double lt, double lg, double *ra,double *dec);

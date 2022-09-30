@@ -35,6 +35,7 @@ void me_findlun(
   JD0 = ((double)mjd) + 2400000.5;     /* ref: http://tycho.usno.navy.mil/mjd.html */
   H   = ((double)mpm)/(3600.0*1000.0); /* mpm in hours */
   JD = JD0 + H/24.0; /* days */
+  JD = JD + deltat(JD-MJD0)/86400.0;
 
   /* Get L, B, R for the Moon so we can figure out how far away it is */
   moon ( JD-MJD0, &L, &B, &R, &msp, &mdp);
