@@ -1362,7 +1362,7 @@ int main ( int narg, char *argv[] ) {
                       dec = osf.OBS_DEC;
                       break;
                     case LWA_OM_TRK_LUN:
-                      me_findlun( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist );
+                      me_findlun( mjd, mpm, s.fGeoN, s.fGeoE, s.fGeoEl, &(osf.OBS_RA), &(osf.OBS_DEC), &dist );
                       ra = osf.OBS_RA;
                       dec = osf.OBS_DEC;
                       break;
