@@ -16,10 +16,23 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "mcs.h"
 #include "me_astro.h"
 
 int main ( int narg, char *argv[] ) {
-
+  struct ssmif_struct obs;
+  
+  /* Load in the SSMIF */  
+  FILE *fp;
+  if( (fp = fopen("state/ssmif.dat","rb")) ) {
+    fread(&obs, sizeof(struct ssmif_struct), 1, fp);
+    fclose(fp);
+  } else {
+    printf("Warning: state/ssmif.dat not found, defaulting to geocenter\n");
+    obs.fGeoN = obs.fGeoE = 0.0;
+    obs.fGeoEl = -6.37816e6;
+  }
+  
   long int mjd; /* (input) mean julian date */
   long int mpm; /* (input) milliseconds past UTC midnight */ 
   float ra;     /* (output) [h] RA */
@@ -39,11 +52,14 @@ int main ( int narg, char *argv[] ) {
     }
  
   me_findsol(
-              mjd,  /* (input) mean julian date */
-              mpm,  /* (input) milliseconds past UTC midnight */ 
-              &ra,  /* (output) [h] calculated RA */
-              &dec, /* (output) [deg] calculated dec */ 
-              &dist /* (output) [AU] distance from Earth */
+              mjd,        /* (input) mean julian date */
+              mpm,        /* (input) milliseconds past UTC midnight */ 
+              obs.fGeoN,  /* (input) [deg, +N] observer latitude */
+              obs.fGeoE,  /* (input) [deg, +E] observer latitude */
+              obs.fGeoEl, /* (input) [m] observer height above sea level */
+              &ra,        /* (output) [h] calculated RA */
+              &dec,       /* (output) [deg] calculated dec */ 
+              &dist       /* (output) [AU] distance from Earth */
              );
 
   m = (ra - floor(ra))*60.0;
@@ -70,5 +86,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

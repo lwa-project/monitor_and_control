@@ -1352,7 +1352,7 @@ int main ( int narg, char *argv[] ) {
                   /* Updated: 2015 Aug 31                                            */
                   switch (osf.OBS_MODE) {
                     case LWA_OM_TRK_SOL:
-                      me_findsol( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist );
+                      me_findsol( mjd, mpm, s.fGeoN, s.fGeoE, s.fGeoEl, &(osf.OBS_RA), &(osf.OBS_DEC), &dist );
                       ra = osf.OBS_RA;
                       dec = osf.OBS_DEC;
 	                    break;  
