@@ -9,17 +9,12 @@
 // Find RA and DEC of Jupiter
 // See end of this file for history.
 
-#include <math.h>
-
 /* The codes below are ported from Xephem */
 #include "ephem_astro.h"  /* mostly gutted, leaving only stuff needed for others */
 
 void me_findjov(
                  long int mjd, /* (input) modified julian date */
                  long int mpm, /* (input) milliseconds past UTC midnight */ 
-                 double lat,   /* (input) observer latitude [deg, +N] */
-                 double lng,   /* (input) observer longitude [deg, +E] */
-                 double elev,  /* (input) observer height above sea level [m] */
                  float *ra,    /* (output) [h] RA */
                  float *dec,   /* (output) [deg] dec */
                  float *dist   /* (output) [AU] distance from Earth */
@@ -35,9 +30,7 @@ void me_findjov(
   double lambdaHelio, betaHelio, rhoHelio;
   double lambdaSun, rhoSun, betaSun;
   double dRA, dDec;
-  double eps, lst, deps, dpsi;
-  double ha_in, rho_topo, ha_out, dec_out;
-
+  
   /* Get JD from mjd/mpm */
   JD0 = ((double)mjd) + 2400000.5;     /* ref: http://tycho.usno.navy.mil/mjd.html */
   H   = ((double)mpm)/(3600.0*1000.0); /* mpm in hours */
@@ -88,22 +81,6 @@ void me_findjov(
   
   /* Apply aberration */
   ab_eq(TJD-MJD0, lambdaSun, &dRA, &dDec);
-  
-  /* Correct for parallax from the Earth's center to the observer */
-  utc_gst (mjd_day (JD-MJD0), mjd_hr (JD-MJD0), &lst);
-  lst += radhr(lng * M_PI/180);
-  obliquity (JD-MJD0, &eps);
-  nutation (JD-MJD0, &deps, &dpsi);
-  lst += radhr(dpsi*cos(eps+deps));
-  ephem_range (&lst, 24.0);
-  
-  ha_in = hrrad(lst) - dRA;
-  rho_topo = rho * MAU/ERAD;
-  ta_par (ha_in, dDec, lat * M_PI/180, elev / ERAD, &rho_topo, &ha_out, &dec_out);
-  
-  dRA = hrrad(lst) - ha_out;
-  ephem_range (&dRA, 2*M_PI);
-  dDec = dec_out;
   
   /* Back to floats */
   *ra = (float) radhr(dRA);
