@@ -7,7 +7,7 @@
 extern void me_findlun(long int mjd, long int mpm, double lat, double lng, double elev, float *ra, float *dec, float *dist);
 
 /* me_findjov.c */
-extern void me_findjov(long int mjd, long int mpm, float *ra, float *dec, float *dist);
+extern void me_findjov(long int mjd, long int mpm, double lat, double lng, double elev, float *ra, float *dec, float *dist);
 
 /* me_findsol.c */
 extern void me_findsol(long int mjd, long int mpm, double lat, double lng, double elev, float *ra, float *dec, float *dist);

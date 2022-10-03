@@ -1357,7 +1357,7 @@ int main ( int narg, char *argv[] ) {
                       dec = osf.OBS_DEC;
 	                    break;  
                     case LWA_OM_TRK_JOV:
-                      me_findjov( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist );
+                      me_findjov( mjd, mpm, s.fGeoN, s.fGeoE, s.fGeoEl, &(osf.OBS_RA), &(osf.OBS_DEC), &dist );
                       ra = osf.OBS_RA;
                       dec = osf.OBS_DEC;
                       break;
