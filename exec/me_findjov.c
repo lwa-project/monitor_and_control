@@ -90,6 +90,8 @@ void me_findjov(
   return;
   } /* me_findjov */
 
+// me_findjov.c: J. Dowell, UNM, 2022 Oct 3
+//  -- add in gravitational deflection near the Sun
 // me_findjov.c: J. Dowell, UNM, 2015 Sep 1
 //  -- changed the call so that the distance to Jupiter in AU is also returned
 // me_findjov.c: J. Dowell, UNM, 2015 Aug 31

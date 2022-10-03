@@ -41,9 +41,6 @@ int main ( int narg, char *argv[] ) {
   me_findjov(
               mjd,        /* (input) mean julian date */
               mpm,        /* (input) milliseconds past UTC midnight */ 
-              obs.fGeoN,  /* (input) [deg, +N] observer latitude */
-              obs.fGeoE,  /* (input) [deg, +E] observer latitude */
-              obs.fGeoEl, /* (input) [m] observer height above sea level */
               &ra,        /* (output) [h] calculated RA */
               &dec,       /* (output) [deg] calculated dec */ 
               &dist       /* (output) [AU] distance from Earth */
