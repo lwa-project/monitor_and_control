@@ -22,6 +22,7 @@ sch/ms_mu
 sch/msei
 ## executive
 exec/me_exec
+exec/me_findlun_x
 exec/me_findjov_x
 exec/me_findsol_x
 exec/me_getaltaz_x
