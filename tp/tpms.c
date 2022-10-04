@@ -29,6 +29,10 @@
 //                <arg4> FREQ1 [tuning word].  DEFAULT is  832697741 (37.999999997 MHz)
 //                <arg5> FREQ2 [tuning word].  DEFAULT is 1621569285 (73.999999990 MHz)
 //                <arg6> BW [filter code].  DEFAULT is 7.
+//     TRK_LUN:   <arg3> OBS_DUR [ms], integer.  DEFAULT is 10000.
+//                <arg4> FREQ1 [tuning word].  DEFAULT is  832697741 (37.999999997 MHz)
+//                <arg5> FREQ2 [tuning word].  DEFAULT is 1621569285 (73.999999990 MHz)
+//                <arg6> BW [filter code].  DEFAULT is 7.
 //     TBN:       <arg3> OBS_DUR [ms], integer.  DEFAULT is 10000.
 //                <arg4> FREQ1 [tuning word].  DEFAULT is 832697741 (37.999999997 MHz)
 //                (OBS_BW is assumed to be 7 (100 kSPS) 
@@ -94,6 +98,7 @@ int main ( int narg, char *argv[] ) {
         case LWA_OM_TRK_RADEC: break;
         case LWA_OM_TRK_SOL: break;
         case LWA_OM_TRK_JOV: break;
+        case LWA_OM_TRK_LUN: break;
         case LWA_OM_TBN: break;
 #ifdef USE_ADP
         case LWA_OM_TBF: break;
@@ -130,6 +135,7 @@ int main ( int narg, char *argv[] ) {
       break;
     case LWA_OM_TRK_SOL:
     case LWA_OM_TRK_JOV:
+    case LWA_OM_TRK_LUN:
       iDur=10000;        if (narg>=4) sscanf(argv[3],"%ld",&iDur);
       iFreq =832697741;  if (narg>=5) sscanf(argv[5],"%ld",&iFreq); 
       iFreq2=1621569285; if (narg>=6) sscanf(argv[6],"%ld",&iFreq2);
@@ -289,6 +295,7 @@ int main ( int narg, char *argv[] ) {
       break; 
     case LWA_OM_TRK_SOL:
     case LWA_OM_TRK_JOV:
+    case LWA_OM_TRK_LUN:
       fprintf(fp,"OBS_B          SIMPLE\n");
       fprintf(fp,"OBS_FREQ1      %ld\n",iFreq);
       //fprintf(fp,"OBS_FREQ1+     19.999999955 MHz\n");
@@ -323,6 +330,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpms.c: J. Dowell, UNM, 2022 Sep 30
+//   .1 Added support for TRK_LUN
 // tpms.c: J. Dowell, UNM, 2018 Jan 29
 //   .1 Cleaned up a few compiler warnings
 // tpms.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07
@@ -341,5 +350,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

@@ -781,6 +781,7 @@ double LWA_f8_swap( double x ) {
 #define LWA_OM_TBN       6
 #define LWA_OM_DIAG1     7
 #define LWA_OM_TBF       8
+#define LWA_OM_TRK_LUN   9
 
 int LWA_getmode( char *ssc ) {
   /* ssc is a string from which to determine mode */
@@ -1533,6 +1534,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// Sep 30, 2022: Added support for the moon tracking mode TRK_LUN
 // Dec 16, 2019: Updated the ADP-based stations to support a third beam and
 //               four data recorders
 // Feb 18, 2018: Updated the ADP-based stations to support a second beam and

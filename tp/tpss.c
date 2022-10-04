@@ -370,27 +370,31 @@ int main ( int narg, char *argv[] ) {
 #ifdef USE_ADP
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ) && (obs[n].OBS_FREQ1<222417950) ) {
-      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )   ) && (obs[n].OBS_FREQ1<222417950) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, TRK_LUN, or TBN\n",MT_TPSS,getpid(),n);
       return;
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_FREQ2 != 0 && obs[n].OBS_FREQ2<222417950) ) {
-      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )    ) && (obs[n].OBS_FREQ2 != 0 && obs[n].OBS_FREQ2<222417950) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TRK_LUN\n",MT_TPSS,getpid(),n);
       return;
       }
 #else
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ) && (obs[n].OBS_FREQ1<219130984) ) {
-      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )    ) && (obs[n].OBS_FREQ1<219130984) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, TRK_LUN, or TBN\n",MT_TPSS,getpid(),n);
       return;
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_FREQ2 != 0 && obs[n].OBS_FREQ2<219130984) ) {
-      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )    ) && (obs[n].OBS_FREQ2 != 0 && obs[n].OBS_FREQ2<219130984) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TRK_LUN\n",MT_TPSS,getpid(),n);
       return;
       }
 #endif
@@ -398,14 +402,16 @@ int main ( int narg, char *argv[] ) {
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_LUN  ) ||
            (obs[n].OBS_MODE==LWA_OM_TBF      ) ||
-           (obs[n].OBS_MODE==LWA_OM_TBN      )   ) && (obs[n].OBS_BW<=0) ) {
-      printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
+           (obs[n].OBS_MODE==LWA_OM_TBN      )    ) && (obs[n].OBS_BW<=0) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, TRK_LUN, or TBN\n",MT_TPSS,getpid(),n);
       return;
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_BW>7) ) {
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )    ) && (obs[n].OBS_BW>7) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
       return;
       }
@@ -413,14 +419,16 @@ int main ( int narg, char *argv[] ) {
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TBN      )   ) && (obs[n].OBS_BW<=0) ) {
-      printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
+           (obs[n].OBS_MODE==LWA_OM_TRK_LUN  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TBN      )    ) && (obs[n].OBS_BW<=0) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, TRK_LUN, or TBN\n",MT_TPSS,getpid(),n);
       return;
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_BW>7) ) {
-      printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )    ) && (obs[n].OBS_BW>7) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TRK_LUN\n",MT_TPSS,getpid(),n);
       return;
       }
 #endif
@@ -452,6 +460,7 @@ int main ( int narg, char *argv[] ) {
          (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) || 
          (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
          (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+         (obs[n].OBS_MODE==LWA_OM_TRK_LUN  ) ||
          (obs[n].OBS_MODE==LWA_OM_STEPPED  )   ) b_DRX_requested = 1;
     }
   if ( b_TB_requested && b_DRX_requested ) {
@@ -470,6 +479,7 @@ int main ( int narg, char *argv[] ) {
     if ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) || 
          (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
          (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+         (obs[n].OBS_MODE==LWA_OM_TRK_LUN  ) ||
          (obs[n].OBS_MODE==LWA_OM_STEPPED  )   ) b_DRX_requested = 1;
     }
   if ( b_TB_requested && b_DRX_requested ) {
@@ -990,6 +1000,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpss.c: J. Dowell, UNM 2022 Sep 30
+//   .1 Added support for TRK_LUN
 // tpss.c: J. Dowell, UNM, 2019 Dec 6
 //   .1 Fixed a bug where the frequency limits in tpss4.c did not match those 
 //      in tpss3.c
@@ -1050,5 +1062,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

@@ -1,16 +1,16 @@
-// me_findjov_x.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07
+// me_findlun_x.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07
 // ---
-// COMPILE: gcc -o me_findjov_x me_findjov_x.c -lm
+// COMPILE: gcc -o me_findlun_x me_findlun_x.c -lm
 // ---
 // COMMAND LINE: 
 // ---
 // EXAMPLE:
-// $ ./me_findjov_x ... (see message below)
+// $ ./me_findlun_x ... (see message below)
 // ---
 // REQUIRES: 
-//   me_findjov.c
+//   me_findlun.c
 // ---
-// Wrapper used to test me_findjov() 
+// Wrapper used to test me_findlun() 
 // See end of this file for history.
 
 #include <math.h>
@@ -32,13 +32,13 @@ int main ( int narg, char *argv[] ) {
   if (narg>2) sscanf(argv[2],"%ld",&mpm);   
   if (narg<3) {
     printf("Useage:\n");
-    printf("me_findjov_x <mjd> <mpm>\n");
+    printf("me_findlun_x <mjd> <mpm>\n");
     printf("  <mjd>: integer MJD\n");
     printf("  <mpm>: integer milliseconds past UTC midnight\n");
     return;
     }
  
-  me_findjov(
+  me_findlun(
               mjd,        /* (input) mean julian date */
               mpm,        /* (input) milliseconds past UTC midnight */ 
               &ra,        /* (output) [h] calculated RA */
@@ -60,6 +60,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_findlun_x.c: J. Dowewll, UNM, 2022 Sep 30
+//   .1: Initial version
 // me_findjov_x.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07
 //   .1: Initial version
 // me_getaltazx.c: S.W. Ellingson, Virginia Tech, 2011 May 01
