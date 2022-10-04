@@ -4,7 +4,11 @@
 # ../exec (executables copied to here - Executive)
 # ../tp   (executables copied to here - Task Processor)
 
-all: sch exec tp python
+all: sofa sch exec tp python
+
+.PHONY: sofa
+sofa:
+	$(MAKE) -C sofa/src
 
 .PHONY: sch
 sch:
@@ -35,6 +39,7 @@ install-services:
 
 .PHONY: clean
 clean:
+	$(MAKE) -C sofa/src clean
 	$(MAKE) -C sch clean
 	$(MAKE) -C exec clean
 	$(MAKE) -C tp clean
