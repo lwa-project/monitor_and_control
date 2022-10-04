@@ -781,8 +781,9 @@ double LWA_f8_swap( double x ) {
 #define LWA_OM_TBN          6
 #define LWA_OM_DIAG1        7
 #define LWA_OM_TBF          8
-#define LWA_OM_TRK_NOOP     9
-#define LWA_OM_STEPPED_NOOP 10
+#define LWA_OM_TRK_LUN      9
+#define LWA_OM_TRK_NOOP     10
+#define LWA_OM_STEPPED_NOOP 11
 
 int LWA_getmode( char *ssc ) {
   /* ssc is a string from which to determine mode */
@@ -1549,6 +1550,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// Sep 30, 2022: Added support for the moon tracking mode TRK_LUN
 // Apr 07, 2020: Changed TRK_NULL to TRK_NOOP and added a STEPPED_NOOP
 // Apr 06, 2020: Added a new TRK_NULL mode that works like TRK_RADEC but doesn't 
 ///              record any data

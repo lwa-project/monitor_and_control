@@ -3,6 +3,9 @@
 #ifndef ME_ASTRO_H
 #define ME_ASTRO_H
 
+/* me_findlun.c */
+extern void me_findlun(long int mjd, long int mpm, float *ra, float *dec, float *dist);
+
 /* me_findjov.c */
 extern void me_findjov(long int mjd, long int mpm, float *ra, float *dec, float *dist);
 

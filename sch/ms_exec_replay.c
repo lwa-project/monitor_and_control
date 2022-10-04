@@ -1,8 +1,8 @@
-// ms_exec.c: S.W. Ellingson, Virginia Tech, 2011 Apr 12
+// ms_exec_replay.c: J. Dowell, UNM, 2020 Jun 23
 // ---
-// COMPILE: gcc -o ms_exec ms_exec.c
+// COMPILE: gcc -o ms_exec_replay ms_exec_replay.c
 // ---
-// COMMAND LINE: ms_exec sidlist
+// COMMAND LINE: ms_exec_replay sidlist replaylog
 //   sidlist is a base-10 number whose bits in base-2 representation indicate
 //           the presense/absense of a particular subsystem ID.
 //           Set to 0 (="no subsystems") to test without message queue errors
@@ -20,8 +20,10 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
+#include <math.h>
 #include <sys/time.h>
 
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
 //#include <sys/wait.h>
@@ -34,7 +36,7 @@
 #include <arpa/inet.h>  /* for network sockets */
 #include <fcntl.h>      /* for F_GETFL, other possibly other stuff */
 
-#define MY_NAME "ms_exec (v.20180129.1)"
+#define MY_NAME "ms_exec_replay (v.20200623.1)"
 #define ME "2" 
 
 //#include "LWA_MCS.h"
@@ -42,6 +44,111 @@
 
 #include "ms_exec_log.c"
 
+#define LWA_REPLAY_MSELOG_FILENAME "replay_mselog.txt"
+
+int msgreplay(FILE *msqid, const void *msgp, size_t msgsz, int mqtid, size_t rpsz, int run_as_loop) {
+    struct LWA_cmd_struct msg;
+    int i, found;
+    long int ref, mjd, mpm;
+    int status, sid, cid;
+    char line[255], temp[10], data[32];
+    
+    /* Copy the message over */
+    memcpy(&msg, msgp, sizeof(msg));
+    
+    /* If this is a RPT, find out what MIB entry we are looking for */
+    if( msg.cid == LWA_CMD_RPT ) {
+        strncpy(&data, &msg.data, 31);
+        data[31] = '\0';
+        //printf("Looking for '%s'\n", data);
+    }
+    
+    /* Read through the file until we find what we are looking for */
+    found = 0;
+    while(fgets(&line, sizeof(line), msqid) != NULL) {
+        /* Basic unpak to get the queuing status, subsystem ID, and command ID */
+        strncpy(&temp, &(line[45]), 1);
+        temp[1] = '\0';
+        status = atoi(&temp);
+        strncpy(&temp, &(line[47]), 3);
+        temp[3] = '\0';
+        sid = LWA_getsid(&temp);
+        strncpy(&temp, &(line[51]), 3);
+        temp[3] = '\0';
+        cid = LWA_getcmd(&temp);
+        
+        /* Ignore lines that don't have the right subsystem or command */
+        if( ( (sid != msg.sid) \
+              || (cid != msg.cid) ) ) {
+            continue;
+        }
+        
+        /*
+           Processing of the line:
+             if the status is TP_QUEUED or TP_SEND and we are dealing with a RPT
+             -> save the reference number
+             else if the status is TP_SUCCESS or higher and it is either not a RPT
+             or it is RPT and we have the right reference
+             -> save the response to the message
+        */ 
+        if( ( (status < LWA_MSELOG_TP_SUCCESS ) \
+             && (msg.cid == LWA_CMD_RPT) \
+             && (strncmp(data, &(line[55]), strlen(data)) == 0) ) ) {
+            strncpy(&temp, &(line[35]), 9);
+            temp[9] = '\0';
+            ref = atol(&temp);
+            //printf("Found '%s' at '%s'\n", data, ref);
+        } else {
+            strncpy(&temp, &(line[35]), 9);
+            temp[9] = '\0';
+            
+            if( ( (msg.cid != LWA_CMD_RPT) \
+                 || ( (msg.cid == LWA_CMD_RPT) \
+                     && (ref == atol(&temp)) ) ) ) {
+                found = 1;
+                msg.bAccept = LWA_MSELOG_TP_SUCCESS;
+                LWA_time(&mjd, &mpm);
+                LWA_time2tv(&msg.tv, mjd, mpm);
+                msg.eSummary = LWA_SIDSUM_NORMAL;
+                msg.eMIBerror = LWA_MIBERR_OK;
+                for(i=0; i<LWA_CMD_STRUCT_DATA_FIELD_LENGTH; i++) {
+                    if( line[55+i] != '|' && line[55+i] != '\0') {
+                        msg.data[i] = line[55+i];
+                        msg.data[i+1] = '\0';
+                    } else {
+                        break;
+                    }
+                }
+                msg.datalen = -1;   // Always a string
+                break;
+            }
+        }
+    }
+    
+    /* Brief status report */
+    float complete = 100.0 * ftell(msqid) / rpsz;
+    complete = round(complete);
+    if( ((int) complete % 10) == 0 ) {
+        printf("[%s/%d] INFO: %s is %.0f%% complete\n", ME, getpid(), LWA_sid2str(msg.sid), complete);
+    }
+
+    if (run_as_loop && (ftell(msqid) == rpsz)) {
+       fseek(msqid, 0, 0);
+       printf("[%s/%d] INFO: %s has been reset\n", ME, getpid(), LWA_sid2str(msg.sid));
+       }
+    
+    /* If we found something, send it back to the main thread so that it can be logged */
+    if( found ) {
+        //printf("found = '%s'\n", msg.data);
+        if( msgsnd(mqtid, (void *)&msg, LWA_msz(), 0) == -1 ) {
+            printf("[%s/%d] WARNING: Could not msgsnd()\n",ME,getpid());
+            return -1;
+        }
+        return 0;
+    } else {
+        return -1;
+    }
+}
 
 main ( int narg, char *argv[] ) {
 
@@ -52,15 +159,17 @@ main ( int narg, char *argv[] ) {
   long int sidlist;     /* command line argument */
   int nsid = 0;         /* number of subsystems. initialize to zero */
   int sid[LWA_MAX_SID+1]; /* subsystem IDs; 0..nsid-1 are valid indices */
+  char replaylog[255];  /* log to replay from */
+  int run_as_loop;
 
   int test; 
   int sid_candidate;
 
   int mqrid;
-  int mqtid[LWA_MAX_SID+1];
+  FILE* mqtid[LWA_MAX_SID+1];
+  size_t rpsz;
   struct LWA_cmd_struct mq_msg; //was: struct mq_struct mq_msg;
-  key_t mqtkey;       /* key for transmit message queue */
-
+  
   int n;
 
   int server_len;
@@ -74,7 +183,6 @@ main ( int narg, char *argv[] ) {
 
   struct LWA_cmd_struct c;
 
-  FILE *fpr;
   long int reference; /* "REFERENCE" field in MCS common ICD */
 
   int b_valid_sid;
@@ -113,7 +221,7 @@ main ( int narg, char *argv[] ) {
   /*==================*/
     
   /* initialize log file */
-  fpl = fopen(LWA_MSELOG_FILENAME,"w"); /* clobber any existing file */
+  fpl = fopen(LWA_REPLAY_MSELOG_FILENAME,"w"); /* clobber any existing file */
 
   /* First, announce thyself */
   printf("[%s] I am %s\n",ME,MY_NAME);
@@ -121,8 +229,8 @@ main ( int narg, char *argv[] ) {
   LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
 
   /* add log message showing command line used to call me */
-  if (narg>1) {
-    sprintf(logmsg,"Command line: %s %s",argv[0],argv[1]);
+  if (narg>3) {
+    sprintf(logmsg,"Command line: %s %s %s %s",argv[0],argv[1],argv[2],argv[3]);
     LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
     }
 
@@ -133,7 +241,7 @@ main ( int narg, char *argv[] ) {
   LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
 
   /* Process command line arguments */
-  if (narg>1) { 
+  if (narg>3) { 
     sscanf(argv[1],"%ld",&sidlist);
     //printf("[%s] sidlist = %ld\n",ME,sidlist);
 
@@ -155,9 +263,11 @@ main ( int narg, char *argv[] ) {
       }
     //printf("[%s] nsid=%d\n",ME,nsid);
    
+      strcpy(&replaylog[0], argv[2]);
+      run_as_loop = atoi(argv[3]);
     } else {
 
-    sprintf(logmsg,"FATAL: sidlist not provided");
+    sprintf(logmsg,"FATAL: sidlist, replaylog, and/or loop not provided");
     LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
     exit(EXIT_FAILURE);
 
@@ -165,50 +275,34 @@ main ( int narg, char *argv[] ) {
 
 
   /* initialize reference number */
-  fpr = fopen(".mcs_reference_id", "r");
-  if(fpr) {
-    fscanf(fpr, "%ld", &reference);
-    fclose(fpr);
-   
-    reference += 10; /* advance by 10 to avoid duplicates */ 
-    if (reference > LWA_MAX_REFERENCE) reference=1; /* reference=0  used for error flag */
-    
-    printf("[%s] Initial reference ID found, will be %ld\n",ME,reference);
-    perror("ms_exec");
-    sprintf(logmsg,"Initial reference ID found, will be %ld",reference);
-    LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
-  } else {
-    reference = 1; /* reference number = 0 reserved for error condition */
-    
-    printf("[%s] WARNING: Initial reference ID not found, using %ld\n",ME,reference);
-    perror("ms_exec");
-    sprintf(logmsg,"WARNING: Initial reference ID not found, using %ld",reference);
-    LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
-  }
-  
+  reference = 1; /* reference number = 0 reserved for error condition */
+
   /* Set up for receiving from message queue */
   if (nsid>1) { /* if there is at least one subsystem other than MCS... */
-    mqrid = msgget( (key_t) MQ_MS_KEY, 0666 );
+    mqrid = msgget( (key_t) MQ_MS_KEY, 0666 | IPC_CREAT );
     if (mqrid==-1) {
-      sprintf(logmsg,"WARNING: Message queue setup failed with code %d",mqrid);
+      sprintf(logmsg,"FATAL: Message queue setup failed with code %d",mqrid);
       LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
+      exit(EXIT_FAILURE);
       }  
     }
 
 
-  /* Set up transmit message queues */
+  /* Set up transmit message queues - which are just the logs to replay */
   for ( n=1; n<nsid; n++ ) { /* start at n=1 since n=0 is MCS (me) */ 
-    mqtkey = MQ_MS_KEY + sid[n];
-    //printf("[%s] mqtkey = %d\n",ME,mqtkey);
-    mqtid[sid[n]] = msgget( mqtkey, 0666 );
-    if (mqtid[sid[n]]==-1) {
-      //perror(" ");
-      sprintf(logmsg,"FATAL: Could not msgget() tx message queue\n");
-      LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
-      exit(EXIT_FAILURE);
-      } 
+    mqtid[sid[n]] = fopen(&replaylog[0], "r");
+    if (mqtid[sid[n]]==NULL) {
+       //perror(" ");
+       sprintf(logmsg,"FATAL: Could not fopen() tx message queue\n");
+       LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
+       exit(EXIT_FAILURE);
+       }
     }
-
+  
+  /* Get the replay log size */
+  struct stat st;
+  stat(&replaylog[0], &st);
+  rpsz = st.st_size;
 
   /* set up sockets interface for communicating with MCS/Exec and others... */ 
   server_sockfd = socket(             /* create socket */
@@ -217,7 +311,7 @@ main ( int narg, char *argv[] ) {
                          0);          /* protocol (normally 0) */
   if (server_sockfd == -1) {
     printf("[%s] FATAL: socket() failed\n",ME);
-    perror("ms_exec");
+    perror("ms_exec_replay");
     sprintf(logmsg,"FATAL: socket() failed\n");
     LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
     exit(EXIT_FAILURE); 
@@ -233,7 +327,7 @@ main ( int narg, char *argv[] ) {
             server_len );
   if (i == -1) {
     printf("[%s] FATAL: bind() failed (see error message below)\n",ME);
-    perror("ms_exec");
+    perror("ms_exec_replay");
     printf("[%s] If message above is ``Address already in use'':\n",ME);
     printf("[%s]   (1) Kill any ms_mcic processes (e.g., $ sh ./ms_shutdown).\n",ME);
     printf("[%s]   (2) Wait a few seconds before trying this again.\n",ME);
@@ -247,7 +341,7 @@ main ( int narg, char *argv[] ) {
              32 );           /* backlog */
   if (i == -1) {
     printf("[%s] FATAL: listen() failed\n",ME);
-    perror("ms_exec");
+    perror("ms_exec_replay");
     sprintf(logmsg,"FATAL: listen() failed\n");
     LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
     exit(EXIT_FAILURE); 
@@ -271,15 +365,6 @@ main ( int narg, char *argv[] ) {
   /*==================*/
   /*==================*/
 
-  /* open the referene ID state file for writing */
-  fpr = fopen(".mcs_reference_id", "w");
-  if(fpr == NULL) {
-    printf("[%s] WARNING: cannot open reference ID state file for writing\n",ME);
-    perror("ms_exec");
-    sprintf(logmsg,"WARNING: cannot open reference ID state file for writing\n");
-    LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
-  }
-  
   while ( eSummary > LWA_SIDSUM_NULL ) {
 
     /*=========================================================================*/
@@ -357,7 +442,7 @@ main ( int narg, char *argv[] ) {
 	           LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, mq_msg.ref, 
                                 mq_msg.bAccept, 
                                 mq_msg.sid, mq_msg.cid, mq_msg.data, mq_msg.datalen, &mselog_line_ctr );
-                   //sprintf(logmsg,"Previous message: bAccept = %d",mq_msg.bAccept);
+                   sprintf(logmsg,"Previous message: bAccept = %d",mq_msg.bAccept);
                    //LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, &mselog_line_ctr );    
                    break;
 
@@ -441,15 +526,6 @@ main ( int narg, char *argv[] ) {
                   /* assign reference number */
                   reference += 1;
                   if (reference > LWA_MAX_REFERENCE) reference=1; /* reference=0  used for error flag */
-                  
-                  /* save the reference number */
-                  if(fpr) {
-                    if(reference % 10 == 0) {
-                      fseek(fpr, 0, SEEK_SET);
-                      fprintf(fpr, "%9ld", reference);
-                      fflush(fpr);
-                      }
-                    }
 
                   /* push into the task queue */
                   tq[tqfai] = LWA_MSELOG_TP_QUEUED;
@@ -555,15 +631,6 @@ main ( int narg, char *argv[] ) {
           if (reference > LWA_MAX_REFERENCE) reference=1; /* reference=0  used for error flag */
           c.ref = reference; 
 
-          /* save the reference number */
-          if(fpr) {
-            if(reference % 10 == 0) {
-              fseek(fpr, 0, SEEK_SET);
-              fprintf(fpr, "%9ld", reference);
-              fflush(fpr);
-              }
-            }
-          
           /* push into the task queue */
           tq[tqfai] = LWA_MSELOG_TP_QUEUED;
           task[tqfai].sid        = c.sid;
@@ -678,10 +745,10 @@ main ( int narg, char *argv[] ) {
           memcpy( mq_msg.data, task[tqp].data, task[tqp].datalen );
         }
       mq_msg.datalen    = task[tqp].datalen;               
+      
+      if ( msgreplay(mqtid[task[tqp].sid], (void *)&mq_msg, LWA_msz(), mqrid, rpsz, run_as_loop)== -1 ) {
 
-      if ( msgsnd( mqtid[task[tqp].sid], (void *)&mq_msg, LWA_msz(), 0) == -1 ) {
-
-          sprintf(logmsg,"FATAL: Could not msgsnd()");
+          sprintf(logmsg,"FATAL: Could not msgreplay()");
 	  LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, task[tqp].ref, 
                        LWA_MSELOG_TP_FAIL_EXEC, 
                        task[tqp].sid, task[tqp].cid, task[tqp].data, task[tqp].datalen, &mselog_line_ctr ); 
@@ -699,7 +766,7 @@ main ( int narg, char *argv[] ) {
           tq[tqp]=LWA_MSELOG_TP_SENT;
 
         } /*  */
-
+        
       } /* if (eDone==1) */
 
     if ( (eDone==2) && (eSummary==LWA_SIDSUM_SHUTDWN) ) {
@@ -745,13 +812,6 @@ main ( int narg, char *argv[] ) {
 
     } /* while ( eSummary > LWA_SIDSUM_NULL  */
 
-  if(fpr) {
-    fseek(fpr, 0, SEEK_SET);
-    fprintf(fpr, "%9ld", reference);
-    fflush(fpr);
-    fclose(fpr);
-  }
-  
   /*=========================*/
   /*=========================*/
   /*=== END of Main Loop ====*/
@@ -767,19 +827,19 @@ main ( int narg, char *argv[] ) {
   /* delete transmit message queues */
   for (i=0;i<nsid;i++) {
     if (sid[i] != LWA_SID_MCS) { /* since MCS has no message queue to itself */
-      msgctl(mqtid[sid[i]],IPC_RMID,0); 
-      sprintf(logmsg,"Deleting tx msg queue for %s",LWA_sid2str(sid[i]));
+      fclose(mqtid[sid[i]]); 
+      sprintf(logmsg,"fclose()-ing tx msg queue for %s",LWA_sid2str(sid[i]));
       LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
       }         
     }
 
-  /* kill ms_mdre_ip */
-  sprintf(logmsg,"Killing the ms_mdre_ip process");
+  /* kill ms_mdre_replay */
+  sprintf(logmsg,"Killing the ms_mdre_replay process");
   LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
-  system("killall -v ms_mdre_ip > /dev/null 2> /dev/null");
+  system("killall -v ms_mdre_replay > /dev/null 2> /dev/null");
 
   /* announce the end */
-  sprintf(logmsg,"ms_exec shutdown complete");
+  sprintf(logmsg,"ms_exec_replay shutdown complete");
   LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );  
   fclose(fpl); /* close log */
  
@@ -790,6 +850,8 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_exec_replay.c: J. Dowell, UNM, 2020 Jun 23
+//   .1: Created from ms_exec.c
 // ms_exec.c: J. Dowell, UNM, 2018 Jan 29
 //   .1: Increased the queue size for listen()
 // ms_exec.c: S.W. Ellingson, Virginia Tech, 2011 Apr 12
@@ -851,3 +913,13 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
+
+
+
+
+
+
+
+
+
+

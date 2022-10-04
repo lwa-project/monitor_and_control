@@ -373,30 +373,34 @@ int main ( int narg, char *argv[] ) {
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_NOOP ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_FREQ1<222417950) ) {
-      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )   ) && (obs[n].OBS_FREQ1<222417950) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, TRK_LUN, or TBN\n",MT_TPSS,getpid(),n);
       return;
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_NOOP ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_FREQ2 != 0 && obs[n].OBS_FREQ2<222417950) ) {
-      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )    ) && (obs[n].OBS_FREQ2 != 0 && obs[n].OBS_FREQ2<222417950) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TRK_LUN\n",MT_TPSS,getpid(),n);
       return;
       }
 #else
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_NOOP ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_FREQ1<219130984) ) {
-      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )    ) && (obs[n].OBS_FREQ1<219130984) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, TRK_LUN, or TBN\n",MT_TPSS,getpid(),n);
       return;
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_NOOP ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ) && (obs[n].OBS_FREQ2 != 0 && obs[n].OBS_FREQ2<219130984) ) {
-      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )    ) && (obs[n].OBS_FREQ2 != 0 && obs[n].OBS_FREQ2<219130984) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TRK_LUN\n",MT_TPSS,getpid(),n);
       return;
       }
 #endif
@@ -405,15 +409,17 @@ int main ( int narg, char *argv[] ) {
            (obs[n].OBS_MODE==LWA_OM_TRK_NOOP ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_LUN  ) ||
            (obs[n].OBS_MODE==LWA_OM_TBF      ) ||
-           (obs[n].OBS_MODE==LWA_OM_TBN      )   ) && (obs[n].OBS_BW<=0) ) {
-      printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
+           (obs[n].OBS_MODE==LWA_OM_TBN      )    ) && (obs[n].OBS_BW<=0) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, TRK_LUN, or TBN\n",MT_TPSS,getpid(),n);
       return;
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_NOOP ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_BW>7) ) {
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )    ) && (obs[n].OBS_BW>7) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
       return;
       }
@@ -422,15 +428,17 @@ int main ( int narg, char *argv[] ) {
            (obs[n].OBS_MODE==LWA_OM_TRK_NOOP ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TBN      ) ) && (obs[n].OBS_BW<=0) ) {
-      printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TBN\n",MT_TPSS,getpid(),n);
+           (obs[n].OBS_MODE==LWA_OM_TRK_LUN  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TBN      )    ) && (obs[n].OBS_BW<=0) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, TRK_LUN, or TBN\n",MT_TPSS,getpid(),n);
       return;
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_NOOP ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  )   ) && (obs[n].OBS_BW>7) ) {
-      printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
+           (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
+           (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )    ) && (obs[n].OBS_BW>7) ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TRK_LUN\n",MT_TPSS,getpid(),n);
       return;
       }
 #endif
@@ -463,6 +471,7 @@ int main ( int narg, char *argv[] ) {
          (obs[n].OBS_MODE==LWA_OM_TRK_NOOP    ) || 
          (obs[n].OBS_MODE==LWA_OM_TRK_SOL     ) ||
          (obs[n].OBS_MODE==LWA_OM_TRK_JOV     ) ||
+         (obs[n].OBS_MODE==LWA_OM_TRK_LUN     ) ||
          (obs[n].OBS_MODE==LWA_OM_STEPPED     ) ||
          (obs[n].OBS_MODE==LWA_OM_STEPPED_NOOP)   ) b_DRX_requested = 1;
     }
@@ -483,6 +492,7 @@ int main ( int narg, char *argv[] ) {
          (obs[n].OBS_MODE==LWA_OM_TRK_NOOP    ) ||
          (obs[n].OBS_MODE==LWA_OM_TRK_SOL     ) ||
          (obs[n].OBS_MODE==LWA_OM_TRK_JOV     ) ||
+         (obs[n].OBS_MODE==LWA_OM_TRK_LUN     ) ||
          (obs[n].OBS_MODE==LWA_OM_STEPPED     ) ||
          (obs[n].OBS_MODE==LWA_OM_STEPPED_NOOP)   ) b_DRX_requested = 1;
     }
@@ -1021,6 +1031,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// tpss.c: J. Dowell, UNM 2022 Sep 30
+//   .1 Added support for TRK_LUN
 // tpcc.s: J. Dowell, UNM, 2020 Apr 7
 //   .1 Changed TRK_NULL to TRK_NOOP and added a STEPPED_NOOP mode
 // tpss.c: J. Dowell, UNM, 2020 Apr 6
@@ -1086,5 +1098,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

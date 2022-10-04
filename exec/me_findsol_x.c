@@ -19,7 +19,7 @@
 #include "me_astro.h"
 
 int main ( int narg, char *argv[] ) {
-
+  
   long int mjd; /* (input) mean julian date */
   long int mpm; /* (input) milliseconds past UTC midnight */ 
   float ra;     /* (output) [h] RA */
@@ -39,11 +39,11 @@ int main ( int narg, char *argv[] ) {
     }
  
   me_findsol(
-              mjd,  /* (input) mean julian date */
-              mpm,  /* (input) milliseconds past UTC midnight */ 
-              &ra,  /* (output) [h] calculated RA */
-              &dec, /* (output) [deg] calculated dec */ 
-              &dist /* (output) [AU] distance from Earth */
+              mjd,        /* (input) mean julian date */
+              mpm,        /* (input) milliseconds past UTC midnight */ 
+              &ra,        /* (output) [h] calculated RA */
+              &dec,       /* (output) [deg] calculated dec */ 
+              &dist       /* (output) [AU] distance from Earth */
              );
 
   m = (ra - floor(ra))*60.0;
@@ -70,5 +70,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

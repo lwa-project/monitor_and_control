@@ -20,7 +20,7 @@ void me_findjov(
                  float *dist   /* (output) [AU] distance from Earth */
                 ) {
 
-  double JD, H, JD0;
+  double JD, H, JD0, TJD;
   double ret[6]; /* this is how vsop87() returns output */
   double L,  B,  R;
   double L0, B0, R0;
@@ -30,20 +30,21 @@ void me_findjov(
   double lambdaHelio, betaHelio, rhoHelio;
   double lambdaSun, rhoSun, betaSun;
   double dRA, dDec;
-
+  
   /* Get JD from mjd/mpm */
   JD0 = ((double)mjd) + 2400000.5;     /* ref: http://tycho.usno.navy.mil/mjd.html */
   H   = ((double)mpm)/(3600.0*1000.0); /* mpm in hours */
   JD = JD0 + H/24.0; /* days */
-
+  TJD = JD + deltat(JD-MJD0)/86400.0;
+  
   /* Get L, B, R for Jupiter so we can figure out how far away it is */
-  vsop87 ( JD-MJD0, JUPITER, 0, ret);
+  vsop87 ( TJD-MJD0, JUPITER, 0, ret);
   L = ret[0]; /* [rad] */
   B = ret[1]; /* [rad] */
   R = ret[2]; /* [AU] */
   
   /* Correct L, B, and R for the light travel time by looking back in time a bit*/
-  vsop87 ( JD-MJD0-R/173.144633, JUPITER, 0, ret);
+  vsop87 ( TJD-MJD0-R/173.144633, JUPITER, 0, ret);
   L = ret[0]; /* [rad] */
   B = ret[1]; /* [rad] */
   R = ret[2]; /* [AU] */
@@ -53,7 +54,7 @@ void me_findjov(
   sphcart(L, B, R, &x, &y, &z);
 
   /* Get L0, B0, R0 for Earth and convert to cartesian x0, y0, z0 */
-  vsop87 ( JD-MJD0,       8, 0, ret);
+  vsop87 ( TJD-MJD0,       8, 0, ret);
   L0 = ret[0]; /* [rad] */
   B0 = ret[1]; /* [rad] */
   R0 = ret[2]; /* [AU] */
@@ -67,19 +68,19 @@ void me_findjov(
   cartsph(x-x0, y-y0, z-z0, &lambda, &beta, &rho);
   
   /* to equatorial coordinates */
-  ecl_eq(JD-MJD0, beta, lambda, &dRA, &dDec);
+  ecl_eq(TJD-MJD0, beta, lambda, &dRA, &dDec);
   
   /* Locate the Sun */
-  sunpos(JD-MJD0, &lambdaSun, &rhoSun, &betaSun);
+  sunpos(TJD-MJD0, &lambdaSun, &rhoSun, &betaSun);
   
-//   /* Apply relativistic deflection */
-//   deflect(JD-MJD0, lambdaHelio, betaHelio, lambdaSun, rhoSun, rho, &dRA, &dDec);
+  /* Apply relativistic deflection */
+  deflect(TJD-MJD0, lambdaHelio, betaHelio, lambdaSun, rhoSun, rho, &dRA, &dDec);
  
   /* Apply nutation */
-  nut_eq(JD-MJD0, &dRA, &dDec);
+  nut_eq(TJD-MJD0, &dRA, &dDec);
   
   /* Apply aberration */
-  ab_eq(JD-MJD0, lambdaSun, &dRA, &dDec);
+  ab_eq(TJD-MJD0, lambdaSun, &dRA, &dDec);
   
   /* Back to floats */
   *ra = (float) radhr(dRA);
@@ -89,6 +90,8 @@ void me_findjov(
   return;
   } /* me_findjov */
 
+// me_findjov.c: J. Dowell, UNM, 2022 Oct 3
+//  -- add in gravitational deflection near the Sun
 // me_findjov.c: J. Dowell, UNM, 2015 Sep 1
 //  -- changed the call so that the distance to Jupiter in AU is also returned
 // me_findjov.c: J. Dowell, UNM, 2015 Aug 31
