@@ -4,11 +4,7 @@
 # ../exec (executables copied to here - Executive)
 # ../tp   (executables copied to here - Task Processor)
 
-all: sofa sch exec tp python
-
-.PHONY: sofa
-sofa:
-	$(MAKE) -C sofa/src
+all: sch exec tp python
 
 .PHONY: sch
 sch:
@@ -16,6 +12,7 @@ sch:
 
 .PHONY: exec
 exec:
+	$(MAKE) -C sofa/src
 	$(MAKE) -C exec
 
 .PHONY: tp
