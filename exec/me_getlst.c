@@ -7,8 +7,8 @@
 // Find the local apparent sidereal time for a location
 
 #include <math.h>
-
-#include "ephem_astro.h"  /* mostly gutted, leaving only stuff needed for others */
+#include "sofa.h"
+#include "sofam.h"
 
 void me_getlst(
                long int mjd, /* (input) mean julian date */
@@ -18,30 +18,30 @@ void me_getlst(
                double *LAST /* (output) [h] local apparent sidereal time */
               ) {
 
-  double JD, H, JD0;
-  double lst, eps, deps, dpsi;
-
-  /* Get JD from mjd/mpm */
-  JD0 = ((double)mjd) + 2400000.5;     /* ref: http://tycho.usno.navy.mil/mjd.html */
-  H   = ((double)mpm)/(3600.0*1000.0); /* mpm in hours */
-  JD = JD0 + H/24.0; /* days */
-
-  /* Get the Greenwich Mean Sidereal Time */
-  utc_gst(mjd_day(JD-MJD0), mjd_hr(JD-MJD0),  &lst);
+  double tai1, tai2, tt1, tt2;
   
-  /* Convert to Local Mean Sidereal Time */
-  lst += radhr(degrad(lon));
+  /* Get TAI from mjd/mpm */
+  iauUtctai(mjd+DJM0, mpm/1000.0/86400, &tai1, &tai2);
   
-  /* Convert from mean to apparent */
-  obliquity(JD-MJD0, &eps);
-  nutation(JD-MJD0, &deps, &dpsi);
-  lst += radhr(dpsi*cos(eps+deps));
-  ephem_range (&lst, 24.0);
+  /* Get TT from TAI */
+  iauTaitt(tai1, tai2, &tt1, &tt2);
   
-  *LAST = lst;
+  /* Get GAST */
+  *LAST = iauGst06a(mjd+DJM0, mpm/1000.0/86400, tt1, tt2);
   
-  return;
+  /* Convert to radians */
+  lat *= DD2R;
+  lon *= DD2R;
+  
+  /* Get the LST */
+  *LAST += lon;
+  while( *LAST < 0) *LAST += D2PI;
+  while( *LAST > D2PI) *LAST -= D2PI;
+  *LAST *= DR2D / 15;
+  
   } /* me_getlst() */
 
+// me_getlst.c: J. Dowell, UNM, 2022 Oct 7
+//   -- updated to use the SOFA library
 // me_getlst.c: J. Dowell, UNM, 2015 Sep 1
 //   -- initial version

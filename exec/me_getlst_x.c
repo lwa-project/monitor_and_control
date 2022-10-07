@@ -25,7 +25,8 @@ int main ( int narg, char *argv[] ) {
   double lat;   /* (input) [deg, +N] observer location */
   double lon;   /* (input) [deg, +E] observer location */ 
   double LAST;  /* (output) [h] local apparent sidereal time */
-
+  double m, s;
+  
   /* Parse command line */
   if (narg>1) sscanf(argv[1],"%ld",&mjd);
   if (narg>2) sscanf(argv[2],"%ld",&mpm);
@@ -36,7 +37,7 @@ int main ( int narg, char *argv[] ) {
     printf("me_getlst_x <mjd> <mpm> <lat> <lon>\n");
     printf("  <mjd>: integer MJD\n");
     printf("  <mpm>: integer milliseconds past UTC midnight\n");
-    printf("  <lat>: [deg, +E] observer location\n");
+    printf("  <lat>: [deg, +N] observer location\n");
     printf("  <lon>: [deg, +E] observer location\n");
     return;
     }
@@ -51,7 +52,9 @@ int main ( int narg, char *argv[] ) {
             &LAST /* (output) [h] local apparent sidereal time */
            );
 
-  printf("LAST = %6.3lf h\n",LAST);
+  m = (LAST - floor(LAST))*60.0;
+  s = (m - floor(m))*60.0;
+  printf("LAST = %8.3lf h    =   %02.0lf h %02.0lf m %05.2lf s\n", LAST, floor(LAST), floor(m), s);
   
   return 0;
   } /* main() */
