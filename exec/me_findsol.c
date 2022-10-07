@@ -6,11 +6,11 @@
 // ---
 // REQUIRES: 
 //   
-// Find RA and DEC of the sun
+// Find the geocentric apparent RA and DEC of the Sun
 // See end of this file for history.
 
-/* The codes below are ported from Xephem */
-#include "ephem_astro.h"  /* mostly gutted, leaving only stuff needed for others */
+#include "sofa.h"
+#include "sofam.h"
 
 void me_findsol(
                  long int mjd,  /* (input) modified julian date */
@@ -20,36 +20,59 @@ void me_findsol(
                  float *dist    /* (output) [AU] distance from Earth */
                 ) {
 
-  double JD, H, JD0, TJD;
-  double lambda, beta, rho;
-  double dRA, dDec;
+  double tai1, tai2, tt1, tt2;
+  double pv[2][3], pvb[2][3], tpv[2][3];
+  double L,  B,  R, dL, dB, dR;
+  int i, j;
+  double pmat[3][3], nmat[3][3];
   
-  /* Get JD from mjd/mpm */
-  JD0 = ((double)mjd) + 2400000.5;     /* ref: http://tycho.usno.navy.mil/mjd.html */
-  H   = ((double)mpm)/(3600.0*1000.0); /* mpm in hours */
-  JD = JD0 + H/24.0; /* days */
-  TJD = JD + deltat(JD-MJD0)/86400.0;
+  /* Get TAI from mjd/mpm */
+  iauUtctai(mjd+DJM0, mpm/1000.0/86400, &tai1, &tai2);
   
-  /* Locate the Sun */
-  sunpos(TJD-MJD0, &lambda, &rho, &beta);
+  /* Get TT from TAI */
+  iauTaitt(tai1, tai2, &tt1, &tt2);
   
-  /* to equatorial coordinates */
-  ecl_eq(TJD-MJD0, beta, lambda, &dRA, &dDec);
+  /* Get the position of the Earth in spherical coordinates */
+  iauEpv00(tt1, tt2, &pv[0], &pvb[0]);
+  iauPv2s(pv, &L, &B, &R, &dL, &dB, &dR);
+
+  iauEpv00(tt1, tt2 - R/DC, &pv[0], &pvb[0]);
   
-  /* Apply nutation */
-  nut_eq(TJD-MJD0, &dRA, &dDec);
+  /* Flip it around to be for the Sun */
+  for(i=0; i<2; i++) {
+    for(j=0; j<3; j++) {
+      pv[i][j] *= -1;
+    }
+  }
+  iauPv2s(pv, &L, &B, &R, &dL, &dB, &dR);
+  
+  /* Apply precession and nutation */
+  iauPmat06(tt1, tt2, &pmat[0]);
+  iauNum06a(tt1, tt2, &nmat[0]);
+  iauRxpv(pmat, pv, &tpv[0]);
+  iauRxpv(nmat, tpv, &pv[0]);
+  iauPv2s(pv, &L, &B, &R, &dL, &dB, &dR);
   
   /* Apply aberration */
-  ab_eq(TJD-MJD0, lambda, &dRA, &dDec);
+  // Already done for us apparently
+  // double p[3], lorenz;
+  // lorenz = sqrt(1 - pvb[1][0]*pvb[1][0] - pvb[1][1]*pvb[1][1] - pvb[1][2]*pvb[1][2]);
+  // iauAb(pv[0], pvb[1], R, lorenz, &tpv[0][0]);
+  // iauPv2s(tpv, &L, &B, &R, &dL, &dB, &dR);
+  
+  /* Cleanup */
+  while( L < 0 ) L += D2PI;
+  while( L > D2PI) L -= D2PI;
   
   /* Back to floats */
-  *ra = (float) radhr(dRA);
-  *dec = (float) raddeg(dDec);
-  *dist = (float) rho;
+  *ra = (float) L * DR2D / 15;
+  *dec = (float) B * DR2D;
+  *dist = (float) R;
   
-  return;
   } /* me_findsol() */
 
+// me_findsol.c: J. Dowell, UNM, 2022 Oct 7
+//  -- updated to use the SOFA library
 // me_findsol.c: J. Dowell, UNM, 2015 Sep 1
 //  -- changed the call so that the distance to the Sun in AU is also returned
 // me_findsol.c: J. Dowell, UNM, 2015 Aug 31
