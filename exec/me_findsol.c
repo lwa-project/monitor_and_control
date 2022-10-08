@@ -36,14 +36,12 @@ void me_findsol(
   iauEpv00(tt1, tt2, &pv[0], &pvb[0]);
   iauPv2s(pv, &L, &B, &R, &dL, &dB, &dR);
 
+  /* Get the position of the Earth in spherical coordinates corrected for */
+  /* light travel time from the Sun.*/
   iauEpv00(tt1, tt2 - R/DC, &pv[0], &pvb[0]);
   
   /* Flip it around to be for the Sun */
-  for(i=0; i<2; i++) {
-    for(j=0; j<3; j++) {
-      pv[i][j] *= -1;
-    }
-  }
+  iauSxpv(-1.0, &pv[0], &pv[0]);
   iauPv2s(pv, &L, &B, &R, &dL, &dB, &dR);
   
   /* Apply precession and nutation */
@@ -55,14 +53,9 @@ void me_findsol(
   
   /* Apply aberration */
   // Already done for us apparently
-  // double p[3], lorenz;
-  // lorenz = sqrt(1 - pvb[1][0]*pvb[1][0] - pvb[1][1]*pvb[1][1] - pvb[1][2]*pvb[1][2]);
-  // iauAb(pv[0], pvb[1], R, lorenz, &tpv[0][0]);
-  // iauPv2s(tpv, &L, &B, &R, &dL, &dB, &dR);
   
   /* Cleanup */
-  while( L < 0 ) L += D2PI;
-  while( L > D2PI) L -= D2PI;
+  L = iauAnp(L);
   
   /* Back to floats */
   *ra = (float) L * DR2D / 15;
