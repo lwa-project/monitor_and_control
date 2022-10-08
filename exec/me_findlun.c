@@ -45,8 +45,7 @@ void me_findlun(
   iauPv2s(pv, &L, &B, &R, &dL, &dB, &dR);
   
   /* Cleanup */
-  while( L < 0 ) L += D2PI;
-  while( L > D2PI) L -= D2PI;
+  L = iauAnp(L);
   
   /* Back to floats */
   *ra = (float) L * DR2D / 15;
