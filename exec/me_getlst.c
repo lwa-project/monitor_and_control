@@ -18,7 +18,7 @@ void me_getlst(
                double *LAST /* (output) [h] local apparent sidereal time */
               ) {
 
-  double tai1, tai2, tt1, tt2;
+  double tai1, tai2, tt1, tt2, GAST;
   
   /* Get TAI from mjd/mpm */
   iauUtctai(mjd+DJM0, mpm/1000.0/86400, &tai1, &tai2);
@@ -27,16 +27,14 @@ void me_getlst(
   iauTaitt(tai1, tai2, &tt1, &tt2);
   
   /* Get GAST */
-  *LAST = iauGst06a(mjd+DJM0, mpm/1000.0/86400, tt1, tt2);
+  GAST = iauGst06a(mjd+DJM0, mpm/1000.0/86400, tt1, tt2);
   
   /* Convert to radians */
   lat *= DD2R;
   lon *= DD2R;
   
   /* Get the LST */
-  *LAST += lon;
-  while( *LAST < 0) *LAST += D2PI;
-  while( *LAST > D2PI) *LAST -= D2PI;
+  *LAST = iauAnp(GAST + lon);
   *LAST *= DR2D / 15;
   
   } /* me_getlst() */

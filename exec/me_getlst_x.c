@@ -39,7 +39,7 @@ int main ( int narg, char *argv[] ) {
     printf("  <mpm>: integer milliseconds past UTC midnight\n");
     printf("  <lat>: [deg, +N] observer location\n");
     printf("  <lon>: [deg, +E] observer location\n");
-    return;
+    return 1;
     }
   //printf("MJD/MPM = %5ld %9ld\n",mjd,mpm);
   //printf("LAT/LON = %+6.2lf deg %+7.2lf deg\n",lat,lon); 
