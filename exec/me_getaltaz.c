@@ -9,10 +9,8 @@
 // See end of this file for history.
 
 #include <math.h>
-
-#include "ephem_astro.h"
-
-#define DTR 0.017453292520
+#include "sofa.h"
+#include "sofam.h"
 
 void me_getaltaz(
                  double ra,    /* (input) [h] RA */
@@ -28,70 +26,70 @@ void me_getaltaz(
                  double *az    /* (output) [deg] calculated azimuth */ 
                 ) {
 
-  double JD, H, JD0;
-  double lst, eps, deps, dpsi;
+  double tai1, tai2, tt1, tt2;
+  double fRA, fDec, eo;
+  double r[3][3], x, y, s;
   double HA, tHA, tDec;
-
-  /* Get JD from mjd/mpm */
-  JD0 = ((double)mjd) + 2400000.5;     /* ref: http://tycho.usno.navy.mil/mjd.html */
-  H   = ((double)mpm)/(3600.0*1000.0); /* mpm in hours */
-  JD = JD0 + H/24.0; /* days */
-
-  /* Get the Greenwich Mean Sidereal Time */
-  utc_gst(mjd_day(JD-MJD0), mjd_hr(JD-MJD0),  LAST);
   
-  /* Convert to Local Mean Sidereal Time */
-  *LAST += radhr(degrad(lon));
+  /* Get TAI from mjd/mpm */
+  iauUtctai(mjd+DJM0, mpm/1000.0/86400, &tai1, &tai2);
   
-  /* Convert from mean to apparent */
-  obliquity(JD-MJD0, &eps);
-  nutation(JD-MJD0, &deps, &dpsi);
-  *LAST += radhr(dpsi*cos(eps+deps));
-  ephem_range (LAST, 24.0);
+  /* Get TT from TAI */
+  iauTaitt(tai1, tai2, &tt1, &tt2);
   
-  /* Hour angle */
-  /* http://en.wikipedia.org/wiki/Hour_angle */
-  HA = hrrad(*LAST-ra); /* [rad] */ 
-  ephem_range (&HA, 2.0*PI);
+  /* Get GAST */
+  *LAST = iauGst06a(mjd+DJM0, mpm/1000.0/86400, tt1, tt2);
   
-  /* More unit conversions */
-  dec = degrad(dec);
-  lat = degrad(lat);
-  lon = degrad(lon);
+  /* Convert to radians */
+  lat *= DD2R;
+  lon *= DD2R;
+  ra *= 15 * DD2R;
+  dec *= DD2R;
   
-  /* Deal with parallax if this object is "close" */
-  if ( dist < 1000 ) {
-     dist = dist * MAU/ERAD;		// AU -> m -> Earth radii
-     elev = elev / ERAD;			// m -> Earth radii
-     ta_par(HA, dec, lat, elev, &dist, &tHA, &tDec);
-     
-     HA = tHA;
-     dec = tDec;
+  /* Get the LST */
+  *LAST += lon;
+  while( *LAST < 0) *LAST += D2PI;
+  while( *LAST > D2PI) *LAST -= D2PI;
+  *LAST *= DR2D / 15;
+  
+  /* Switch to CIO based positions */
+  // Equaninox-based BPN matrix...
+  iauPnm06a(tt1, tt2, &r[0]);
+  // Celestial intermediate pole (CIP) location...
+  iauBpn2xy(r, &x, &y);
+  // Celestrial intermediate origin locator...
+  s = iauS06(tt1, tt2, x, y);
+  // ... and add the equation of origins to the RA
+  ra += iauEors(r, s);
+  
+  /* Parallax from the geocenter to the observer */
+  double obs[2][3], obj[3];
+  if( dist < 1e3 ) {
+    iauPvtob(lon, lat, elev, \
+             0.0, 0.0, s, *LAST-lon, \
+             &obs[0]);
+    iauS2p(ra, dec, dist, &obj[0]);
+    obj[0] -= obs[0][0]/DAU;
+    obj[1] -= obs[0][1]/DAU;
+    obj[2] -= obs[0][2]/DAU;
+    iauP2s(obj, &ra, &dec, &dist);
   }
   
-  /* Convert to Alt/Az */
-  /* http://en.wikipedia.org/wiki/Celestial_coordinate_system */
-  *alt = asin(   sin(lat)*sin(dec) + cos(lat)*cos(dec)*cos(HA)              );
-  *az  = acos( ( cos(lat)*sin(dec) - sin(lat)*cos(dec)*cos(HA)) / cos(*alt) );
-  if (HA<PI) { *az = 2*PI - *az; }
+  /* Get the topocentric coordinates */
+  iauAtio13(ra, dec, \
+            mjd+DJM0, mpm/1000.0/86400, 0.0, \
+            lon, lat, elev, 0.0, 0.0, \
+            0.0, 0.0, 0.0, 0.0,
+            az, alt, &HA, \
+            &fDec, &fRA);
+            
+  /* Zenith angle to altitude (elevation) */
+  *alt = DPI/2 - *alt;
   
   /* Back to degrees */
-  *alt = raddeg(*alt);
-  *az = raddeg(*az);
-
-  /* make sure az is in range 0--> 360 */
-  ephem_range (az, 360.0);
-
-  //AZ/ALT from RA/DEC
-  //-- sin ALT = sin LAT sin DEC + cos LAT cos DEC cos H 
-  //-- cos AZ = ( cos LAT sin DEC - sin LAT cos DEC cos H ) / cos ALT
-  //  if H < pi then AZ = 360 - AZ
-
-  //printf("JD=%lf [days]\n",JD); 
-  //printf("GMST=%lf [h]\n",GMST);
-  //printf("GAST=%lf [h]\n",GAST);
-
-  return;
+  *alt *= DR2D;
+  *az *= DR2D;
+  
   } /* me_getaltaz */
 
 // me_getaltaz.c: J. Dowell, UNM, 2015 Sep 1
