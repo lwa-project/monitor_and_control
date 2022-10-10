@@ -12,7 +12,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         printf("...converts to %d\n",obs[nobs].OBS_FEE[n][p]);
         if ( ( obs[nobs].OBS_FEE[n][p]<-1 ) || ( obs[nobs].OBS_FEE[n][p]>1 ) ) {   
           printf("[%d/%d] FATAL: OBS_FEE[%d][%d] out of range\n",MT_TPSS,getpid(),n,p+1);  
-          return;
+          return 6;
           }
         if (n==0) { /* this is intended to apply to all FEEs */
           printf("[%d/%d] ...Applying this setting to this pol of all FEEs\n",MT_TPSS,getpid()); 
@@ -25,7 +25,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         break;
       case TPSS_PL_EOF:                                                                                            break;
       case TPSS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return 6; break;
       }
     } /* for p */
   } /* for n */ 
@@ -48,7 +48,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         if ( ( obs[nobs].OBS_ASP_FLT[n]<-1 ) || ( obs[nobs].OBS_ASP_FLT[n]>3 ) ) {
 #endif
           printf("[%d/%d] FATAL: OBS_ASP_FLT[%d] out of range\n",MT_TPSS,getpid(),n);  
-          return;
+          return 6;
           }
         if (n==0) { /* this is intended to apply to all n */
           for (k=1;k<=LWA_MAX_NSTD;k++) obs[nobs].OBS_ASP_FLT[k] = obs[nobs].OBS_ASP_FLT[n];
@@ -57,7 +57,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         break;
       case TPSS_PL_EOF:                                                                                            break;
       case TPSS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return 6; break;
       }
 
   } /* for n */ 
@@ -74,7 +74,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         printf("...converts to %d\n",obs[nobs].OBS_ASP_AT1[n]);
         if ( ( obs[nobs].OBS_ASP_AT1[n]<-1 ) || ( obs[nobs].OBS_ASP_AT1[n]>15 ) ) {   
           printf("[%d/%d] FATAL: OBS_ASP_AT1[%d] out of range\n",MT_TPSS,getpid(),n);  
-          return;
+          return 6;
           }
         if (n==0) { /* this is intended to apply to all n */
           for (k=1;k<=LWA_MAX_NSTD;k++) obs[nobs].OBS_ASP_AT1[k] = obs[nobs].OBS_ASP_AT1[n];
@@ -83,7 +83,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         break;
       case TPSS_PL_EOF:                                                                                            break;
       case TPSS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return 6; break;
       }
 
   } /* for n */ 
@@ -100,7 +100,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         printf("...converts to %d\n",obs[nobs].OBS_ASP_AT2[n]);
         if ( ( obs[nobs].OBS_ASP_AT2[n]<-1 ) || ( obs[nobs].OBS_ASP_AT2[n]>15 ) ) {   
           printf("[%d/%d] FATAL: OBS_ASP_AT2[%d] out of range\n",MT_TPSS,getpid(),n);  
-          return;
+          return 6;
           }
         if (n==0) { /* this is intended to apply to all n */
           for (k=1;k<=LWA_MAX_NSTD;k++) obs[nobs].OBS_ASP_AT2[k] = obs[nobs].OBS_ASP_AT2[n];
@@ -109,7 +109,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         break;
       case TPSS_PL_EOF:                                                                                            break;
       case TPSS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return 6; break;
       }
 
   } /* for n */
@@ -126,7 +126,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         printf("...converts to %d\n",obs[nobs].OBS_ASP_ATS[n]);
         if ( ( obs[nobs].OBS_ASP_ATS[n]<-1 ) || ( obs[nobs].OBS_ASP_ATS[n]>15 ) ) {   
           printf("[%d/%d] FATAL: OBS_ASP_ATS[%d] out of range\n",MT_TPSS,getpid(),n);  
-          return;
+          return 6;
           }
         if (n==0) { /* this is intended to apply to all n */
           for (k=1;k<=LWA_MAX_NSTD;k++) obs[nobs].OBS_ASP_ATS[k] = obs[nobs].OBS_ASP_ATS[n];
@@ -135,7 +135,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         break;
       case TPSS_PL_EOF:                                                                                            break;
       case TPSS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return 6; break;
       }
 
   } /* for n */
@@ -151,13 +151,13 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         printf("...converts to %ld\n",obs[nobs].OBS_TBF_SAMPLES);
         if ( (obs[nobs].OBS_TBF_SAMPLES>392000000) ) {   
           printf("[%d/%d] FATAL: OBS_TBF_SAMPLES out of range\n",MT_TPSS,getpid());  
-          return;
+          return 6;
           }
         strcpy(data,"");   
         break;
       case TPSS_PL_EOF:                                                                                            break;
       case TPSS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return 6; break;
       }
       
     sprintf(keyword,"OBS_TBF_GAIN");  obs[nobs].OBS_TBF_GAIN=-1; 
@@ -169,13 +169,13 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         printf("...converts to %d\n",obs[nobs].OBS_TBF_GAIN);
         if ( ( obs[nobs].OBS_TBF_GAIN<-1 ) || ( obs[nobs].OBS_TBF_GAIN>15 ) ) {  
           printf("[%d/%d] FATAL: OBS_TBF_GAIN out of range\n",MT_TPSS,getpid());  
-          return;
+          return 6;
           }
         strcpy(data,"");   
         break;
       case TPSS_PL_EOF:                                                                                            break;
       case TPSS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return 6; break;
       }
 #else
     sprintf(keyword,"OBS_TBW_BITS");  obs[nobs].OBS_TBW_BITS=12;
@@ -187,13 +187,13 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         printf("...converts to %d\n",obs[nobs].OBS_TBW_BITS);
         if ( ( obs[nobs].OBS_TBW_BITS!=12 ) && ( obs[nobs].OBS_TBW_BITS!=4 ) ) {   
           printf("[%d/%d] FATAL: OBS_TBW_BITS out of range\n",MT_TPSS,getpid());  
-          return;
+          return 6;
           }
         strcpy(data,"");   
         break;
       case TPSS_PL_EOF:                                                                                            break;
       case TPSS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return 6; break;
       }
 
     sprintf(keyword,"OBS_TBW_SAMPLES");  
@@ -206,17 +206,17 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         printf("...converts to %ld\n",obs[nobs].OBS_TBW_SAMPLES);
         if ( ( obs[nobs].OBS_TBW_BITS==12 ) && (obs[nobs].OBS_TBW_SAMPLES>12000000) ) {   
           printf("[%d/%d] FATAL: OBS_TBW_SAMPLES out of range\n",MT_TPSS,getpid());  
-          return;
+          return 6;
           }
         if ( ( obs[nobs].OBS_TBW_BITS==4 ) && (obs[nobs].OBS_TBW_SAMPLES>36000000) ) {   
           printf("[%d/%d] FATAL: OBS_TBW_SAMPLES out of range\n",MT_TPSS,getpid());  
-          return;
+          return 6;
           }
         strcpy(data,"");   
         break;
       case TPSS_PL_EOF:                                                                                            break;
       case TPSS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return 6; break;
       }
 #endif
 
@@ -230,19 +230,19 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
 #ifdef USE_ADP
         if ( ( obs[nobs].OBS_TBN_GAIN<-1 ) || ( obs[nobs].OBS_TBN_GAIN>30 ) ) {  
           printf("[%d/%d] FATAL: OBS_TBN_GAIN out of range\n",MT_TPSS,getpid());  
-          return;
+          return 6;
           }
 #else
         if ( ( obs[nobs].OBS_TBN_GAIN<-1 ) || ( obs[nobs].OBS_TBN_GAIN>30 ) ) {   
           printf("[%d/%d] FATAL: OBS_TBN_GAIN out of range\n",MT_TPSS,getpid());  
-          return;
+          return 6;
           }
 #endif
         strcpy(data,"");   
         break;
       case TPSS_PL_EOF:                                                                                            break;
       case TPSS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return 6; break;
       }
 
     sprintf(keyword,"OBS_DRX_GAIN");  obs[nobs].OBS_DRX_GAIN=-1; 
@@ -254,13 +254,13 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         printf("...converts to %d\n",obs[nobs].OBS_DRX_GAIN);
         if ( ( obs[nobs].OBS_DRX_GAIN<-1 ) || ( obs[nobs].OBS_DRX_GAIN>255 ) ) {   
           printf("[%d/%d] FATAL: OBS_DRX_GAIN out of range\n",MT_TPSS,getpid());  
-          return;
+          return 6;
           }
         strcpy(data,"");   
         break;
       case TPSS_PL_EOF:                                                                                            break;
       case TPSS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return 6; break;
       }
 
 

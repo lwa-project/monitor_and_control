@@ -95,14 +95,14 @@ main ( int narg, char *argv[] ) {
     //printf("dest = <%s>\n",dest);
     } else {
     printf("[%s] FATAL: dest not provided\n",ME);
-    return;
+    return 1;
     } 
   if (narg>2) { 
     sscanf(argv[2],"%3s",cmd);
     //printf("dest = <%s>\n",dest);
     } else {
     printf("[%s] FATAL: cmd not provided\n",ME);
-    return;
+    return 1;
     } 
   strcpy(data,"");
   if (narg>3) { 
@@ -115,7 +115,7 @@ main ( int narg, char *argv[] ) {
   /* figure out what subsystem */
   if ( !( c.sid = LWA_getsid( dest ) ) ) {
     printf("[%s] FATAL: subsystem <%s> not recognized\n",ME,dest);
-    return;    
+    return 1;    
     }
 
   /* Outbound value of ref doesn't matter. (Gets assigned by ms_exec.) */
@@ -124,7 +124,7 @@ main ( int narg, char *argv[] ) {
   /* figure out what command */
   if ( !( c.cid = LWA_getcmd( cmd ) ) ) {
     printf("[%s] FATAL: cmd <%s> not recognized\n",ME,cmd);
-    return;    
+    return 1;    
     }  
   //printf("[%s] c.cid=%d\n",ME,c.cid);
 
@@ -176,9 +176,9 @@ main ( int narg, char *argv[] ) {
          if (narg>6) { sscanf(argv[6],"%lu",&i8u1); } else {bError=1;}
          if (bError) {
            printf("[%s] FATAL: %s/%s args are:\n TBF_BITS (number, uint8)\nTBF_TRIG_TIME (samples, int32)\n TBF_SAMPLES (samples, int32)\n DRX_TUNING_MASK (mask, uint64)\n",ME,dest,cmd);
-           return;
+           return 1;
            }
-         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;
+         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return 0;
          i2u.i = i2u1;                      c.data[ 0]=i2u.b[0]; 
          i4s.i = i4s1; c.data[ 1]=i4s.b[3]; c.data[ 2]=i4s.b[2]; c.data[ 3]=i4s.b[1]; c.data[ 4]=i4s.b[0];
          i4s.i = i4s2; c.data[ 5]=i4s.b[3]; c.data[ 6]=i4s.b[2]; c.data[ 7]=i4s.b[1]; c.data[ 8]=i4s.b[0];
@@ -199,9 +199,9 @@ main ( int narg, char *argv[] ) {
          if (narg>5) { sscanf(argv[5],"%hu",&i2u2); } else {bError=1;}
          if (bError) {
            printf("[%s] FATAL: %s/%s args are:\n TBN_FREQ (Hz, float32)\n TBN_BW {5..11}\n TBN_GAIN {0..15}",ME,dest,cmd);
-           return;
+           return 1;
            }
-         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;
+         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return 0;
          f4.f  = f41;  c.data[0]= f4.b[3]; c.data[1]= f4.b[2]; c.data[2]= f4.b[1]; c.data[3]= f4.b[0];
          i2u.i = i2u1; c.data[4]=i2u.b[1]; c.data[5]=i2u.b[0]; 
          i2u.i = i2u2; c.data[6]=i2u.b[1]; c.data[7]=i2u.b[0]; 
@@ -221,9 +221,9 @@ main ( int narg, char *argv[] ) {
          if (narg>6) { sscanf(argv[6],"%hu",&i2u3); } else {bError=1;}
          if (bError) {
            printf("[%s] FATAL: %s/%s args are:\n COR_NAVG (Number, int32)\n DRX_TUNING_MASK (mask, uint64)\n COR_GAIN {0..15}\n sub_slot {0..99}",ME,dest,cmd);
-           return;
+           return 1;
            }
-         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;
+         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return 0;
          i4s.i = i4s1; c.data[ 0]=i4s.b[3]; c.data[ 1]=i4s.b[2]; c.data[ 2]=i4s.b[1]; c.data[ 3]=i4s.b[0];
          i8u.i = i8u1; c.data[ 4]=i8u.b[7]; c.data[ 5]=i8u.b[6]; c.data[ 6]=i8u.b[5]; c.data[ 7]=i8u.b[4];
                        c.data[ 8]=i8u.b[3]; c.data[ 9]=i8u.b[2]; c.data[10]=i8u.b[1]; c.data[11]=i8u.b[0]; 
@@ -238,7 +238,7 @@ main ( int narg, char *argv[] ) {
          if (narg>3) { sscanf(argv[3],"%u",&i4u1); } else {bError=1;}
          if (bError) {
            printf("[%s] FATAL: %s/%s arg is CLK_SET_TIME (uint32)\n",ME,dest,cmd);
-           return;
+           return 1;
            }
          i4u.i = i4u1; c.data[0]=i4u.b[3]; c.data[1]=i4u.b[2]; c.data[2]=i4u.b[1]; c.data[3]=i4u.b[0];
          c.datalen=4;
@@ -259,14 +259,14 @@ main ( int narg, char *argv[] ) {
          } else {bError=1;}
          if (bError) {
            printf("[%s] FATAL: %s/%s arg is one of TBN|TBF|BEAM#|COR (string)\n",ME,dest,cmd);
-           return;
+           return 1;
            }
          c.datalen=-1;
          break;
  
        default:
          printf("[%s] FATAL: cmd <%s> not recognized as valid for ADP\n",ME,cmd);
-         return;
+         return 1;
          break;
 
        } /* switch (c.cid) */
@@ -301,9 +301,9 @@ main ( int narg, char *argv[] ) {
          if (narg>5) { sscanf(argv[5],"%u", &i4u2); } else {bError=1;}
          if (bError) {
            printf("[%s] FATAL: %s/%s args are:\n TBW_BITS {0|1}\n TBW_TRIG_TIME (samples, uint32)\n TBW_SAMPLES (samples, uint32)\n",ME,dest,cmd);
-           return;
+           return 1;
            }
-         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;
+         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return 0;
          i2u.i = i2u1;                     c.data[0]=i2u.b[0]; 
          i4u.i = i4u1; c.data[1]=i4u.b[3]; c.data[2]=i4u.b[2]; c.data[3]=i4u.b[1]; c.data[4]=i4u.b[0];
          i4u.i = i4u2; c.data[5]=i4u.b[3]; c.data[6]=i4u.b[2]; c.data[7]=i4u.b[1]; c.data[8]=i4u.b[0];
@@ -322,9 +322,9 @@ main ( int narg, char *argv[] ) {
          if (narg>4) { sscanf(argv[5],"%hu",&i2u2); } else {bError=1;}
          if (bError) {
            printf("[%s] FATAL: %s/%s args are:\n TBN_FREQ (Hz, float32)\n TBN_BW {1..7}\n TBN_GAIN {0..15}\n sub_slot {0..99}",ME,dest,cmd);
-           return;
+           return 1;
            }
-         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;
+         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return 0;
          f4.f  = f41;  c.data[0]= f4.b[3]; c.data[1]= f4.b[2]; c.data[2]= f4.b[1]; c.data[3]= f4.b[0];
          i2u.i = i2u1; c.data[4]=i2u.b[1]; c.data[5]=i2u.b[0]; 
          i2u.i = i2u2; c.data[6]=i2u.b[1]; c.data[7]=i2u.b[0]; 
@@ -338,7 +338,7 @@ main ( int narg, char *argv[] ) {
          if (narg>3) { sscanf(argv[3],"%u",&i4u1); } else {bError=1;}
          if (bError) {
            printf("[%s] FATAL: %s/%s arg is CLK_SET_TIME (uint32)\n",ME,dest,cmd);
-           return;
+           return 1;
            }
          i4u.i = i4u1; c.data[0]=i4u.b[3]; c.data[1]=i4u.b[2]; c.data[2]=i4u.b[1]; c.data[3]=i4u.b[0];
          c.datalen=4;
@@ -358,14 +358,14 @@ main ( int narg, char *argv[] ) {
          } else {bError=1;}
          if (bError) {
            printf("[%s] FATAL: %s/%s arg is one of TBN|TBW|BEAM# (string)\n",ME,dest,cmd);
-           return;
+           return 1;
            }
          c.datalen=-1;
          break;
            
        default:
          printf("[%s] FATAL: cmd <%s> not recognized as valid for DP\n",ME,cmd);
-         return;
+         return 1;
          break;
 
        } /* switch (c.cid) */
@@ -394,7 +394,7 @@ main ( int narg, char *argv[] ) {
   result = connect( sockfd, (struct sockaddr *) &address, sizeof(address));
   if (result==-1) {
     perror("msei");
-    return;
+    return 1;
     }
 
   write(sockfd, &c, sizeof(struct LWA_cmd_struct));
@@ -403,7 +403,7 @@ main ( int narg, char *argv[] ) {
   printf("[%s] ref=%ld, bAccept=%d, eSummary=%d, data=<%s>\n",ME,c.ref,c.bAccept,c.eSummary,c.data);
 
   close(sockfd); 
-  return;
+  return 0;
 
   } /* main() */
 

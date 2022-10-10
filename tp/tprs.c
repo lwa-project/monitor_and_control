@@ -172,13 +172,13 @@ int main ( int narg, char *argv[] ) {
   /* Parse command line */
   if (narg<2) {
     printf("[%d/%d] FATAL: filename_ssmif not specified\n",MT_TPRS,getpid());
-    return;
+    return 1;
     }
   sprintf(filename_ssmif,"%s",argv[1]);
   printf("[%d/%d] Input: filename_ssmif='%s'\n",MT_TPRS,getpid(),filename_ssmif);
   if (!strcmp(filename_ssmif,"ssmif.dat")) {
     printf("[%d/%d] FATAL: Input SSMIF cannot be named 'ssmif.dat' (this filename reserved)\n",MT_TPRS,getpid());
-    return;  
+    return 1;  
     }
 
   printf("[%d/%d] *********************************************************\n",MT_TPRS,getpid()); 
@@ -188,7 +188,7 @@ int main ( int narg, char *argv[] ) {
   /* Open SSMIF */
   if (!(fp = fopen(filename_ssmif,"r"))) {
     printf("[%d/%d] FATAL: unable to fopen SSMIF '%s'\n",MT_TPRS,getpid(),filename_ssmif);
-    return;
+    return 1;
     }
 
   strcpy(data,"");
@@ -202,14 +202,14 @@ int main ( int narg, char *argv[] ) {
       if (s.iARBAnt[iARB][k]!=0) {
         if ( c[ s.iARBAnt[iARB][k] -1 ] ) {
           printf("[%d/%d] FATAL: ARB_ANT[%d][%d] = %d has multiple assignments\n",MT_TPRS,getpid(),iARB+1,k+1,s.iARBAnt[iARB][k]);
-          //return; 
+          //return 1; 
           }
         } 
       c[ s.iARBAnt[iARB][k] -1 ] = 1;
       //printf("[%d/%d] Saw: ARB_ANT[%d][%d] = %d\n",MT_TPRS,getpid(),iARB+1,k+1,s.iARBAnt[iARB][k]);
       } /* for (k */
     } /* for ( iARB */     
-  //return;
+  //return 1;
 
   printf("[%d/%d] *********************************************************\n",MT_TPRS,getpid()); 
   printf("[%d/%d] *** Writing ssmif.dat ***********************************\n",MT_TPRS,getpid());
@@ -217,7 +217,7 @@ int main ( int narg, char *argv[] ) {
 
   if (!(fp = fopen("ssmif.dat","wb"))) {
     printf("[%d/%d] FATAL: unable to fopen 'ssmif.dat'\n",MT_TPRS,getpid());
-    return;
+    return 1;
     }  
 
   fwrite(&s,sizeof(s),1,fp);

@@ -19,7 +19,17 @@
 #include <string.h>
 #include <fcntl.h> /* needed for O_READONLY, F_GETFL; perhaps other things */
 #include <gdbm.h>
+
+#if defined(__linux__)
+/* Linux */
 #include <byteswap.h>
+#elif defined(__APPLE__) && defined(__MACH__)
+/* OSX */
+#include <libkern/OSByteOrder.h>
+#define bswap_16 OSSwapInt16
+#define bswap_32 OSSwapInt32
+#define bswap_64 OSSwapInt64
+#endif
 
 /* additional stuff related to sockets */
 #include <sys/socket.h>
@@ -33,7 +43,7 @@
 #define MY_NAME "ms_mdre_ip (v.20191030.1)"
 #define ME "16" 
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/

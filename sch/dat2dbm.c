@@ -20,7 +20,18 @@
 #include <string.h>
 #include <fcntl.h>
 #include <gdbm.h>
+
+#if defined(__linux__)
+/* Linux */
 #include <byteswap.h>
+#elif defined(__APPLE__) && defined(__MACH__)
+/* OSX */
+#include <libkern/OSByteOrder.h>
+#define bswap_16 OSSwapInt16
+#define bswap_32 OSSwapInt32
+#define bswap_64 OSSwapInt64
+#endif
+
 
 //#include "LWA_MCS.h" 
 #include "mcs.h"

@@ -86,12 +86,12 @@ int main ( int narg, char *argv[] ) {
   /* Parse command line */
   if (narg<2) {
       printf("[%d/%d] FATAL: <mode> not specified\n",MT_TPMS,getpid());
-      return;
+      return 1;
     } else {
       sprintf(sMode,"%s",argv[1]); 
       if (!(eMode=LWA_getmode(sMode))) { 
         printf("[%d/%d] FATAL: Invalid <mode>\n",MT_TPSS,getpid());   
-        return;
+        return 1;
         }
       switch (eMode) { /* not all modes are yet implemented */
         case LWA_OM_STEPPED: break;
@@ -106,13 +106,13 @@ int main ( int narg, char *argv[] ) {
         case LWA_OM_TBW: break;
 #endif
         case LWA_OM_DIAG1: break;
-        default: printf("[%d/%d] FATAL: This <mode> not yet implemented\n",MT_TPSS,getpid()); return; break;
+        default: printf("[%d/%d] FATAL: This <mode> not yet implemented\n",MT_TPSS,getpid()); return 1; break;
         }
       LWA_saymode( eMode, sMode );
     }
   if (narg<3) {
       printf("[%d/%d] FATAL: <dt> not specified\n",MT_TPMS,getpid());
-      return;
+      return 1;
     } else {
       sscanf(argv[2],"%ld",&dt);    
     }
@@ -182,7 +182,7 @@ int main ( int narg, char *argv[] ) {
       break;
     default: 
       printf("[%d/%d] FATAL: Mode supported but not implemented(?)\n",MT_TPSS,getpid()); 
-      return; 
+      return 1; 
       break;
     }
 
@@ -317,7 +317,7 @@ int main ( int narg, char *argv[] ) {
       break; 
     default:
       printf("[%d/%d] FATAL: Mode supported but not implemented(?)\n",MT_TPSS,getpid()); 
-      return; 
+      return 1; 
       break;
     }
 

@@ -93,14 +93,14 @@ int main ( int narg, char *argv[] ) {
     printf("            =1 means use only SSMIF (initialization info from ssmif.dat)\n");
     printf("example: '$ ./tpsdm mbox sta 1'\n");
     printf("\n");
-    return;
+    return 1;
     }
 
   if (narg>1) {
       sprintf(sDir,"%s",argv[1]);
     } else {
       printf("FATAL: <dir> not specified\n");
-      return;
+      return 1;
     }
   //printf("input: <dir>='%s'\n",sDir);
 
@@ -128,34 +128,34 @@ int main ( int narg, char *argv[] ) {
       if (strncmp(arg,"pwr",3)==0) { eRpt = TPSDM_RPT_PWR; bStatic=1; }
       if (eRpt==TPSDM_RPT_NUL) {
         printf("FATAL: invalid <rpt>='%s'\n",arg);
-        return;
+        return 1;
         }
     } else {
       printf("FATAL: <rpt> not specified\n");
-      return;
+      return 1;
     }
 
   if (narg>3) {
     sscanf(argv[3],"%d",&bStatic);
     if ( (bStatic<0) || (bStatic>1) ) {
       printf("FATAL: invalid <static>=%d\n",bStatic);
-      return;      
+      return 1;      
       }
     if ( bStatic && (eRpt==TPSDM_RPT_SUM) ) {
       printf("FATAL: <static>=1 not allowed for <rpt>='sum'\n");
-      return;   
+      return 1;   
       }
     if ( (!bStatic) && (eRpt==TPSDM_RPT_ANT) ) {
       printf("FATAL: <static>=0 not allowed for <rpt>='ANT'\n");
-      return;   
+      return 1;   
       }
     if ( (!bStatic) && (eRpt==TPSDM_RPT_ANS) ) {
       printf("FATAL: <static>=0 not allowed for <rpt>='ans'\n");
-      return;   
+      return 1;   
       }
     if ( (!bStatic) && (eRpt==TPSDM_RPT_PWR) ) {
       printf("FATAL: <static>=0 not allowed for <rpt>='pwr'\n");
-      return;   
+      return 1;   
       }
     }
 
@@ -166,7 +166,7 @@ int main ( int narg, char *argv[] ) {
   sprintf(filename,"%s/ssmif.dat",sDir);
   if ((fp=fopen(filename,"rb"))==NULL) {
     printf("[%d/%d] FATAL: Can't open '%s'\n",MT_TPSDM,getpid(),filename);
-    return;
+    return 1;
     }
   fread(&s,sizeof(struct ssmif_struct),1,fp);
   fclose(fp);
@@ -175,13 +175,13 @@ int main ( int narg, char *argv[] ) {
   eErr = me_sc_MakeASM( s, &sc );
   if (eErr>0) {
     printf("[%d/%d] FATAL: me_sc_MakeASM() failed with error %d\n",MT_TPSDM,getpid(),eErr);
-    return;
+    return 1;
     }
   /* assemble information about digital signal mapping */
   eErr = me_sc_MakeDSM( s, &sc ); 
   if (eErr>0) {
     printf("[%d/%d] FATAL: me_sc_MakeDSM() failed with error %d\n",MT_TPSDM,getpid(),eErr);
-    return;
+    return 1;
     }
 
   /* Get SDM, if needed */
@@ -189,7 +189,7 @@ int main ( int narg, char *argv[] ) {
     sprintf(filename,"%s/sdm.dat",sDir);
     if ((fp=fopen(filename,"rb"))==NULL) {
       printf("[%d/%d] FATAL: Can't open '%s'\n",MT_TPSDM,getpid(),filename);
-      return;
+      return 1;
       }
     fread(&sdm,sizeof(struct sdm_struct),1,fp);
     fclose(fp); 
