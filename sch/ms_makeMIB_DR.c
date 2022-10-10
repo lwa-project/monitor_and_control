@@ -22,13 +22,14 @@
 // See end of this file for history.
 
 #include <stdio.h>
+#include <unistd.h>
 
 //#include "LWA_MCS.h"
 
 #define MY_NAME "ms_makeMIB_DR (v.20150910.1)"
 #define ME "15" 
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/
@@ -60,55 +61,55 @@ main ( int narg, char *argv[] ) {
     sscanf(argv[1],"%d",&id);
     } else {
     printf("[%s] FATAL: ID not provided\n",ME);
-    return;
+    return 1;
     } 
   if (narg>2) { 
     sscanf(argv[2],"%d",&nMaxScheduleCount);
     } else {
     printf("[%s] FATAL: nMaxScheduleCount not provided\n",ME);
-    return;
+    return 1;
     } 
   if (narg>3) { 
     sscanf(argv[3],"%d",&nMaxDirectoryCount);
     } else {
     printf("[%s] FATAL: nMaxDirectoryCount not provided\n",ME);
-    return;
+    return 1;
     } 
   if (narg>4) { 
     sscanf(argv[4],"%d",&nMaxDeviceCount);
     } else {
     printf("[%s] FATAL: nMaxDeviceCount not provided\n",ME);
-    return;
+    return 1;
     } 
   if (narg>5) { 
     sscanf(argv[5],"%d",&nMaxCPUCount);
     } else {
     printf("[%s] FATAL: nMaxCPUCount not provided\n",ME);
-    return;
+    return 1;
     } 
   if (narg>6) { 
     sscanf(argv[6],"%d",&nMaxHDDCount);
     } else {
     printf("[%s] FATAL: nMaxHDDCount not provided\n",ME);
-    return;
+    return 1;
     } 
   if (narg>7) { 
     sscanf(argv[7],"%d",&nMaxFormatsCount);
     } else {
     printf("[%s] FATAL: nMaxFormatsCount not provided\n",ME);
-    return;
+    return 1;
     } 
   if (narg>8) { 
     sscanf(argv[8],"%d",&nMaxLogCount);
     } else {
     printf("[%s] FATAL: nMaxLogCount not provided\n",ME);
-    return;
+    return 1;
     } 
   if (narg>9) { 
     sscanf(argv[9],"%d",&nMaxDRSUCount);
     } else {
     printf("[%s] FATAL: nMaxDRSUCount not provided\n",ME);
-    return;
+    return 1;
     } 
 
   /* create file */

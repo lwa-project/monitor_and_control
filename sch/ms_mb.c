@@ -45,6 +45,8 @@
 #include <stdlib.h> /* needed for exit(); possibly other things */
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
+#include <unistd.h>
 #include <ncurses.h>
 
 #define MY_NAME "ms_mb (v.20100531.2)"
@@ -56,7 +58,7 @@
 #define MAX_ANNOTATIONS 99
 
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/

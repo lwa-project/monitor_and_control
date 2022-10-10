@@ -11,13 +11,14 @@
 // See end of this file for history.
 
 #include <stdio.h>
+#include <unistd.h>
 
 //#include "LWA_MCS.h"
 
 #define MY_NAME "ms_makeMIB_DP (v.20150909.1)"
 #define ME "11" 
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/
@@ -38,7 +39,7 @@ main ( int narg, char *argv[] ) {
   //  sscanf(argv[1],"%d",&n_ARXSUPPLY_NO);
   //  } else {
   //  printf("[%s] FATAL: ARXSUPPLY-NO not provided\n",ME);
-  //  return;
+  //  return 1;
   //  } 
 
   /* create file */

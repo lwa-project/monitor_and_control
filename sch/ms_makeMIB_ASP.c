@@ -11,13 +11,14 @@
 // See end of this file for history.
 
 #include <stdio.h>
+#include <unistd.h>
 
 //#include "LWA_MCS.h"
 
 #define MY_NAME "ms_makeMIB_ASP (v.20090814.1)"
 #define ME "10" 
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/
@@ -42,19 +43,19 @@ main ( int narg, char *argv[] ) {
     sscanf(argv[1],"%d",&n_ARXSUPPLY_NO);
     } else {
     printf("[%s] FATAL: ARXSUPPLY-NO not provided\n",ME);
-    return;
+    return 1;
     } 
   if (narg>2) { 
     sscanf(argv[2],"%d",&n_FEESUPPLY_NO);
     } else {
     printf("[%s] FATAL: FEESUPPLY_NO not provided\n",ME);
-    return;
+    return 1;
     } 
   if (narg>3) { 
     sscanf(argv[3],"%d",&n_TEMPSENSE_NO);
     } else {
     printf("[%s] FATAL: TEMPSENSE_NO not provided\n",ME);
-    return;
+    return 1;
     } 
 
 
