@@ -30,6 +30,7 @@
 //#define MCS_LAN_DEV1PC /* Development configuration -- all on 1 PC; using only loopback IP addr */
 //#define MCS_LAN_DEV2PC /* Development configuration -- Sch on 1 PC#1, Exec & TP on PC#2, TP shares Exec's IP addr */
 
+#include <string.h>
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>     /* added 110309 to facilitate use of "stat()" in me_exec */
