@@ -1212,7 +1212,7 @@ int me_sdm_write( struct sdm_struct *sdm ) {
   fwrite(sdm,sizeof(struct sdm_struct),1,fp);
   fclose(fp);  
 
-  return;
+  return 0;
   } /* me_sdm_write() */
 
 
