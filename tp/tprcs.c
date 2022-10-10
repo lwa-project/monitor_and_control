@@ -30,7 +30,7 @@ int main ( int narg, char *argv[] ) {
   /* parse command line */
   if (narg<2) {
     printf("syntax: $ ./tprcs <csfile>\n");
-    return;
+    return 1;
     }
   sprintf(csfile,"%s",argv[1]);
   printf("input: <csfile>='%s'\n",csfile);
@@ -38,7 +38,7 @@ int main ( int narg, char *argv[] ) {
   /* Open .cs file */
   if ((fp=fopen(csfile,"rb"))==NULL) {
     printf("[%d/%d] FATAL: Can't open '%s'\n",MT_TPRCS,getpid(),csfile);
-    return;
+    return 1;
     }
 
   //printf("MJD   MPM      A SID CID LEN  Data\n");  
