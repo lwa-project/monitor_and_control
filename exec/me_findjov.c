@@ -6,11 +6,11 @@
 // ---
 // REQUIRES: 
 //   
-// Find RA and DEC of Jupiter
+// Find the geocentric apparent RA and DEC of Jupiter
 // See end of this file for history.
 
-/* The codes below are ported from Xephem */
-#include "ephem_astro.h"  /* mostly gutted, leaving only stuff needed for others */
+#include "sofa.h"
+#include "sofam.h"
 
 void me_findjov(
                  long int mjd, /* (input) modified julian date */
@@ -20,76 +20,69 @@ void me_findjov(
                  float *dist   /* (output) [AU] distance from Earth */
                 ) {
 
-  double JD, H, JD0, TJD;
-  double ret[6]; /* this is how vsop87() returns output */
-  double L,  B,  R;
-  double L0, B0, R0;
-  double x,y,z;
-  double x0,y0,z0;
-  double lambda, beta, rho;
-  double lambdaHelio, betaHelio, rhoHelio;
-  double lambdaSun, rhoSun, betaSun;
-  double dRA, dDec;
+  double tai1, tai2, tt1, tt2;
+  double pv[2][3], pve[2][3], pvb[2][3], tpv[2][3];
+  double L,  B,  R, dL, dB, dR;
+  int i,j;
+  double pmat[3][3], nmat[3][3];
+  double R2;
   
-  /* Get JD from mjd/mpm */
-  JD0 = ((double)mjd) + 2400000.5;     /* ref: http://tycho.usno.navy.mil/mjd.html */
-  H   = ((double)mpm)/(3600.0*1000.0); /* mpm in hours */
-  JD = JD0 + H/24.0; /* days */
-  TJD = JD + deltat(JD-MJD0)/86400.0;
+  /* Get TAI from mjd/mpm */
+  iauUtctai(mjd+DJM0, mpm/1000.0/86400, &tai1, &tai2);
   
-  /* Get L, B, R for Jupiter so we can figure out how far away it is */
-  vsop87 ( TJD-MJD0, JUPITER, 0, ret);
-  L = ret[0]; /* [rad] */
-  B = ret[1]; /* [rad] */
-  R = ret[2]; /* [AU] */
+  /* Get TT from TAI */
+  iauTaitt(tai1, tai2, &tt1, &tt2);
   
-  /* Correct L, B, and R for the light travel time by looking back in time a bit*/
-  vsop87 ( TJD-MJD0-R/173.144633, JUPITER, 0, ret);
-  L = ret[0]; /* [rad] */
-  B = ret[1]; /* [rad] */
-  R = ret[2]; /* [AU] */
-  //printf("me_findjov(): L =%lf rad, B =%lf rad, R =%lf AU\n",L,B,R);
+  /* Get the heliocentric position of Jupiter and the Earth */
+  iauPlan94(tt1, tt2, 5, pv);
+  iauEpv00(tt1, tt2, pve, pvb);
   
-  /* Convert the location of number to cartesian x, y, z */
-  sphcart(L, B, R, &x, &y, &z);
-
-  /* Get L0, B0, R0 for Earth and convert to cartesian x0, y0, z0 */
-  vsop87 ( TJD-MJD0,       8, 0, ret);
-  L0 = ret[0]; /* [rad] */
-  B0 = ret[1]; /* [rad] */
-  R0 = ret[2]; /* [AU] */
-  sphcart(L0, B0, R0, &x0, &y0, &z0);
-  //printf("me_findjov(): L0=%lf rad, B0=%lf rad, R0=%lf AU\n",L0,B0,R0);
+  /* Un-correct for aberration */
+  iauASTROM astrom;
+  iauApcg13(tt1, tt2, &astrom);
   
-//   /* to ecliptical heliocentric coordinates */
-//   cartsph(x, y, z, &lambdaHelio, &betaHelio, &rhoHelio);
+  /* Get the geocentric position of Jupiter */
+  for(i=0; i<3; i++) {
+    pv[0][i] -= pve[0][i];
+    pv[1][i] -= pve[1][i];
+  }
+  iauPv2s(pv, &L, &B, &R, &dL, &dB, &dR);
   
-  /* to ecliptical geocentric coordinates */
-  cartsph(x-x0, y-y0, z-z0, &lambda, &beta, &rho);
+  /* Get the geocentric position of Jupiter corrected for light travel time */
+  iauPlan94(tt1, tt2 - R/DC, 5, pv);
   
-  /* to equatorial coordinates */
-  ecl_eq(TJD-MJD0, beta, lambda, &dRA, &dDec);
-  
-  /* Locate the Sun */
-  sunpos(TJD-MJD0, &lambdaSun, &rhoSun, &betaSun);
+  /* Get the barycentric position of Jupiter corrected for light travel time */
+  for(i=0; i<3; i++) {
+    pv[0][i] -= pve[0][i];
+    pv[1][i] -= pve[1][i];
+  }
+  iauPv2s(pv, &L, &B, &R, &dL, &dB, &dR);
   
   /* Apply relativistic deflection */
-  deflect(TJD-MJD0, lambdaHelio, betaHelio, lambdaSun, rhoSun, rho, &dRA, &dDec);
+  iauLdsun(pv[0], astrom.eh, astrom.em, &tpv[0][0]);
  
-  /* Apply nutation */
-  nut_eq(TJD-MJD0, &dRA, &dDec);
-  
   /* Apply aberration */
-  ab_eq(TJD-MJD0, lambdaSun, &dRA, &dDec);
+  iauAb(tpv[0], astrom.v, astrom.em, astrom.bm1, &pv[0][0]);
+  
+  /* Apply precession and nutation */
+  iauPmat06(tt1, tt2, &pmat[0]);
+  iauNum06a(tt1, tt2, &nmat[0]);
+  iauRxpv(pmat, pv, &tpv[0]);
+  iauRxpv(nmat, tpv, &pv[0]);
+  iauPv2s(pv, &L, &B, &R2, &dL, &dB, &dR);
+  
+  /* Cleanup */
+  L = iauAnp(L);
   
   /* Back to floats */
-  *ra = (float) radhr(dRA);
-  *dec = (float) raddeg(dDec);
-  *dist = (float) rho;
-
-  return;
+  *ra = (float) L * DR2D / 15;
+  *dec = (float) B * DR2D;
+  *dist = (float) R;
+  
   } /* me_findjov */
 
+// me_findjov.c: J. Dowell, UNM, 2022 Oct 7
+//  -- updated for the SOFA library
 // me_findjov.c: J. Dowell, UNM, 2022 Oct 3
 //  -- add in gravitational deflection near the Sun
 // me_findjov.c: J. Dowell, UNM, 2015 Sep 1
