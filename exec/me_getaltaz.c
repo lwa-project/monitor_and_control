@@ -27,7 +27,7 @@ void me_getaltaz(
                 ) {
 
   double tai1, tai2, tt1, tt2;
-  double fRA, fDec, eo;
+  double GAST, fRA, fDec, eo;
   double r[3][3], x, y, s;
   double HA, tHA, tDec;
   
@@ -38,7 +38,7 @@ void me_getaltaz(
   iauTaitt(tai1, tai2, &tt1, &tt2);
   
   /* Get GAST */
-  *LAST = iauGst06a(mjd+DJM0, mpm/1000.0/86400, tt1, tt2);
+  GAST = iauGst06a(mjd+DJM0, mpm/1000.0/86400, tt1, tt2);
   
   /* Convert to radians */
   lat *= DD2R;
@@ -47,9 +47,7 @@ void me_getaltaz(
   dec *= DD2R;
   
   /* Get the LST */
-  *LAST += lon;
-  while( *LAST < 0) *LAST += D2PI;
-  while( *LAST > D2PI) *LAST -= D2PI;
+  *LAST = iauAnp(GAST + lon);
   *LAST *= DR2D / 15;
   
   /* Switch to CIO based positions */
