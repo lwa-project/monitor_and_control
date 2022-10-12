@@ -64,7 +64,7 @@ void me_getaltaz(
   double obs[2][3], obj[3];
   if( dist < 1e3 ) {
     iauPvtob(lon, lat, elev, \
-             0.0, 0.0, s, *LAST-lon, \
+             0.0, 0.0, s, GAST, \
              &obs[0]);
     iauS2p(ra, dec, dist, &obj[0]);
     obj[0] -= obs[0][0]/DAU;
