@@ -35,7 +35,7 @@ int main ( int narg, char *argv[] ) {
   if (narg<6) {
     printf("Useage:\n");
     printf("me_point_corr_x <fPCAxisTh> <fPCAxisPh> <fPCAxisRot> <alt> <az>\n");
-    return;
+    return 1;
     }
 
   me_point_corr( 
