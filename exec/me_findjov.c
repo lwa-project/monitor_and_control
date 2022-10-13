@@ -23,8 +23,7 @@ void me_findjov(
   double tai1, tai2, tt1, tt2;
   double pv[2][3], pve[2][3], pvb[2][3], tpv[2][3];
   double L,  B,  R, dL, dB, dR;
-  int i,j;
-  double pmat[3][3], nmat[3][3];
+  double pnmat[3][3];
   double R2;
   
   /* Get TAI from mjd/mpm */
@@ -42,37 +41,28 @@ void me_findjov(
   iauApcg13(tt1, tt2, &astrom);
   
   /* Get the geocentric position of Jupiter */
-  for(i=0; i<3; i++) {
-    pv[0][i] -= pve[0][i];
-    pv[1][i] -= pve[1][i];
-  }
+  iauPvmpv(pv, pve, &pv[0]);
   iauPv2s(pv, &L, &B, &R, &dL, &dB, &dR);
   
-  /* Get the geocentric position of Jupiter corrected for light travel time */
+  /* Get the heliocentric position of Jupiter corrected for light travel time */
   iauPlan94(tt1, tt2 - R/DC, 5, pv);
   
-  /* Get the barycentric position of Jupiter corrected for light travel time */
-  for(i=0; i<3; i++) {
-    pv[0][i] -= pve[0][i];
-    pv[1][i] -= pve[1][i];
-  }
-  iauPv2s(pv, &L, &B, &R, &dL, &dB, &dR);
+  /* Get the geocentric position of Jupiter corrected for light travel time */
+  iauPvmpv(pv, pve, &tpv[0]);
+  iauPv2s(tpv, &L, &B, &R, &dL, &dB, &dR);
   
   /* Apply relativistic deflection */
+  iauPn(tpv[0], &R2, &pv[0][0]);
   iauLdsun(pv[0], astrom.eh, astrom.em, &tpv[0][0]);
  
-  /* Apply aberration */
-  iauAb(tpv[0], astrom.v, astrom.em, astrom.bm1, &pv[0][0]);
-  
   /* Apply precession and nutation */
-  iauPmat06(tt1, tt2, &pmat[0]);
-  iauNum06a(tt1, tt2, &nmat[0]);
-  iauRxpv(pmat, pv, &tpv[0]);
-  iauRxpv(nmat, tpv, &pv[0]);
+  iauPnm06a(tt1, tt2, &pnmat[0]);
+  iauRxpv(pnmat, tpv, &pv[0]);
+
+  /* Apply aberration */
+  iauPn(pv[0], &R2, &tpv[0][0]);
+  iauAb(tpv[0], astrom.v, astrom.em, astrom.bm1, &pv[0][0]);
   iauPv2s(pv, &L, &B, &R2, &dL, &dB, &dR);
-  
-  /* Cleanup */
-  L = iauAnp(L);
   
   /* Back to floats */
   *ra = (float) L * DR2D / 15;
