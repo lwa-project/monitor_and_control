@@ -46,10 +46,6 @@ void me_getaltaz(
   ra *= 15 * DD2R;
   dec *= DD2R;
   
-  /* Get the LST */
-  *LAST = iauAnp(GAST + lon);
-  *LAST *= DR2D / 15;
-  
   /* Switch to CIO based positions */
   // Equaninox-based BPN matrix...
   iauPnm06a(tt1, tt2, &r[0]);
@@ -61,18 +57,22 @@ void me_getaltaz(
   ra += iauEors(r, s);
   
   /* Parallax from the geocenter to the observer */
-  double obs[2][3], obj[3];
+  double era, obs[2][3], obj[3];
   if( dist < 1e3 ) {
+    era = iauEra00(mjd+DJM0, mpm/1000.0/86400);
     iauPvtob(lon, lat, elev, \
-             0.0, 0.0, s, GAST, \
+             0.0, 0.0, 0.0, era, \
              &obs[0]);
     iauS2p(ra, dec, dist, &obj[0]);
-    obj[0] -= obs[0][0]/DAU;
-    obj[1] -= obs[0][1]/DAU;
-    obj[2] -= obs[0][2]/DAU;
+    iauSxpv(1/DAU, obs, &obs[0]);
+    iauPmp(obj, obs[0], &obj[0]);
     iauP2s(obj, &ra, &dec, &dist);
   }
   
+  /* Get the LST */
+  *LAST = iauAnp(GAST + lon);
+  *LAST *= DR2D / 15;
+
   /* Get the topocentric coordinates */
   iauAtio13(ra, dec, \
             mjd+DJM0, mpm/1000.0/86400, 0.0, \
