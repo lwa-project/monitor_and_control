@@ -39,7 +39,7 @@ int main ( int narg, char *argv[] ) {
     printf("  <ra>:  float right ascension in hours, J2000.0\n");
     printf("  <dec>: float declination in degrees, J2000.0\n");
     
-    return;
+    return 1;
     }
  
   me_precess(
