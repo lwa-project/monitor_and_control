@@ -53,7 +53,7 @@ int main ( int narg, char *argv[] ) {
     printf("  <lat> : [deg, +N] observer location\n");
     printf("  <lon> : [deg, +E] observer location\n");
     printf("  <elev>: [m] observation location\n");
-    return;
+    return 1;
     }
   //printf("RA/DEC/DIST  = %6.2lf h %+6.2lf deg %.2lf AU\n",ra,dec,dist);
   //printf("MJD/MPM = %5ld %9ld\n",mjd,mpm);
