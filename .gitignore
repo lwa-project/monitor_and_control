@@ -1,7 +1,12 @@
 # Object files
 *.o
 
+# Libraries
+sofa/src/libsofa_c.a
+
 # Executables
+## sofa
+sofa/src/t_sofa_c
 ## scheduler
 sch/dat2dbm
 sch/ms_exec
@@ -24,7 +29,6 @@ sch/ms_mon
 sch/ms_mu
 sch/msei
 ## executive
-sofa/src/libsofa_c.a
 exec/me_exec
 exec/me_findlun_x
 exec/me_findjov_x
