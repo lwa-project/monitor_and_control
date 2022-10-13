@@ -35,7 +35,7 @@ int main ( int narg, char *argv[] ) {
     printf("me_findjov_x <mjd> <mpm>\n");
     printf("  <mjd>: integer MJD\n");
     printf("  <mpm>: integer milliseconds past UTC midnight\n");
-    return;
+    return 1;
     }
  
   me_findjov(
