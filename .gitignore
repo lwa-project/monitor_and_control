@@ -24,7 +24,7 @@ sch/ms_mon
 sch/ms_mu
 sch/msei
 ## executive
-exec/libsofa_c.a
+sofa/src/libsofa_c.a
 exec/me_exec
 exec/me_findlun_x
 exec/me_findjov_x

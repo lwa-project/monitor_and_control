@@ -56,7 +56,7 @@ me_point_corr_x: me_point_corr_x.o me_point_corr.o
 #
 
 SOFA_CFLAGS := -I../sofa/src
-SOFA_LDFLAGS := -L. -lsofa_c -lm
+SOFA_LDFLAGS := -L../sofa/src -lsofa_c -lm
 
 me_inproc: me_inproc.o me_getaltaz.o me_point_corr.o me_findsol.o me_findjov.o me_findlun.o me_precess.o me.h ../common/mcs.h
 	$(CC) -o me_inproc me_inproc.o  me_getaltaz.o me_point_corr.o me_findsol.o me_findjov.o me_findlun.o me_precess.o $(LDFLAGS) $(SOFA_LDFLAGS)
