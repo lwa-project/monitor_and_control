@@ -23,8 +23,7 @@ void me_findsol(
   double tai1, tai2, tt1, tt2;
   double pv[2][3], pvb[2][3], tpv[2][3];
   double L,  B,  R, dL, dB, dR;
-  int i, j;
-  double pmat[3][3], nmat[3][3];
+  double pnmat[3][3];
   
   /* Get TAI from mjd/mpm */
   iauUtctai(mjd+DJM0, mpm/1000.0/86400, &tai1, &tai2);
@@ -45,11 +44,9 @@ void me_findsol(
   iauPv2s(pv, &L, &B, &R, &dL, &dB, &dR);
   
   /* Apply precession and nutation */
-  iauPmat06(tt1, tt2, &pmat[0]);
-  iauNum06a(tt1, tt2, &nmat[0]);
-  iauRxpv(pmat, pv, &tpv[0]);
-  iauRxpv(nmat, tpv, &pv[0]);
-  iauPv2s(pv, &L, &B, &R, &dL, &dB, &dR);
+  iauPnm06a(tt1, tt2, &pnmat[0]);
+  iauRxpv(pnmat, pv, &tpv[0]);
+  iauPv2s(tpv, &L, &B, &R, &dL, &dB, &dR);
   
   /* Apply aberration */
   // Already done for us apparently
