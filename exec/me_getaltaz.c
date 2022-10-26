@@ -9,6 +9,7 @@
 // See end of this file for history.
 
 #include <math.h>
+#include <stdio.h>
 #include "sofa.h"
 #include "sofam.h"
 
@@ -27,12 +28,15 @@ void me_getaltaz(
                 ) {
 
   double tai1, tai2, tt1, tt2;
-  double GAST, fRA, fDec, eo;
+  double GAST, xp, yp, dut, fRA, fDec, eo;
   double r[3][3], x, y, s;
   double HA, tHA, tDec;
   
   /* Get TAI from mjd/mpm */
-  iauUtctai(mjd+DJM0, mpm/1000.0/86400, &tai1, &tai2);
+  int status = iauUtctai(mjd+DJM0+mpm/1000.0/86400, 0.0, &tai1, &tai2);
+  if( status == 1 ) {
+    printf("WARNING: iauUtctai returned 1 - dubious year\n");
+  }
   
   /* Get TT from TAI */
   iauTaitt(tai1, tai2, &tt1, &tt2);
@@ -54,7 +58,7 @@ void me_getaltaz(
   // Celestrial intermediate origin locator...
   s = iauS06(tt1, tt2, x, y);
   // ... and add the equation of origins to the RA
-  ra += iauEors(r, s);
+  ra = iauAnp(ra + iauEors(r, s));
   
   /* Parallax from the geocenter to the observer */
   double era, obs[2][3], obj[3];
@@ -72,17 +76,28 @@ void me_getaltaz(
   /* Get the LST */
   *LAST = iauAnp(GAST + lon);
   *LAST *= DR2D / 15;
+  
+  /* Get the Earth orientation parameters for the day */
+  status = me_geteop(mjd, mpm, &xp, &yp, &dut);
+  if( status == 1 ) {
+    printf("WARNING: me_geteop returned 1 - MJD/MPM out of range of table\n");
+  }
 
   /* Get the topocentric coordinates */
   iauAtio13(ra, dec, \
-            mjd+DJM0, mpm/1000.0/86400, 0.0, \
-            lon, lat, elev, 0.0, 0.0, \
+            DJM0, mjd+mpm/1000.0/86400, dut, \
+            lon, lat, elev, xp * (DD2R/3600), yp * (DD2R/3600), \
             0.0, 0.0, 0.0, 0.0,
             az, alt, &HA, \
             &fDec, &fRA);
             
   /* Zenith angle to altitude (elevation) */
   *alt = DPI/2 - *alt;
+  
+  int idmsf[4];
+  char sg='+';
+  iauA2af(2, *alt, &sg, idmsf);
+  printf("%c%i d %02i d %02i.%02i\n", sg, idmsf[0], idmsf[1], idmsf[2], idmsf[3]);
   
   /* Back to degrees */
   *alt *= DR2D;

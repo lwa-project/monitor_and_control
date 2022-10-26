@@ -5,6 +5,7 @@ import os
 import numpy
 import shutil
 import subprocess
+from datetime import datetime, timedelta
 
 from lsl.astro import DJD_OFFSET, MJD_OFFSET
 
@@ -24,14 +25,16 @@ except ImportError:
 try:
     import json
     import requests
-    use_horizons = True
+    use_horizons = False
 except ImportError:
     use_horizons = False
 
 
-TEST_DATE_START = (2020, 1, 1)
-TEST_DATE_END = (2030, 12, 31)
-TEST_DATE_STEP_DAY = 14
+_test_date_start = datetime.utcnow()
+_test_date_end = _test_date_start + timedelta(days=60)
+TEST_DATE_START = (_test_date_start.year, _test_date_start.month, _test_date_start.day)
+TEST_DATE_END = (_test_date_end.year, _test_date_end.month, _test_date_end.day)
+TEST_DATE_STEP_DAY = 1
 
 TEST_TOLERANCE_ARCSEC = 2.0
 

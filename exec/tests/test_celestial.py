@@ -5,6 +5,7 @@ import os
 import numpy
 import shutil
 import subprocess
+from datetime import datetime, timedelta
 
 from lsl.astro import DJD_OFFSET, MJD_OFFSET
 
@@ -22,11 +23,13 @@ except ImportError:
     use_astropy = False
 
 
-TEST_DATE_START = (2020, 1, 1)
-TEST_DATE_END = (2030, 12, 31)
-TEST_DATE_STEP_DAY = 14
+_test_date_start = datetime.utcnow()
+_test_date_end = _test_date_start + timedelta(days=60)
+TEST_DATE_START = (_test_date_start.year, _test_date_start.month, _test_date_start.day)
+TEST_DATE_END = (_test_date_end.year, _test_date_end.month, _test_date_end.day)
+TEST_DATE_STEP_DAY = 1
 
-TEST_TOLERANCE_ARCSEC = 2.0
+TEST_TOLERANCE_ARCSEC = 1.0
 
 
 def _call_mcs(mjd, mpm, ra, dec, lat, lng, hgt):
@@ -168,13 +171,14 @@ class CelestialTests(unittest.TestCase):
         values = []
         while t < tStop:
             frame = AltAz(location=observer, obstime=t,
-                          pressure=0, temperature=0, obswl=0)
+                          pressure=0, temperature=0, relative_humidity=0, obswl=0)
             mjd = t.mjd
             mpm = int((int(mjd)- mjd)*86400*1000)
             mjd = int(mjd)
             
             obj = body.transform_to(frame)
             mcs_alt, mcs_az = _call_mcs(mjd, mpm, ra, dec, self._lat, self._lng, self._hgt)
+            # print(obj.alt.to('deg').value, obj.az.to('deg').value, mjd, mpm, ra, dec, mcs_alt, mcs_az)
             
             values.append({'mjd': t.mjd,
                            'ra': ra,

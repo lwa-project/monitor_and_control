@@ -9,21 +9,25 @@
 // Precesses a RA/Dec coordinate pair from J2000.0 to the current epoch.  Also, 
 // apply corrections for nutation and aberration to the coordinates.
 
+#include <stdio.h>
 #include "sofa.h"
 #include "sofam.h"
 
 void me_precess(
                  long int mjd, /* (input) modified julian date */
                  long int mpm, /* (input) milliseconds past UTC midnight */ 
-                 float *ra,   /* (input/output) [h] RA */
-                 float *dec  /* (input/output) [deg] dec */
+                 double *ra,   /* (input/output) [h] RA */
+                 double *dec   /* (input/output) [deg] dec */
                 ) {
 
   double tai1, tai2, tt1, tt2;
   double dRA, dDec, fRA, fDec, eo;
   
   /* Get TAI from mjd/mpm */
-  iauUtctai(mjd+DJM0, mpm/1000.0/86400, &tai1, &tai2);
+  int status = iauUtctai(mjd+DJM0+mpm/1000.0/86400, 0.0, &tai1, &tai2);
+  if( status == 1 ) {
+    printf("WARNING: iauUtctai returned 1 - dubious year\n");
+  }
   
   /* Get TT from TAI */
   iauTaitt(tai1, tai2, &tt1, &tt2);
@@ -39,11 +43,11 @@ void me_precess(
             &fRA, &fDec, &eo);
             
   /* Swith to equinox based positions */
-  fRA -= eo;
+  fRA = iauAnp(fRA - eo);
   
   /* Back to floats */
-  *ra = (float) fRA * DR2D / 15;
-  *dec = (float) fDec * DR2D;
+  *ra = fRA * (DR2D / 15);
+  *dec = fDec * DR2D;
   
   } /* me_precess */
 

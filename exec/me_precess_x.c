@@ -20,8 +20,8 @@
 
 int main ( int narg, char *argv[] ) {
 
-  float ra;    /* (input) [h] RA */
-  float dec;   /* (input) [deg] dec */
+  double ra;    /* (input) [h] RA */
+  double dec;   /* (input) [deg] dec */
   long int mjd; /* (input) mean julian date */
   long int mpm; /* (input) milliseconds past UTC midnight */
   float m, s;
@@ -29,8 +29,8 @@ int main ( int narg, char *argv[] ) {
   /* Parse command line */
   if (narg>1) sscanf(argv[1],"%ld",&mjd);
   if (narg>2) sscanf(argv[2],"%ld",&mpm);  
-  if (narg>3) sscanf(argv[3],"%f",&ra);
-  if (narg>4) sscanf(argv[4],"%f",&dec);
+  if (narg>3) sscanf(argv[3],"%lf",&ra);
+  if (narg>4) sscanf(argv[4],"%lf",&dec);
   if (narg<4) {
     printf("Usage:\n");
     printf("me_precess_x <mjd> <mpm> <ra> <dec>\n");
@@ -68,5 +68,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

@@ -58,14 +58,17 @@ me_point_corr_x: me_point_corr_x.o me_point_corr.o
 SOFA_CFLAGS := -I../sofa/src
 SOFA_LDFLAGS := -L../sofa/src -lsofa_c -lm
 
-me_inproc: me_inproc.o me_getaltaz.o me_point_corr.o me_findsol.o me_findjov.o me_findlun.o me_precess.o me.h ../common/mcs.h
-	$(CC) -o me_inproc me_inproc.o  me_getaltaz.o me_point_corr.o me_findsol.o me_findjov.o me_findlun.o me_precess.o $(LDFLAGS) $(SOFA_LDFLAGS)
+me_inproc: me_inproc.o me_geteop.o me_getaltaz.o me_point_corr.o me_findsol.o me_findjov.o me_findlun.o me_precess.o me.h ../common/mcs.h
+	$(CC) -o me_inproc me_inproc.o  me_geteop.o me_getaltaz.o me_point_corr.o me_findsol.o me_findjov.o me_findlun.o me_precess.o $(LDFLAGS) $(SOFA_LDFLAGS)
+
+me_geteop.o: me_geteop.c
+	$(CC) $(CFLAGS) $(SOFA_CFLAGS) -c -o me_geteop.o me_geteop.c
 
 me_getaltaz.o: me_getaltaz.c
 	$(CC) $(CFLAGS) $(SOFA_CFLAGS) -c -o me_getaltaz.o me_getaltaz.c
 
-me_getaltaz_x: me_getaltaz_x.o me_getaltaz.o
-	$(CC) -o me_getaltaz_x me_getaltaz_x.o me_getaltaz.o $(LDFLAGS) $(SOFA_LDFLAGS)
+me_getaltaz_x: me_getaltaz_x.o me_getaltaz.o me_geteop.o
+	$(CC) -o me_getaltaz_x me_getaltaz_x.o me_getaltaz.o me_geteop.o $(LDFLAGS) $(SOFA_LDFLAGS)
 
 me_getlst.o: me_getlst.c
 	$(CC) $(CFLAGS) $(SOFA_CFLAGS) -c -o me_getlst.o me_getlst.c

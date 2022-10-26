@@ -22,6 +22,9 @@ extern void me_getlst(long int mjd, long int mpm, double lat, double lon, double
 extern void me_point_corr(float fPCAxisTh, float fPCAxisPH, float fPCRot, double *alt, double *az);
 
 /* me_precess.c */
-extern void me_precess(long int mjd, long int mpm, float *ra, float *dec);
+extern void me_precess(long int mjd, long int mpm, double *ra, double *dec);
+
+/* me_geteop.c */
+extern int me_geteop(long int mjd, long int mpm, double *xp, double *yp, double *dut);
 
 #endif // #ifndef ME_ASTRO_H
