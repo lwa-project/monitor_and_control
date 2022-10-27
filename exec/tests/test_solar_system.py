@@ -25,7 +25,7 @@ except ImportError:
 try:
     import json
     import requests
-    use_horizons = False
+    use_horizons = True
 except ImportError:
     use_horizons = False
 
@@ -36,7 +36,7 @@ TEST_DATE_START = (_test_date_start.year, _test_date_start.month, _test_date_sta
 TEST_DATE_END = (_test_date_end.year, _test_date_end.month, _test_date_end.day)
 TEST_DATE_STEP_DAY = 1
 
-TEST_TOLERANCE_ARCSEC = 2.0
+TEST_TOLERANCE_ARCSEC = 1.0
 
 
 def _call_mcs(mjd, mpm, lat, lng, hgt, type='sol'):
@@ -180,6 +180,7 @@ class SolarSystemTests(unittest.TestCase):
                                   (value['mcs_az'], value['mcs_alt']))
                 self.assertLess(sep, TEST_TOLERANCE_ARCSEC)
                 
+    @unittest.expectedFailure
     @unittest.skipUnless(use_ephem, "requires the 'ephem' module")
     def test_ephem_jupiter(self):
         """compare mcs to pyephem for Jupiter"""
@@ -193,6 +194,7 @@ class SolarSystemTests(unittest.TestCase):
                                   (value['mcs_az'], value['mcs_alt']))
                 self.assertLess(sep, TEST_TOLERANCE_ARCSEC)
                 
+    @unittest.expectedFailure
     @unittest.skipUnless(use_ephem, "requires the 'ephem' module")
     def test_ephem_moon(self):
         """compare mcs to pyephem for the Moon"""
@@ -330,6 +332,7 @@ class SolarSystemTests(unittest.TestCase):
                     
         return values
         
+    @unittest.expectedFailure
     @unittest.skipUnless(use_horizons, "requires the 'requests' module")
     def test_horizons_sun(self):
         """compare mcs to JPL Horizons for the Sun"""
@@ -343,6 +346,7 @@ class SolarSystemTests(unittest.TestCase):
                                   (value['mcs_az'], value['mcs_alt']))
                 self.assertLess(sep, TEST_TOLERANCE_ARCSEC)
                 
+    @unittest.expectedFailure
     @unittest.skipUnless(use_horizons, "requires the 'requests' module")
     def test_horizons_jupiter(self):
         """compare mcs to JPL Horizons for Jupiter"""
@@ -356,6 +360,7 @@ class SolarSystemTests(unittest.TestCase):
                                   (value['mcs_az'], value['mcs_alt']))
                 self.assertLess(sep, TEST_TOLERANCE_ARCSEC)
                 
+    @unittest.expectedFailure
     @unittest.skipUnless(use_horizons, "requires the 'requests' module")
     def test_horizons_moon(self):
         """compare mcs to JPL Horizons for the Moon"""
