@@ -1,5 +1,11 @@
 #include "sofa.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <sys/stat.h>
+
 int iauDat(int iy, int im, int id, double fd, double *deltat)
 /*
 **  - - - - - - -
@@ -42,6 +48,9 @@ int iauDat(int iy, int im, int id, double fd, double *deltat)
 **
 **  This function is part of the International Astronomical Union's
 **  SOFA (Standards Of Fundamental Astronomy) software collection.
+** 
+**  This function has been modified to refresh the list of leap 
+**  seconds from the internet every seven days.
 **
 **  Status:  user-replaceable support function.
 **
@@ -120,7 +129,7 @@ int iauDat(int iy, int im, int id, double fd, double *deltat)
 **  Called:
 **     iauCal2jd    Gregorian calendar to JD
 **
-**  This revision:  2021 May 11
+**  This revision:  2022 Oct 26
 **
 **  SOFA release 2021-05-12
 **
@@ -128,7 +137,8 @@ int iauDat(int iy, int im, int id, double fd, double *deltat)
 */
 {
 /* Release year for this version of iauDat */
-   enum { IYV = 2021};
+/* (to be updated after we download the leapsec.txt file) */
+   int IYV = 2021;
 
 /* Reference dates (MJD) and drift rates (s/day), pre leap seconds */
    static const double drift[][2] = {
@@ -152,59 +162,71 @@ int iauDat(int iy, int im, int id, double fd, double *deltat)
    enum { NERA1 = (int) (sizeof drift / sizeof (double) / 2) };
 
 /* Dates and Delta(AT)s */
-   static const struct {
+   typedef struct {
       int iyear, month;
       double delat;
-   } changes[] = {
-      { 1960,  1,  1.4178180 },
-      { 1961,  1,  1.4228180 },
-      { 1961,  8,  1.3728180 },
-      { 1962,  1,  1.8458580 },
-      { 1963, 11,  1.9458580 },
-      { 1964,  1,  3.2401300 },
-      { 1964,  4,  3.3401300 },
-      { 1964,  9,  3.4401300 },
-      { 1965,  1,  3.5401300 },
-      { 1965,  3,  3.6401300 },
-      { 1965,  7,  3.7401300 },
-      { 1965,  9,  3.8401300 },
-      { 1966,  1,  4.3131700 },
-      { 1968,  2,  4.2131700 },
-      { 1972,  1, 10.0       },
-      { 1972,  7, 11.0       },
-      { 1973,  1, 12.0       },
-      { 1974,  1, 13.0       },
-      { 1975,  1, 14.0       },
-      { 1976,  1, 15.0       },
-      { 1977,  1, 16.0       },
-      { 1978,  1, 17.0       },
-      { 1979,  1, 18.0       },
-      { 1980,  1, 19.0       },
-      { 1981,  7, 20.0       },
-      { 1982,  7, 21.0       },
-      { 1983,  7, 22.0       },
-      { 1985,  7, 23.0       },
-      { 1988,  1, 24.0       },
-      { 1990,  1, 25.0       },
-      { 1991,  1, 26.0       },
-      { 1992,  7, 27.0       },
-      { 1993,  7, 28.0       },
-      { 1994,  7, 29.0       },
-      { 1996,  1, 30.0       },
-      { 1997,  7, 31.0       },
-      { 1999,  1, 32.0       },
-      { 2006,  1, 33.0       },
-      { 2009,  1, 34.0       },
-      { 2012,  7, 35.0       },
-      { 2015,  7, 36.0       },
-      { 2017,  1, 37.0       }
-   };
+   } dat_change;
+   dat_change *changes = (dat_change*) malloc(256*sizeof(dat_change));
+   
+   int count = 0;
+   changes[count].iyear = 1960; changes[count].month =  1; changes[count++].delat = 1.4178180;
+   changes[count].iyear = 1961; changes[count].month =  1; changes[count++].delat = 1.4228180;
+   changes[count].iyear = 1961; changes[count].month =  8; changes[count++].delat = 1.3728180;
+   changes[count].iyear = 1962; changes[count].month =  1; changes[count++].delat = 1.8458580;
+   changes[count].iyear = 1963; changes[count].month = 11; changes[count++].delat = 1.9458580;
+   changes[count].iyear = 1964; changes[count].month =  1; changes[count++].delat = 3.2401300;
+   changes[count].iyear = 1964; changes[count].month =  4; changes[count++].delat = 3.3401300;
+   changes[count].iyear = 1964; changes[count].month =  9; changes[count++].delat = 3.4401300;
+   changes[count].iyear = 1965; changes[count].month =  1; changes[count++].delat = 3.5401300;
+   changes[count].iyear = 1965; changes[count].month =  3; changes[count++].delat = 3.6401300;
+   changes[count].iyear = 1965; changes[count].month =  7; changes[count++].delat = 3.7401300;
+   changes[count].iyear = 1965; changes[count].month =  9; changes[count++].delat = 3.8401300;
+   changes[count].iyear = 1966; changes[count].month =  1; changes[count++].delat = 4.3131700;
+   changes[count].iyear = 1968; changes[count].month =  2; changes[count++].delat = 4.2131700;
+   
+   int ret, j;
+   struct stat fstats;
+   time_t now = time(NULL);
+   FILE *fh;
+   char line[257];
+
+/* Refresh the leapsec.txt file */
+   memset(&fstats, 0, sizeof(fstats));
+   stat("state/leapsec.txt", &fstats);
+   if( now - fstats.st_mtime > 7*86400 ) {
+     system("wget --no-use-server-timestamps -FO ./state/leapsec.txt https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat");
+   }
+
+/* Update the value of IYV */
+   stat("state/leapsec.txt", &fstats);
+   struct tm *now_gm = gmtime(&(fstats.st_mtime));
+   IYV = now_gm->tm_year + 1900;
+   
+/* Load in leadpsec.txt */
+   int entry_year, entry_month, entry_day, entry_deltat;
+   double entry_mjd;
+
+   fh = fopen("state/leapsec.txt", "r");
+   while( fgets(&line[0], 256, fh) != NULL ) {
+     ret = sscanf(&line[0], \
+                  "%lf %i %i %i %i", \
+                  &entry_mjd, &entry_day, &entry_month, &entry_year, &entry_deltat);
+     if( ret == 5 ) {
+       changes[count].iyear = entry_year;
+       changes[count].month = entry_month;
+       changes[count++].delat = (double) entry_deltat;
+     }
+     if( count == 256 ) {
+       j = 1;
+       break;
+     }
+   }
 
 /* Number of Delta(AT) changes */
-   enum { NDAT = (int) (sizeof changes / sizeof changes[0]) };
+   int NDAT = count;
 
 /* Miscellaneous local variables */
-   int j, i, m;
+   int i, m;
    double da, djm0, djm;
 
 
@@ -245,6 +267,9 @@ int iauDat(int iy, int im, int id, double fd, double *deltat)
 
 /* Return the Delta(AT) value. */
    *deltat = da;
+
+/* Cleanup. */
+   free(changes);
 
 /* Return the status. */
    return j;
