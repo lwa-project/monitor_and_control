@@ -22,9 +22,9 @@ int main ( int narg, char *argv[] ) {
   
   long int mjd; /* (input) mean julian date */
   long int mpm; /* (input) milliseconds past UTC midnight */ 
-  float ra;     /* (output) [h] RA */
-  float dec;    /* (output) [deg] dec */
-  float dist;   /* (output) [AU] distance from Earth */
+  double ra;    /* (output) [h] RA */
+  double dec;   /* (output) [deg] dec */
+  double dist;  /* (output) [AU] distance from Earth */
   float m, s;
 
   /* Parse command line */

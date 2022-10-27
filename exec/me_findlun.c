@@ -15,9 +15,9 @@
 void me_findlun(
                  long int mjd,  /* (input) modified julian date */
                  long int mpm,  /* (input) milliseconds past UTC midnight */ 
-                 float *ra,     /* (output) [h] RA */
-                 float *dec,    /* (output) [deg] dec */
-                 float *dist    /* (output) [AU] distance from Earth */
+                 double *ra,    /* (output) [h] RA */
+                 double *dec,   /* (output) [deg] dec */
+                 double *dist   /* (output) [AU] distance from Earth */
                 ) {
   double tai1, tai2, tt1, tt2;
   double pv[2][3], tpv[2][3];
@@ -47,10 +47,9 @@ void me_findlun(
   /* Cleanup */
   L = iauAnp(L);
   
-  /* Back to floats */
-  *ra = (float) L * DR2D / 15;
-  *dec = (float) B * DR2D;
-  *dist = (float) R;
+  *ra = L * (DR2D / 15);
+  *dec = B * DR2D;
+  *dist = R;
   
   } /* me_findlun */
 
