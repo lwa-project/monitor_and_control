@@ -29,14 +29,14 @@ int main ( int narg, char *argv[] ) {
       sprintf(dbm_filename,"%s",argv[1]);
     } else {
       printf("[%d/%d] FATAL: subsystem not specified\n",ME_MEMDREX,getpid());
-      return;
+      return 1;
     } 
   if (narg>2) { 
       //printf("[%s/%d] label <%s> specified\n",ME,getpid(),argv[2]);
       sprintf(label,"%s",argv[2]);
     } else {
       printf("[%d/%d] FATAL: MIB label not specified\n",ME_MEMDREX,getpid());
-      return;
+      return 1;
     } 
 
   eResult = memdre(dbm_filename,label,val,&last_change);

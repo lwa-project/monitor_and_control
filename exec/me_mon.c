@@ -28,7 +28,7 @@
 
 #define MEELOG_STR_LEN 4096
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/

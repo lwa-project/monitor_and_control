@@ -140,7 +140,7 @@ int main ( int narg, char *argv[] ) {
 
       if (!(fp=fopen(sManifestFilename,"r"))) {
         printf("[%d/%d] FATAL: Couldn't fopen('%s')\n",ME_TPCOM,getpid(),sManifestFilename);
-        return;
+        return 1;
         }
 
       /* transfer files identified in manifest */
@@ -170,7 +170,7 @@ int main ( int narg, char *argv[] ) {
     /* check the state directory for any outprocessing manifest files */
     if (!(dir = opendir("state"))) {
       printf("[%d/%d] FATAL: Couldn't opendir('state')\n",ME_TPCOM,getpid());
-      return;
+      return 1;
       } 
 
     while ( (sDirEnt=readdir(dir)) != NULL ) {
@@ -182,7 +182,7 @@ int main ( int narg, char *argv[] ) {
         /* read the manifest */
         if (!(fp = fopen(om_filename,"rb"))) {
           printf("[%d/%d] FATAL: Couldn't fopen('%s')\n",ME_TPCOM,getpid(),om_filename);
-          return;
+          return 1;
           }       
         fread(&om,sizeof(om),1,fp);
         fclose(fp);

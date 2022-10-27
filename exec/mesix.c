@@ -52,14 +52,14 @@ int main ( int narg, char *argv[] ) {
     //printf("dest = <%s>\n",dest);
     } else {
     printf("[%d/%d] FATAL: dest not provided\n",ME_MESIX,getpid());
-    return;
+    return 1;
     } 
   if (narg>2) { 
     sscanf(argv[2],"%3s",cmd);
     //printf("dest = <%s>\n",dest);
     } else {
     printf("[%d/%d] FATAL: cmd not provided\n",ME_MESIX,getpid());
-    return;
+    return 1;
     } 
   strcpy(data,"");
   if (narg>3) { 
