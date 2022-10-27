@@ -43,7 +43,7 @@ int main( int narg, char *argv[] ) {
   /* Parse command line */
   if (narg<3) {
     printf("%s: FATAL: Insufficient arguments.  Usage is 'mecfg <cft_file> <cf_file>'\n",ME);
-    return;
+    return 1;
     }
   sscanf(argv[1],"%s",cft_file); 
   sscanf(argv[2],"%s",cf_file); 
@@ -63,7 +63,7 @@ int main( int narg, char *argv[] ) {
   fp = fopen(cft_file,"r");
   if (!fp) {
     printf("%s: FATAL: Unable to open '%s' for input.\n",ME,cft_file);
-    return;
+    return 1;
     }
   for (i=0; i<MAX_DELAYS; i++) {
     for (j=0; j<MAX_COEFFS; j++) {
@@ -89,12 +89,12 @@ int main( int narg, char *argv[] ) {
   fp = fopen(cf_file,"wb");
   if (!fp) {
     printf("%s: FATAL: Unable to open '%s' for output.\n",ME,cf_file);
-    return;
+    return 1;
     }  
   fwrite( c, sizeof(c[0][0]), sizeof(c)/sizeof(c[0][0]), fp );
   fclose(fp);
 
-  return;
+  return 0;
   } /* main() */
 
 //==================================================================================

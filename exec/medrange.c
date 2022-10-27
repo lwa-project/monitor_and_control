@@ -89,14 +89,14 @@ int main ( int narg, char *argv[] ) {
     printf("  <fmhz>: center frequency in MHz, used to compute dispersive component of cable delay, defaults to 74\n");
     printf("example: '$ ./medrange state 74'\n");
     printf("\n");
-    return;
+    return 1;
     }
 
   if (narg>1) {
       sprintf(sSDir,"%s",argv[1]);
     } else {
       printf("[%d/%d] FATAL: <sdir> not specified\n",ME_DRANGE,getpid());
-      return;
+      return 1;
     }
   //printf("input: <sdir>='%s'\n",sSDir);
 
@@ -111,11 +111,11 @@ int main ( int narg, char *argv[] ) {
   sprintf(filename,"%s/ssmif.dat",sSDir);
   if ((fp=fopen(filename,"rb"))==NULL) {
     printf("[%d/%d] FATAL: Can't open '%s'\n",ME_DRANGE,getpid(),filename);
-    return;
+    return 1;
     }
   fread(&s,sizeof(struct ssmif_struct),1,fp);
   fclose(fp);
-  //return;
+  //return 0;
 
   /* cleanup */
   sprintf(cmd,"rm -rf %s/mindelay.txt",sSDir);
@@ -125,13 +125,13 @@ int main ( int narg, char *argv[] ) {
   //eErr = me_sc_MakeASM( s, &sc );
   //if (eErr>0) {
   //  printf("[%d/%d] FATAL: me_sc_MakeASM() failed with error %d\n",MT_TPSDM,getpid(),eErr);
-  //  return;
+  //  return 1;
   //  }
   ///* assemble information about digital signal mapping */
   //eErr = me_sc_MakeDSM( s, &sc ); 
   //if (eErr>0) {
   //  printf("[%d/%d] FATAL: me_sc_MakeDSM() failed with error %d\n",MT_TPSDM,getpid(),eErr);
-  //  return;
+  //  return 1;
   //  }
 
   /*********************************************/
@@ -201,7 +201,7 @@ int main ( int narg, char *argv[] ) {
   //    s.iDP1Ant[m][p],
   //    s.iAntStd[s.iDP1Ant[m][p]-1]);
   //  }   
-  //return;
+  //return 0;
 
   /***********************************/
   /* Figure out dc[] *****************/
@@ -254,7 +254,7 @@ int main ( int narg, char *argv[] ) {
   //    dc[i]*(c*.83)
   //    );
   //  }   
-  //return;
+  //return 0;
 
 //  float  fRPDLeng[ME_MAX_NRPD];    /* RPD_LENG[] */
 //  float  fRPDVF[ME_MAX_NRPD];      /* RPD_VF[] */
@@ -352,7 +352,7 @@ int main ( int narg, char *argv[] ) {
   sprintf(filename,"%s/mindelay.txt",sSDir);
   if ((fp=fopen(filename,"wb"))==NULL) {
     printf("[%d/%d] FATAL: Can't open '%s'\n",ME_DRANGE,getpid(),filename);
-    return;
+    return 1;
     }
   fprintf(fp, "%i", smin);
   fclose(fp);
