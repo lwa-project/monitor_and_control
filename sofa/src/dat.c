@@ -194,7 +194,7 @@ int iauDat(int iy, int im, int id, double fd, double *deltat)
    memset(&fstats, 0, sizeof(fstats));
    stat("state/leapsec.txt", &fstats);
    if( now - fstats.st_mtime > 7*86400 ) {
-     system("wget --no-use-server-timestamps -FO ./state/leapsec.txt https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat");
+     system("wget --quiet --no-use-server-timestamps -FO ./state/leapsec.txt https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat");
    }
 
 /* Update the value of IYV */
