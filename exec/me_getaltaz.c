@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "sofa.h"
 #include "sofam.h"
+#include "me_astro.h"
 
 void me_getaltaz(
                  double ra,    /* (input) [h] RA */
@@ -60,12 +61,19 @@ void me_getaltaz(
   // ... and add the equation of origins to the RA
   ra = iauAnp(ra + iauEors(r, s));
   
+  /* Get the Earth orientation parameters for the day */
+  status = me_geteop(mjd, mpm, &xp, &yp, &dut);
+  if( status == 1 ) {
+    printf("WARNING: me_geteop returned 1 - MJD/MPM out of range of table\n");
+  }
+  
   /* Parallax from the geocenter to the observer */
-  double era, obs[2][3], obj[3];
+  double sp, era, obs[2][3], obj[3];
   if( dist < 1e3 ) {
+    sp = iauSp00(tt1, tt2);
     era = iauEra00(mjd+DJM0, mpm/1000.0/86400);
     iauPvtob(lon, lat, elev, \
-             0.0, 0.0, 0.0, era, \
+             xp, yp, sp, era, \
              &obs[0]);
     iauS2p(ra, dec, dist, &obj[0]);
     iauSxpv(1/DAU, obs, &obs[0]);
@@ -77,12 +85,6 @@ void me_getaltaz(
   *LAST = iauAnp(GAST + lon);
   *LAST *= DR2D / 15;
   
-  /* Get the Earth orientation parameters for the day */
-  status = me_geteop(mjd, mpm, &xp, &yp, &dut);
-  if( status == 1 ) {
-    printf("WARNING: me_geteop returned 1 - MJD/MPM out of range of table\n");
-  }
-
   /* Get the topocentric coordinates */
   iauAtio13(ra, dec, \
             DJM0, mjd+mpm/1000.0/86400, dut, \
