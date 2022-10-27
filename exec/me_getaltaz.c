@@ -34,7 +34,7 @@ void me_getaltaz(
   double HA, tHA, tDec;
   
   /* Get TAI from mjd/mpm */
-  int status = iauUtctai(mjd+DJM0+mpm/1000.0/86400, 0.0, &tai1, &tai2);
+  int status = iauUtctai(mjd+DJM0, mpm/1000.0/86400, &tai1, &tai2);
   if( status == 1 ) {
     printf("WARNING: iauUtctai returned 1 - dubious year\n");
   }
@@ -87,7 +87,7 @@ void me_getaltaz(
   
   /* Get the topocentric coordinates */
   iauAtio13(ra, dec, \
-            DJM0, mjd+mpm/1000.0/86400, dut, \
+            mjd+DJM0, mpm/1000.0/86400, dut, \
             lon, lat, elev, xp * (DD2R/3600), yp * (DD2R/3600), \
             0.0, 0.0, 0.0, 0.0,
             az, alt, &HA, \
@@ -95,11 +95,6 @@ void me_getaltaz(
             
   /* Zenith angle to altitude (elevation) */
   *alt = DPI/2 - *alt;
-  
-  int idmsf[4];
-  char sg='+';
-  iauA2af(2, *alt, &sg, idmsf);
-  printf("%c%i d %02i d %02i.%02i\n", sg, idmsf[0], idmsf[1], idmsf[2], idmsf[3]);
   
   /* Back to degrees */
   *alt *= DR2D;

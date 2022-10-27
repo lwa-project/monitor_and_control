@@ -24,7 +24,7 @@ void me_precess(
   double dRA, dDec, fRA, fDec, eo;
   
   /* Get TAI from mjd/mpm */
-  int status = iauUtctai(mjd+DJM0+mpm/1000.0/86400, 0.0, &tai1, &tai2);
+  int status = iauUtctai(mjd+DJM0, mpm/1000.0/86400, &tai1, &tai2);
   if( status == 1 ) {
     printf("WARNING: iauUtctai returned 1 - dubious year\n");
   }
