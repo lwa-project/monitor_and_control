@@ -33,7 +33,7 @@ int me_geteop(
   memset(&fstats, 0, sizeof(fstats));
   stat("state/eop.txt", &fstats);
   if( now - fstats.st_mtime > 7*86400 ) {
-    system("wget --quiet --no-use-server-timestamps -FO ./state/eop.txt https://datacenter.iers.org/data/latestVersion/6_BULLETIN_A_V2013_016.txt");
+    ret = system("wget --quiet --no-use-server-timestamps -FO ./state/eop.txt https://datacenter.iers.org/data/latestVersion/6_BULLETIN_A_V2013_016.txt");
   }
   
   // Load in the contents of the file and save lists of MJD, x, y, and DUT
