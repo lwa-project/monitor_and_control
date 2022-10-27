@@ -9,6 +9,7 @@
 /* uncommented by J. Dowell 2014/2/25 */
 #define ME_SCP2CP /* WARNING: assumes tp, exec, and sch are on same machine! */
 
+#include <stdlib.h>
 #include "mcs.h"
 
 #define ME_ACTION_WINDOW 1000 /* number of milliseconds prior to scheduled time */
@@ -45,7 +46,6 @@
 
 #include "mesi.c"
 #include "memdre.c"
-#include "meos.c"
 
 /**************************************/
 /*** me_sc_init( ) ********************/
@@ -319,5 +319,6 @@ int me_GetMIBEntry( char *ss,                        /* (input) subsystem TLA */
   return eResult;
   }  
 
+#include "meos.c"
 
 #endif // #ifndef ME_H 
