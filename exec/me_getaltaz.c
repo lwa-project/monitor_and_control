@@ -73,7 +73,7 @@ void me_getaltaz(
     sp = iauSp00(tt1, tt2);
     era = iauEra00(mjd+DJM0, mpm/1000.0/86400);
     iauPvtob(lon, lat, elev, \
-             xp, yp, sp, era, \
+             xp * (DD2R/3600), yp * (DD2R/3600), sp, era, \
              &obs[0]);
     iauS2p(ra, dec, dist, &obj[0]);
     iauSxpv(1/DAU, obs, &obs[0]);
