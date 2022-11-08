@@ -9,6 +9,8 @@
 #include <arpa/inet.h>  /* for network sockets */
 
 #if PY_MAJOR_VERSION >= 3
+    #define PyMIB_RETURN "y"
+
     #define PyInt_FromLong PyLong_FromLong
     #define PyString_AS_STRING PyBytes_AS_STRING
     #define PyString_FromString PyUnicode_FromString
@@ -32,6 +34,8 @@
             PyModuleDef_HEAD_INIT, name, doc, -1, methods, }; \
         ob = PyModule_Create(&moduledef);
 #else
+    #define PyMIB_RETURN "s"
+
     #define MOD_ERROR_VAL
     #define MOD_SUCCESS_VAL(val)
     #define MOD_INIT(name) PyMODINIT_FUNC init##name(void)
@@ -173,7 +177,7 @@ static PyObject *read_mib_ip(
     
     tv = record.last_change;
     ts = tv.tv_sec + tv.tv_usec/1e6;
-    output = Py_BuildValue("(s#f)", record.val, MIB_VAL_FIELD_LENGTH, ts);
+    output = Py_BuildValue("(" PyMIB_RETURN "#f)", record.val, MIB_VAL_FIELD_LENGTH, ts);
     close(sockfd);
     return output;
 
@@ -234,7 +238,7 @@ static PyObject *read_mib(PyObject *self, PyObject *args, PyObject *kwds) {
     tv = record.last_change;
     ts = tv.tv_sec + tv.tv_usec/1e6;
     
-    output = Py_BuildValue("(ss#f)", record.type_dbm, record.val, MIB_VAL_FIELD_LENGTH, ts);
+    output = Py_BuildValue("(" PyMIB_RETURN PyMIB_RETURN "#f)", record.type_dbm, record.val, MIB_VAL_FIELD_LENGTH, ts);
     gdbm_close(dbm_ptr);
     return output;
     

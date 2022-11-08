@@ -20,11 +20,10 @@ def read(ss, label, trim_nulls=True):
     timestamp.
     """
     
-    
     # Send the command
     value, ts = read_mib_ip(ss, label)
     if trim_nulls:
-        value = value.replace('\x00', '').strip().rstrip()
+        value = value.replace(b'\x00', b'').strip().rstrip()
         
     return value, ts
 
