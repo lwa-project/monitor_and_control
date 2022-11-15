@@ -286,15 +286,17 @@ class SolarSystemTests(unittest.TestCase):
                                  'OBJ_DATA':  'NO',
                                  'MAKE_EPHEM': 'YES',
                                  'EPHEM_TYPE': 'OBSERVER',
-                                 'CENTER': "'coord'",
+                                 'CENTER': "'coord@399'",
                                  'SITE_COORD': f"'{lng},{lat},{hgt}'",
                                  'COORD_TYPE': 'GEODETIC',
                                  'START_TIME': "'%04i-%02i-%02i'" % TEST_DATE_START,
                                  'STOP_TIME': "'%04i-%02i-%02i'" % TEST_DATE_END,
                                  'STEP_SIZE': "'%i d'" % TEST_DATE_STEP_DAY,
+                                 'REF_SYSTEM': "'ICRF'",
                                  'CAL_FORMAT': "'JD'",
                                  'ANG_FORMAT': "'DEG'",
                                  'APPARENT': "'AIRLESS'",
+                                 'RANGE_UNITS': "'AU'",
                                  'QUANTITIES': "'1,4,20'"})
         j = json.loads(r.content)
         
