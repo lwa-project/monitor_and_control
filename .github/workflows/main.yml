@@ -21,6 +21,7 @@ jobs:
             gpg \
             gpgv \
             gzip \
+            libfftw3-dev \
             libgdbm-dev \
             pkg-config \
             software-properties-common
