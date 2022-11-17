@@ -1,0 +1,44 @@
+name: "Build and Test"
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ['3.6', '3.8', '3.10']
+      fail-fast: false
+    steps:
+      - name: "Software Install - Ubuntu"
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          sudo apt-get install -y \
+            build-essential \
+            ca-certificates \
+            coreutils \
+            curl \
+            git \
+            gpg \
+            gpgv \
+            gzip \
+            libgdbm-dev \
+            pkg-config \
+            software-properties-common
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/checkout@v3
+      - name: "Software Install - Python" 
+        run: |
+          python -m pip install \
+            setuptools \
+            numpy \
+            astropy \
+            "ephem<4.1.1" \
+            requests
+      - name: "Build and Install"
+        run: make all
+      - name: Test
+        run: |
+          cd exec/tests
+          python -m unittest discover
