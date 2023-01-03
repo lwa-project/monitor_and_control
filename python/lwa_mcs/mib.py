@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 
 from lwa_mcs._mcs import read_mib_ip, read_mib, MCS_TIMEOUT
 
-__version__ = "0.3"
+__version__ = "0.4"
 __all__ = ['read', 'read_from_disk']
 
 
@@ -22,9 +22,21 @@ def read(ss, label, trim_nulls=True):
     
     # Send the command
     value, ts = read_mib_ip(ss, label)
+    try:
+        value = value.decode('ascii')
+    except AttributeError:
+        pass
     if trim_nulls:
-        value = value.replace(b'\x00', b'').strip().rstrip()
+        value = value.replace('\0', '').strip().rstrip()
         
+    try:
+        value = int(value, 10)
+    except ValueError:
+        try:
+            value = float(value)
+        except ValueError:
+            pass
+            
     return value, ts
 
 
