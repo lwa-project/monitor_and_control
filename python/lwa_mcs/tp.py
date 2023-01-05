@@ -60,7 +60,7 @@ def schedule_sdfs(filenames, max_retries=5, fast_submit=False, logfile=None, err
             log_is_string = True
         except IOError as e:
             warnings.warn("Could not open logfile '%s' for appending: %s" % (logfile, str(e)), 
-                          warnings.RuntimeWarning)
+                          RuntimeWarning)
             logfile = None
     elif isinstance(logfile, IOBase):
         pass
@@ -68,7 +68,7 @@ def schedule_sdfs(filenames, max_retries=5, fast_submit=False, logfile=None, err
         pass
     else:
         warnings.warn("logfile is of unknown type '%s'" % str(type(logfile)), 
-                      warings.RuntimeWarning)
+                      RuntimeWarning)
         logfile = None
     ## stderr
     err_is_string = False
@@ -79,7 +79,7 @@ def schedule_sdfs(filenames, max_retries=5, fast_submit=False, logfile=None, err
             err_is_string = True
         except IOError as e:
             warnings.warn("Could not open errorfile '%s' for appending: %s" % (logfile, str(e)), 
-                          warnings.RuntimeWarning)
+                          RuntimeWarning)
             errorfile = None
     elif isinstance(errorfile, IOBase):
         pass
@@ -87,7 +87,7 @@ def schedule_sdfs(filenames, max_retries=5, fast_submit=False, logfile=None, err
         pass
     else:
         warnings.warn("errorfile is of unknown type '%s'" % str(type(logfile)), 
-                      warings.RuntimeWarning)
+                      RuntimeWarning)
         errorfile = None
         
     # Submit the files
