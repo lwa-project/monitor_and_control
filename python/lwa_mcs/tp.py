@@ -99,7 +99,7 @@ def schedule_sdfs(filenames, max_retries=5, fast_submit=False, logfile=None, err
             logfile.write("Submitting SDF for %s, session %i\n" % psID)
         ids[psID] = filename
         tpss = subprocess.Popen(['./tpss', filename, '5', '0', 'mbox'], 
-                                cwd=TP_PATH, stdin=logfile, stdout=errorfile)
+                                cwd=TP_PATH, stdout=logfile, stderr=errorfile)
         tpss.wait()
         time.sleep(0.5)
         
@@ -126,7 +126,7 @@ def schedule_sdfs(filenames, max_retries=5, fast_submit=False, logfile=None, err
                 if errorfile is not None:
                     errorfile.write("Resubmitting SDF for %s, session %i\n" % psID)
                 tpss = subprocess.Popen(['./tpss', filename, '5', '0', 'mbox'], 
-                                        cwd=TP_PATH, stdin=logfile, stdout=errorfile)
+                                        cwd=TP_PATH, stdout=logfile, stderr=errorfile)
                 tpss.wait()
                 time.sleep(0.5)
                 
