@@ -124,8 +124,7 @@ def read_from_disk(ss, label, trim_nulls=True):
                 value = 'TIMEOUT'
                 ts = 0.0
                 time.sleep(0.2)
-            fh.close()
-            
+                
         except Exception as e:
             print(str(e))
             value = None
