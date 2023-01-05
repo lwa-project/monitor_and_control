@@ -24,18 +24,20 @@ def read(ss, label, trim_nulls=True):
     value, ts = read_mib_ip(ss, label)
     try:
         value = value.decode('ascii')
-    except AttributeError:
-        pass
-    if trim_nulls:
-        value = value.replace('\0', '').strip().rstrip()
-        
-    try:
-        value = int(value, 10)
-    except ValueError:
+        if trim_nulls:
+            value = value.replace('\0', '').strip().rstrip()
+            
         try:
-            value = float(value)
+            value = int(value, 10)
         except ValueError:
-            pass
+            try:
+                value = float(value)
+            except ValueError:
+                pass
+                
+    except (AttributeError, UnicodeDecodeError):
+        if trim_nulls:
+            value = value.replace(b'\0', b'').strip().rstrip()
             
     return value, ts
 
@@ -114,10 +116,12 @@ def read_from_disk(ss, label, trim_nulls=True):
                 else:
                     try:
                         val = val.decode('ascii')
-                    except AttributeError:
-                        pass
-                    if trim_nulls:
-                        value = val.replace('\0', '').strip().rstrip()
+                        if trim_nulls:
+                            value = val.replace('\0', '').strip().rstrip()
+                            
+                    except (AttributeError, UnicodeDecodeError):
+                        if trim_nulls:
+                            value = val.replace(b'\0', b'').strip().rstrip()
                 break
                 
             else:
