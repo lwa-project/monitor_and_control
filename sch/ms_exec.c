@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 //#include <sys/wait.h>
+#include <sys/msg.h>
 
 #include <string.h>
 
@@ -43,7 +44,7 @@
 #include "ms_exec_log.c"
 
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/

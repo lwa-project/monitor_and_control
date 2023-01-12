@@ -31,7 +31,7 @@ int LWA_mibupdate_DP_(
   char tbw_trig_time[10];
   char tbw_samples[9];
 
-  char sData[10];
+  char sData[13];
   long int mjd, mpm;
 
   float f4;

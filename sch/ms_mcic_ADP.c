@@ -32,11 +32,11 @@ int LWA_mibupdate_ADP(
   signed int si;
   unsigned long int uli;
   char tbf_trig_time[10];
-  char tbf_samples[9];
+  char tbf_samples[10];
   unsigned long int ul;
-  char tbf_tuning_mask[20];
+  char tbf_tuning_mask[21];
 
-  char sData[10];
+  char sData[13];
   long int mjd, mpm;
 
   float f4;
@@ -44,8 +44,8 @@ int LWA_mibupdate_ADP(
   char tbn_bw[2];
   char tbn_gain[3];    
   
-  char cor_navg[10];
-  char cor_tuning_mask[20];
+  char cor_navg[13];
+  char cor_tuning_mask[21];
   char cor_gain[3];
   char cor_sub_slot[3];
 
@@ -96,7 +96,7 @@ int LWA_mibupdate_ADP(
       memset(&uli,0,8);
         memcpy(&uli,cmdata+9,8);
         //sprintf(tbw_tuning_mask,"%20u",uli);
-        sprintf(tbf_tuning_mask,"%20d",LWA_i8u_swap(uli));
+        sprintf(tbf_tuning_mask,"%20lu",LWA_i8u_swap(uli));
 
       /* updating the MIB using the LWA_mibupdate_RPT() function */
 
@@ -186,7 +186,7 @@ int LWA_mibupdate_ADP(
         sprintf(cor_navg,"%12d",LWA_i4s_swap(si)); /* (12345678.123); swapping endianness */
       memset(&uli,0,8);
         memcpy(&usi,cmdata+4,8);
-        sprintf(cor_tuning_mask,"%20d",LWA_i8u_swap(uli));
+        sprintf(cor_tuning_mask,"%20lu",LWA_i8u_swap(uli));
       memset(&usi,0,2);
         memcpy(&usi,cmdata+12,2);
         sprintf(cor_gain,"%2u",LWA_i2u_swap(usi));

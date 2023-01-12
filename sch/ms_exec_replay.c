@@ -27,6 +27,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 //#include <sys/wait.h>
+#include <sys/msg.h>
 
 #include <string.h>
 
@@ -58,24 +59,24 @@ int msgreplay(FILE *msqid, const void *msgp, size_t msgsz, int mqtid, size_t rps
     
     /* If this is a RPT, find out what MIB entry we are looking for */
     if( msg.cid == LWA_CMD_RPT ) {
-        strncpy(&data, &msg.data, 31);
+        strncpy(&(data[0]), &(msg.data[0]), 31);
         data[31] = '\0';
         //printf("Looking for '%s'\n", data);
     }
     
     /* Read through the file until we find what we are looking for */
     found = 0;
-    while(fgets(&line, sizeof(line), msqid) != NULL) {
+    while(fgets(&line[0], sizeof(line), msqid) != NULL) {
         /* Basic unpak to get the queuing status, subsystem ID, and command ID */
-        strncpy(&temp, &(line[45]), 1);
+        strncpy(&(temp[0]), &(line[45]), 1);
         temp[1] = '\0';
-        status = atoi(&temp);
-        strncpy(&temp, &(line[47]), 3);
+        status = atoi(&(temp[0]));
+        strncpy(&(temp[0]), &(line[47]), 3);
         temp[3] = '\0';
-        sid = LWA_getsid(&temp);
-        strncpy(&temp, &(line[51]), 3);
+        sid = LWA_getsid(&(temp[0]));
+        strncpy(&(temp[0]), &(line[51]), 3);
         temp[3] = '\0';
-        cid = LWA_getcmd(&temp);
+        cid = LWA_getcmd(&(temp[0]));
         
         /* Ignore lines that don't have the right subsystem or command */
         if( ( (sid != msg.sid) \
@@ -94,17 +95,17 @@ int msgreplay(FILE *msqid, const void *msgp, size_t msgsz, int mqtid, size_t rps
         if( ( (status < LWA_MSELOG_TP_SUCCESS ) \
              && (msg.cid == LWA_CMD_RPT) \
              && (strncmp(data, &(line[55]), strlen(data)) == 0) ) ) {
-            strncpy(&temp, &(line[35]), 9);
+            strncpy(&(temp[0]), &(line[35]), 9);
             temp[9] = '\0';
-            ref = atol(&temp);
+            ref = atol(&(temp[0]));
             //printf("Found '%s' at '%s'\n", data, ref);
         } else {
-            strncpy(&temp, &(line[35]), 9);
+            strncpy(&(temp[0]), &(line[35]), 9);
             temp[9] = '\0';
             
             if( ( (msg.cid != LWA_CMD_RPT) \
                  || ( (msg.cid == LWA_CMD_RPT) \
-                     && (ref == atol(&temp)) ) ) ) {
+                     && (ref == atol(&(temp[0]))) ) ) ) {
                 found = 1;
                 msg.bAccept = LWA_MSELOG_TP_SUCCESS;
                 LWA_time(&mjd, &mpm);
@@ -150,7 +151,7 @@ int msgreplay(FILE *msqid, const void *msgp, size_t msgsz, int mqtid, size_t rps
     }
 }
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/
@@ -913,13 +914,3 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-
-
-
-
-
-
-
-
-

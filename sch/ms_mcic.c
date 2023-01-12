@@ -48,7 +48,7 @@
 #include "ms_mcic_mib.c" /* this must follow all other macro defines; */
                          /* especially those for MY_NAME and ME */
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/
@@ -130,10 +130,10 @@ main ( int narg, char *argv[] ) {
     } i2u;
   signed short int i2u1;
   unsigned char i1u1, i1u2;
-  char filename[1024];
-  char dfile[1024];
-  char gfile[1024];
-  char full_filename[1024];
+  char filename[210];
+  char dfile[210];
+  char gfile[210];
+  char full_filename[225];
   FILE *fp;
 
   int bErr=0;
@@ -915,5 +915,3 @@ main ( int narg, char *argv[] ) {
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
 //
-
-

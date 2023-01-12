@@ -11,13 +11,14 @@
 // See end of this file for history.
 
 #include <stdio.h>
+#include <stdlib.h>
 
 //#include "LWA_MCS.h"
 
 #define MY_NAME "ms_makeMIB_ADP (v.20191029.1)"
 #define ME "11" 
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/
@@ -179,7 +180,9 @@ main ( int narg, char *argv[] ) {
   fprintf(fp,"V 13.2		GLOBAL_TEMP_MAX	0	f4r	f4r\n");
   fprintf(fp,"V 13.3		GLOBAL_TEMP_AVG	0	f4r	f4r\n");
   
-  close(fp);
+  fclose(fp);
+  
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
@@ -195,4 +198,3 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-

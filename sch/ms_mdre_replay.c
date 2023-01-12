@@ -33,7 +33,7 @@
 #define MY_NAME "ms_mdre_replay (v.20200624.1)"
 #define ME "16" 
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/
@@ -187,17 +187,17 @@ main ( int narg, char *argv[] ) {
       /* Look for the entry */
       /* Read through the file until we find what we are looking for */
       found = 0;
-      while(fgets(&line, sizeof(line), fpr[sid]) != NULL) {
+      while(fgets(&line[0], sizeof(line), fpr[sid]) != NULL) {
         /* Basic unpak to get the queuing status, subsystem ID, and command ID */
-        strncpy(&temp, &(line[45]), 1);
+        strncpy(&(temp[0]), &(line[45]), 1);
         temp[1] = '\0';
-        status = atoi(&temp);
-        strncpy(&temp, &(line[47]), 3);
+        status = atoi(&(temp[0]));
+        strncpy(&(temp[0]), &(line[47]), 3);
         temp[3] = '\0';
-        lsid = LWA_getsid(&temp);
-        strncpy(&temp, &(line[51]), 3);
+        lsid = LWA_getsid(&(temp[0]));
+        strncpy(&(temp[0]), &(line[51]), 3);
         temp[3] = '\0';
-        lcid = LWA_getcmd(&temp);
+        lcid = LWA_getcmd(&(temp[0]));
         
         /* Ignore lines that don't have the right subsystem or command */
         if( ( (lsid != sid) \
@@ -214,15 +214,15 @@ main ( int narg, char *argv[] ) {
         */ 
         if( ( (status < LWA_MSELOG_TP_SUCCESS ) \
              && (strncmp(label, &(line[55]), strlen(label)) == 0) ) ) {
-            strncpy(&temp, &(line[35]), 9);
+            strncpy(&(temp[0]), &(line[35]), 9);
             temp[9] = '\0';
-            ref = atol(&temp);
+            ref = atol(&(temp[0]));
             //printf("Found '%s' at '%li'\n", label, ref);
         } else {
-            strncpy(&temp, &(line[35]), 9);
+            strncpy(&(temp[0]), &(line[35]), 9);
             temp[9] = '\0';
             
-            if( ref == atol(&temp) ) {
+            if( ref == atol(&(temp[0])) ) {
                 found = 1;
                 LWA_time(&mjd, &mpm);
                 LWA_time2tv(&c.last_change, mjd, mpm);
@@ -307,15 +307,3 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-
-
-
-
-
-
-
-
-
-
-

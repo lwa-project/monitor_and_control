@@ -25,8 +25,8 @@ int LWA_mibupdate_ASP(
   int nBoards;
   char snBoards[3];
   int iStand, iPol, eSet;
-  char s2[2];
-  char s3[3];
+  char s2[3];
+  char s3[4];
   int i;
 
   char sMIBlabel[MIB_LABEL_FIELD_LENGTH];
