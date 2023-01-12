@@ -10,6 +10,9 @@
 // ---
 // See end of this file for history.
 
+#define _GNU_SOURCE
+#include <stdio.h>
+
 #include "me.h"        /* includes mcs.h */
 
 /* defined global static */
@@ -82,21 +85,21 @@ int main ( int narg, char *argv[] ) {
 
   if (narg<2) {
     printf("[%d/%d] FATAL: flagset not specified\n",ME_ME_C,getpid());
-    return;
+    exit(EXIT_FAILURE);
     }
   sscanf(argv[1],"%lu",&flagset);
   //printf("[%d/%d] Input: me_tpcom_pid=%d\n",ME_ME_C,getpid(),me_tpcom_pid);
 
   if (narg<3) {
     printf("[%d/%d] FATAL: me_tpcom_pid not specified\n",ME_ME_C,getpid());
-    return;
+    exit(EXIT_FAILURE);
     }
   sscanf(argv[2],"%d",&me_tpcom_pid);
   //printf("[%d/%d] Input: me_tpcom_pid=%d\n",ME_ME_C,getpid(),me_tpcom_pid);
 
   if (narg<4) {
     printf("[%d/%d] FATAL: me_inproc_pid not specified\n",ME_ME_C,getpid());
-    return;
+    exit(EXIT_FAILURE);
     }
   sscanf(argv[3],"%d",&me_inproc_pid);
 
@@ -143,7 +146,7 @@ int main ( int narg, char *argv[] ) {
     printf("[%d/%d] FATAL: unable to fopen 'state/ssmif.dat'\n",ME_ME_C,getpid());
     sprintf(msg,"FATAL: unable to fopen 'state/ssmif.dat'");
     me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 ); 
-    return;
+    exit(EXIT_FAILURE);
     }
   fread(&s,sizeof(s),1,fp);
   fclose(fp);
@@ -160,7 +163,7 @@ int main ( int narg, char *argv[] ) {
     printf("[%d/%d] FATAL: me_sc_MakeASM() failed with error %d\n",ME_ME_C,getpid(),iErr);
     sprintf(msg,"FATAL: me_sc_MakeASM() failed with error %d",iErr);
     me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 );
-    return;
+    exit(EXIT_FAILURE);
     }
   me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_sc_MakeASM() completed", sq_ptr, 0 );
 
@@ -170,7 +173,7 @@ int main ( int narg, char *argv[] ) {
     printf("[%d/%d] FATAL: me_sc_MakeDSM() failed with error %d\n",ME_ME_C,getpid(),iErr);
     sprintf(msg,"FATAL: me_sc_MakeDSM() failed with error %d",iErr);
     me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 );
-    return;
+    exit(EXIT_FAILURE);
     }
   me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_sc_MakeDSM() completed", sq_ptr, 0 );
 
@@ -193,7 +196,7 @@ int main ( int narg, char *argv[] ) {
     printf("[%d/%d] FATAL: me_write_mess() failed with error %d\n",ME_ME_C,getpid(),iErr);
     sprintf(msg,"FATAL: me_write_mess() failed with error %d",iErr);
     me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 );
-    return;
+    exit(EXIT_FAILURE);
     }  
 
   /***************************************************************************/
@@ -209,7 +212,7 @@ int main ( int narg, char *argv[] ) {
     perror("me_exec");
     sprintf(msg,"FATAL: socket() failed");
     me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 );
-    return; 
+    exit(EXIT_FAILURE); 
     }
   /* name socket */
   server_address.sin_family      = AF_INET;                /* network sockets */  
@@ -228,7 +231,7 @@ int main ( int narg, char *argv[] ) {
     printf("[%d/%d]   (2) Wait a few seconds before trying this again.\n",ME_ME_C,getpid());
     sprintf(msg,"FATAL: bind() failed");
     me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 );
-    return; 
+    exit(EXIT_FAILURE); 
     }
 
   /* create a connection queue */
@@ -239,7 +242,7 @@ int main ( int narg, char *argv[] ) {
     perror("me_exec");
     sprintf(msg,"FATAL: me_exec: listen() failed\n");
     me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 );
-    return; 
+    exit(EXIT_FAILURE); 
     }
   /* change accept() from blocking to non-blocking */
   flags = fcntl( server_sockfd, F_GETFL, 0 );
@@ -275,7 +278,7 @@ int main ( int narg, char *argv[] ) {
        perror("me_exec");
        sprintf(msg,"FATAL: me_exec: connect() failed\n");
        me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 );
-       return;
+       exit(EXIT_FAILURE);
        }
 
     /* Send PNG to MCS to make sure Scheduler is responding */
@@ -285,7 +288,7 @@ int main ( int narg, char *argv[] ) {
     if (err!=MESI_ERR_OK) {
       me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "FATAL (see error code in above line)", sq_ptr, 0 );
       printf("[%d/%d] FATAL: me_exec: Initial ping of MCS/Sch failed\n",ME_ME_C,getpid());
-      return;  
+      exit(EXIT_FAILURE);  
       }
 
     me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "MCS/Sch TCP socket setup complete", sq_ptr, 0 );
@@ -331,7 +334,7 @@ int main ( int narg, char *argv[] ) {
           printf("[%d/%d] FATAL: me_action() failed with error %d\n",ME_ME_C,getpid(),iErr);
           sprintf(msg,"FATAL: me_action() failed with error %d",iErr);
           me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 );
-          eQuit=2; //return;
+          eQuit=2; //exit(EXIT_FAILURE);
           break;
         }  
       }    
@@ -386,7 +389,7 @@ int main ( int narg, char *argv[] ) {
           printf("[%d/%d] FATAL: me_session_queue_outprocess() failed with error %d\n",ME_ME_C,getpid(),iErr);
           sprintf(msg,"FATAL: me_session_queue_outprocess() failed with error %d",iErr);
           me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 );
-          eQuit=2; //return;
+          eQuit=2; //exit(EXIT_FAILURE);
           break;
         }     
       }
@@ -400,7 +403,7 @@ int main ( int narg, char *argv[] ) {
           printf("[%d/%d] FATAL: me_pull_from_tp() failed with error %d\n",ME_ME_C,getpid(),iErr);
           sprintf(msg,"FATAL: me_session_queue_outprocess() failed with error %d",iErr);
           me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 );
-          eQuit=2; //return;
+          eQuit=2; //exit(EXIT_FAILURE);
           break;
         default: break;
         }
@@ -416,7 +419,7 @@ int main ( int narg, char *argv[] ) {
           printf("[%d/%d] FATAL: me_session_queue_inprocess() failed with error %d\n",ME_ME_C,getpid(),iErr);
           sprintf(msg,"FATAL: me_session_queue_inprocess() failed with error %d",iErr);
           me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 );
-          eQuit=2; //return;
+          eQuit=2; //exit(EXIT_FAILURE);
           break;
         }
       }
@@ -431,7 +434,7 @@ int main ( int narg, char *argv[] ) {
           printf("[%d/%d] FATAL: me_inproc_readback() failed with error %d\n",ME_ME_C,getpid(),iErr);
           sprintf(msg,"FATAL: me_inproc_readback() failed with error %d",iErr);
           me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 );
-          eQuit=2; //return;
+          eQuit=2; //exit(EXIT_FAILURE);
           break;
         }  
       }
@@ -444,7 +447,7 @@ int main ( int narg, char *argv[] ) {
         //printf("[%d/%d] FATAL: me_write_mess() failed with error %d\n",ME_ME_C,getpid(),iErr);
         sprintf(msg,"FATAL: me_write_mess() failed with error %d",iErr);
         me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 );
-        eQuit=2; //return;
+        eQuit=2; //exit(EXIT_FAILURE);
         }
       }
 
@@ -511,7 +514,7 @@ int main ( int narg, char *argv[] ) {
       //    printf("[%d/%d] FATAL: me_pull_from_tp() failed with error %d\n",ME_ME_C,getpid(),iErr);
       //    sprintf(msg,"FATAL: me_session_queue_outprocess() failed with error %d",iErr);
       //    me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 );
-      //    eQuit=2; //return;
+      //    eQuit=2; //exit(EXIT_FAILURE);
       //    break;
       //  default: break;
       //  }

@@ -9,6 +9,8 @@
 //   (This is the client-side of a client-server connection)
 // See end of this file for history.
 
+#include <stdlib.h>
+
 #include "me.h"
 
 /* error codes returned by mesi() */
