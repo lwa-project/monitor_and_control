@@ -27,6 +27,8 @@
 // See MCS0030 for details about what this code does, and for context within MCS.
 // See end of this file for history.
 
+#include <stdlib.h>
+
 #include "mt.h"
 
 #ifdef USE_ADP
@@ -210,7 +212,7 @@ int main ( int narg, char *argv[] ) {
       sscanf(argv[1],"%s",sdfname);
     } else {
       printf("[%d/%d] FATAL: sdf not specified\n",MT_TPSS,getpid());
-      return;
+      exit(EXIT_FAILURE);
     }
   printf("[%d/%d] Input: sdf='%s'\n",MT_TPSS,getpid(),sdfname);
 
@@ -218,7 +220,7 @@ int main ( int narg, char *argv[] ) {
       sscanf(argv[2],"%d",&max_phase);
     } else {
       printf("[%d/%d] FATAL: max_phase not specified\n",MT_TPSS,getpid());
-      return;
+      exit(EXIT_FAILURE);
     }
   printf("[%d/%d] Input: max_phase=%d\n",MT_TPSS,getpid(),max_phase);
 
@@ -226,12 +228,12 @@ int main ( int narg, char *argv[] ) {
       sscanf(argv[3],"%d",&bIgnoreActualTime);
     } else {
       printf("[%d/%d] FATAL: bIgnoreActualTime not specified\n",MT_TPSS,getpid());
-      return;
+      exit(EXIT_FAILURE);
     }
   printf("[%d/%d] Input: bIgnoreActualTime=%d\n",MT_TPSS,getpid(),bIgnoreActualTime);
   if ((bIgnoreActualTime==1) && (max_phase>=5)) {
     printf("[%d/%d] bIgnoreActualTime=1 not allowed for max_phase>=5\n",MT_TPSS,getpid());
-    return;
+    exit(EXIT_FAILURE);
     }
   if (bIgnoreActualTime==-1) bIgnoreActualTime=1; 
 
@@ -239,7 +241,7 @@ int main ( int narg, char *argv[] ) {
   if (narg>4) sscanf(argv[4],"%s",mbox);
   printf("[%d/%d] Input: mbox='%s'\n",MT_TPSS,getpid(),mbox);
 
-  if (max_phase<1) return;
+  if (max_phase<1) exit(EXIT_SUCCESS);
   printf("[%d/%d] *********************************************************\n",MT_TPSS,getpid()); 
   printf("[%d/%d] *** Phase 1: Reading/Parsing Session Defintion File *****\n",MT_TPSS,getpid());
   printf("[%d/%d] *********************************************************\n",MT_TPSS,getpid());
@@ -247,7 +249,7 @@ int main ( int narg, char *argv[] ) {
   /* Open input SDF */
   if (!(fpsdf = fopen(sdfname,"r"))) {
     printf("[%d/%d] FATAL: unable to fopen('%s')\n",MT_TPSS,getpid(),sdfname);
-    return;
+    exit(EXIT_FAILURE);
     }
  
   strcpy(data,"");
@@ -266,13 +268,13 @@ int main ( int narg, char *argv[] ) {
       printf("...converts to %u\n",obs[nobs].OBS_ID);
       if ( obs[nobs].OBS_ID != nobs ) {
         printf("[%d/%d] FATAL: OBS_ID not incrementing correctly\n",MT_TPSS,getpid());
-        return;
+        exit(EXIT_FAILURE);
         }
       strcpy(data,"");   
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: TPSS_PL_KEYWORD_MISMATCH\n",MT_TPSS,getpid()); return; break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: TPSS_PL_KEYWORD_MISMATCH\n",MT_TPSS,getpid()); exit(EXIT_FAILURE); break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   while (i==TPSS_PL_KEYWORD_MATCH) { /* as long as we see "OBS_ID" */
@@ -298,13 +300,13 @@ int main ( int narg, char *argv[] ) {
         printf("...converts to %u\n",obs[nobs].OBS_ID);
         if ( obs[nobs].OBS_ID != nobs ) {
           printf("[%d/%d] FATAL: OBS_ID not incrementing correctly\n",MT_TPSS,getpid());
-          return;
+          exit(EXIT_FAILURE);
           }
         strcpy(data,"");   
         break;
-      case TPSS_PL_EOF:                                                                                            break;
-      case TPSS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+      case TPSS_PL_EOF:                                                                                                        break;
+      case TPSS_PL_KEYWORD_MISMATCH:                                                                                           break;
+      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
       }
 
     } /* while (i==TPSS_PL_KEYWORD_MATCH) */
@@ -322,14 +324,14 @@ int main ( int narg, char *argv[] ) {
 
   printf("[%d/%d] Phase 1: OK\n",MT_TPSS,getpid());
 
-  if (max_phase<2) return;
+  if (max_phase<2) exit(EXIT_SUCCESS);
   printf("[%d/%d] *********************************************************\n",MT_TPSS,getpid()); 
   printf("[%d/%d] *** Phase 2: Second Pass Consistency/Error Checking *****\n",MT_TPSS,getpid());
   printf("[%d/%d] *********************************************************\n",MT_TPSS,getpid());
 
   if (nobs<1) {
     printf("[%d/%d] FATAL: no observations defined\n",MT_TPSS,getpid());
-    return;
+    exit(EXIT_FAILURE);
     }
 
   for (n=1;n<=nobs;n++) {
@@ -337,34 +339,34 @@ int main ( int narg, char *argv[] ) {
     if ( (obs[n].OBS_DUR==0) && ( ! ( (obs[n].OBS_MODE==LWA_OM_TBF)     || 
                                       (obs[n].OBS_MODE==LWA_OM_DIAG1)     ) ) )  {
       printf("[%d/%d] FATAL: obs[%d].OBS_DUR==0 for a mode other than TBF or DIAG\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
 #else
     if ( (obs[n].OBS_DUR==0) && ( ! ( (obs[n].OBS_MODE==LWA_OM_TBW)     || 
                                       (obs[n].OBS_MODE==LWA_OM_DIAG1)     ) ) )  {
       printf("[%d/%d] FATAL: obs[%d].OBS_DUR==0 for a mode other than TBW or DIAG\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
 #endif
     if ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) && (obs[n].OBS_RA<0) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_RA<0 when mode is TRK_RADEC\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
 #ifdef USE_ADP
     if ( ( obs[n].OBS_MODE==LWA_OM_TBF ) && ( obs[n].OBS_FREQ1<222417950 ) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TBF\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
 #endif
 #ifdef USE_ADP
     if ( ( obs[n].OBS_MODE==LWA_OM_TBN ) && ( obs[n].OBS_FREQ1<65739295 ) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TBN\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
 #else
     if ( ( obs[n].OBS_MODE==LWA_OM_TBN ) && ( obs[n].OBS_FREQ1<109565492 ) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TBN\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
 #endif
 #ifdef USE_ADP
@@ -373,14 +375,14 @@ int main ( int narg, char *argv[] ) {
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )   ) && (obs[n].OBS_FREQ1<222417950) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, TRK_LUN, or TBN\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )    ) && (obs[n].OBS_FREQ2 != 0 && obs[n].OBS_FREQ2<222417950) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TRK_LUN\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
 #else
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
@@ -388,14 +390,14 @@ int main ( int narg, char *argv[] ) {
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )    ) && (obs[n].OBS_FREQ1<219130984) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, TRK_LUN, or TBN\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )    ) && (obs[n].OBS_FREQ2 != 0 && obs[n].OBS_FREQ2<219130984) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ2 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TRK_LUN\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
 #endif
 #ifdef USE_ADP
@@ -406,14 +408,14 @@ int main ( int narg, char *argv[] ) {
            (obs[n].OBS_MODE==LWA_OM_TBF      ) ||
            (obs[n].OBS_MODE==LWA_OM_TBN      )    ) && (obs[n].OBS_BW<=0) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, TRK_LUN, or TBN\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )    ) && (obs[n].OBS_BW>7) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, or TRK_JOV\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
 #else
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
@@ -422,30 +424,30 @@ int main ( int narg, char *argv[] ) {
            (obs[n].OBS_MODE==LWA_OM_TRK_LUN  ) ||
            (obs[n].OBS_MODE==LWA_OM_TBN      )    ) && (obs[n].OBS_BW<=0) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, TRK_LUN, or TBN\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )    ) && (obs[n].OBS_BW>7) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TRK_LUN\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
 #endif
 #ifdef USE_ADP
     if ( (obs[n].OBS_MODE==LWA_OM_TBF      ) && (SESSION_DRX_BEAM!=1) ) {
       printf("[%d/%d] FATAL: SESSION_DRX_BEAM!=1 when obs[%d].OBS_MODE is TBF\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
     if ( (obs[n].OBS_MODE==LWA_OM_TBN      ) && (SESSION_DRX_BEAM>-1) ) {
       printf("[%d/%d] FATAL: SESSION_DRX_BEAM>-1 when obs[%d].OBS_MODE is TBN\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
 #else
     if ( ( (obs[n].OBS_MODE==LWA_OM_TBW      ) || 
            (obs[n].OBS_MODE==LWA_OM_TBN      )   ) && (SESSION_DRX_BEAM>-1) ) {
       printf("[%d/%d] FATAL: SESSION_DRX_BEAM>-1 when obs[%d].OBS_MODE is TBW or TBN\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
 #endif
     } /* for n */
@@ -465,7 +467,7 @@ int main ( int narg, char *argv[] ) {
     }
   if ( b_TB_requested && b_DRX_requested ) {
     printf("[%d/%d] FATAL: Sessions cannot mix TBN with other observing modes\n",MT_TPSS,getpid());
-    return;
+    exit(EXIT_FAILURE);
     }
     
   if (b_TB_requested) SESSION_DRX_BEAM=ME_MAX_NDPOUT;
@@ -484,7 +486,7 @@ int main ( int narg, char *argv[] ) {
     }
   if ( b_TB_requested && b_DRX_requested ) {
     printf("[%d/%d] FATAL: Sessions cannot mix TBW/TBN with other observing modes\n",MT_TPSS,getpid());
-    return;
+    exit(EXIT_FAILURE);
     }
     
   if (b_TB_requested) SESSION_DRX_BEAM=ME_MAX_NDPOUT;
@@ -523,7 +525,7 @@ int main ( int narg, char *argv[] ) {
     LWA_time2tv( &t1, obs[n+1].OBS_START_MJD, obs[n+1].OBS_START_MPM ); /* t1 is now start time as a timeval */
     if (LWA_timediff(t1,t0)<0) {
       printf("[%d/%d] FATAL: Observation %d overlaps Observation %d\n",MT_TPSS,getpid(),n,n+1);
-      return;
+      exit(EXIT_FAILURE);
       } 
     }
 
@@ -567,7 +569,7 @@ int main ( int narg, char *argv[] ) {
 
   printf("[%d/%d] Phase 2: OK\n",MT_TPSS,getpid());
 
-  if (max_phase<3) return;
+  if (max_phase<3) exit(EXIT_SUCCESS);
   printf("[%d/%d] *********************************************************\n",MT_TPSS,getpid()); 
   printf("[%d/%d] *** Phase 3: Checking Resource Availability *************\n",MT_TPSS,getpid());
   printf("[%d/%d] *********************************************************\n",MT_TPSS,getpid());
@@ -579,12 +581,12 @@ int main ( int narg, char *argv[] ) {
      printf("[%d/%d] LWA_dpoavail says: %s\n",MT_TPSS,getpid(),msg); 
      if (err<=0) {
        printf("[%d/%d] FATAL: SESSION_DRX_BEAM==%hd cannot be accommodated\n",MT_TPSS,getpid(),SESSION_DRX_BEAM);
-       return; 
+       exit(EXIT_FAILURE); 
        }
 
     } else {                 /* No particular DRX output has been requested  */
       printf("[%d/%d] FATAL: SESSION_DRX_BEAM not specified\n",MT_TPSS,getpid());
-      return;
+      exit(EXIT_FAILURE);
 
       //if (b_DRX_requested) { /* and DRX-dependent mode(s) have been requested */
       //  /* check each beam output, select best */
@@ -597,7 +599,7 @@ int main ( int narg, char *argv[] ) {
       //    }
       //  if (err_max<1) {
       //    printf("[%d/%d] FATAL: Unable to schedule\n",MT_TPSS,getpid(),i,msg);
-      //    return;
+      //    exit(EXIT_FAILURE);
       //    }
       //  SESSION_DRX_BEAM = i_max;
       //  printf("[%d/%d] Selected DP output %hd of 4\n",MT_TPSS,getpid(),SESSION_DRX_BEAM);
@@ -607,7 +609,7 @@ int main ( int narg, char *argv[] ) {
 
   printf("[%d/%d] Phase 3: OK\n",MT_TPSS,getpid());
 
-  if (max_phase<4) return;
+  if (max_phase<4) exit(EXIT_SUCCESS);
   printf("[%d/%d] *************************************************\n",MT_TPSS,getpid()); 
   printf("[%d/%d] *** Phase 4: Generate Full-SDF, SSF, and OSFs ***\n",MT_TPSS,getpid());
   printf("[%d/%d] *************************************************\n",MT_TPSS,getpid());
@@ -617,7 +619,7 @@ int main ( int narg, char *argv[] ) {
   sprintf(sdfname,"%s_%04u.txt",PROJECT_ID,SESSION_ID);
   if (!(fp = fopen(sdfname,"w"))) {
     printf("[%d/%d] Unable to create SDF '%s'\n",MT_TPSS,getpid(),sdfname);
-    return;
+    exit(EXIT_FAILURE);
     }
 
   fprintf(fp,"PI_ID %s\n",PI_ID);
@@ -814,7 +816,7 @@ int main ( int narg, char *argv[] ) {
   sprintf(ssfname,"%s_%04u.ses",PROJECT_ID,SESSION_ID);
   if (!(fp = fopen(ssfname,"wb"))) {
     printf("[%d/%d] Unable to create SSF '%s'\n",MT_TPSS,getpid(),ssfname);
-    return;
+    exit(EXIT_FAILURE);
     }
   fwrite(&ssf,sizeof(struct ssf_struct),1,fp);
   fclose(fp);
@@ -828,7 +830,7 @@ int main ( int narg, char *argv[] ) {
     sprintf(osfname,"%s_%04d_%04u.obs",PROJECT_ID,SESSION_ID,n);
     if ((fp = fopen(osfname,"wb"))==NULL) {
       printf("[%d/%d] Unable to create OSF '%s'\n",MT_TPSS,getpid(),osfname);
-      return;
+      exit(EXIT_FAILURE);
       }
 
     osf.FORMAT_VERSION = TPSS_FORMAT_VERSION;   //printf("osf.FORMAT_VERSION  = %hu\n",osf.FORMAT_VERSION);
@@ -917,7 +919,7 @@ int main ( int narg, char *argv[] ) {
 
   printf("[%d/%d] Phase 4: OK\n",MT_TPSS,getpid());
 
-  if (max_phase<5) return;
+  if (max_phase<5) exit(EXIT_SUCCESS);
   printf("[%d/%d] ******************************************************\n",MT_TPSS,getpid()); 
   printf("[%d/%d] *** Phase 5: Push to tp outbox and notify MCS/Exec ***\n",MT_TPSS,getpid());
   printf("[%d/%d] ******************************************************\n",MT_TPSS,getpid());
@@ -937,7 +939,7 @@ int main ( int narg, char *argv[] ) {
         fscanf(fp,"%s",line); //printf("<%s> <%s>\n",data,line);
         if (!strncmp(line,data,strlen(data))) {
           printf("[%d/%d] FATAL: Session '%s' already appears in manifest\n",MT_TPSS,getpid(),data);
-          return;
+          exit(EXIT_FAILURE);
           }
         } 
 
@@ -961,7 +963,7 @@ int main ( int narg, char *argv[] ) {
         //printf("<%s> <%s> <%s>\n",line,PROJECT_ID,data);
         if ( (strstr(line,PROJECT_ID)!=NULL) && (strstr(line,data)!=NULL) ) {
           printf("[%d/%d] FATAL: Session already appears in mess.dat\n",MT_TPSS,getpid());
-          return;
+          exit(EXIT_FAILURE);
           }
         } 
 
@@ -994,7 +996,7 @@ int main ( int narg, char *argv[] ) {
 
   printf("[%d/%d] Phase 5: OK\n",MT_TPSS,getpid());
 
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================

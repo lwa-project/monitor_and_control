@@ -9,6 +9,8 @@
 // read by MCS/Executive and utility programs
 // See end of this file for history.
 
+#include <stdlib.h>
+
 #include "mt.h"
 
 #define ME_FILENAME_MAX_LENGTH 256
@@ -172,13 +174,13 @@ int main ( int narg, char *argv[] ) {
   /* Parse command line */
   if (narg<2) {
     printf("[%d/%d] FATAL: filename_ssmif not specified\n",MT_TPRS,getpid());
-    return;
+    exit(EXIT_FAILURE);
     }
   sprintf(filename_ssmif,"%s",argv[1]);
   printf("[%d/%d] Input: filename_ssmif='%s'\n",MT_TPRS,getpid(),filename_ssmif);
   if (!strcmp(filename_ssmif,"ssmif.dat")) {
     printf("[%d/%d] FATAL: Input SSMIF cannot be named 'ssmif.dat' (this filename reserved)\n",MT_TPRS,getpid());
-    return;  
+    exit(EXIT_FAILURE);  
     }
 
   printf("[%d/%d] *********************************************************\n",MT_TPRS,getpid()); 
@@ -188,7 +190,7 @@ int main ( int narg, char *argv[] ) {
   /* Open SSMIF */
   if (!(fp = fopen(filename_ssmif,"r"))) {
     printf("[%d/%d] FATAL: unable to fopen SSMIF '%s'\n",MT_TPRS,getpid(),filename_ssmif);
-    return;
+    exit(EXIT_FAILURE);
     }
 
   strcpy(data,"");
@@ -217,7 +219,7 @@ int main ( int narg, char *argv[] ) {
 
   if (!(fp = fopen("ssmif.dat","wb"))) {
     printf("[%d/%d] FATAL: unable to fopen 'ssmif.dat'\n",MT_TPRS,getpid());
-    return;
+    exit(EXIT_FAILURE);
     }  
 
   fwrite(&s,sizeof(s),1,fp);
@@ -225,7 +227,7 @@ int main ( int narg, char *argv[] ) {
 
   fclose(fp);
 
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
@@ -243,5 +245,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-
