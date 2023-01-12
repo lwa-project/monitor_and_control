@@ -985,9 +985,14 @@ int main ( int narg, char *argv[] ) {
   //sprintf(data,"%s%s",data,sdfname);
   //sprintf(data,"%s\n%s",data,ssfname);
 
+  #pragma GCC diagnostic ignored "-Wformat-overflow"
   sprintf(data,"%s%s %4u %4d %s",data,PROJECT_ID,SESSION_ID,-1,sdfname);
+  #pragma GCC diagnostic ignored "-Wformat-overflow"
   sprintf(data,"%s\n%s %4u %4d %s",data,PROJECT_ID,SESSION_ID,0,ssfname);
-  for (n=1;n<=nobs;n++) sprintf(data,"%s\n%s %4u %4d %s_%04d_%04d.obs",data,PROJECT_ID,SESSION_ID,n,PROJECT_ID,SESSION_ID,n);
+  for (n=1;n<=nobs;n++) {
+    #pragma GCC diagnostic ignored "-Wformat-overflow"
+    sprintf(data,"%s\n%s %4u %4d %s_%04d_%04d.obs",data,PROJECT_ID,SESSION_ID,n,PROJECT_ID,SESSION_ID,n);
+  }
 
   //printf("<%s>\n",data);
   sprintf(cmd,"echo \"%s\" > manifest_add.dat",data); system(cmd);
