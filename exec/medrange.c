@@ -13,6 +13,7 @@
 
 #include "me.h"
 #include <math.h>
+#include <stdlib.h>
 
 #define FS (196.0e+6)      /* [samples/s] sample rate */
 #define DTR 0.017453292520 /* pi/180 */
@@ -35,9 +36,9 @@ int main ( int narg, char *argv[] ) {
   float fmhz=74.0;
   float alt, az;
 
-  char filename[256];
+  char filename[512];
   FILE *fp;
-  char cmd[256];
+  char cmd[512];
 
   static struct ssmif_struct s; // when this code was tpsdm, had problems if this wasn't declared static
   //struct sdm_struct sdm;
@@ -89,14 +90,14 @@ int main ( int narg, char *argv[] ) {
     printf("  <fmhz>: center frequency in MHz, used to compute dispersive component of cable delay, defaults to 74\n");
     printf("example: '$ ./medrange state 74'\n");
     printf("\n");
-    return;
+    exit(EXIT_FAILURE);
     }
 
   if (narg>1) {
       sprintf(sSDir,"%s",argv[1]);
     } else {
       printf("[%d/%d] FATAL: <sdir> not specified\n",ME_DRANGE,getpid());
-      return;
+      exit(EXIT_FAILURE);
     }
   //printf("input: <sdir>='%s'\n",sSDir);
 
@@ -111,7 +112,7 @@ int main ( int narg, char *argv[] ) {
   sprintf(filename,"%s/ssmif.dat",sSDir);
   if ((fp=fopen(filename,"rb"))==NULL) {
     printf("[%d/%d] FATAL: Can't open '%s'\n",ME_DRANGE,getpid(),filename);
-    return;
+    exit(EXIT_FAILURE);
     }
   fread(&s,sizeof(struct ssmif_struct),1,fp);
   fclose(fp);
@@ -125,13 +126,13 @@ int main ( int narg, char *argv[] ) {
   //eErr = me_sc_MakeASM( s, &sc );
   //if (eErr>0) {
   //  printf("[%d/%d] FATAL: me_sc_MakeASM() failed with error %d\n",MT_TPSDM,getpid(),eErr);
-  //  return;
+  //  exit(EXIT_FAILURE);
   //  }
   ///* assemble information about digital signal mapping */
   //eErr = me_sc_MakeDSM( s, &sc ); 
   //if (eErr>0) {
   //  printf("[%d/%d] FATAL: me_sc_MakeDSM() failed with error %d\n",MT_TPSDM,getpid(),eErr);
-  //  return;
+  //  exit(EXIT_FAILURE);
   //  }
 
   /*********************************************/
@@ -352,12 +353,12 @@ int main ( int narg, char *argv[] ) {
   sprintf(filename,"%s/mindelay.txt",sSDir);
   if ((fp=fopen(filename,"wb"))==NULL) {
     printf("[%d/%d] FATAL: Can't open '%s'\n",ME_DRANGE,getpid(),filename);
-    return;
+    exit(EXIT_FAILURE);
     }
   fprintf(fp, "%i", smin);
   fclose(fp);
 
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 
@@ -372,4 +373,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-

@@ -13,6 +13,7 @@
 // Wrapper used to test me_point_corr() 
 // See end of this file for history.
 
+#include <stdlib.h>
 #include <math.h>
 
 #include "me.h"
@@ -35,7 +36,7 @@ int main ( int narg, char *argv[] ) {
   if (narg<6) {
     printf("Useage:\n");
     printf("me_point_corr_x <fPCAxisTh> <fPCAxisPh> <fPCAxisRot> <alt> <az>\n");
-    return;
+    exit(EXIT_FAILURE);
     }
 
   me_point_corr( 
@@ -49,7 +50,7 @@ int main ( int narg, char *argv[] ) {
   printf("alt [deg] = %lf\n",alt);
   printf("az  [deg] = %lf\n",az);
 
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
@@ -61,5 +62,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

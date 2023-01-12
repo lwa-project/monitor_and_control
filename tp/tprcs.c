@@ -11,6 +11,8 @@
 // Reads MCS/Exec command script (".cs") file, writes it to stdout in human-readable format
 // See end of this file for history.
 
+#include <stdlib.h>
+
 #include "mt.h"
 
 /*==============================================================*/
@@ -30,7 +32,7 @@ int main ( int narg, char *argv[] ) {
   /* parse command line */
   if (narg<2) {
     printf("syntax: $ ./tprcs <csfile>\n");
-    return;
+    exit(EXIT_FAILURE);
     }
   sprintf(csfile,"%s",argv[1]);
   printf("input: <csfile>='%s'\n",csfile);
@@ -38,7 +40,7 @@ int main ( int narg, char *argv[] ) {
   /* Open .cs file */
   if ((fp=fopen(csfile,"rb"))==NULL) {
     printf("[%d/%d] FATAL: Can't open '%s'\n",MT_TPRCS,getpid(),csfile);
-    return;
+    exit(EXIT_FAILURE);
     }
 
   //printf("MJD   MPM      A SID CID LEN  Data\n");  
@@ -79,7 +81,7 @@ int main ( int narg, char *argv[] ) {
   /* Close .cs file */
   fclose(fp);
 
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
@@ -97,5 +99,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

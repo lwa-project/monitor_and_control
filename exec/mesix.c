@@ -32,6 +32,8 @@
 // This is essentially equivalent to msei.c, from the MCS/Scheduler distribution
 // See end of this file for history.
 
+#include <stdlib.h>
+
 #include "me.h"
 
 int main ( int narg, char *argv[] ) {
@@ -52,14 +54,14 @@ int main ( int narg, char *argv[] ) {
     //printf("dest = <%s>\n",dest);
     } else {
     printf("[%d/%d] FATAL: dest not provided\n",ME_MESIX,getpid());
-    return;
+    exit(EXIT_FAILURE);
     } 
   if (narg>2) { 
     sscanf(argv[2],"%3s",cmd);
     //printf("dest = <%s>\n",dest);
     } else {
     printf("[%d/%d] FATAL: cmd not provided\n",ME_MESIX,getpid());
-    return;
+    exit(EXIT_FAILURE);
     } 
   strcpy(data,"");
   if (narg>3) { 
@@ -84,7 +86,7 @@ int main ( int narg, char *argv[] ) {
   
   printf("[%d/%d] mesi() returned code %d; reference=%ld\n",ME_MESIX,getpid(),eResult,reference);
   
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
@@ -125,5 +127,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

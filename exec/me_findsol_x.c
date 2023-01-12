@@ -14,6 +14,7 @@
 // See end of this file for history.
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 #include "me_astro.h"
@@ -35,7 +36,7 @@ int main ( int narg, char *argv[] ) {
     printf("me_findsol_x <mjd> <mpm>\n");
     printf("  <mjd>: integer MJD\n");
     printf("  <mpm>: integer milliseconds past UTC midnight\n");
-    return;
+    exit(EXIT_FAILURE);
     }
  
   me_findsol(
@@ -54,7 +55,7 @@ int main ( int narg, char *argv[] ) {
   printf("dec  = %8.3f deg = %+03.0f d %02.0f m %04.1f s\n",dec, (dec/fabs(dec))*floor(fabs(dec)), floor(m), s);
   printf("dist = %8.6f AU\n", dist);
   
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================

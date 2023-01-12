@@ -17,6 +17,7 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define ME "megfg"
@@ -49,7 +50,7 @@ int main( int narg, char *argv[] ) {
   /* Parse command line */
   if (narg<3) {
     printf("%s: FATAL: Insufficient arguments.  Usage is 'megfg <gft_file> <gf_file>'\n",ME);
-    return;
+    exit(EXIT_FAILURE);
     }
   sscanf(argv[1],"%s",gft_file); 
   sscanf(argv[2],"%s",gf_file); 
@@ -70,7 +71,7 @@ int main( int narg, char *argv[] ) {
   fp = fopen(gft_file,"r");
   if (!fp) {
     printf("%s: FATAL: Unable to open '%s' for input.\n",ME,gft_file);
-    return;
+    exit(EXIT_FAILURE);
     }
   for (i=0; i<MAX_STD; i++) {
     fscanf(fp,"%f %f %f %f",&gi[i][0][0],&gi[i][0][1],&gi[i][1][0],&gi[i][1][1]);
@@ -104,12 +105,12 @@ int main( int narg, char *argv[] ) {
   fp = fopen(gf_file,"wb");
   if (!fp) {
     printf("%s: FATAL: Unable to open '%s' for output.\n",ME,gf_file);
-    return;
+    exit(EXIT_FAILURE);
    }  
   fwrite( g, sizeof(g[0][0][0]), sizeof(g)/sizeof(g[0][0][0]), fp );
   fclose(fp);
 
-  return;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
@@ -126,5 +127,3 @@ int main( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

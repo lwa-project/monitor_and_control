@@ -32,6 +32,8 @@
 // Used to do one-shot acquisition using meos() 
 // See end of this file for history.
 
+#include <stdlib.h>
+
 #include "me.h"
 
 int main ( int narg, char *argv[] ) {
@@ -79,7 +81,7 @@ int main ( int narg, char *argv[] ) {
   eResult = meos(nDR,sExtDev,sDestDir,mode,args);
   printf("[%d/%d] meos() returned code %d\n",ME_MEOSX,getpid(),eResult);
   
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
@@ -98,5 +100,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

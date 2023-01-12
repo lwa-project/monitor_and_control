@@ -45,7 +45,7 @@
 #define MY_NAME "ms_mu (v.20191030.1)"
 #define ME "14" 
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/
@@ -81,7 +81,7 @@ main ( int narg, char *argv[] ) {
 
   //char display[33];
 
-  char cmd_line[256];
+  char cmd_line[768];
   int bUpdate = 0;
   int nUpdate = 0;
   int bDone = 0;
@@ -254,4 +254,3 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-

@@ -16,6 +16,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/wait.h>
+#include <sys/msg.h>
 
 //#include "LWA_MCS.h"
 #include "mcs.h"
@@ -28,7 +29,7 @@
 #define MAX_LINE_LENGTH 256
 #define MAX_TOKENS 10
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/
@@ -360,5 +361,3 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

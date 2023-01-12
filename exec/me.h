@@ -19,7 +19,7 @@
 #define ME_FLAG_NO_SCH 1 
 
 #define ME_FILENAME_MAX_LENGTH 256
-#define ME_MAX_COMMAND_LINE_LENGTH 256
+#define ME_MAX_COMMAND_LINE_LENGTH 512
 #define ME_MAX_PROJECT_ID_LENGTH 9 /* set by MCS0030 */
 #define ME_OUTCOME_STRING_LENGTH 40
 
@@ -45,7 +45,6 @@
 
 #include "mesi.c"
 #include "memdre.c"
-#include "meos.c"
 
 /**************************************/
 /*** me_sc_init( ) ********************/
@@ -181,15 +180,18 @@ int me_log( FILE *fp,                          /* handle to an open log file */
   
   LWA_time(&mjd,&mpm);
   sprintf(line,"%5ld %8ld ",mjd,mpm);
+  #pragma GCC diagnostic ignored "-Wformat-overflow"
   switch (eScope) {
     case    ME_LOG_SCOPE_SESSION: sprintf(line,"%sS",line); break;
     default:                      sprintf(line,"%sG",line); break;
     }
+  #pragma GCC diagnostic ignored "-Wformat-overflow"
   switch (eType) {
     case    ME_LOG_TYPE_SCH_CMD:  sprintf(line,"%sC ",line); break;
     default:                      sprintf(line,"%sI ",line); break;
     }
   if (eScope==ME_LOG_SCOPE_SESSION) {
+    #pragma GCC diagnostic ignored "-Wformat-overflow"
     sprintf(line,"%s %8s %4u %1d %4d",line,
                      sq->ssf[i].PROJECT_ID,
                          sq->ssf[i].SESSION_ID,
@@ -198,6 +200,7 @@ int me_log( FILE *fp,                          /* handle to an open log file */
     } else {
     sprintf(line,"%s                     ",line);
     }
+  #pragma GCC diagnostic ignored "-Wformat-overflow"
   sprintf(line,"%s %s",line,msg);
   fprintf(fp,"%s\n",line);
 
@@ -319,5 +322,6 @@ int me_GetMIBEntry( char *ss,                        /* (input) subsystem TLA */
   return eResult;
   }  
 
+#include "meos.c"
 
 #endif // #ifndef ME_H 

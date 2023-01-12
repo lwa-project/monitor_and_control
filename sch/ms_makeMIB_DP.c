@@ -11,13 +11,14 @@
 // See end of this file for history.
 
 #include <stdio.h>
+#include <stdlib.h>
 
 //#include "LWA_MCS.h"
 
 #define MY_NAME "ms_makeMIB_DP (v.20150909.1)"
 #define ME "11" 
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/
@@ -156,7 +157,9 @@ main ( int narg, char *argv[] ) {
       }
     }
 
-  close(fp);
+  fclose(fp);
+  
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
@@ -180,4 +183,3 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-

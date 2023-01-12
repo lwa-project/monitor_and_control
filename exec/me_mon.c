@@ -28,7 +28,7 @@
 
 #define MEELOG_STR_LEN 4096
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/
@@ -42,7 +42,7 @@ main ( int narg, char *argv[] ) {
   int k=0;
 
   char tempfile[256];
-  char cmd_line[256];
+  char cmd_line[512];
 
   FILE* fid;
   char line[MEELOG_STR_LEN];
@@ -54,7 +54,7 @@ main ( int narg, char *argv[] ) {
   struct timeval tv;
   struct tm *tm;
   char time_string[256];
-  char status_line[256];
+  char status_line[512];
   
   /*======================================*/
   /*=== Initialize: Command line stuff ===*/

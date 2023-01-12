@@ -33,8 +33,6 @@ void me_action_cmd_msg( char *msg,
     default: /* includes 0 */
       break;
     }
-
-  return;
   } /* me_inproc_cmd_log() */
 
 /*******************************************************************/
@@ -55,7 +53,6 @@ void me_initialize_session_queue_entry( struct me_session_queue_struct *sq, int 
   sq->ssf[i].SESSION_NOBS = 0;
   /* not bothering to initialize the remaining sq->ssf[] members since only the above are */
   /* are used before the memcpy initialization from the SSF */
-  return;
   } /* me_initialize_session_queue_entry() */
 
 
@@ -294,7 +291,7 @@ int me_inproc_readback(
           if ( (sq->fpc[i]=fopen(filename,"rb")) == NULL ) { 
             me_log( fpl, ME_LOG_SCOPE_SESSION, ME_LOG_TYPE_INFO, "me_inproc_readback(): cs file not found", sq, i );
             eErr = ME_INPROC_READBACK_ERR_CS_NOT_FOUND; /* this should be FATAL */
-            return;
+            return eErr;
             }
 
           /* read first command from command script file */
@@ -306,7 +303,7 @@ int me_inproc_readback(
             me_log( fpl, ME_LOG_SCOPE_SESSION, ME_LOG_TYPE_INFO, "me_inproc_readback(): action.sid != LWA_SID_MCS", sq, i );
             fclose(sq->fpc[i]);
             eErr = ME_INPROC_READBACK_ERR_CS_BAD_SID; /* this should be FATAL */
-            return;
+            return eErr;
             }
 
           switch(action.cid) {
@@ -337,7 +334,7 @@ int me_inproc_readback(
               me_log( fpl, ME_LOG_SCOPE_SESSION, ME_LOG_TYPE_INFO, msg, sq, i );
               fclose(sq->fpc[i]);
               eErr = ME_INPROC_READBACK_ERR_CS_BAD_CID; 
-              return;
+              return eErr;
               break;
             } /* switch(action.cid) */
    
@@ -883,7 +880,7 @@ int me_init_sdm( struct ssmif_struct s,
   sprintf(filename,"state/sdm.dat");
   if ((fp=fopen(filename,"rb"))==NULL) {
     printf("[%d/%d] Can't open '%s'\n",ME_ME_C,getpid(),filename);
-    return;
+    return 1;
     }
   fread(sdm,sizeof(struct sdm_struct),1,fp);
   fclose(fp); 
@@ -925,7 +922,7 @@ int me_init_sdm( struct ssmif_struct s,
 
   /* .settings are left alone */ 
 
-  return;
+  return 0;
   } /* me_init_sdm() */
 
 
@@ -983,7 +980,7 @@ int me_make_gf( struct ssmif_struct s
   fpi = fopen("state/default.gft","r");
   if (!fpi) {
     printf("me_exec_1 / me_make_gf(): FATAL: Unable to open 'state/default.gft' for input.\n");
-    return;
+    return 1;
     }
   fpo = fopen("state/default_m.gft","w");
   i=0;
@@ -1007,7 +1004,7 @@ int me_make_gf( struct ssmif_struct s
     #endif
   system(cmd);
 
-  return;
+  return 0;
   } /* me_gf() */
 
 
