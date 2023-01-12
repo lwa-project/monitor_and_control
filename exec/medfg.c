@@ -18,6 +18,7 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define ME "medfg"
@@ -60,7 +61,7 @@ int main( int narg, char *argv[] ) {
   /* Parse command line */
   if (narg<3) {
     printf("%s: FATAL: Insufficient arguments.  Usage is 'medfg <dft_file> <df_file>'\n",ME);
-    return;
+    exit(EXIT_FAILURE);
     }
   sscanf(argv[1],"%s",dft_file); 
   sscanf(argv[2],"%s",df_file); 
@@ -78,7 +79,7 @@ int main( int narg, char *argv[] ) {
   fp = fopen(dft_file,"r");
   if (!fp) {
     printf("%s: FATAL: Unable to open '%s' for input.\n",ME,dft_file);
-    return;
+    exit(EXIT_FAILURE);
     }
   for (i=0; i<MAX_ANT; i++) {
     fscanf(fp,"%hu %hu",&d[i],&f[i]);
@@ -103,12 +104,12 @@ int main( int narg, char *argv[] ) {
   fp = fopen(df_file,"wb");
   if (!fp) {
     printf("%s: FATAL: Unable to open '%s' for output.\n",ME,df_file);
-    return;
+    exit(EXIT_FAILURE);
    }  
   fwrite( d, sizeof(d[0]), sizeof(d)/sizeof(d[0]), fp );
   fclose(fp);
 
-  return;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================

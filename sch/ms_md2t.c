@@ -36,7 +36,7 @@
 #define MY_NAME "ms_md2t (v.20191030.1)"
 #define ME "12" 
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/
@@ -69,7 +69,7 @@ main ( int narg, char *argv[] ) {
 
   char display[33];
 
-  char cmd_line[256];
+  char cmd_line[768];
 
   union {
     unsigned char i;
@@ -401,4 +401,3 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-

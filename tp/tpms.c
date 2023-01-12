@@ -29,6 +29,10 @@
 //                <arg4> FREQ1 [tuning word].  DEFAULT is  832697741 (37.999999997 MHz)
 //                <arg5> FREQ2 [tuning word].  DEFAULT is 1621569285 (73.999999990 MHz)
 //                <arg6> BW [filter code].  DEFAULT is 7.
+//     TRK_LUN:   <arg3> OBS_DUR [ms], integer.  DEFAULT is 10000.
+//                <arg4> FREQ1 [tuning word].  DEFAULT is  832697741 (37.999999997 MHz)
+//                <arg5> FREQ2 [tuning word].  DEFAULT is 1621569285 (73.999999990 MHz)
+//                <arg6> BW [filter code].  DEFAULT is 7.
 //     TBN:       <arg3> OBS_DUR [ms], integer.  DEFAULT is 10000.
 //                <arg4> FREQ1 [tuning word].  DEFAULT is 832697741 (37.999999997 MHz)
 //                (OBS_BW is assumed to be 7 (100 kSPS) 
@@ -45,6 +49,8 @@
 //   time of observation can be determined automatically to be a certain distance into
 //   the future
 // See end of this file for history.
+
+#include <stdlib.h>
 
 #include "mt.h"
 
@@ -82,18 +88,19 @@ int main ( int narg, char *argv[] ) {
   /* Parse command line */
   if (narg<2) {
       printf("[%d/%d] FATAL: <mode> not specified\n",MT_TPMS,getpid());
-      return;
+      exit(EXIT_FAILURE);
     } else {
       sprintf(sMode,"%s",argv[1]); 
       if (!(eMode=LWA_getmode(sMode))) { 
         printf("[%d/%d] FATAL: Invalid <mode>\n",MT_TPSS,getpid());   
-        return;
+        exit(EXIT_FAILURE);
         }
       switch (eMode) { /* not all modes are yet implemented */
         case LWA_OM_STEPPED: break;
         case LWA_OM_TRK_RADEC: break;
         case LWA_OM_TRK_SOL: break;
         case LWA_OM_TRK_JOV: break;
+        case LWA_OM_TRK_LUN: break;
 #if !defined(USE_NDP)
         case LWA_OM_TBN: break;
 #endif
@@ -103,13 +110,13 @@ int main ( int narg, char *argv[] ) {
         case LWA_OM_TBW: break;
 #endif
         case LWA_OM_DIAG1: break;
-        default: printf("[%d/%d] FATAL: This <mode> not yet implemented\n",MT_TPSS,getpid()); return; break;
+        default: printf("[%d/%d] FATAL: This <mode> not yet implemented\n",MT_TPSS,getpid()); exit(EXIT_FAILURE); break;
         }
       LWA_saymode( eMode, sMode );
     }
   if (narg<3) {
       printf("[%d/%d] FATAL: <dt> not specified\n",MT_TPMS,getpid());
-      return;
+      exit(EXIT_FAILURE);
     } else {
       sscanf(argv[2],"%ld",&dt);    
     }
@@ -132,6 +139,7 @@ int main ( int narg, char *argv[] ) {
       break;
     case LWA_OM_TRK_SOL:
     case LWA_OM_TRK_JOV:
+    case LWA_OM_TRK_LUN:
       iDur=10000;        if (narg>=4) sscanf(argv[3],"%ld",&iDur);
       iFreq =832697741;  if (narg>=5) sscanf(argv[5],"%ld",&iFreq); 
       iFreq2=1621569285; if (narg>=6) sscanf(argv[6],"%ld",&iFreq2);
@@ -180,7 +188,7 @@ int main ( int narg, char *argv[] ) {
       break;
     default: 
       printf("[%d/%d] FATAL: Mode supported but not implemented(?)\n",MT_TPSS,getpid()); 
-      return; 
+      exit(EXIT_FAILURE); 
       break;
     }
 
@@ -297,6 +305,7 @@ int main ( int narg, char *argv[] ) {
       break; 
     case LWA_OM_TRK_SOL:
     case LWA_OM_TRK_JOV:
+    case LWA_OM_TRK_LUN:
       fprintf(fp,"OBS_B          SIMPLE\n");
       fprintf(fp,"OBS_FREQ1      %ld\n",iFreq);
       //fprintf(fp,"OBS_FREQ1+     19.999999955 MHz\n");
@@ -318,21 +327,26 @@ int main ( int narg, char *argv[] ) {
       break; 
     default:
       printf("[%d/%d] FATAL: Mode supported but not implemented(?)\n",MT_TPSS,getpid()); 
-      return; 
+      exit(EXIT_FAILURE);
       break;
     }
 
   /* close SDF */
   fclose(fp);
 
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+<<<<<<< HEAD
 // tpms.c: J. Dowell, UNM, 2022 May 2
 //   .1 Updated for MCS-NDP
+=======
+// tpms.c: J. Dowell, UNM, 2022 Sep 30
+//   .1 Added support for TRK_LUN
+>>>>>>> master
 // tpms.c: J. Dowell, UNM, 2018 Jan 29
 //   .1 Cleaned up a few compiler warnings
 // tpms.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07

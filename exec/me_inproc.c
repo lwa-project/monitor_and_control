@@ -21,6 +21,9 @@
 //     be commanded 
 // See end of this file for history.
 
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
 #include <math.h>        /* needed for me_getaltaz.c + others */
 #include <dirent.h>      /* this is listing files in a directory */
 
@@ -72,7 +75,7 @@ int me_medfg( struct beam_struct beam,
   if (!fp) {
     printf("FATAL: In me_medfg() of me_inproc(), unable to open '%s' for output.\n",df_file);
     fprintf(fp,"FATAL: In me_medfg() of me_inproc(), unable to open '%s' for output.\n",df_file);
-    return;
+    exit(EXIT_FAILURE);
    }  
   fwrite( d, sizeof(d[0]), sizeof(d)/sizeof(d[0]), fp );
   fclose(fp);
@@ -137,7 +140,7 @@ int me_megfg( struct beam_struct beam,
   if (!fp) {
     printf("FATAL: In me_megfg() of me_inproc(), unable to open '%s' for output.\n",gf_file);
     fprintf(fp,"FATAL: In me_megfg() of me_inproc(), unable to open '%s' for output.\n",gf_file);
-    return;
+    exit(EXIT_FAILURE);
    }  
   fwrite( g, sizeof(g[0][0][0]), sizeof(g)/sizeof(g[0][0][0]), fp );
   fclose(fp);
@@ -306,7 +309,7 @@ int me_bdm_setup( char *OBS_BDM,
   fpi = fopen("state/default_m.gft","r");
   if (!fpi) {
     printf("me_inproc.c / me_bdm_setup(): FATAL: Unable to open 'state/default_m.gft' for input.\n");
-    return;
+    exit(EXIT_FAILURE);
     }
   fpo = fopen("me_inproc_bm/temp.gft","w");
 
@@ -385,8 +388,6 @@ void me_inproc_cmd_log( FILE *fpl,
       fprintf(fpl,"\n");
       break;
     }
-
-  return;
   } /* me_inproc_cmd_log() */
 
 /*************************************************************/
@@ -408,7 +409,6 @@ void me_timecalc( long int mjd0,
     (*mpm) += 86400000;
     (*mjd)--;
     }
-  return;
   } /* me_timecalc() */
 
 /*************************************************************/
@@ -473,8 +473,6 @@ void me_trim( char *src, char *dest ) {
       }
     }
   dest[k] = '\0';
-
-  return;
   } /* me_trim() */
 
 /*******************************************************************/
@@ -591,7 +589,7 @@ int main ( int narg, char *argv[] ) {
     /* check for a .inp file */
     if (!(dir = opendir("sinbox"))) {
       printf("[%d/%d] FATAL: Couldn't opendir('sinbox')\n",ME_INPROC,getpid());
-      return;
+      exit(EXIT_FAILURE);
       } 
 
     while ( (sDirEnt=readdir(dir)) != NULL ) {
@@ -615,7 +613,7 @@ int main ( int narg, char *argv[] ) {
         if ((fp=fopen(inp_filename,"rb"))==NULL) {
           printf("[%d/%d] FATAL: me_inproc can't open '%s'\n",ME_INPROC,getpid(),inp_filename);
           closedir(dir);
-          return;
+          exit(EXIT_FAILURE);
           }
         fread(&ssf,sizeof(struct ssf_struct),1,fp);
         fclose(fp);  
@@ -629,7 +627,7 @@ int main ( int narg, char *argv[] ) {
           printf("[%d/%d] FATAL: me_inproc can't open '%s'\n",ME_INPROC,getpid(),log_filename);
           closedir(dir);
           fcloseall();
-          return;
+          exit(EXIT_FAILURE);
           }
         fprintf(fpl,"[%d/%d] starting\n",ME_INPROC,getpid());
 
@@ -672,7 +670,7 @@ int main ( int narg, char *argv[] ) {
             closedir(dir);
             fflush(fpl);
             fcloseall();          
-            return;   
+            exit(EXIT_FAILURE);   
             }
           fprintf(fpl,"opened '%s' (first pass)\n",osf_filename);
 
@@ -710,6 +708,7 @@ int main ( int narg, char *argv[] ) {
             case LWA_OM_TRK_RADEC:
             case LWA_OM_TRK_SOL:   
             case LWA_OM_TRK_JOV:   
+            case LWA_OM_TRK_LUN:   
               eD=0;
               break;
             case LWA_OM_STEPPED:
@@ -739,7 +738,7 @@ int main ( int narg, char *argv[] ) {
               printf(     "[%d/%d] FATAL: me_inproc can't open '%s'\n",ME_INPROC,getpid(),cs_filename);
               closedir(dir);
               fcloseall();          
-              return;    
+              exit(EXIT_FAILURE);    
               }  
             fprintf(fpl,"cs file is open\n"); 
             }
@@ -760,7 +759,7 @@ int main ( int narg, char *argv[] ) {
               printf(     "[%d/%d] FATAL: me_inproc doesn't see '2^32-2' marker\n",ME_INPROC,getpid());
               closedir(dir); 
               fcloseall();          
-              return; 
+              exit(EXIT_FAILURE); 
               }
             } /* for m */
 
@@ -774,7 +773,7 @@ int main ( int narg, char *argv[] ) {
             printf(     "[%d/%d] FATAL: me_inproc doesn't see '2^32-1' marker\n",ME_INPROC,getpid()); 
             closedir(dir);
             fcloseall();         
-            return; 
+            exit(EXIT_FAILURE); 
             }
 
           /* close the .obs file */
@@ -896,7 +895,7 @@ int main ( int narg, char *argv[] ) {
                 fprintf(fpl,"[%d/%d] FATAL: osf.SESSION_DRX_BEAM=%d is not in s.iDRDP[0..%d]\n",ME_INPROC,getpid(),osf.SESSION_DRX_BEAM,ME_MAX_NDR-1);
                 closedir(dir);
                 fcloseall();
-                return;
+                exit(EXIT_FAILURE);
                 }
 
 #ifdef USE_ADP                
@@ -917,6 +916,7 @@ int main ( int narg, char *argv[] ) {
                 case LWA_OM_TRK_RADEC: 
                 case LWA_OM_TRK_SOL:   
                 case LWA_OM_TRK_JOV:   
+                case LWA_OM_TRK_LUN:   
                 case LWA_OM_STEPPED:   
                   sprintf(dr_format,"DRX_FILT_%1hu",osf.OBS_BW); 
                   break;
@@ -940,7 +940,7 @@ int main ( int narg, char *argv[] ) {
                   fprintf(fpl,"[%d/%d] FATAL: During DR setup, osf.OBS_MODE=%d not recognized\n",ME_INPROC,getpid(),osf.OBS_MODE);
                   closedir(dir);
                   fcloseall();
-                  return;  
+                  exit(EXIT_FAILURE);  
                   break;
                 }
 
@@ -1178,6 +1178,7 @@ int main ( int narg, char *argv[] ) {
               case LWA_OM_TRK_RADEC:
               case LWA_OM_TRK_SOL:
               case LWA_OM_TRK_JOV:
+              case LWA_OM_TRK_LUN:
 
                 /* DRX trigger time is in units of "subslots" (1/100ths of a second) */
                 t0 = dp_cmd_mpm % 1000; /* number of ms beyond a second boundary */
@@ -1352,9 +1353,14 @@ int main ( int narg, char *argv[] ) {
                       me_findsol( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist );
                       ra = osf.OBS_RA;
                       dec = osf.OBS_DEC;
-	                 break;  
+	                    break;  
                     case LWA_OM_TRK_JOV:
                       me_findjov( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist );
+                      ra = osf.OBS_RA;
+                      dec = osf.OBS_DEC;
+                      break;
+                    case LWA_OM_TRK_LUN:
+                      me_findlun( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist );
                       ra = osf.OBS_RA;
                       dec = osf.OBS_DEC;
                       break;
@@ -1463,7 +1469,7 @@ int main ( int narg, char *argv[] ) {
 #endif
                 closedir(dir);
                 fcloseall();
-                return; 
+                exit(EXIT_FAILURE); 
                 break;
               } /* switch (osf.OBS_MODE) */
 
@@ -1505,7 +1511,7 @@ int main ( int narg, char *argv[] ) {
             printf(     "[%d/%d] FATAL: me_inproc can't open '%s'\n",ME_INPROC,getpid(),osf_filename);
             closedir(dir);
             fcloseall();          
-            return;   
+            exit(EXIT_FAILURE);   
             }
           fprintf(fpl,"opened '%s' (second pass)\n",osf_filename);
 
@@ -1702,7 +1708,7 @@ int main ( int narg, char *argv[] ) {
 
                 /* --- SPEC_DELAYS_GAINS beamforming: ---------------------------------------*/
 
-                //printf("FATAL: Shouldn't be here!"); return;
+                //printf("FATAL: Shouldn't be here!"); exit(EXIT_FAILURE);
 
                 /* come up with unique root filename for delay and gain files */ 
                 /* These start with "c" to denote "custom" -- this keeps me_beamspec() from getting confused */
@@ -1784,7 +1790,7 @@ int main ( int narg, char *argv[] ) {
               printf(     "[%d/%d] FATAL: me_inproc doesn't see '2^32-2' marker\n",ME_INPROC,getpid());
               closedir(dir); 
               fcloseall();          
-              return;
+              exit(EXIT_FAILURE);
               }
 
             } /* for m */
@@ -1849,6 +1855,7 @@ int main ( int narg, char *argv[] ) {
               case LWA_OM_TRK_RADEC:
               case LWA_OM_TRK_SOL:
               case LWA_OM_TRK_JOV:
+              case LWA_OM_TRK_LUN:
               case LWA_OM_STEPPED:
 #ifdef USE_ADP
                  cs[ncs].action.tv.tv_sec  = cs[ncs-1].action.tv.tv_sec;
@@ -1911,7 +1918,7 @@ int main ( int narg, char *argv[] ) {
           printf(     "[%d/%d] FATAL: me_inproc can't open '%s'\n",ME_INPROC,getpid(),cs_filename);
           closedir(dir);
           fcloseall();          
-         return;    
+         exit(EXIT_FAILURE);    
           }  
         fprintf(fpl,"cs file is open\n"); 
 
@@ -1981,12 +1988,14 @@ int main ( int narg, char *argv[] ) {
     } /* while (!bDone) */
 
 
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_inproc.c: J. Dowell, UNM, 2022 Sep 30
+//   .1 Added support for TRK_LUN
 // me_inproc.c: J. Dowell, UNM, 2020 Sep 29
 //   .1 Fixed a bug in RA/Dec STEPPED mode observations that caused the start time 
 //      of the steps to not be updated correctly
@@ -2072,4 +2081,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-

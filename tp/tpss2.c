@@ -8,9 +8,9 @@
       printf("...converts to %u\n",SESSION_ID);
       strcpy(data,"");   
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: TPSS_PL_KEYWORD_MISMATCH\n",MT_TPSS,getpid()); return; break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: TPSS_PL_KEYWORD_MISMATCH\n",MT_TPSS,getpid()); exit(EXIT_FAILURE); break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
 
@@ -22,9 +22,9 @@
       strcpy(SESSION_TITLE,data);
       strcpy(data,"");   
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: TPSS_PL_KEYWORD_MISMATCH\n",MT_TPSS,getpid()); return; break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: TPSS_PL_KEYWORD_MISMATCH\n",MT_TPSS,getpid()); exit(EXIT_FAILURE); break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_REMPI");
@@ -35,9 +35,9 @@
       strcpy(SESSION_REMPI,data);
       strcpy(data,"");   
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: TPSS_PL_KEYWORD_MISMATCH\n",MT_TPSS,getpid()); return; break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: TPSS_PL_KEYWORD_MISMATCH\n",MT_TPSS,getpid()); exit(EXIT_FAILURE); break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_REMPO");
@@ -48,9 +48,9 @@
       strcpy(SESSION_REMPO,data);
       strcpy(data,"");   
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: TPSS_PL_KEYWORD_MISMATCH\n",MT_TPSS,getpid()); return; break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: TPSS_PL_KEYWORD_MISMATCH\n",MT_TPSS,getpid()); exit(EXIT_FAILURE); break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_CRA"); SESSION_CRA=0;
@@ -62,13 +62,13 @@
       printf("...converts to %d\n",SESSION_CRA);
       if ( (SESSION_CRA<0) || (SESSION_CRA>65535) ) {   
         printf("[%d/%d] FATAL: SESSION_CRA not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }
       strcpy(data,"");   
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional keyword */                                                        break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional keyword */                                                                    break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_DRX_BEAM"); SESSION_DRX_BEAM=-1;
@@ -81,19 +81,19 @@
 #if defined(USE_NDP) || defined(USE_ADP)
       if (!( (SESSION_DRX_BEAM==-1) || ( (SESSION_DRX_BEAM>=1) && (SESSION_DRX_BEAM<=ME_MAX_NDPOUT) ) )) {   
         printf("[%d/%d] FATAL: SESSION_DRX_BEAM not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }
 #else
       if (!( (SESSION_DRX_BEAM==-1) || ( (SESSION_DRX_BEAM>=1) && (SESSION_DRX_BEAM<=ME_MAX_NDPOUT-1) ) )) {   
         printf("[%d/%d] FATAL: SESSION_DRX_BEAM not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }
 #endif
       strcpy(data,"");   
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional keyword */                                                        break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional keyword */                                                                    break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_SPC"); strcpy(SESSION_SPC,"");
@@ -105,9 +105,9 @@
       printf("...converts to '%s'\n",SESSION_SPC);
       strcpy(data,"");   
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional keyword */                                                        break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional keyword */                                                                    break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MRP_ASP"); SESSION_MRP_ASP=-1;
@@ -119,13 +119,13 @@
       printf("...converts to %d\n",SESSION_MRP_ASP);
       if (SESSION_MRP_ASP<-1) {   
         printf("[%d/%d] FATAL: SESSION_MRP_ASP not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }                 
       strcpy(data,"");  
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MRP_DP_"); SESSION_MRP_DP_=-1;
@@ -137,13 +137,13 @@
       printf("...converts to %d\n",SESSION_MRP_DP_);
       if (SESSION_MRP_DP_<-1) {   
         printf("[%d/%d] FATAL: SESSION_MRP_DP_ not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }
       strcpy(data,"");                     
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MRP_DR1"); SESSION_MRP_DR1=-1;
@@ -155,13 +155,13 @@
       printf("...converts to %d\n",SESSION_MRP_DR1);
       if (SESSION_MRP_DR1<-1) {   
         printf("[%d/%d] FATAL: SESSION_MRP_DR1 not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MRP_DR2"); SESSION_MRP_DR2=-1;
@@ -173,13 +173,13 @@
       printf("...converts to %d\n",SESSION_MRP_DR2);
       if (SESSION_MRP_DR2<-1) {   
         printf("[%d/%d] FATAL: SESSION_MRP_DR2 not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MRP_DR3"); SESSION_MRP_DR3=-1;
@@ -191,13 +191,13 @@
       printf("...converts to %d\n",SESSION_MRP_DR3);
       if (SESSION_MRP_DR3<-1) {   
         printf("[%d/%d] FATAL: SESSION_MRP_DR3 not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MRP_DR4"); SESSION_MRP_DR4=-1;
@@ -209,13 +209,13 @@
       printf("...converts to %d\n",SESSION_MRP_DR4);
       if (SESSION_MRP_DR4<-1) {   
         printf("[%d/%d] FATAL: SESSION_MRP_DR4 not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MRP_DR5"); SESSION_MRP_DR5=-1;
@@ -227,13 +227,13 @@
       printf("...converts to %d\n",SESSION_MRP_DR5);
       if (SESSION_MRP_DR5<-1) {   
         printf("[%d/%d] FATAL: SESSION_MRP_DR5 not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MRP_SHL"); SESSION_MRP_SHL=-1;
@@ -245,13 +245,13 @@
       printf("...converts to %d\n",SESSION_MRP_SHL);
       if (SESSION_MRP_SHL<-1) {   
         printf("[%d/%d] FATAL: SESSION_MRP_SHL not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MRP_MCS"); SESSION_MRP_MCS=-1;
@@ -263,13 +263,13 @@
       printf("...converts to %d\n",SESSION_MRP_MCS);
       if (SESSION_MRP_MCS<-1) {   
         printf("[%d/%d] FATAL: SESSION_MRP_MCS not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MUP_ASP"); SESSION_MUP_ASP=-1;
@@ -281,13 +281,13 @@
       printf("...converts to %d\n",SESSION_MUP_ASP);
       if (SESSION_MUP_ASP<-1) {   
         printf("[%d/%d] FATAL: SESSION_MUP_ASP not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }                 
       strcpy(data,"");  
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MUP_DP_"); SESSION_MUP_DP_=-1;
@@ -299,13 +299,13 @@
       printf("...converts to %d\n",SESSION_MUP_DP_);
       if (SESSION_MUP_DP_<-1) {   
         printf("[%d/%d] FATAL: SESSION_MUP_DP_ not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }
       strcpy(data,"");                     
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MUP_DR1"); SESSION_MUP_DR1=-1;
@@ -317,13 +317,13 @@
       printf("...converts to %d\n",SESSION_MUP_DR1);
       if (SESSION_MUP_DR1<-1) {   
         printf("[%d/%d] FATAL: SESSION_MUP_DR1 not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MUP_DR2"); SESSION_MUP_DR2=-1;
@@ -335,13 +335,13 @@
       printf("...converts to %d\n",SESSION_MUP_DR2);
       if (SESSION_MUP_DR2<-1) {   
         printf("[%d/%d] FATAL: SESSION_MUP_DR2 not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MUP_DR3"); SESSION_MUP_DR3=-1;
@@ -353,13 +353,13 @@
       printf("...converts to %d\n",SESSION_MUP_DR3);
       if (SESSION_MUP_DR3<-1) {   
         printf("[%d/%d] FATAL: SESSION_MUP_DR3 not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MUP_DR4"); SESSION_MUP_DR4=-1;
@@ -371,13 +371,13 @@
       printf("...converts to %d\n",SESSION_MUP_DR4);
       if (SESSION_MUP_DR4<-1) {   
         printf("[%d/%d] FATAL: SESSION_MUP_DR4 not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MUP_DR5"); SESSION_MUP_DR5=-1;
@@ -389,13 +389,13 @@
       printf("...converts to %d\n",SESSION_MUP_DR5);
       if (SESSION_MUP_DR5<-1) {   
         printf("[%d/%d] FATAL: SESSION_MUP_DR5 not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MUP_SHL"); SESSION_MUP_SHL=-1;
@@ -407,13 +407,13 @@
       printf("...converts to %d\n",SESSION_MUP_SHL);
       if (SESSION_MUP_SHL<-1) {   
         printf("[%d/%d] FATAL: SESSION_MUP_SHL not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_MUP_MCS"); SESSION_MUP_MCS=-1;
@@ -425,13 +425,13 @@
       printf("...converts to %d\n",SESSION_MUP_MCS);
       if (SESSION_MUP_MCS<-1) {   
         printf("[%d/%d] FATAL: SESSION_MUP_MCS not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_LOG_SCH"); SESSION_LOG_SCH=0;
@@ -443,13 +443,13 @@
       printf("...converts to %d\n",SESSION_LOG_SCH);
       if ( (SESSION_LOG_SCH<0) || (SESSION_LOG_SCH>1) )  {   
         printf("[%d/%d] FATAL: SESSION_LOG_SCH not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_LOG_EXE"); SESSION_LOG_EXE=0;
@@ -461,13 +461,13 @@
       printf("...converts to %d\n",SESSION_LOG_EXE);
       if ( (SESSION_LOG_EXE<0) || (SESSION_LOG_EXE>1) )  {   
         printf("[%d/%d] FATAL: SESSION_LOG_EXE not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_INC_SMIB"); SESSION_INC_SMIB=0;
@@ -479,13 +479,13 @@
       printf("...converts to %d\n",SESSION_INC_SMIB);
       if ( (SESSION_INC_SMIB<0) || (SESSION_INC_SMIB>1) )  {   
         printf("[%d/%d] FATAL: SESSION_INC_SMIB not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
   strcpy(keyword,"SESSION_INC_DES"); SESSION_INC_DES=0;
@@ -497,11 +497,11 @@
       printf("...converts to %d\n",SESSION_INC_DES);
       if ( (SESSION_INC_DES<0) || (SESSION_INC_DES>1) )  {   
         printf("[%d/%d] FATAL: SESSION_INC_DES not valid\n",MT_TPSS,getpid());  
-        return;
+        exit(EXIT_FAILURE);
         }      
       strcpy(data,"");               
       break;
-    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   return; break;
-    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                break;
-    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    return; break;
+    case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
+    case TPSS_PL_KEYWORD_MISMATCH: /* optional */                                                                            break;
+    case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }

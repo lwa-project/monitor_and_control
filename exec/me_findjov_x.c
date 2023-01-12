@@ -15,11 +15,12 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "me_astro.h"
 
 int main ( int narg, char *argv[] ) {
-
+  
   long int mjd; /* (input) mean julian date */
   long int mpm; /* (input) milliseconds past UTC midnight */ 
   float ra;     /* (output) [h] RA */
@@ -35,15 +36,15 @@ int main ( int narg, char *argv[] ) {
     printf("me_findjov_x <mjd> <mpm>\n");
     printf("  <mjd>: integer MJD\n");
     printf("  <mpm>: integer milliseconds past UTC midnight\n");
-    return;
+    exit(EXIT_FAILURE);
     }
  
   me_findjov(
-              mjd,  /* (input) mean julian date */
-              mpm,  /* (input) milliseconds past UTC midnight */ 
-              &ra,  /* (output) [h] calculated RA */
-              &dec, /* (output) [deg] calculated dec */ 
-              &dist /* (output) [AU] distance from Earth */
+              mjd,        /* (input) mean julian date */
+              mpm,        /* (input) milliseconds past UTC midnight */ 
+              &ra,        /* (output) [h] calculated RA */
+              &dec,       /* (output) [deg] calculated dec */ 
+              &dist       /* (output) [AU] distance from Earth */
              );
 
   m = (ra - floor(ra))*60.0;
@@ -54,7 +55,7 @@ int main ( int narg, char *argv[] ) {
   printf("dec  = %8.3f deg = %+03.0f d %02.0f m %04.1f s\n",dec, (dec/fabs(dec))*floor(fabs(dec)), floor(m), s);
   printf("dist = %8.6f AU\n", dist);
 
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
@@ -68,5 +69,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

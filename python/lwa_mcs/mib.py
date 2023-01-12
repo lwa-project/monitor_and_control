@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 
 from lwa_mcs._mcs import read_mib_ip, read_mib, MCS_TIMEOUT
 
-__version__ = "0.3"
+__version__ = "0.4"
 __all__ = ['read', 'read_from_disk']
 
 
@@ -20,12 +20,25 @@ def read(ss, label, trim_nulls=True):
     timestamp.
     """
     
-    
     # Send the command
     value, ts = read_mib_ip(ss, label)
-    if trim_nulls:
-        value = value.replace('\x00', '').strip().rstrip()
-        
+    try:
+        value = value.decode('ascii')
+        if trim_nulls:
+            value = value.replace('\0', '').strip().rstrip()
+            
+        try:
+            value = int(value, 10)
+        except ValueError:
+            try:
+                value = float(value)
+            except ValueError:
+                pass
+                
+    except (AttributeError, UnicodeDecodeError):
+        if trim_nulls:
+            value = value.replace(b'\0', b'').strip().rstrip()
+            
     return value, ts
 
 
@@ -103,18 +116,19 @@ def read_from_disk(ss, label, trim_nulls=True):
                 else:
                     try:
                         val = val.decode('ascii')
-                    except AttributeError:
-                        pass
-                    if trim_nulls:
-                        value = val.replace('\0', '').strip().rstrip()
+                        if trim_nulls:
+                            value = val.replace('\0', '').strip().rstrip()
+                            
+                    except (AttributeError, UnicodeDecodeError):
+                        if trim_nulls:
+                            value = val.replace(b'\0', b'').strip().rstrip()
                 break
                 
             else:
                 value = 'TIMEOUT'
                 ts = 0.0
                 time.sleep(0.2)
-            fh.close()
-            
+                
         except Exception as e:
             print(str(e))
             value = None

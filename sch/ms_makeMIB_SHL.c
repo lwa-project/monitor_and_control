@@ -11,13 +11,14 @@
 // See end of this file for history.
 
 #include <stdio.h>
+#include <stdlib.h>
 
 //#include "LWA_MCS.h"
 
 #define MY_NAME "ms_makeMIB_SHL (v.20150909.1)"
 #define ME "10" 
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/
@@ -41,13 +42,13 @@ main ( int narg, char *argv[] ) {
     sscanf(argv[1],"%d",&n_RACK);
     } else {
     printf("[%s] FATAL: RACK-COUNT not provided\n",ME);
-    return;
+    exit(EXIT_FAILURE);
     } 
   if (narg>2) { 
     sscanf(argv[2],"%d",&n_RACK_PORT);
     } else {
     printf("[%s] FATAL: RACK-PORT-COUNT not provided\n",ME);
-    return;
+    exit(EXIT_FAILURE);
     } 
     
     
@@ -104,7 +105,9 @@ main ( int narg, char *argv[] ) {
   fprintf(fp,"V 5.2		LIGHTNING-10MIN	UNK	a10	a10\n");
   fprintf(fp,"V 5.3		LIGHTNING-30MIN	UNK	a10	a10\n");
   
-  close(fp);
+  fclose(fp);
+  
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
@@ -116,4 +119,3 @@ main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-

@@ -12,6 +12,8 @@
 // Assumes ssmif.dat is on TP and tries to copy/read it
 // See end of this file for history.
 
+#include <stdlib.h>
+
 #include "me.h"
 
 #define MY_NAME "me_init (v.20180222.1)"
@@ -342,7 +344,7 @@ int main ( int narg, char *argv[] ) {
   /* say goodbye */
   printf("[%d/%d] me_init: I'm done. Exiting normally.\n",ME_INIT,getpid());  
 
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
@@ -392,5 +394,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

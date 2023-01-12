@@ -10,6 +10,8 @@
 // Used to query ms_mdre_ip (the MCS/Scheduler subsystem MIB interface) using msmdre() 
 // See end of this file for history.
 
+#include <stdlib.h>
+
 #include "me.h"
 
 int main ( int narg, char *argv[] ) {
@@ -29,14 +31,14 @@ int main ( int narg, char *argv[] ) {
       sprintf(dbm_filename,"%s",argv[1]);
     } else {
       printf("[%d/%d] FATAL: subsystem not specified\n",ME_MEMDREX,getpid());
-      return;
+      exit(EXIT_FAILURE);
     } 
   if (narg>2) { 
       //printf("[%s/%d] label <%s> specified\n",ME,getpid(),argv[2]);
       sprintf(label,"%s",argv[2]);
     } else {
       printf("[%d/%d] FATAL: MIB label not specified\n",ME_MEMDREX,getpid());
-      return;
+      exit(EXIT_FAILURE);
     } 
 
   eResult = memdre(dbm_filename,label,val,&last_change);
@@ -47,7 +49,7 @@ int main ( int narg, char *argv[] ) {
   printf("%02d%02d%02d %02d:%02d:%02d\n", (tm->tm_year)-100, (tm->tm_mon)+1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
 
 
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
@@ -63,5 +65,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-
