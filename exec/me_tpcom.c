@@ -10,6 +10,8 @@
 // Handles movement of files between MCS/TP and the MCS/Exec 'me' process
 // See end of this file for history.
 
+#include <stdlib.h>
+
 #include "me.h"
 #include <dirent.h> /* this is listing files in a directory */
 
@@ -140,7 +142,7 @@ int main ( int narg, char *argv[] ) {
 
       if (!(fp=fopen(sManifestFilename,"r"))) {
         printf("[%d/%d] FATAL: Couldn't fopen('%s')\n",ME_TPCOM,getpid(),sManifestFilename);
-        return 1;
+        exit(EXIT_FAILURE);
         }
 
       /* transfer files identified in manifest */
@@ -170,7 +172,7 @@ int main ( int narg, char *argv[] ) {
     /* check the state directory for any outprocessing manifest files */
     if (!(dir = opendir("state"))) {
       printf("[%d/%d] FATAL: Couldn't opendir('state')\n",ME_TPCOM,getpid());
-      return 1;
+      exit(EXIT_FAILURE);
       } 
 
     while ( (sDirEnt=readdir(dir)) != NULL ) {
@@ -182,7 +184,7 @@ int main ( int narg, char *argv[] ) {
         /* read the manifest */
         if (!(fp = fopen(om_filename,"rb"))) {
           printf("[%d/%d] FATAL: Couldn't fopen('%s')\n",ME_TPCOM,getpid(),om_filename);
-          return 1;
+          exit(EXIT_FAILURE);
           }       
         fread(&om,sizeof(om),1,fp);
         fclose(fp);
@@ -242,7 +244,7 @@ int main ( int narg, char *argv[] ) {
   
     } /* while (!bDone) */
 
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
@@ -258,4 +260,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-

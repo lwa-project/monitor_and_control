@@ -14,6 +14,7 @@
 // See end of this file for history.
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 #include "me_astro.h"
@@ -39,7 +40,7 @@ int main ( int narg, char *argv[] ) {
     printf("  <mpm>: integer milliseconds past UTC midnight\n");
     printf("  <lat>: [deg, +N] observer location\n");
     printf("  <lon>: [deg, +E] observer location\n");
-    return 1;
+    exit(EXIT_FAILURE);
     }
   //printf("MJD/MPM = %5ld %9ld\n",mjd,mpm);
   //printf("LAT/LON = %+6.2lf deg %+7.2lf deg\n",lat,lon); 
@@ -56,7 +57,7 @@ int main ( int narg, char *argv[] ) {
   s = (m - floor(m))*60.0;
   printf("LAST = %8.3lf h    =   %02.0lf h %02.0lf m %05.2lf s\n", LAST, floor(LAST), floor(m), s);
   
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================

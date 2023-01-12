@@ -39,7 +39,7 @@
 #define MY_NAME "dat2dbm (v.20191030.1)"
 #define ME "5" 
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/

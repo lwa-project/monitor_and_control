@@ -48,6 +48,8 @@
 #include <time.h>
 #include <unistd.h>
 #include <ncurses.h>
+#include <unistd.h>
+#include <time.h>
 
 #define MY_NAME "ms_mb (v.20100531.2)"
 #define ME "13" 
@@ -82,7 +84,7 @@ int main ( int narg, char *argv[] ) {
   int ay[MAX_ANNOTATIONS];
   char at[MAX_ANNOTATIONS][MAX_FIELD_LENGTH];
 
-  char cmd_line[256];
+  char cmd_line[768];
 
   char label0[MAX_FIELD_LENGTH];
   char eType[MAX_FIELD_LENGTH];

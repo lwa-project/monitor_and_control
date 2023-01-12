@@ -44,7 +44,7 @@
 #include "ms_exec_log.c"
 
 
-main ( int narg, char *argv[] ) {
+int main ( int narg, char *argv[] ) {
 
   /*=================*/
   /*=== Variables ===*/

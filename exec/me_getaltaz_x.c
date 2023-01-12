@@ -13,6 +13,7 @@
 // Wrapper used to test me_getaltaz() 
 // See end of this file for history.
 
+#include <stdlib.h>
 #include <math.h>
 
 #include "me.h"
@@ -53,7 +54,7 @@ int main ( int narg, char *argv[] ) {
     printf("  <lat> : [deg, +N] observer location\n");
     printf("  <lon> : [deg, +E] observer location\n");
     printf("  <elev>: [m] observation location\n");
-    return 1;
+    exit(EXIT_FAILURE);
     }
   //printf("RA/DEC/DIST  = %6.2lf h %+6.2lf deg %.2lf AU\n",ra,dec,dist);
   //printf("MJD/MPM = %5ld %9ld\n",mjd,mpm);
@@ -83,7 +84,7 @@ int main ( int narg, char *argv[] ) {
   s = (m - floor(m))*60.0;
   printf("AZ   = %8.3lf deg  =  %03.0lf d %02.0lf m %05.2lf s\n", az, floor(az), floor(m), s);
 
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
@@ -98,5 +99,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

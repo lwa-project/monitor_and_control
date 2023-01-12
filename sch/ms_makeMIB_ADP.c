@@ -11,6 +11,7 @@
 // See end of this file for history.
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 //#include "LWA_MCS.h"
@@ -180,7 +181,9 @@ int main ( int narg, char *argv[] ) {
   fprintf(fp,"V 13.2		GLOBAL_TEMP_MAX	0	f4r	f4r\n");
   fprintf(fp,"V 13.3		GLOBAL_TEMP_AVG	0	f4r	f4r\n");
   
-  close(fp);
+  fclose(fp);
+  
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
@@ -196,4 +199,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-

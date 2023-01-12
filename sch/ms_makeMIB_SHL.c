@@ -11,6 +11,7 @@
 // See end of this file for history.
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 //#include "LWA_MCS.h"
@@ -42,13 +43,13 @@ int main ( int narg, char *argv[] ) {
     sscanf(argv[1],"%d",&n_RACK);
     } else {
     printf("[%s] FATAL: RACK-COUNT not provided\n",ME);
-    return 1;
+    exit(EXIT_FAILURE);
     } 
   if (narg>2) { 
     sscanf(argv[2],"%d",&n_RACK_PORT);
     } else {
     printf("[%s] FATAL: RACK-PORT-COUNT not provided\n",ME);
-    return 1;
+    exit(EXIT_FAILURE);
     } 
     
     
@@ -105,7 +106,9 @@ int main ( int narg, char *argv[] ) {
   fprintf(fp,"V 5.2		LIGHTNING-10MIN	UNK	a10	a10\n");
   fprintf(fp,"V 5.3		LIGHTNING-30MIN	UNK	a10	a10\n");
   
-  close(fp);
+  fclose(fp);
+  
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
@@ -117,4 +120,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-

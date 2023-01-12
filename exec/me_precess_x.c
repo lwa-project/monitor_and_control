@@ -15,6 +15,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "me_astro.h"
 
@@ -39,7 +40,7 @@ int main ( int narg, char *argv[] ) {
     printf("  <ra>:  float right ascension in hours, J2000.0\n");
     printf("  <dec>: float declination in degrees, J2000.0\n");
     
-    return 1;
+    exit(EXIT_FAILURE);
     }
  
   me_precess(
@@ -56,7 +57,7 @@ int main ( int narg, char *argv[] ) {
   s = (m - floor(m))*60.0;
   printf("dec = %8.3f deg = %+03.0f d %02.0f m %04.1f s\n",dec, (dec/fabs(dec))*floor(fabs(dec)), floor(m), s);
 
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
