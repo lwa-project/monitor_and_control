@@ -187,7 +187,7 @@ int main ( int narg, char *argv[] ) {
       /* Look for the entry */
       /* Read through the file until we find what we are looking for */
       found = 0;
-      while(fgets(&line[0], sizeof(line), fpr[sid]) != NULL) {
+      while(fgets(&(line[0]), sizeof(line), fpr[sid]) != NULL) {
         /* Basic unpak to get the queuing status, subsystem ID, and command ID */
         strncpy(&(temp[0]), &(line[45]), 1);
         temp[1] = '\0';

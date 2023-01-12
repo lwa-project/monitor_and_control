@@ -122,7 +122,7 @@ int main ( int narg, char *argv[] ) {
     //printf("line = <%s>\n",line);
 
     /* parse line - the only thing we care about is the subsystem name */
-    strncpy(&token[0], &(line[47]), 3);
+    strncpy(&(token[0]), &(line[47]), 3);
     token[3] = '\0';
     
     found = 0;
