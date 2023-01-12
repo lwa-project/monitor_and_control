@@ -1204,15 +1204,13 @@ struct sdm_struct  {
 /*** me_sdm_write() ************************************************/
 /*******************************************************************/
 
-int me_sdm_write( struct sdm_struct *sdm ) {
+void me_sdm_write( struct sdm_struct *sdm ) {
 
   FILE* fp;
 
   fp=fopen("state/sdm.dat","wb");
   fwrite(sdm,sizeof(struct sdm_struct),1,fp);
-  fclose(fp);  
-
-  return 0;
+  fclose(fp);
   } /* me_sdm_write() */
 
 
