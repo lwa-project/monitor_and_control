@@ -32,11 +32,11 @@ int LWA_mibupdate_ADP(
   signed int si;
   unsigned long int uli;
   char tbf_trig_time[10];
-  char tbf_samples[10];
+  char tbf_samples[10];   // Was 9 - 2023 Jan 12
   unsigned long int ul;
-  char tbf_tuning_mask[21];
+  char tbf_tuning_mask[21];   // Was 20 - 2023 Jan 12
 
-  char sData[13];
+  char sData[13];  // Was 10 - 2023 Jan 12
   long int mjd, mpm;
 
   float f4;
@@ -44,8 +44,8 @@ int LWA_mibupdate_ADP(
   char tbn_bw[2];
   char tbn_gain[3];    
   
-  char cor_navg[13];
-  char cor_tuning_mask[21];
+  char cor_navg[13];  // Was 10 - 2023 Jan 12
+  char cor_tuning_mask[21];  // Was 21 - 2023 Jan 12
   char cor_gain[3];
   char cor_sub_slot[3];
 

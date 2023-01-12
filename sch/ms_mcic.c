@@ -130,10 +130,10 @@ int main ( int narg, char *argv[] ) {
     } i2u;
   signed short int i2u1;
   unsigned char i1u1, i1u2;
-  char filename[210];
-  char dfile[210];
-  char gfile[210];
-  char full_filename[225];
+  char filename[210];  // Was 1024 - 2023 Jan 12
+  char dfile[210];  // Was 1024 - 2023 Jan 12
+  char gfile[210];  // Was 1024 - 2023 Jan 12
+  char full_filename[225];  //Was 1024 - 2023 Jan 12
   FILE *fp;
 
   int bErr=0;

@@ -31,7 +31,7 @@ int LWA_mibupdate_DP_(
   char tbw_trig_time[10];
   char tbw_samples[9];
 
-  char sData[13];
+  char sData[13];  // Was 10 - 2023 Jan 12
   long int mjd, mpm;
 
   float f4;

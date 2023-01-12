@@ -25,8 +25,8 @@ int LWA_mibupdate_ASP(
   int nBoards;
   char snBoards[3];
   int iStand, iPol, eSet;
-  char s2[3];
-  char s3[4];
+  char s2[3];  // Was 2 - 2023 Jan 12
+  char s3[4];  // Was 3 - 2023 Jan 12
   int i;
 
   char sMIBlabel[MIB_LABEL_FIELD_LENGTH];
