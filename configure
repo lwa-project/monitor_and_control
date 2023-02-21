@@ -12808,7 +12808,7 @@ then :
 else $as_nop
   as_fn_error $? "no" "$LINENO" 5
 fi
-)
+
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for gdbm_open in -lgdbm" >&5
 printf %s "checking for gdbm_open in -lgdbm... " >&6; }

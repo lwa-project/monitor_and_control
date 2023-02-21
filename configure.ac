@@ -37,7 +37,7 @@ AC_CHECK_HEADERS([arpa/inet.h])
 AC_CHECK_LIB([m], [cos],
              [AC_SUBST([HAVE_MATH], [1])
               LIBS="$LIBS -lm"],
-             [AC_MSG_ERROR([no])]))
+             [AC_MSG_ERROR([no])])
 
 AC_CHECK_LIB([gdbm], [gdbm_open],
              [AC_SUBST([HAVE_GDBM], [1])
