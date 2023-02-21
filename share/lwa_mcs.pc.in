@@ -4,7 +4,7 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: lwa_mcs
-Description: Monitor and control software for Long Wavelenght Array Stations
+Description: Monitor and control software for Long Wavelength Array stations
 Requires:
 Version: @PACKAGE_VERSION@
 Cflags: -I${includedir}

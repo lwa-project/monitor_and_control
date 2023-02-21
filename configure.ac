@@ -1,4 +1,4 @@
-AC_INIT([bifrost], [0.1.0], [], [], [https://github.com/lwa-project/monitor_and_control/])
+AC_INIT([lwa_mcs], [0.1.0], [], [], [https://github.com/lwa-project/monitor_and_control/])
 AC_LANG(C)
 AC_CONFIG_SRCDIR([sch/msei.c])
 
@@ -148,6 +148,21 @@ AC_ARG_WITH([pyinstall_flags],
             [])
 AC_SUBST(PYINSTALLFLAGS, $with_pyinstall_flags)
 
+#
+# Version splitting
+#
+
+AC_SUBST([PACKAGE_VERSION_MAJOR], [`echo $PACKAGE_VERSION | $AWK -F. '{print $1}
+'`])
+AC_SUBST([PACKAGE_VERSION_MINOR], [`echo $PACKAGE_VERSION | $AWK -F. '{print $2}
+'`])
+AC_SUBST([PACKAGE_VERSION_MICRO], [`echo $PACKAGE_VERSION | $AWK -F. '{print $3}
+'`])
+
+#
+# Generate files
+#
+
 AC_CONFIG_FILES([common/config.h Makefile sch/Makefile exec/Makefile tp/Makefile python/Makefile share/lwa_mcs.pc])
 
 AC_OUTPUT
@@ -158,17 +173,25 @@ AC_OUTPUT
 
 echo ""
 
-AC_MSG_NOTICE(beam repoint check interval: $BEAM_REPOINT_INTERVAL s)
-AC_MSG_NOTICE(beam repoint check step: $BEAM_REPOINT_RES deg)
+AC_MSG_NOTICE(install path: $prefix)
+
+AC_MSG_NOTICE(network setup:)
+AC_MSG_NOTICE([  scheduler - $MSE_IP])
+AC_MSG_NOTICE([  executive - $MEE_IP])
+AC_MSG_NOTICE([  task processor - $MTE_IP])
 
 AS_IF([test x$HAVE_ADP = x1],
       [AC_MSG_NOTICE(digital backend: ADP)],
       [AC_MSG_NOTICE(digital backend: DP)])
+
+AC_MSG_NOTICE(beam repointing control:)
+AC_MSG_NOTICE([  check interval - $BEAM_REPOINT_INTERVAL s])
+AC_MSG_NOTICE([  step size - $BEAM_REPOINT_RES deg])
       
 AS_IF([test x$HAVE_PYTHON = x1],
       [AC_MSG_NOTICE(python bindings: yes)],
       [AC_MSG_NOTICE(python bindings: no)])
 
 echo ""
-echo "monitor_and_control is now ready to be compiled.  Please run 'make'"
+echo "lwa_mcs is now ready to be compiled.  Please run 'make'"
 echo ""
