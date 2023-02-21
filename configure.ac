@@ -34,10 +34,10 @@ AC_CHECK_HEADERS([sys/socket.h])
 AC_CHECK_HEADERS([netinet/in.h])
 AC_CHECK_HEADERS([arpa/inet.h])
 
-#AC_CHECK_LIB([gdbm], [gdbm_open],
-#             [AC_SUBST([HAVE_GDBM], [1])
-#              LIBS="$LIBS -lgdbm"],
-#             [AC_MSG_ERROR([no])])
+AC_CHECK_LIB([gdbm], [gdbm_open],
+             [AC_SUBST([HAVE_GDBM], [1])
+              LIBS="$LIBS -lgdbm"],
+             [AC_MSG_ERROR([no])])
 
 AC_CHECK_LIB([ncurses], [initscr],
              [AC_SUBST([HAVE_NCURSES], [1])
@@ -143,7 +143,7 @@ AC_ARG_WITH([pyinstall_flags],
             [])
 AC_SUBST(PYINSTALLFLAGS, $with_pyinstall_flags)
 
-AC_CONFIG_FILES([common/config.h sch/Makefile exec/Makefile tp/Makefile python/Makefile share/lwa_mcs.pc])
+AC_CONFIG_FILES([common/config.h Makefile sch/Makefile exec/Makefile tp/Makefile python/Makefile share/lwa_mcs.pc])
 
 AC_OUTPUT
 

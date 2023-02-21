@@ -673,6 +673,7 @@ BEAM_REPOINT_RES
 BEAM_REPOINT_INTERVAL
 HAVE_ADP
 HAVE_NCURSES
+HAVE_GDBM
 SO_EXT
 SET_MAKE
 INSTALL_DATA
@@ -12763,10 +12764,50 @@ then :
 fi
 
 
-#AC_CHECK_LIB([gdbm], [gdbm_open],
-#             [AC_SUBST([HAVE_GDBM], [1])
-#              LIBS="$LIBS -lgdbm"],
-#             [AC_MSG_ERROR([no])])
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for gdbm_open in -lgdbm" >&5
+printf %s "checking for gdbm_open in -lgdbm... " >&6; }
+if test ${ac_cv_lib_gdbm_gdbm_open+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgdbm  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+char gdbm_open ();
+int
+main (void)
+{
+return gdbm_open ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_gdbm_gdbm_open=yes
+else $as_nop
+  ac_cv_lib_gdbm_gdbm_open=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gdbm_gdbm_open" >&5
+printf "%s\n" "$ac_cv_lib_gdbm_gdbm_open" >&6; }
+if test "x$ac_cv_lib_gdbm_gdbm_open" = xyes
+then :
+  HAVE_GDBM=1
+
+              LIBS="$LIBS -lgdbm"
+else $as_nop
+  as_fn_error $? "no" "$LINENO" 5
+fi
+
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for initscr in -lncurses" >&5
 printf %s "checking for initscr in -lncurses... " >&6; }
@@ -13172,7 +13213,7 @@ fi
 PYINSTALLFLAGS=$with_pyinstall_flags
 
 
-ac_config_files="$ac_config_files common/config.h sch/Makefile exec/Makefile tp/Makefile python/Makefile share/lwa_mcs.pc"
+ac_config_files="$ac_config_files common/config.h Makefile sch/Makefile exec/Makefile tp/Makefile python/Makefile share/lwa_mcs.pc"
 
 
 cat >confcache <<\_ACEOF
@@ -14173,6 +14214,7 @@ do
   case $ac_config_target in
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "common/config.h") CONFIG_FILES="$CONFIG_FILES common/config.h" ;;
+    "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "sch/Makefile") CONFIG_FILES="$CONFIG_FILES sch/Makefile" ;;
     "exec/Makefile") CONFIG_FILES="$CONFIG_FILES exec/Makefile" ;;
     "tp/Makefile") CONFIG_FILES="$CONFIG_FILES tp/Makefile" ;;

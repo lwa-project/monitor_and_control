@@ -3,7 +3,7 @@
 
 CC       ?= @CC@
 CFLAGS   ?= -I../common @CFLAGS@
-LDFLAGS  ?= @LDFLAGS@ @LIBS
+LDFLAGS  ?= @LDFLAGS@ @LIBS@
 
 HAVE_ADP ?= @HAVE_ADP@
 
@@ -26,12 +26,12 @@ TARGETS := \
 	ms_exec_replay \
 	ms_mdre_replay \
 	ms_init_replay
-ifeq ($(HAVE_ADP))
+ifeq ($(HAVE_ADP),1)
 	TARGETS += \
-		ms_makeMIB_ADP
+	ms_makeMIB_ADP
 else
 	TARGETS += \
-		ms_makeMIB_DP 
+	ms_makeMIB_DP 
 endif
 
 all: $(TARGETS)
