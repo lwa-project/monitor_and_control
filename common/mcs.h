@@ -1479,6 +1479,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// Feb 21, 2023: Moved some configuration parameters into config.h
 // Sep 30, 2022: Added support for the moon tracking mode TRK_LUN
 // Dec 16, 2019: Updated the ADP-based stations to support a third beam and
 //               four data recorders
