@@ -22,7 +22,7 @@ tp:
 
 .PHONY: python
 python:
-	ifeq ($(HAVE_PYTHON))
+	ifeq ($(HAVE_PYTHON),1)
 		$(MAKE) -C python
 	endif
 
@@ -31,7 +31,7 @@ install:
 	$(MAKE) -C sch install
 	$(MAKE) -C exec install
 	$(MAKE) -C tp install
-	ifeq ($(HAVE_PYTHON))
+	ifeq ($(HAVE_PYTHON),1)
 		$(MAKE) -C python install
 	endif
 
@@ -44,7 +44,9 @@ clean:
 	$(MAKE) -C sch clean
 	$(MAKE) -C exec clean
 	$(MAKE) -C tp clean
-	$(MAKE) -C python clean
+	ifeq ($(HAVE_PYTHON),1)
+		$(MAKE) -C python clean
+	endif
 
 $(INSTALL_INC_DIR)/lwa_mcs: common/*.h
 	mkdir -p $@
