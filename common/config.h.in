@@ -12,9 +12,15 @@
 #define LWA_SCH_SCP_ADDR "@MSE_USERNAME@@@MSE_IP@"      /* SCP: PC/account for sch */
 #define LWA_SCH_SCP_DIR  "@prefix@/sch"                 /* SCP: path to sch */
 
+// Directory configuration
+/* MCS/Sch directory locations */
+#define MCS_CFILES_PATH "@prefix@/sch/cfiles" /* path to .cf files (COEFF_DATA) */
+#define MCS_DFILES_PATH "@prefix@/sch/dfiles" /* path to .df files (BEAM_DELAY) */
+#define MCS_GFILES_PATH "@prefix@/sch/gfiles" /* path to .gf files (BEAM_GAIN) */
+
 /* Miscellaneous parameters affecting operation... */
 #define LWA_REPOINT_CHECK_INTERVAL_SEC  @BEAM_REPOINT_INTERVAL@ /* This is how often [s] MCS (me_inproc) checks to see if it's time to repoint the beam */
 #define LWA_RES_DEG                     @BEAM_REPOINT_RES@ /* This is the resolution [deg] to which pointing data is computed */
 
 
-#endif // MCS_CONFIG_H
+#endif // #ifndef MCS_CONFIG_H

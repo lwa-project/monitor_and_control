@@ -7,8 +7,8 @@
 // possible issues in accomodating LWA_MCS.h
 // LWA_MCS.h has "#include <string.h>" (after "#include <time.h>")
 
-#ifndef MCS_H  /* this keeps this header from getting rolled in more than once */
-#define MCS_H
+#ifndef MCS_COMMON_H  /* this keeps this header from getting rolled in more than once */
+#define MCS_COMMON_H
 
 #include "config.h"
 
@@ -26,11 +26,6 @@
 #include <fcntl.h>      /* added 110309 for network sockets in me_exec; for F_GETFL, other possibly other stuff */
 #include <signal.h>     /* added 110312 to allow me_exec to send kill(SIGKILL) to me_tpcom */ 
 #include <string.h>
-                                            
-/* MCS/Sch directory locations */
-#define MCS_CFILES_PATH "../sch/cfiles" /* path to .cf files (COEFF_DATA) */
-#define MCS_DFILES_PATH "../sch/dfiles" /* path to .df files (BEAM_DELAY) */
-#define MCS_GFILES_PATH "../sch/gfiles" /* path to .gf files (BEAM_GAIN) */
 
 #define LWA_MAX_REFERENCE 999999999 /* largest reference number before roll-over */
 #define LWA_MS_CMD_ADV_NOTICE_MS 5 /* [ms] required advance notice for time-scheduled commands */ 
@@ -1456,7 +1451,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 
 
 /*============================================*/
-#endif // #ifndef MCS_H 
+#endif // #ifndef MCS_COMMON_H 
 
 //==================================================================================
 //=== NOTES ========================================================================
