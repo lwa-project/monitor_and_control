@@ -13223,9 +13223,9 @@ fi
 fi
        if test x${PYTHON} != xno
 then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether $PYTHON runs" >&5
-printf %s "checking whether $PYTHON runs... " >&6; }
-              if ! ${PYTHON} -c "import sys" 2>/dev/null
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether $PYTHON has pip" >&5
+printf %s "checking whether $PYTHON has pip... " >&6; }
+              if ! ${PYTHON} -m pip 2>/dev/null
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }

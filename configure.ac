@@ -128,8 +128,8 @@ AS_IF([test x$enable_python != xno],
               AS_IF([test x${PYTHON3} != xno],
                     [AC_SUBST([PYTHON], [$PYTHON3])])])
        AS_IF([test x${PYTHON} != xno],
-             [AC_MSG_CHECKING([whether $PYTHON runs])
-              AS_IF([! ${PYTHON} -c "import sys" 2>/dev/null],
+             [AC_MSG_CHECKING([whether $PYTHON has pip])
+              AS_IF([! ${PYTHON} -m pip 2>/dev/null],
                     [AC_MSG_RESULT([no])
                      AC_MSG_WARN([python module will not be built])],
                     [AC_MSG_RESULT([yes])
