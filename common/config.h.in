@@ -1,0 +1,20 @@
+#ifndef MCS_CONFIG_H  /* this keeps this header from getting rolled in more than once */
+#define MCS_CONFIG_H
+
+// Digital processor selection
+#define USE_ADP @HAVE_ADP@
+
+// LAN configuration
+#define LWA_IP_MSE       "@MSE_IP@"                     /* IP address of MCS Scheduler "ms_exec" process */
+#define LWA_IP_MEE       "@MEE_IP@"                     /* IP address of MCS Executive "me" process */
+#define LWA_TP_SCP_ADDR  "@MTE_USERNAME@@@MTE_IP@"      /* SCP: PC/account for TP */
+#define LWA_TP_SCP_DIR   "@prefix@/tp/mbox"             /* SCP: path to TP mbox */
+#define LWA_SCH_SCP_ADDR "@MSE_USERNAME@@@MSE_IP@"      /* SCP: PC/account for sch */
+#define LWA_SCH_SCP_DIR  "@prefix@/sch"                 /* SCP: path to sch */
+
+/* Miscellaneous parameters affecting operation... */
+#define LWA_REPOINT_CHECK_INTERVAL_SEC  @BEAM_REPOINT_INTERVAL@ /* This is how often [s] MCS (me_inproc) checks to see if it's time to repoint the beam */
+#define LWA_RES_DEG                     @BEAM_REPOINT_RES@ /* This is the resolution [deg] to which pointing data is computed */
+
+
+#endif // MCS_CONFIG_H

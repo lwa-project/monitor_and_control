@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: lwa_mcs
+Description: Monitor and control software for Long Wavelenght Array Stations
+Requires:
+Version: @PACKAGE_VERSION@
+Cflags: -I${includedir}
