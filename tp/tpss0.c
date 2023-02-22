@@ -81,7 +81,7 @@
     int OBS_ASP_AT1[LWA_MAX_NSTD+1];
     int OBS_ASP_AT2[LWA_MAX_NSTD+1];
     int OBS_ASP_ATS[LWA_MAX_NSTD+1];
-#if defined USE_ADP && USE_ADP
+#if defined(USE_ADP) && USE_ADP
     long int OBS_TBF_SAMPLES;
     int OBS_TBF_GAIN;
 #else

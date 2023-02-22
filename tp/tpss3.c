@@ -233,7 +233,7 @@
       printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
       sscanf(data,"%ld",&(obs[nobs].OBS_FREQ1));
       printf("...converts to %ld\n",obs[nobs].OBS_FREQ1);
-#if defined USE_ADP && USE_ADP
+#if defined(USE_ADP) && USE_ADP
       if ( obs[nobs].OBS_MODE == LWA_OM_TBN ) {
          if ( ( obs[nobs].OBS_FREQ1<65739295 ) || ( obs[nobs].OBS_FREQ1>2037918156 ) ) {   
             printf("[%d/%d] FATAL: OBS_FREQ1 out of range\n",MT_TPSS,getpid());  
@@ -285,7 +285,7 @@
       printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
       sscanf(data,"%ld",&(obs[nobs].OBS_FREQ2));
       printf("...converts to %ld\n",obs[nobs].OBS_FREQ2);
-#if defined USE_ADP && USE_ADP
+#if defined(USE_ADP) && USE_ADP
       if ( obs[nobs].OBS_FREQ2 == 0 ) {
         printf("[%d/%d] WARNING: OBS_FREQ2 is zero, this will be a half beam observation\n",MT_TPSS,getpid());
       } else if ( ( obs[nobs].OBS_FREQ2<222417950 ) || ( obs[nobs].OBS_FREQ2>1928352663 ) ) {   
@@ -327,7 +327,7 @@
       printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
       sscanf(data,"%d",&(obs[nobs].OBS_BW));
       printf("...converts to %d\n",obs[nobs].OBS_BW);
-#if defined USE_ADP && USE_ADP
+#if defined(USE_ADP) && USE_ADP
       if ( obs[nobs].OBS_MODE == LWA_OM_TBN ) {
          if ( ( obs[nobs].OBS_BW<1 ) || ( obs[nobs].OBS_BW>7 ) ) { 		// TODO: Update this when possible
             printf("[%d/%d] FATAL: Invalid OBS_BW\n",MT_TPSS,getpid());

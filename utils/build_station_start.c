@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
   printf("echo \\\n'");
   printf("mibinit ASP %s.40 1740 1741\n", ipaddr);
   printf("mcic    ASP\n\n");
-  #if defined USE_ADP && USE_ADP
+  #if defined(USE_ADP) && USE_ADP
     printf("mibinit ADP %s.10 1742 1743\n", ipaddr);
     printf("mcic    ADP\n\n");
   #else
