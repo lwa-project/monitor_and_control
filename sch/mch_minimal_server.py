@@ -39,8 +39,8 @@ B = 8192                    # [bytes] Max message size
 
 # Check for required command line argument <CMD> 
 if len(sys.argv)<5: 
-    print 'Proper usage is "mch_minimal_server.py <subsystem> <ip_address> <tx_port> <rx_port>".'
-    print 'No action taken.'
+    print('Proper usage is "mch_minimal_server.py <subsystem> <ip_address> <tx_port> <rx_port>".')
+    print('No action taken.')
     exit()
 else:               
     subsystem  =     string.strip(sys.argv[1]) 
@@ -48,10 +48,10 @@ else:
     tx_port    = int(string.strip(sys.argv[3]))
     rx_port    = int(string.strip(sys.argv[4]))   
     
-# print 'subsystem <'+subsystem+'>'
-# print 'ip_address <'+ip_address+'>'
-# print 'tx_port ', tx_port
-# print 'rx_port ', rx_port
+# print('subsystem <'+subsystem+'>')
+# print('ip_address <'+ip_address+'>')
+# print('tx_port ', tx_port)
+# print('rx_port ', rx_port)
 # exit()
 
 
@@ -59,7 +59,7 @@ else:
 # Set up the MIB
 # --------------------------
 
-#print 'Setting up the MIB...'
+#print('Setting up the MIB...')
 
 ml = [] # this becomes a list of MIB labels
 me = [] # this becomes a list of MIB entries (data)
@@ -70,14 +70,14 @@ ml.append('SUBSYSTEM'); me.append(subsystem)
 ml.append('SERIALNO');  me.append(subsystem+'-1')
 ml.append('VERSION');   me.append('mch_minimal_server.py_'+subsystem);
 
-#print ml[0]+' '+me[0]
-#print ml[1]+' '+me[1]
-#print ml[2]+' '+me[2]
-#print ml[3]+' '+me[3]
-#print ml[4]+' '+me[4]
-#print ml[5]+' '+me[5]
+#print(ml[0]+' '+me[0])
+#print(ml[1]+' '+me[1])
+#print(ml[2]+' '+me[2])
+#print(ml[3]+' '+me[3])
+#print(ml[4]+' '+me[4])
+#print(ml[5]+' '+me[5])
 
-#print 'I am '+me[3]+'.'
+#print('I am '+me[3]+'.')
 
 
 # --------------------------
@@ -93,14 +93,14 @@ r.setblocking(1)   # Blocking on this sock
 t = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 t.connect((ip_address,tx_port)) 
 
-#print 'Running...'
+#print('Running...')
 
 while 1:
 
     payload = r.recv(B)  # wait for something to appear
 
     # Say what was received
-    #print 'rcvd> '+payload+'|'
+    #print(b'rcvd> '+payload+b'|')
 
     # --------------------------
     # Analyzing received command
@@ -114,23 +114,23 @@ while 1:
     # (2) The message is for us but is not a PNG, RPT, or SHT message.  In this case, send "reject" response
     # (3) The message is for us and is a PNG, RPT, or SHT message.  In this case, respond appropriately  
                 
-    destination = payload[:3] 
-    sender      = payload[3:6]
-    command     = payload[6:9]
+    destination = payload[:3].decode()
+    sender      = payload[3:6].decode()
+    command     = payload[6:9].decode()
     reference   = int(payload[9:18])
     datalen     = int(payload[18:22]) 
     mjd         = int(payload[22:28]) 
     mpm         = int(payload[28:37]) 
     data        = payload[38:38+datalen]
         
-    #print 'DESTINATION: |'+destination+'|'
-    #print 'SENDER:      |'+sender+'|'
-    #print 'TYPE:        |'+command+'|'
-    #print 'REFERENCE: ', reference
-    #print 'DATALEN:   ', datalen
-    #print 'MJD:       ', mjd
-    #print 'MPM:       ', mpm
-    #print 'DATA: |'+data+'|'
+    #print('DESTINATION: |'+destination+'|')
+    #print('SENDER:      |'+sender+'|')
+    #print('TYPE:        |'+command+'|')
+    #print('REFERENCE: ', reference)
+    #print('DATALEN:   ', datalen)
+    #print('MJD:       ', mjd)
+    #print('MPM:       ', mpm)
+    #print(b'DATA: |'+data+b'|')
 
     if (destination==me[3]) or (destination=='ALL'): # comparing to MIB entry 1.4, "SUBSYSTEM"              
 
@@ -142,9 +142,9 @@ while 1:
 
         if command=='RPT':
             response = 'R'+string.rjust(str(me[0]),7)+'Invalid MIB label' # use this until we find otherwis
-            mib_label = string.strip(data)
-            #print '|'+mib_label+'|'
-            #print '|'+data+'|'
+            mib_label = string.strip(data.decode())
+            #print('|'+mib_label+'|')
+            #print(b'|'+data+b'|')
             # find in mib  
             response = 'R'+string.rjust(str(me[0]),7)+'MIB label not recognized'  
             for i in range(len(ml)):
@@ -154,13 +154,13 @@ while 1:
 
         if command=='SHT':
             response = 'A'+string.rjust(str(me[0]),7)  # use this until we find otherwis
-            arg = string.strip(data)
+            arg = string.strip(data.decode())
             me[0] = "SHTDOWN"
             # verify arguments
             while len(arg)>0:
                args = string.split(arg,' ',1)
                args[0] = string.strip(args[0])
-               #print '>'+args[0]+'|'
+               #print('>'+args[0]+'|')
                if (not(args[0]=='SCRAM') and not(args[0]=='RESTART')):
                    response = 'R'+string.rjust(str(me[0]),7)+' Invalid extra arguments' 
                if len(args)>1:
@@ -195,23 +195,23 @@ while 1:
         q = (y // 4) - (y // 100) + (y // 400) - 32045
         mjdi = int(math.floor( (p+q) - 2400000.5))
         mjd = string.rjust(str(mjdi),6)
-        #print '#'+mjd+'#'
+        #print('#'+mjd+'#')
 
         # compute MPM
         mpmi = int(math.floor( (hour*3600 + minute*60 + second)*1000 + millisecond ))
         mpm = string.rjust(str(mpmi),9) 
-        #print '#'+mpm+'#'
+        #print('#'+mpm+'#')
 
         # Build the payload
         # Note we are just using a single, non-updating REFERENCE number in this case
         payload = 'MCS'+me[3]+command+string.rjust(str(reference),9)
         payload = payload + string.rjust(str(len(response)),4)+str(mjd)+str(mpm)+' '
         payload = payload + response
-        #print '#'+payload+'#' 
+        #print('#'+payload+'#' )
 
-        t.send(payload)      # send it 
+        t.send(payload.encode())      # send it 
 
-    #print 'sent> '+payload+'|' # say what was sent 
+    #print('sent> '+payload+'|' # say what was sent )
 
 # never get here, but what the heck.
 s.close()
