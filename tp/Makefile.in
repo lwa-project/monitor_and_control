@@ -1,11 +1,19 @@
 # assumes the following directories already exist
 # ../common  (MCS-wide header files; specifically mcs.h)
-# ../../tp (executables copied to here)
 
-CFLAGS := -I../common
-LDFLAGS := 
+CC      ?= @CC
+CFLAGS  ?= -I../common @CFLAGS@
+LDFLAGS ?= @LDFLAGS@ @LIBS@
 
-TARGETS := tpss tptc tpsdm tprs tpms tprcs
+HAVE_ADP ?= @HAVE_ADP@
+
+TARGETS := \
+	tpss \
+	tptc \
+	tpsdm \
+	tprs \
+	tpms \
+	tprcs
 
 all: $(TARGETS)
 
@@ -29,11 +37,11 @@ tprcs: tprcs.c mt.h ../common/mcs.h
 
 .PHONY: install
 install: all
-	install -d ../../tp ../../tp/mbox ../../tp/test
+	install -d @prefix@/tp @prefix@/tp/mbox @prefix@/tp/test
 	for target in $(TARGETS); do \
-		install $$target ../../tp/.; \
+		install $$target @prefix@/tp/.; \
 	done
-	install -m 644 test/* ../../tp/test/.
+	install -m 644 test/* @prefix@/tp/test/.
 
 .PHONY: clean
 clean:

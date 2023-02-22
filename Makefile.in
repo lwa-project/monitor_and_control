@@ -1,10 +1,12 @@
 # assumes the following directories already exist
 # common  (MCS-wide header files; specifically mcs.h)
-# ../sch  (executables copied to here - Scheduler)
-# ../exec (executables copied to here - Executive)
-# ../tp   (executables copied to here - Task Processor)
 
-all: sch exec tp python
+INC_DIR = src
+DAT_DIR = share
+
+HAVE_PYTHON = @HAVE_PYTHON@
+
+all: sch exec tp utils python
 
 .PHONY: sch
 sch:
@@ -18,16 +20,24 @@ exec:
 tp:
 	$(MAKE) -C tp
 
+.PHONY: utils
+utils:
+	$(MAKE) -C utils
+	
 .PHONY: python
 python:
+ifeq ($(HAVE_PYTHON),1)
 	$(MAKE) -C python
+endif
 
 .PHONY: install
 install:
 	$(MAKE) -C sch install
 	$(MAKE) -C exec install
 	$(MAKE) -C tp install
+ifeq ($(HAVE_PYTHON),1)
 	$(MAKE) -C python install
+endif
 
 .PHONY: install-services
 install-services:
@@ -38,4 +48,15 @@ clean:
 	$(MAKE) -C sch clean
 	$(MAKE) -C exec clean
 	$(MAKE) -C tp clean
+	$(MAKE) -C utils cleans
+ifeq ($(HAVE_PYTHON),1)
 	$(MAKE) -C python clean
+endif
+
+$(INSTALL_INC_DIR)/lwa_mcs: common/*.h
+	mkdir -p $@
+	cp $? $@/
+
+$(INSTALL_LIB_DIR)/pkgconfig: $(DAT_DIR)/*.pc
+	mkdir -p $@
+	cp $? $@/

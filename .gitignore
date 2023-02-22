@@ -1,3 +1,16 @@
+# Local configuration
+aclocal.m4
+autom4te.cache
+config.status
+config.mk
+Makefile
+sch/Makefile
+exec/Makefile
+tp/Makefile
+python/Makefile
+share/lwa_mcs.pc
+common/config.h
+
 # Object files
 *.o
 
@@ -52,6 +65,10 @@ tp/tprs
 tp/tpsdm
 tp/tpss
 tp/tptc
+## utils
+utils/build_station_start
+utils/test_sch_connection
+utils/test_tp_connection
 
 # Python stuff
 *.pyc
