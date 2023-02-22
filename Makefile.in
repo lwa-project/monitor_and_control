@@ -6,7 +6,7 @@ DAT_DIR = share
 
 HAVE_PYTHON = @HAVE_PYTHON@
 
-all: sch exec tp python
+all: sch exec tp utils python
 
 .PHONY: sch
 sch:
@@ -20,6 +20,10 @@ exec:
 tp:
 	$(MAKE) -C tp
 
+.PHONY: utils
+utils:
+	$(MAKE) -C utils
+	
 .PHONY: python
 python:
 ifeq ($(HAVE_PYTHON),1)
@@ -44,6 +48,7 @@ clean:
 	$(MAKE) -C sch clean
 	$(MAKE) -C exec clean
 	$(MAKE) -C tp clean
+	$(MAKE) -C utils cleans
 ifeq ($(HAVE_PYTHON),1)
 	$(MAKE) -C python clean
 endif

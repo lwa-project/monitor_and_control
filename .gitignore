@@ -65,6 +65,8 @@ tp/tprs
 tp/tpsdm
 tp/tpss
 tp/tptc
+## utils
+utils/build_station_start
 
 # Python stuff
 *.pyc

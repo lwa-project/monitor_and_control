@@ -1,0 +1,20 @@
+# assumes the following directories already exist
+# ../common  (MCS-wide header files; specifically mcs.h)
+
+CC       ?= @CC@
+CFLAGS   ?= -I../common @CFLAGS@
+LDFLAGS  ?= @LDFLAGS@ @LIBS@
+
+HAVE_ADP ?= @HAVE_ADP@
+
+TARGETS := \
+	build_station_start
+
+all: $(TARGETS)
+
+build_station_start: build_station_start.c ../common/config.h ../common/mcs.h
+	$(CC) $(CFLAGS) -o build_station_start build_station_start.c $(LDFLAGS)
+
+.PHONY: clean
+clean:
+	-rm -f $(TARGETS)
