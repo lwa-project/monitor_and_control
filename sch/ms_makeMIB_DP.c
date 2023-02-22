@@ -40,7 +40,7 @@ int main ( int narg, char *argv[] ) {
   //  sscanf(argv[1],"%d",&n_ARXSUPPLY_NO);
   //  } else {
   //  printf("[%s] FATAL: ARXSUPPLY-NO not provided\n",ME);
-  //  return 1;
+  //  exit(EXIT_FAILURE);
   //  } 
 
   /* create file */
