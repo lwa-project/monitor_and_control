@@ -23,7 +23,7 @@
 
 #define ME "medfg"
 
-#ifdef USE_ADP
+#if defined USE_ADP && USE_ADP
 #define MAX_ANT 512           /* number of antennas ("channels") */  
 #define MAX_COARSE_DELAY 1023 /* maximum coarse delay, in sample periods */
 #else

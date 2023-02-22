@@ -1,15 +1,42 @@
 # assumes the following directories already exist
 # ../common  (MCS-wide header files; specifically mcs.h)
-# ../../sch  (executables copied to here)
 
-CFLAGS := -I/usr/include/gdbm -I../common 
-LDFLAGS := -lgdbm -lncurses
+CC       ?= @CC@
+CFLAGS   ?= -I../common @CFLAGS@
+LDFLAGS  ?= @LDFLAGS@ @LIBS@
 
-TARGETS := ms_init dat2dbm ms_mcic ms_exec msei ms_mdr ms_mdre ms_makeMIB_ASP ms_makeMIB_ADP ms_makeMIB_DP ms_makeMIB_DR ms_makeMIB_SHL ms_md2t ms_mb ms_mu ms_mdre_ip ms_mon ms_exec_replay ms_mdre_replay ms_init_replay
+HAVE_ADP ?= @HAVE_ADP@
+
+TARGETS := \
+	ms_init \
+	dat2dbm \
+	ms_mcic \
+	ms_exec \
+	msei \
+	ms_mdr \
+	ms_mdre \
+	ms_makeMIB_ASP \
+	ms_makeMIB_DR \
+	ms_makeMIB_SHL \
+	ms_md2t \
+	ms_mb \
+	ms_mu \
+	ms_mdre_ip \
+	ms_mon \
+	ms_exec_replay \
+	ms_mdre_replay \
+	ms_init_replay
+ifeq ($(HAVE_ADP),1)
+	TARGETS += \
+	ms_makeMIB_ADP
+else
+	TARGETS += \
+	ms_makeMIB_DP 
+endif
 
 all: $(TARGETS)
 
-ms_init: ms_init.c ../common/mcs.h
+ms_init: ms_init.c ../common/config.h ../common/mcs.h
 	$(CC) $(CFLAGS) -o ms_init ms_init.c $(LDFLAGS)
 
 dat2dbm: dat2dbm.c ../common/mcs.h
@@ -71,16 +98,15 @@ ms_init_replay: ms_init_replay.c ../common/mcs.h
 
 .PHONY: install
 install:
-	install -d ../../sch ../../sch/cfiles ../../sch/dfiles ../../sch/gfiles
+	install -d @prefix@/sch @prefix@/sch/cfiles @prefix@/sch/dfiles @prefix@/sch/gfiles
 	for target in $(TARGETS); do \
-		install $$target ../../sch/.; \
+		install $$target @prefix@/sch/.; \
 	done
-	install *.py ../../sch/.
-	install *.sh ../../sch/.
-	install -m 644 readme*.txt ../../sch/.
-	install -m 644 *_MIB_init.dat ../../sch/.
+	install *.py @prefix@/sch/.
+	install *.sh @prefix@/sch/.
+	install -m 644 readme*.txt @prefix@/sch/.
+	install -m 644 *_MIB_init.dat @prefix@/sch/.
 
 .PHONY: clean
 clean:
 	-rm -f $(TARGETS)
-

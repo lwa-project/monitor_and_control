@@ -23,7 +23,7 @@
 #define TPSDM_RPT_RPD  5
 #define TPSDM_RPT_SEP  6
 #define TPSDM_RPT_ARX  7
-#ifdef USE_ADP
+#if defined USE_ADP && USE_ADP
 #define TPSDM_RPT_ROACH  8
 #define TPSDM_RPT_SERVER 9
 #else
@@ -77,7 +77,7 @@ int main ( int narg, char *argv[] ) {
     printf("          'RPD': List status, other info about cables\n");
     printf("          'SEP': List status, other info about SEP ports\n");
     printf("          'ARX': List status, other info about ARX channels\n");
-#ifdef USE_ADP
+#if defined USE_ADP && USE_ADP
     printf("          'ROACH': List status, other info about ROACH channels\n");
     printf("          'SERVER': List status, other infor about SERVER channels\n");
 #else
@@ -115,7 +115,7 @@ int main ( int narg, char *argv[] ) {
       if (strncmp(arg,"RPD",3)==0) { eRpt = TPSDM_RPT_RPD; }
       if (strncmp(arg,"SEP",3)==0) { eRpt = TPSDM_RPT_SEP; }
       if (strncmp(arg,"ARX",3)==0) { eRpt = TPSDM_RPT_ARX; }
-#ifdef USE_ADP
+#if defined USE_ADP && USE_ADP
       if (strncmp(arg,"ROACH",5)==0)  { eRpt = TPSDM_RPT_ROACH; }
       if (strncmp(arg,"SERVER",6)==0) { eRpt = TPSDM_RPT_SERVER; }
 #else
@@ -246,7 +246,7 @@ int main ( int narg, char *argv[] ) {
       printf("N_SEP:   %d\n",s.nSEP);
       printf("N_ARB:   %d\n",s.nARB);
       printf("N_ARBCH: %d\n",s.nARBCH);
-#ifdef USE_ADP
+#if defined USE_ADP && USE_ADP
       printf("N_ROACH:   %d\n",s.nRoach);
       printf("N_ROACHCH: %d\n",s.nRoachCh);
 #else
@@ -255,7 +255,7 @@ int main ( int narg, char *argv[] ) {
 #endif
       printf("N_DR:    %d\n",s.nDR);
       printf("MCS_CRA: %d\n",s.eCRA); /* MCS_CRA */  
-#ifdef USE_ADP
+#if defined USE_ADP && USE_ADP
                     printf("TBF_GAIN: %2hd",  s.settings.tbf_gain);
       if (!bStatic) printf(       " | %2hd",sdm.settings.tbf_gain);
       printf("\n");
@@ -440,7 +440,7 @@ int main ( int narg, char *argv[] ) {
       printf("  ARB_IN (label on input connector for this channel on ASP chassis)\n");
       printf("  ARB_OUT (label on output connector for this channel on ASP chassis)\n");
       break;
-#ifdef USE_ADP
+#if defined USE_ADP && USE_ADP
     case TPSDM_RPT_ROACH:
       /* Roach */
       for (i=0;i<s.nRoach;i++) { 
@@ -684,7 +684,7 @@ int main ( int narg, char *argv[] ) {
     case TPSDM_RPT_DPP: /* dpp */
       if (bStatic) {
 
-#ifdef USE_ADP
+#if defined USE_ADP && USE_ADP
         for ( i=0; i<ME_MAX_NDPOUT; i++ ) {
           if (i<ME_MAX_NDPOUT-1)              { sprintf(st1," Beam #%d",i+1);                     }
           if (i>ME_MAX_NDPOUT-2)              { sprintf(st1," TBN ");         }

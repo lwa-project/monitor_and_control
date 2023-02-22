@@ -102,7 +102,7 @@ int main ( int narg, char *argv[] ) {
         case LWA_OM_TRK_JOV: break;
         case LWA_OM_TRK_LUN: break;
         case LWA_OM_TBN: break;
-#ifdef USE_ADP
+#if defined USE_ADP && USE_ADP
         case LWA_OM_TBF: break;
 #else
         case LWA_OM_TBW: break;
@@ -153,7 +153,7 @@ int main ( int narg, char *argv[] ) {
       printf("[%d/%d] INPUT: iDur=%ld\n",MT_TPMS,getpid(),iDur);
       printf("[%d/%d] INPUT: iFreq=%ld\n",MT_TPMS,getpid(),iFreq);
       break;
-#ifdef USE_ADP
+#if defined USE_ADP && USE_ADP
     case LWA_OM_TBF:
       iDur=10000;      if (narg>=4) sscanf(argv[3],"%ld",&iDur);
       iFreq=832697741; if (narg>=5) sscanf(argv[4],"%ld",&iFreq); 
@@ -237,7 +237,7 @@ int main ( int narg, char *argv[] ) {
   switch (eMode) {
     case LWA_OM_TBN:
       break;
-#ifndef USE_ADP
+#if !defined USE_ADP || !USE_ADP
     case LWA_OM_TBW:
       break;
 #endif
@@ -273,7 +273,7 @@ int main ( int narg, char *argv[] ) {
       fprintf(fp,"OBS_BW         7\n");
       fprintf(fp,"OBS_BW+        100 kSPS\n"); 
       break;
-#ifdef USE_ADP
+#if defined USE_ADP && USE_ADP
     case LWA_OM_TBF:
       fprintf(fp,"OBS_FREQ1      %ld\n",iFreq);
       //fprintf(fp,"OBS_FREQ1+     19.999999955 MHz\n");
