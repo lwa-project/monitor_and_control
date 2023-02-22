@@ -78,7 +78,7 @@
       printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
       sscanf(data,"%hd",&SESSION_DRX_BEAM);
       printf("...converts to %hd\n",SESSION_DRX_BEAM);
-#if defined USE_ADP && USE_ADP
+#if defined(USE_ADP) && USE_ADP
       if (!( (SESSION_DRX_BEAM==-1) || ( (SESSION_DRX_BEAM>=1) && (SESSION_DRX_BEAM<=ME_MAX_NDPOUT) ) )) {   
         printf("[%d/%d] FATAL: SESSION_DRX_BEAM not valid\n",MT_TPSS,getpid());  
         exit(EXIT_FAILURE);
