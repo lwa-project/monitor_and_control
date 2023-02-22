@@ -104,7 +104,7 @@ int main ( int narg, char *argv[] ) {
 #if !defined(USE_NDP)
         case LWA_OM_TBN: break;
 #endif
-#if define(USE_NDP) || defined(USE_ADP)
+#if (define(USE_NDP) && USE_NDP) || (defined(USE_ADP) && USE_ADP)
         case LWA_OM_TBF: break;
 #else
         case LWA_OM_TBW: break;
@@ -157,7 +157,7 @@ int main ( int narg, char *argv[] ) {
       printf("[%d/%d] INPUT: iFreq=%ld\n",MT_TPMS,getpid(),iFreq);
       break;
 #endif
-#if defined(USE_NDP) || defined(USE_ADP)
+#if (defined(USE_NDP) && USE_NDP) || (defined(USE_ADP) && USE_ADP)
     case LWA_OM_TBF:
       iDur=10000;      if (narg>=4) sscanf(argv[3],"%ld",&iDur);
       iFreq=832697741; if (narg>=5) sscanf(argv[4],"%ld",&iFreq); 
@@ -243,7 +243,7 @@ int main ( int narg, char *argv[] ) {
     case LWA_OM_TBN:
       break;
 #endif
-#if !defined(USE_NDP) && !defined(USE_ADP)
+#if (!defined(USE_NDP) || !USE_NDP) && (!defined(USE_ADP) || !USE_ADP)
     case LWA_OM_TBW:
       break;
 #endif
@@ -281,7 +281,7 @@ int main ( int narg, char *argv[] ) {
       fprintf(fp,"OBS_BW+        100 kSPS\n"); 
       break;
 #endif
-#if define(USE_NDP) || defined(USE_ADP)
+#if (define(USE_NDP) && USE_NDP) || (defined(USE_ADP) && USE_ADP)
     case LWA_OM_TBF:
       fprintf(fp,"OBS_FREQ1      %ld\n",iFreq);
       //fprintf(fp,"OBS_FREQ1+     19.999999955 MHz\n");
@@ -340,13 +340,10 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
-<<<<<<< HEAD
-// tpms.c: J. Dowell, UNM, 2022 May 2
-//   .1 Updated for MCS-NDP
-=======
 // tpms.c: J. Dowell, UNM, 2022 Sep 30
 //   .1 Added support for TRK_LUN
->>>>>>> master
+// tpms.c: J. Dowell, UNM, 2022 May 2
+//   .1 Updated for MCS-NDP
 // tpms.c: J. Dowell, UNM, 2018 Jan 29
 //   .1 Cleaned up a few compiler warnings
 // tpms.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07

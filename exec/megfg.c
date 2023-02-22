@@ -22,13 +22,13 @@
 
 #define ME "megfg"
 
-#if defined(USE_NDP)
-#  if defined(NPD_IS_FULL_STATION)
+#if defined(USE_NDP) && USE_NDP
+#  if defined(NPD_IS_FULL_STATION) && NDP_IS_FULL_STATION
 #    define MAX_STD 256           /* max number of stands */
 #  else
 #    define MAX_STD 64           /* max number of stands */
 #  endif
-#elif defined(USE_ADP)
+#elif defined(USE_ADP) && USE_ADP
 #  define MAX_STD 256           /* max number of stands */  
 #else
 #  define MAX_STD 260           /* max number of stands */  

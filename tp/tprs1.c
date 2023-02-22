@@ -1466,7 +1466,7 @@
       } /* for (k */
     } /* for ( iARB */
 
-#if define(USE_NDP)
+#if define(USE_NDP) && USE_NDP
   /* reading N_SNAP */
   sprintf(keyword,"N_SNAP"); s.nSnap = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
@@ -1776,7 +1776,7 @@
     printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.eServerDesi[iDP2]);    
 
     } /* for ( iDP2 */
-#elif defined(USE_ADP)
+#elif defined(USE_ADP) && USE_ADP
   /* reading N_ROACH */
   sprintf(keyword,"N_ROACH"); s.nRoach = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
@@ -3254,7 +3254,7 @@
 
     } /* for ( iStd */
 
-#ifdef USE_ADP
+#if defined USE_ADP && USE_ADP
   /* reading TBF_GAIN */
   sprintf(keyword,"TBF_GAIN"); s.settings.tbn_gain = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }

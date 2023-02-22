@@ -1,11 +1,34 @@
 # assumes the following directories already exist
 # ../common  (MCS-wide header files; specifically mcs.h)
-# ../../exec (executables copied to here)
 
-CFLAGS := -I../common
-LDFLAGS := -lm -lncurses
+CC      ?= @CC
+CFLAGS  ?= -I../common @CFLAGS@
+LDFLAGS ?= @LDFLAGS@ @LIBS@
 
-TARGETS :=  mesix meosx memdrex mecfg medfg megfg me_exec meeix me_init me_tpcom me_inproc me_mon mefsdfg medrange me_getaltaz_x me_point_corr_x me_findsol_x me_findjov_x me_findlun_x me_precess_x me_getlst_x
+HAVE_ADP ?= @HAVE_ADP@
+
+TARGETS :=  \
+	mesix \
+	meosx \
+	memdrex \
+	mecfg \
+	medfg \
+	megfg \
+	me_exec \
+	meeix \
+	me_init \
+	me_tpcom \
+	me_inproc \
+	me_mon \
+	mefsdfg \
+	medrange \
+	me_getaltaz_x \
+	me_point_corr_x \
+	me_findsol_x \
+	me_findjov_x \
+	me_findlun_x \
+	me_precess_x \
+	me_getlst_x
 
 all: $(TARGETS)
 
@@ -129,11 +152,11 @@ ephem_vsop87_data.o: ephem_vsop87_data.c ephem_vsop87.h ephem_astro.h
 
 .PHONY: install
 install:
-	install -d ../../exec
+	install -d @prefix@/exec @prefix@/exec/state
 	for target in $(TARGETS); do \
-		install $$target ../../exec/.; \
+		install $$target @prefix@/exec/.; \
 	done
-	install *.sh ../../exec/.
+	install *.sh @prefix@/exec/.
 
 .PHONY: clean
 clean:

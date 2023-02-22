@@ -1,0 +1,18 @@
+
+.PHONY: all
+all: build
+
+.PHONY: build
+build: ../common/config.h ../common/mcs.h setup.py lwa_mcs/*.py
+	@PYTHON@ setup.py build @PYBUILDFLAGS@
+
+.PHONY: install
+install: build
+	@PYTHON@ -m pip install @PYINSTALLFLAGS@ .
+
+.PHONY: clean
+clean:
+	@PYTHON@ setup.py clean --all
+
+uninstall:
+	@PYTHON@ -m pip uninstall lwa_mcs

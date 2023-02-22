@@ -7,53 +7,10 @@
 // possible issues in accomodating LWA_MCS.h
 // LWA_MCS.h has "#include <string.h>" (after "#include <time.h>")
 
-#ifndef MCS_H  /* this keeps this header from getting rolled in more than once */
-#define MCS_H
+#ifndef MCS_COMMON_H  /* this keeps this header from getting rolled in more than once */
+#define MCS_COMMON_H
 
-/****************************************************/
-/***        WARNING: COMPILE-TIME OPTION:         ***/
-/****************************************************/
-/* Station Configuration:                           */
-/* Uncomment the following to command ADP instead   */ 
-/* of DP.                                           */
-/****************************************************/
-//#define USE_ADP /* Use ADP at LWA-SV */
-
-/****************************************************/
-/***        WARNING: COMPILE-TIME OPTION:         ***/
-/****************************************************/
-/* Station Configuration:                           */
-/* Uncomment the following to command NDP instead   */
-/* of DP.                                           */
-/****************************************************/
-//#define USE_NDP /* Use the new NDP at LWA-NA */
-
-#if defined(USE_ADP) && defined(USE_NDP)
-#error "Can only choose one of USE_ADP and USE_NDP"
-#endif
-
-/****************************************************/
-/***        WARNING: COMPILE-TIME OPTION:         ***/
-/****************************************************/
-/* Station Configuration:                           */
-/* For a NDP-based station, whether or not it is a  */
-/* mini-station with 64 stands.                     */
-/****************************************************/
-//#defined NDP_IS_FULL_STATION
-
-#if !defined(USE_NDP) && defined(NDP_IS_FULL_STATION)
-#warning "NDP_IS_FULL_STATION is defined but NDP is not selected"
-#endif
-
-/*****************************************************/
-/***         WARNING: COMPILE-TIME OPTION:         ***/
-/*****************************************************/
-/* LAN configuration:                                */
-/* Must uncomment one and only one of the following: */
-/*****************************************************/
-#define MCS_LAN_ACTUAL /* Actual (MCS0033) shelter LAN configuration */
-//#define MCS_LAN_DEV1PC /* Development configuration -- all on 1 PC; using only loopback IP addr */
-//#define MCS_LAN_DEV2PC /* Development configuration -- Sch on 1 PC#1, Exec & TP on PC#2, TP shares Exec's IP addr */
+#include "config.h"
 
 #include <stdio.h>
 #include <time.h>
@@ -68,15 +25,7 @@
 #include <arpa/inet.h>  /* for network sockets */
 #include <fcntl.h>      /* added 110309 for network sockets in me_exec; for F_GETFL, other possibly other stuff */
 #include <signal.h>     /* added 110312 to allow me_exec to send kill(SIGKILL) to me_tpcom */ 
-
-/* Miscellaneous parameters affecting operation... */
-#define LWA_REPOINT_CHECK_INTERVAL_SEC  1.0 /* This is how often [s] MCS (me_inproc) checks to see if it's time to repoint the beam */
-#define LWA_RES_DEG                     0.2 /* This is the resolution [deg] to which pointing data is computed */
-                                            
-/* MCS/Sch directory locations */
-#define MCS_CFILES_PATH "../sch/cfiles" /* path to .cf files (COEFF_DATA) */
-#define MCS_DFILES_PATH "../sch/dfiles" /* path to .df files (BEAM_DELAY) */
-#define MCS_GFILES_PATH "../sch/gfiles" /* path to .gf files (BEAM_GAIN) */
+#include <string.h>
 
 #define LWA_MAX_REFERENCE 999999999 /* largest reference number before roll-over */
 #define LWA_MS_CMD_ADV_NOTICE_MS 5 /* [ms] required advance notice for time-scheduled commands */ 
@@ -94,33 +43,6 @@
 /* === BEGIN: IP addresses, sockets, directories === *
 /* ================================================= */
 /* (check /etc/services for ports already assigned) */
-
-#ifdef MCS_LAN_ACTUAL
-#define LWA_IP_MSE   "172.16.1.103" /* IP address of MCS Scheduler "ms_exec" process */
-#define LWA_IP_MEE   "172.16.1.103" /* IP address of MCS Executive "me" process */
-#define LWA_TP_SCP_ADDR "op1@172.16.1.103"             /* SCP: PC/account for TP */
-#define LWA_TP_SCP_DIR "/home/op1/MCS/tp/mbox"                /* SCP: path to TP mbox */
-#define LWA_SCH_SCP_ADDR "op1@172.16.1.103"           /* SCP: PC/account for sch */
-#define LWA_SCH_SCP_DIR "/home/op1/MCS/sch"                   /* SCP: path to sch */
-#endif
-
-#ifdef MCS_LAN_DEV1PC
-#define LWA_IP_MSE   "127.0.0.1" /* IP address of MCS Scheduler "ms_exec" process */
-#define LWA_IP_MEE   "127.0.0.1" /* IP address of MCS Executive "me" process */
-#define LWA_TP_SCP_ADDR "steve@127.0.0.1"                /* SCP: PC/account for TP */
-#define LWA_TP_SCP_DIR "/home/steve/prj/LWA/Design/MCS-dev/tp/mbox" /* SCP: path to TP mbox */
-#define LWA_SCH_SCP_ADDR "steve@127.0.0.1"               /* SCP: PC/account for sch */          
-#define LWA_SCH_SCP_DIR "/home/steve/prj/LWA/Design/MCS-dev/sch"    /* SCP: path to sch */ 
-#endif
-
-#ifdef MCS_LAN_DEV2PC
-#define LWA_IP_MSE   "172.16.1.101" /* IP address of MCS Scheduler "ms_exec" process */
-#define LWA_IP_MEE   "172.16.1.104" /* IP address of MCS Executive "me" process */
-#define LWA_TP_SCP_ADDR "steve@172.16.1.104"             /* SCP: PC/account for TP */
-#define LWA_TP_SCP_DIR "/home/steve/Desktop/MCS/tp/mbox" /* SCP: path to TP mbox */
-#define LWA_SCH_SCP_ADDR "steve@172.16.1.101"            /* SCP: PC/account for sch */
-#define LWA_SCH_SCP_DIR "/home/steve/Desktop/MCS/sch"    /* SCP: path to sch */
-#endif
 
 /* common to all configurations */
 #define LWA_PORT_MSE  9734 /* port for MCS Scheduler "ms_exec" process */
@@ -748,6 +670,7 @@ double LWA_f8_swap( double x ) {
 /*** moved here from me.h *************/
 /**************************************/
 
+<<<<<<< HEAD
 #ifdef defined(USE_NDP)
 #define ME_SSMIF_FORMAT_VERSION 10
 #if defined(NDP_IS_FULL_STATION)
@@ -784,6 +707,9 @@ double LWA_f8_swap( double x ) {
 #define ME_MAX_SSNAME_LENGTH 3 /* for codes used for PWR_NAME */
 #define ME_MAX_NDPOUT 4 /* ADP outputs; 1,2,3,4 */
 #elif defined(USE_ADP)
+=======
+#if defined USE_ADP && USE_ADP
+>>>>>>> main
 #define ME_SSMIF_FORMAT_VERSION 9
 #define ME_MAX_NSTD 256
 #define ME_MAX_NFEE 256
@@ -1049,6 +975,7 @@ struct osfs_struct { /* one step within an observation */
   unsigned short int OBS_STP_B;
   };
 
+<<<<<<< HEAD
 #if defined(USE_NDP)
 #  if defined(NDP_IS_FULL_STATION)
 #    define LWA_MAX_NSTD 256 /* FIXME should be reconciled with ME_MAX_NSTD */
@@ -1056,6 +983,9 @@ struct osfs_struct { /* one step within an observation */
 #    define LWA_MAX_NSTD 64 /* FIXME should be reconciled with ME_MAX_NSTD */
 #  endif
 #elif defined(USE_ADP)
+=======
+#if defined USE_ADP && USE_ADP
+>>>>>>> main
 #define LWA_MAX_NSTD 256 /* FIXME should be reconciled with ME_MAX_NSTD */
 #else
 #define LWA_MAX_NSTD 260 /* FIXME should be reconciled with ME_MAX_NSTD */
@@ -1071,7 +1001,11 @@ struct osf2_struct { /* really just a continuation of osf_struct */
   signed short int   OBS_ASP_AT1[LWA_MAX_NSTD];
   signed short int   OBS_ASP_AT2[LWA_MAX_NSTD];
   signed short int   OBS_ASP_ATS[LWA_MAX_NSTD];
+<<<<<<< HEAD
 #if defined(USE_NDP) || defined(USE_ADP)
+=======
+#if defined USE_ADP && USE_ADP
+>>>>>>> main
   unsigned int       OBS_TBF_SAMPLES;
   signed short int   OBS_TBF_GAIN;
 #else
@@ -1117,7 +1051,11 @@ struct station_settings_struct {
   signed short int asp_at1[LWA_MAX_NSTD]; // OBS_ASP_AT1[LWA_MAX_NSTD] // ASP_AT1[LWA_MAX_NSTD]
   signed short int asp_at2[LWA_MAX_NSTD]; // OBS_ASP_AT2[LWA_MAX_NSTD] // ASP_AT2[LWA_MAX_NSTD]
   signed short int asp_ats[LWA_MAX_NSTD]; // OBS_ASP_ATS[LWA_MAX_NSTD] // ASP_ATS[LWA_MAX_NSTD]
+<<<<<<< HEAD
 #if defined(USE_NDP) || defined(USE_ADP)
+=======
+#if defined USE_ADP && USE_ADP
+>>>>>>> main
   signed short int tbf_gain; // OBS_TBF_GAIN // TBF_GAIN
 #endif
 #if !defined(USE_NDP)
@@ -1185,6 +1123,7 @@ struct ssmif_struct {
   int    iARBAnt[ME_MAX_NARB][ME_MAX_NARBCH];        /* ARB_ANT[][] */
   char   sARBIN[ME_MAX_NARB][ME_MAX_NARBCH][ME_MAX_ARBID_LENGTH+1]; /* ARB_IN[][] */
   char   sARBOUT[ME_MAX_NARB][ME_MAX_NARBCH][ME_MAX_ARBID_LENGTH+1]; /* ARB_OUT[][] */
+<<<<<<< HEAD
 #if defined(USE_NDP)
   int    nSnap;                     /* N_SNAP */
   int    nSnapCh;                   /* N_SNAPCH */
@@ -1201,6 +1140,9 @@ struct ssmif_struct {
   int    eServerStat[ME_MAX_NSERVER];       /* SERVER_STAT[] */
   int    eServerDesi[ME_MAX_NSERVER];       /* SERVER_DESI[] */
 #elfi defined(USE_ADP)
+=======
+#if defined USE_ADP && USE_ADP
+>>>>>>> main
   int    nRoach;                     /* N_ROACH */
   int    nRoachCh;                   /* N_ROACHCH */
   char   sRoachID[ME_MAX_NROACH][ME_MAX_ROACHID_LENGTH+1]; /* ROACH_ID[] */
@@ -1265,10 +1207,14 @@ struct subsubsystem_status_struct {
   int    eRPDStat[ME_MAX_NRPD];                /* RPD_STAT[] */
   int    eSEPStat[ME_MAX_NSEP];                /* SEP_STAT[] */
   int    eARBStat[ME_MAX_NARB][ME_MAX_NARBCH]; /* ARB_STAT[][] */
+<<<<<<< HEAD
 #if defined(USE_NDP)
   int    eSnapStat[ME_MAX_NSNAP][ME_MAX_NSNAPCH]; /* SNAP_STAT[][] */
   int    eServerStat[ME_MAX_NSERVER];             /* SERVER_STAT[] */
 #elif defined(USE_ADP)
+=======
+#if defined USE_ADP && USE_ADP
+>>>>>>> main
   int    eRoachStat[ME_MAX_NROACH][ME_MAX_NROACHCH]; /* ROACH_STAT[][] */
   int    eServerStat[ME_MAX_NSERVER];                /* SERVER_STAT[] */
 #else
@@ -1485,6 +1431,7 @@ int me_sc_MakeASM( struct ssmif_struct s, struct sc_struct *sc ) {
       } /* for c */ 
     } /* for i */
 
+<<<<<<< HEAD
 #if defined(USE_NDP)
   /* load SNAP channel information into station config data structure */
   for ( i=0; i<s.nSnap; i++ ) {
@@ -1497,6 +1444,9 @@ int me_sc_MakeASM( struct ssmif_struct s, struct sc_struct *sc ) {
       } /* for c */
     } /* for i */
 #elif defined(USE_ADP)
+=======
+#if defined USE_ADP && USE_ADP
+>>>>>>> main
   /* load ROACH channel information into station config data structure */
   for ( i=0; i<s.nRoach; i++ ) {
     for ( c=0; c<s.nRoachCh; c++ ) {
@@ -1560,8 +1510,13 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
       sc->DPO[i].iStat = s.eDRStat[ sc->DPO[i].iDR -1 ]; 
       }
 
+<<<<<<< HEAD
 #if defined(USE_NDP) || defined(USE_ADP)
     /* consider the status of the ROACH/SNAP boards */
+=======
+#if defined USE_ADP && USE_ADP
+    /* consider the status of the ROACH boards */
+>>>>>>> main
     if (i<ME_MAX_NDPOUT) { /* i=0 to 1: These are standard beams */
        /* no basis for marking this anything other than "3" at the moment*/
       sc->DPO[i].iStat = 3;
@@ -1606,7 +1561,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 
 
 /*============================================*/
-#endif // #ifndef MCS_H 
+#endif // #ifndef MCS_COMMON_H 
 
 //==================================================================================
 //=== NOTES ========================================================================
@@ -1634,6 +1589,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// Feb 21, 2023: Moved some configuration parameters into config.h
 // Sep 30, 2022: Added support for the moon tracking mode TRK_LUN
 // May 2, 2022:  Added new SIDs and CMDs for the Next Generation Digital Processor (NDP)
 // Dec 16, 2019: Updated the ADP-based stations to support a third beam and
