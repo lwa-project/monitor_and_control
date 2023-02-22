@@ -7,6 +7,7 @@ import glob
 import time
 import warnings
 import subprocess
+from typing import IO, List, Optional, Union
 
 try:
     from io import IOBase
@@ -40,7 +41,9 @@ def _get_sdf_id(filename):
     return pid, sid
 
 
-def schedule_sdfs(filenames, max_retries=5, fast_submit=False, logfile=None, errorfile=None):
+def schedule_sdfs(filenames: List[str], max_retries: int=5, fast_submit: bool=False,
+                  logfile Optional[Union[str,IO[str]]]=None,
+                  errorfile Optional[Union[str,IO[str]]]=None) -> bool:
     # Figure out the input
     if not isinstance(filenames, list):
         filenames = [filenames,]
@@ -147,7 +150,7 @@ def schedule_sdfs(filenames, max_retries=5, fast_submit=False, logfile=None, err
     return True
 
 
-def get_completed_metadata():
+def get_completed_metadata() -> List[str]:
     """
     Return a list of metadata tarballs for completed observations.
     """

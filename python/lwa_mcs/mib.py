@@ -6,6 +6,7 @@ import os
 import time
 import struct
 from datetime import datetime, timedelta
+from typing import Tuple, Union
 
 from lwa_mcs._mcs import read_mib_ip, read_mib, MCS_TIMEOUT
 
@@ -13,7 +14,7 @@ __version__ = "0.4"
 __all__ = ['read', 'read_from_disk']
 
 
-def read(ss, label, trim_nulls=True):
+def read(ss: str, label: str, trim_nulls: bool=True) -> Tuple[Union[str,bytes,int,float],float]:
     """
     Read the specified MIB label for the specified subsystem using the 
     ms_mdre_ip interface.  Returns a two-element tuple of value, UTC 
@@ -42,7 +43,7 @@ def read(ss, label, trim_nulls=True):
     return value, ts
 
 
-def read_from_disk(ss, label, trim_nulls=True):
+def read_from_disk(ss: str, label: str, trim_nulls: bool=True) -> Tuple[Union[str,bytes,int,float],float]:
     """
     Read the specified MIB label for the specified subsystem using the 
     GDBM interface.  Returns a two-element tuple of value, UTC 
