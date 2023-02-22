@@ -51,7 +51,7 @@ int LWA_mibupdate_NDP(
 
   unsigned short int beam_id;
   unsigned char subslot;
-  #if defined(NDP_IS_FULL_STATION)
+  #if defined(NDP_IS_FULL_STATION) && NDP_IS_FULL_STATION
   char dfile[1024];
   char gfile[1024]; 
   #else
@@ -65,7 +65,7 @@ int LWA_mibupdate_NDP(
   unsigned char ebw;
   unsigned short int gain;
   
-  #if defined(NDP_IS_FULL_STATION)
+  #if defined(NDP_IS_FULL_STATION) && NDP_IS_FULL_STATION
   char output[1024];
   #else
   char output[256];
