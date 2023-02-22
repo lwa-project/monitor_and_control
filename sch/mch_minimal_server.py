@@ -51,20 +51,17 @@ parser.add_argument('rx_port', type=int,
                     help='port address for receive; e.g., 1738')
 parser.add_argument('-a', '--accept-all', action='store_true',
                     help='respond to all incoming commands whether they are valid or not')
+parser.add_argument('-v', '--verbose', action='store_true',
+                    help='be verbose about what is happening')
 args = parse.parse_args()
-
-# print('subsystem <'+args.subsystem+'>')
-# print('ip_address <'+args.ip_address+'>')
-# print('tx_port ', args.tx_port)
-# print('rx_port ', args.rx_port)
-# exit()
 
 
 # --------------------------
 # Set up the MIB
 # --------------------------
 
-#print('Setting up the MIB...')
+if args.verbose:
+    print('Setting up the MIB...')
 
 ml = [] # this becomes a list of MIB labels
 me = [] # this becomes a list of MIB entries (data)
@@ -75,14 +72,15 @@ ml.append('SUBSYSTEM'); me.append(args.subsystem)
 ml.append('SERIALNO');  me.append(args.subsystem+'-1')
 ml.append('VERSION');   me.append('mch_minimal_server.py_'+args.subsystem);
 
-#print(ml[0]+' '+me[0])
-#print(ml[1]+' '+me[1])
-#print(ml[2]+' '+me[2])
-#print(ml[3]+' '+me[3])
-#print(ml[4]+' '+me[4])
-#print(ml[5]+' '+me[5])
+if args.verbose:
+    print(ml[0]+' '+me[0])
+    print(ml[1]+' '+me[1])
+    print(ml[2]+' '+me[2])
+    print(ml[3]+' '+me[3])
+    print(ml[4]+' '+me[4])
+    print(ml[5]+' '+me[5])
 
-#print('I am '+me[3]+'.')
+    print('I am '+me[3]+'.')
 
 
 # --------------------------
@@ -98,14 +96,16 @@ r.setblocking(1)   # Blocking on this sock
 t = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 t.connect((args.ip_address,args.tx_port)) 
 
-#print('Running...')
+if args.verbose:
+    print('Running...')
 
 while 1:
 
     payload = r.recv(B)  # wait for something to appear
 
-    # Say what was received
-    #print(b'rcvd> '+payload+b'|')
+    if args.verbose:
+        # Say what was received
+        print(b'rcvd> '+payload+b'|')
 
     # --------------------------
     # Analyzing received command
@@ -127,15 +127,16 @@ while 1:
     mjd         = int(payload[22:28]) 
     mpm         = int(payload[28:37]) 
     data        = payload[38:38+datalen]
-        
-    #print('DESTINATION: |'+destination+'|')
-    #print('SENDER:      |'+sender+'|')
-    #print('TYPE:        |'+command+'|')
-    #print('REFERENCE: ', reference)
-    #print('DATALEN:   ', datalen)
-    #print('MJD:       ', mjd)
-    #print('MPM:       ', mpm)
-    #print(b'DATA: |'+data+b'|')
+    
+    if args.verbose:
+        print('DESTINATION: |'+destination+'|')
+        print('SENDER:      |'+sender+'|')
+        print('TYPE:        |'+command+'|')
+        print('REFERENCE: ', reference)
+        print('DATALEN:   ', datalen)
+        print('MJD:       ', mjd)
+        print('MPM:       ', mpm)
+        print(b'DATA: |'+data+b'|')
 
     if (destination==me[3]) or (destination=='ALL'): # comparing to MIB entry 1.4, "SUBSYSTEM"              
 
@@ -219,7 +220,8 @@ while 1:
 
         t.send(payload.encode())      # send it 
 
-    #print('sent> '+payload+'|' # say what was sent )
+    if args.verbose:
+        print('sent> '+payload+'|' # say what was sent )
 
 # never get here, but what the heck.
 s.close()
