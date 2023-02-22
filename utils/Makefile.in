@@ -8,13 +8,21 @@ LDFLAGS  ?= @LDFLAGS@ @LIBS@
 HAVE_ADP ?= @HAVE_ADP@
 
 TARGETS := \
-	build_station_start
+	build_station_start \
+	test_sch_connection \
+	test_tp_connection
 
 all: $(TARGETS)
 
 build_station_start: build_station_start.c ../common/config.h ../common/mcs.h
 	$(CC) $(CFLAGS) -o build_station_start build_station_start.c $(LDFLAGS)
 
+test_sch_connection: test_sch_connection.c ../common/config.h ../common/mcs.h
+	$(CC) $(CFLAGS) -o test_sch_connection test_sch_connection.c $(LDFLAGS)
+
+test_tp_connection: test_tp_connection.c ../common/config.h ../common/mcs.h
+	$(CC) $(CFLAGS) -o test_tp_connection test_tp_connection.c $(LDFLAGS)
+	
 .PHONY: clean
 clean:
 	-rm -f $(TARGETS)
