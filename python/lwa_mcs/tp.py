@@ -42,8 +42,8 @@ def _get_sdf_id(filename):
 
 
 def schedule_sdfs(filenames: List[str], max_retries: int=5, fast_submit: bool=False,
-                  logfile Optional[Union[str,IO[str]]]=None,
-                  errorfile Optional[Union[str,IO[str]]]=None) -> bool:
+                  logfile Optional[Union[str,IO[bytes]]]=None,
+                  errorfile Optional[Union[str,IO[bytes]]]=None) -> bool:
     # Figure out the input
     if not isinstance(filenames, list):
         filenames = [filenames,]
@@ -58,7 +58,7 @@ def schedule_sdfs(filenames: List[str], max_retries: int=5, fast_submit: bool=Fa
     log_is_string = False
     if isinstance(logfile, str):
         try:
-            fh = open(logfile, 'a')
+            fh = open(logfile, 'ab')
             logfile = fh
             log_is_string = True
         except IOError as e:
@@ -77,7 +77,7 @@ def schedule_sdfs(filenames: List[str], max_retries: int=5, fast_submit: bool=Fa
     err_is_string = False
     if isinstance(errorfile, str):
         try:
-            fh = open(errorfile, 'a')
+            fh = open(errorfile, 'ab')
             errorfile = fh
             err_is_string = True
         except IOError as e:
