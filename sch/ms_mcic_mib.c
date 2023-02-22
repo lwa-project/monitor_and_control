@@ -109,7 +109,7 @@ int LWA_mibupdate_RPT(
 #include "ms_mcic_ASP.c" /* LWA_mibupdate_ASP() */
 #if defined(USE_NDP) && USE_NDP
 #include "ms_mcic_NDP.c" /* LWA_mibupdate_NDP() */
-#elif defined(USE_ADP) & USE_ADP
+#elif defined(USE_ADP) && USE_ADP
 #include "ms_mcic_ADP.c" /* LWA_mibupdate_ADP() */
 #else
 #include "ms_mcic_DP_.c" /* LWA_mibupdate_DP_() */
@@ -226,7 +226,7 @@ int mib_update(
               case LWA_SID_NDP:
                 eMIBerror = eMIBerror | LWA_mibupdate_NDP( dbm_ptr, cid, cmdata, r_comment, datalen, ref, sent_tv );                
                 break;
-#elif defined(USE_ADP) & USE_ADP
+#elif defined(USE_ADP) && USE_ADP
               case LWA_SID_ADP:
                 eMIBerror = eMIBerror | LWA_mibupdate_ADP( dbm_ptr, cid, cmdata, r_comment, datalen, ref, sent_tv );                
                 break;
