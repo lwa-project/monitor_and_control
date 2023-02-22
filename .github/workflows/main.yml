@@ -42,6 +42,7 @@ jobs:
           python -m pip install lsl
       - name: "Build and Install"
         run: |
+          ./configure
           make all
           mkdir exec/state
       - name: Test
