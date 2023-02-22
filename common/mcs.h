@@ -10,7 +10,9 @@
 #ifndef MCS_COMMON_H  /* this keeps this header from getting rolled in more than once */
 #define MCS_COMMON_H
 
-#include "config.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdio.h>
 #include <time.h>
@@ -43,6 +45,7 @@
 /* === BEGIN: IP addresses, sockets, directories === *
 /* ================================================= */
 /* (check /etc/services for ports already assigned) */
+#include "config.h"
 
 /* common to all configurations */
 #define LWA_PORT_MSE  9734 /* port for MCS Scheduler "ms_exec" process */
@@ -1451,6 +1454,11 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 
 
 /*============================================*/
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
+
 #endif // #ifndef MCS_COMMON_H 
 
 //==================================================================================

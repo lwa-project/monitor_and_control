@@ -2,6 +2,10 @@
 #ifndef MCS_CONFIG_H  /* this keeps this header from getting rolled in more than once */
 #define MCS_CONFIG_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Digital processor selection
 #define USE_ADP @HAVE_ADP@
 
@@ -22,6 +26,10 @@
 /* Miscellaneous parameters affecting operation... */
 #define LWA_REPOINT_CHECK_INTERVAL_SEC  @BEAM_REPOINT_INTERVAL@ /* This is how often [s] MCS (me_inproc) checks to see if it's time to repoint the beam */
 #define LWA_RES_DEG                     @BEAM_REPOINT_RES@ /* This is the resolution [deg] to which pointing data is computed */
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif // #ifndef MCS_CONFIG_H
 
