@@ -27,6 +27,7 @@ import math
 import string
 import struct   # for packing of binary to/from strings
 import sys
+import argparse
 
 
 # Below are things that shouldn't be changed
@@ -38,20 +39,24 @@ B = 8192                    # [bytes] Max message size
 # ------------------------------
 
 # Check for required command line argument <CMD> 
-if len(sys.argv)<5: 
-    print('Proper usage is "mch_minimal_server.py <subsystem> <ip_address> <tx_port> <rx_port>".')
-    print('No action taken.')
-    exit()
-else:               
-    subsystem  =     string.strip(sys.argv[1]) 
-    ip_address =     string.strip(sys.argv[2])
-    tx_port    = int(string.strip(sys.argv[3]))
-    rx_port    = int(string.strip(sys.argv[4]))   
-    
-# print('subsystem <'+subsystem+'>')
-# print('ip_address <'+ip_address+'>')
-# print('tx_port ', tx_port)
-# print('rx_port ', rx_port)
+parser = argparse.ArgumentParser(
+                    description='Minimum implementation of the MCS Common ICD for controlled subsystems')
+parser.add_argument('subsystem', type=str,
+                    help='three letter subsystem designator; e.g., "NU1", "SHL"')
+parser.add_argument('ip_address', type=str,
+                    help='IP address of the *client* as a dotted-quad; e.g., "127.0.0.1"')
+parser.add_argument('tx_port', type=int,
+                    help='port address for transmit; e.g., 1739')
+parser.add_argument('rx_port', type=int,
+                    help='port address for receive; e.g., 1738')
+parser.add_argument('-a', '--accept-all', action='store_true',
+                    help='respond to all incoming commands whether they are valid or not')
+args = parse.parse_args()
+
+# print('subsystem <'+args.subsystem+'>')
+# print('ip_address <'+args.ip_address+'>')
+# print('tx_port ', args.tx_port)
+# print('rx_port ', args.rx_port)
 # exit()
 
 
@@ -64,11 +69,11 @@ else:
 ml = [] # this becomes a list of MIB labels
 me = [] # this becomes a list of MIB entries (data)
 ml.append('SUMMARY');   me.append('NORMAL')
-ml.append('INFO');      me.append('This is mock INFO from '+subsystem)
-ml.append('LASTLOG');   me.append('This is mock LASTLOG from '+subsystem)
-ml.append('SUBSYSTEM'); me.append(subsystem)
-ml.append('SERIALNO');  me.append(subsystem+'-1')
-ml.append('VERSION');   me.append('mch_minimal_server.py_'+subsystem);
+ml.append('INFO');      me.append('This is mock INFO from '+args.subsystem)
+ml.append('LASTLOG');   me.append('This is mock LASTLOG from '+args.subsystem)
+ml.append('SUBSYSTEM'); me.append(args.subsystem)
+ml.append('SERIALNO');  me.append(args.subsystem+'-1')
+ml.append('VERSION');   me.append('mch_minimal_server.py_'+args.subsystem);
 
 #print(ml[0]+' '+me[0])
 #print(ml[1]+' '+me[1])
@@ -86,12 +91,12 @@ ml.append('VERSION');   me.append('mch_minimal_server.py_'+subsystem);
 
 # Set up the receive socket for UDP
 r = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
-r.bind(('',rx_port)) # Accept connections from anywhere
+r.bind(('',args.rx_port)) # Accept connections from anywhere
 r.setblocking(1)   # Blocking on this sock
 
 # Set up the transmit socket for UDP
 t = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-t.connect((ip_address,tx_port)) 
+t.connect((args.ip_address,args.tx_port)) 
 
 #print('Running...')
 
@@ -135,7 +140,10 @@ while 1:
     if (destination==me[3]) or (destination=='ALL'): # comparing to MIB entry 1.4, "SUBSYSTEM"              
 
         bRespond = True
-        response = 'R'+string.rjust(str(me[0]),7)+'Command not recognized' # use this until we find otherwise
+        if args.accept_all:
+            response = 'A'+string.rjust(str(me[0]),7)+'Command not recognized' # use this until we find otherwise
+        else:
+            response = 'R'+string.rjust(str(me[0]),7)+'Command not recognized' # use this until we find otherwise
 
         if command=='PNG':
             response = 'A'+string.rjust(str(me[0]),7) 

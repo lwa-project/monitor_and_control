@@ -32,15 +32,15 @@ else
 fi
 
 # Fire up an emulator to play the role of subsystems
-python mch_minimal_server_acceptall.py SHL 127.0.0.1 1739 1738 &
-python mch_minimal_server_acceptall.py ASP 127.0.0.1 1741 1740 &
-python mch_minimal_server_acceptall.py ${dpName} 127.0.0.1 1743 1742 &
-python mch_minimal_server_acceptall.py DR1 127.0.0.1 1745 1744 &
+python mch_minimal_server.py --accept-all SHL 127.0.0.1 1739 1738 &
+python mch_minimal_server.py --accept-all ASP 127.0.0.1 1741 1740 &
+python mch_minimal_server.py --accept-all ${dpName} 127.0.0.1 1743 1742 &
+python mch_minimal_server.py --accept-all DR1 127.0.0.1 1745 1744 &
 if [ "${dpName}" == "DP_" ]; then
-	python mch_minimal_server_acceptall.py DR2 127.0.0.1 1747 1746 &
-	python mch_minimal_server_acceptall.py DR3 127.0.0.1 1749 1748 &
-	python mch_minimal_server_acceptall.py DR4 127.0.0.1 1751 1750 &
-	python mch_minimal_server_acceptall.py DR5 127.0.0.1 1753 1752 &
+	python mch_minimal_server.py --accept-all DR2 127.0.0.1 1747 1746 &
+	python mch_minimal_server.py --accept-all DR3 127.0.0.1 1749 1748 &
+	python mch_minimal_server.py --accept-all DR4 127.0.0.1 1751 1750 &
+	python mch_minimal_server.py --accept-all DR5 127.0.0.1 1753 1752 &
 fi
 
 # Create ASP MIB initialization file for an ASP with
