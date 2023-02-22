@@ -67,6 +67,8 @@ tp/tpss
 tp/tptc
 ## utils
 utils/build_station_start
+utils/test_sch_connection
+utils/test_tp_connection
 
 # Python stuff
 *.pyc
