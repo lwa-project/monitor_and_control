@@ -58,7 +58,7 @@ int main ( int narg, char *argv[] ) {
   if (narg>3) { 
     sscanf(argv[3],"%s",sDestDir);
     }
-#if defined USE_ADP && USE_ADP
+#if defined(USE_ADP) && USE_ADP
   sprintf(mode,"TBF");
   if (narg>4) { 
     sscanf(argv[4],"%s",mode);

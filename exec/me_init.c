@@ -242,7 +242,7 @@ int main ( int narg, char *argv[] ) {
   for (i=0;i<ME_MAX_NARB;i++) { 
     for (j=0;j<ME_MAX_NARBCH;j++) { 
       sdm.ssss.eARBStat[i][j] = 0; } }                   /* ARB_STAT[][] */
-#if defined USE_ADP && USE_ADP
+#if defined(USE_ADP) && USE_ADP
   for (i=0;i<ME_MAX_NROACH;i++) { 
     for (j=0;j<ME_MAX_NROACHCH;j++) { 
       sdm.ssss.eRoachStat[i][j] = 0; } }                   /* ROACH_STAT[][] */

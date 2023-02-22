@@ -18,7 +18,7 @@
 #define FS (196.0e+6)      /* [samples/s] sample rate */
 #define DTR 0.017453292520 /* pi/180 */
 #define FLAG_VAL (1e+20)
-#if defined USE_ADP && USE_ADP
+#if defined(USE_ADP) && USE_ADP
 #define MAX_DP_CH 512      /* number of ROACH channel inputs (per ADP ICD) */
 #else
 #define MAX_DP_CH 520      /* number of DP1 channel inputs (per DP ICD) */
@@ -229,7 +229,7 @@ int main ( int narg, char *argv[] ) {
     id[i] = -1;
     }
 
-#if defined USE_ADP && USE_ADP
+#if defined(USE_ADP) && USE_ADP
   /* figure out antenna positions, indexed by ADP channel */
   for (i=0;i<s.nRoach;i++) { 
     for (k=0;k<s.nRoachCh;k++) { 
