@@ -204,14 +204,14 @@ int main ( int narg, char *argv[] ) {
       if (s.iARBAnt[iARB][k]!=0) {
         if ( c[ s.iARBAnt[iARB][k] -1 ] ) {
           printf("[%d/%d] FATAL: ARB_ANT[%d][%d] = %d has multiple assignments\n",MT_TPRS,getpid(),iARB+1,k+1,s.iARBAnt[iARB][k]);
-          //return 1; 
+          //exit(EXIT_FAILURE); 
           }
         } 
       c[ s.iARBAnt[iARB][k] -1 ] = 1;
       //printf("[%d/%d] Saw: ARB_ANT[%d][%d] = %d\n",MT_TPRS,getpid(),iARB+1,k+1,s.iARBAnt[iARB][k]);
       } /* for (k */
     } /* for ( iARB */     
-  //return 1;
+  //exit(EXIT_FAILURE);
 
   printf("[%d/%d] *********************************************************\n",MT_TPRS,getpid()); 
   printf("[%d/%d] *** Writing ssmif.dat ***********************************\n",MT_TPRS,getpid());
