@@ -8,6 +8,7 @@ import sys
 import math
 import pytz
 import subprocess
+from typing import Dict, Tuple, Union
 from datetime import datetime, timedelta
 
 from lwa_mcs._mcs import get_current_time
@@ -21,7 +22,7 @@ __all__ = ['get_uptime', 'get_current_mjdmpm', 'mjdmpm_to_datetime', 'datetime_t
 _UTC = pytz.utc
 
 
-def get_uptime():
+def get_uptime() -> int:
     """
     Determine and return the current uptime in minutes.
     """
@@ -30,11 +31,8 @@ def get_uptime():
     upre = re.compile('up ((?P<days>\d+) day(s)?,)?\s*((?P<hours>\d+)\:)?(?P<minutes>\d+)( min(ute(s)?)?)?,')
     
     # Run the command and see if we have something that looks right
-    output = subprocess.check_output(['uptime'])
-    try:
-        output = output.decode('ascii', errors='backslashreplace')
-    except AttributeError:
-        pass
+    output = subprocess.check_output(['uptime'], stderr=subprocess.DEVNULL)
+    output = output.decode('ascii', errors='backslashreplace')
     mtch = upre.search(output)
     if mtch is None:
         raise RuntimeError("Could not determine the current uptime")
@@ -58,7 +56,7 @@ def get_uptime():
     return uptime
 
 
-def get_current_mjdmpm():
+def get_current_mjdmpm() -> Tuple[int, int]:
     return get_current_time()
 
 
@@ -73,7 +71,7 @@ def mjdmpm_to_datetime(mjd, mpm):
     return datetime.utcfromtimestamp(unix)
 
 
-def datetime_to_mjdmpm(dt):
+def datetime_to_mjdmpm(dt: datetime) -> Tuple[int, int]:
     """
     Convert a UTC datetime instance to a MJD, MPM pair (returned as a 
     two-element tuple).
@@ -109,7 +107,7 @@ def datetime_to_mjdmpm(dt):
     return (mjd, mpm)
 
 
-def get_at_queue():
+def get_at_queue() -> Dict[int, datetime]:
     """
     Read in the current 'at' queue and return a dictionary of id, time pairs.
     The times that returned are timezone-aware datetime instances.
@@ -118,13 +116,8 @@ def get_at_queue():
     queue = {}
     
     # Run atq to get the current list of commands
-    atlist = subprocess.Popen(['/usr/bin/atq',], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output, error = atlist.communicate()
-    try:
-        output = output.decode('ascii', errors='backslashreplace')
-        error = error.decode('ascii', errors='backslashreplace')
-    except AttributeError:
-        pass
+    output = subprocess.check_output(['/usr/bin/atq',], stderr=subprocess.DEVNULL)
+    output = output.decode('ascii', errors='backslashreplace')
     output = output.split('\n')
     
     # Loop over the output
@@ -148,37 +141,31 @@ def get_at_queue():
     return queue
 
 
-def get_at_command(id):
+def get_at_command(id: int) -> str:
     """
     For the specified 'at' command ID, figure out what is happening.
     """
     
     # Run at to information about the specified command
-    atdetail = subprocess.Popen(['/usr/bin/at', '-c', str(id)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output, error = atdetail.communicate()
-    try:
-        output = output.decode('ascii', errors='backslashreplace')
-        error = error.decode('ascii', errors='backslashreplace')
-    except AttributeError:
-        pass
+    output = subprocess.check_output(['/usr/bin/at', '-c', str(id)], stderr=subprocess.DEVNULL)
+    output = output.decode('ascii', errors='backslashreplace')
     output = output.split('\n')
     
-    toExecute = []
+    toExecute = ''
     inCommand = 2048
     for line in output:
         inCommand -= 1
         if inCommand <= 0:
-            toExecute.append(line)
+            toExecute += line
+            toExecute += '\n'
             
         if line.find("echo 'Execution directory inaccessible' >&2") != -1:
             inCommand = 3
             
-    toExecute = '\n'.join(toExecute)
-    
-    return toExecute
+    return toExecute.rstrip()
 
 
-def schedule_at_command(execution_time, command):
+def schedule_at_command(execution_time: Union[int, float, datetime], command: str) -> int:
     """
     Simple function to schedule a command to run at the provided time using
     the 'at' command.  The job ID is returned as an integer.  This function 
@@ -197,7 +184,7 @@ def schedule_at_command(execution_time, command):
 
     # Time conversion
     ## Does the the execution time look like a time stamp?
-    if isinstance(execution_time, (float, int)):
+    if isinstance(execution_time, (int, float)):
         execution_time = datetime.utcfromtimestamp(execution_time)
     ## Has the execution time already had a time zone assigned to it?
     if execution_time.tzinfo is None:

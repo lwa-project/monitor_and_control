@@ -664,7 +664,6 @@ PACKAGE_VERSION_MINOR
 PACKAGE_VERSION_MAJOR
 PYINSTALLFLAGS
 PYBUILDFLAGS
-PYTHON3
 PYTHON
 HAVE_PYTHON
 MTE_USERNAME
@@ -783,7 +782,7 @@ with_exec_ip
 with_tp_ip
 with_tp_username
 enable_python
-with_python
+with_python3
 with_pybuild_flags
 with_pyinstall_flags
 '
@@ -1448,7 +1447,7 @@ Optional Packages:
   --with-tp-ip=N.N.N.N    default task processor IP address
                           (default=172.16.1.103)
   --with-tp-username=A    default task processor username (default=op1)
-  --with-python=[PATH]  absolute path to python executable
+  --with-python3=[PATH] absolute path to python3 executable
   --with-pybuild-flags    build flags for python (default='')
   --with-pyinstall-flags  install flags for python (default='')
 
@@ -1462,7 +1461,7 @@ Some influential environment variables:
               you have headers in a nonstandard directory <include dir>
   LT_SYS_LIBRARY_PATH
               User-defined run-time library search path.
-  PYTHON      Absolute path to python executable
+  PYTHON      Absolute path to python3 executable
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -13036,13 +13035,13 @@ then :
     if test -z "$PYTHON"
 then :
 
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether python executable path has been provided" >&5
-printf %s "checking whether python executable path has been provided... " >&6; }
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether python3 executable path has been provided" >&5
+printf %s "checking whether python3 executable path has been provided... " >&6; }
 
-# Check whether --with-python was given.
-if test ${with_python+y}
+# Check whether --with-python3 was given.
+if test ${with_python3+y}
 then :
-  withval=$with_python;
+  withval=$with_python3;
             if test "$withval" != yes && test "$withval" != no
 then :
 
@@ -13058,8 +13057,8 @@ printf "%s\n" "no" >&6; }
                 if test "$withval" != no
 then :
 
-                  # Extract the first word of "python", so it can be a program name with args.
-set dummy python; ac_word=$2
+                  # Extract the first word of "python3", so it can be a program name with args.
+set dummy python3; ac_word=$2
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 printf %s "checking for $ac_word... " >&6; }
 if test ${ac_cv_path_PYTHON+y}
@@ -13113,8 +13112,8 @@ else $as_nop
 
             { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
-            # Extract the first word of "python", so it can be a program name with args.
-set dummy python; ac_word=$2
+            # Extract the first word of "python3", so it can be a program name with args.
+set dummy python3; ac_word=$2
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 printf %s "checking for $ac_word... " >&6; }
 if test ${ac_cv_path_PYTHON+y}
@@ -13170,60 +13169,6 @@ fi
 
 
 
-       if test x${PYTHON} = xno
-then :
-  # Extract the first word of "python3", so it can be a program name with args.
-set dummy python3; ac_word=$2
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-printf %s "checking for $ac_word... " >&6; }
-if test ${ac_cv_path_PYTHON3+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  case $PYTHON3 in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_PYTHON3="$PYTHON3" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  case $as_dir in #(((
-    '') as_dir=./ ;;
-    */) ;;
-    *) as_dir=$as_dir/ ;;
-  esac
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
-    ac_cv_path_PYTHON3="$as_dir$ac_word$ac_exec_ext"
-    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_path_PYTHON3" && ac_cv_path_PYTHON3="no"
-  ;;
-esac
-fi
-PYTHON3=$ac_cv_path_PYTHON3
-if test -n "$PYTHON3"; then
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $PYTHON3" >&5
-printf "%s\n" "$PYTHON3" >&6; }
-else
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-fi
-
-
-              if test x${PYTHON3} != xno
-then :
-  PYTHON=$PYTHON3
-
-fi
-fi
        if test x${PYTHON} != xno
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether $PYTHON has pip" >&5

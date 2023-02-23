@@ -27,6 +27,7 @@ import math
 import string
 import struct   # for packing of binary to/from strings
 import sys
+import argparse
 
 
 # Below are things that shouldn't be changed
@@ -38,46 +39,48 @@ B = 8192                    # [bytes] Max message size
 # ------------------------------
 
 # Check for required command line argument <CMD> 
-if len(sys.argv)<5: 
-    print 'Proper usage is "mch_minimal_server.py <subsystem> <ip_address> <tx_port> <rx_port>".'
-    print 'No action taken.'
-    exit()
-else:               
-    subsystem  =     string.strip(sys.argv[1]) 
-    ip_address =     string.strip(sys.argv[2])
-    tx_port    = int(string.strip(sys.argv[3]))
-    rx_port    = int(string.strip(sys.argv[4]))   
-    
-# print 'subsystem <'+subsystem+'>'
-# print 'ip_address <'+ip_address+'>'
-# print 'tx_port ', tx_port
-# print 'rx_port ', rx_port
-# exit()
+parser = argparse.ArgumentParser(
+                    description='Minimum implementation of the MCS Common ICD for controlled subsystems')
+parser.add_argument('subsystem', type=str,
+                    help='three letter subsystem designator; e.g., "NU1", "SHL"')
+parser.add_argument('ip_address', type=str,
+                    help='IP address of the *client* as a dotted-quad; e.g., "127.0.0.1"')
+parser.add_argument('tx_port', type=int,
+                    help='port address for transmit; e.g., 1739')
+parser.add_argument('rx_port', type=int,
+                    help='port address for receive; e.g., 1738')
+parser.add_argument('-a', '--accept-all', action='store_true',
+                    help='respond to all incoming commands whether they are valid or not')
+parser.add_argument('-v', '--verbose', action='store_true',
+                    help='be verbose about what is happening')
+args = parse.parse_args()
 
 
 # --------------------------
 # Set up the MIB
 # --------------------------
 
-#print 'Setting up the MIB...'
+if args.verbose:
+    print('Setting up the MIB...')
 
 ml = [] # this becomes a list of MIB labels
 me = [] # this becomes a list of MIB entries (data)
 ml.append('SUMMARY');   me.append('NORMAL')
-ml.append('INFO');      me.append('This is mock INFO from '+subsystem)
-ml.append('LASTLOG');   me.append('This is mock LASTLOG from '+subsystem)
-ml.append('SUBSYSTEM'); me.append(subsystem)
-ml.append('SERIALNO');  me.append(subsystem+'-1')
-ml.append('VERSION');   me.append('mch_minimal_server.py_'+subsystem);
+ml.append('INFO');      me.append('This is mock INFO from '+args.subsystem)
+ml.append('LASTLOG');   me.append('This is mock LASTLOG from '+args.subsystem)
+ml.append('SUBSYSTEM'); me.append(args.subsystem)
+ml.append('SERIALNO');  me.append(args.subsystem+'-1')
+ml.append('VERSION');   me.append('mch_minimal_server.py_'+args.subsystem);
 
-#print ml[0]+' '+me[0]
-#print ml[1]+' '+me[1]
-#print ml[2]+' '+me[2]
-#print ml[3]+' '+me[3]
-#print ml[4]+' '+me[4]
-#print ml[5]+' '+me[5]
+if args.verbose:
+    print(ml[0]+' '+me[0])
+    print(ml[1]+' '+me[1])
+    print(ml[2]+' '+me[2])
+    print(ml[3]+' '+me[3])
+    print(ml[4]+' '+me[4])
+    print(ml[5]+' '+me[5])
 
-#print 'I am '+me[3]+'.'
+    print('I am '+me[3]+'.')
 
 
 # --------------------------
@@ -86,21 +89,23 @@ ml.append('VERSION');   me.append('mch_minimal_server.py_'+subsystem);
 
 # Set up the receive socket for UDP
 r = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
-r.bind(('',rx_port)) # Accept connections from anywhere
+r.bind(('',args.rx_port)) # Accept connections from anywhere
 r.setblocking(1)   # Blocking on this sock
 
 # Set up the transmit socket for UDP
 t = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-t.connect((ip_address,tx_port)) 
+t.connect((args.ip_address,args.tx_port)) 
 
-#print 'Running...'
+if args.verbose:
+    print('Running...')
 
 while 1:
 
     payload = r.recv(B)  # wait for something to appear
 
-    # Say what was received
-    #print 'rcvd> '+payload+'|'
+    if args.verbose:
+        # Say what was received
+        print(b'rcvd> '+payload+b'|')
 
     # --------------------------
     # Analyzing received command
@@ -114,37 +119,41 @@ while 1:
     # (2) The message is for us but is not a PNG, RPT, or SHT message.  In this case, send "reject" response
     # (3) The message is for us and is a PNG, RPT, or SHT message.  In this case, respond appropriately  
                 
-    destination = payload[:3] 
-    sender      = payload[3:6]
-    command     = payload[6:9]
+    destination = payload[:3].decode()
+    sender      = payload[3:6].decode()
+    command     = payload[6:9].decode()
     reference   = int(payload[9:18])
     datalen     = int(payload[18:22]) 
     mjd         = int(payload[22:28]) 
     mpm         = int(payload[28:37]) 
     data        = payload[38:38+datalen]
-        
-    #print 'DESTINATION: |'+destination+'|'
-    #print 'SENDER:      |'+sender+'|'
-    #print 'TYPE:        |'+command+'|'
-    #print 'REFERENCE: ', reference
-    #print 'DATALEN:   ', datalen
-    #print 'MJD:       ', mjd
-    #print 'MPM:       ', mpm
-    #print 'DATA: |'+data+'|'
+    
+    if args.verbose:
+        print('DESTINATION: |'+destination+'|')
+        print('SENDER:      |'+sender+'|')
+        print('TYPE:        |'+command+'|')
+        print('REFERENCE: ', reference)
+        print('DATALEN:   ', datalen)
+        print('MJD:       ', mjd)
+        print('MPM:       ', mpm)
+        print(b'DATA: |'+data+b'|')
 
     if (destination==me[3]) or (destination=='ALL'): # comparing to MIB entry 1.4, "SUBSYSTEM"              
 
         bRespond = True
-        response = 'R'+string.rjust(str(me[0]),7)+'Command not recognized' # use this until we find otherwise
+        if args.accept_all:
+            response = 'A'+string.rjust(str(me[0]),7)+'Command not recognized' # use this until we find otherwise
+        else:
+            response = 'R'+string.rjust(str(me[0]),7)+'Command not recognized' # use this until we find otherwise
 
         if command=='PNG':
             response = 'A'+string.rjust(str(me[0]),7) 
 
         if command=='RPT':
             response = 'R'+string.rjust(str(me[0]),7)+'Invalid MIB label' # use this until we find otherwis
-            mib_label = string.strip(data)
-            #print '|'+mib_label+'|'
-            #print '|'+data+'|'
+            mib_label = string.strip(data.decode())
+            #print('|'+mib_label+'|')
+            #print(b'|'+data+b'|')
             # find in mib  
             response = 'R'+string.rjust(str(me[0]),7)+'MIB label not recognized'  
             for i in range(len(ml)):
@@ -154,13 +163,13 @@ while 1:
 
         if command=='SHT':
             response = 'A'+string.rjust(str(me[0]),7)  # use this until we find otherwis
-            arg = string.strip(data)
+            arg = string.strip(data.decode())
             me[0] = "SHTDOWN"
             # verify arguments
             while len(arg)>0:
                args = string.split(arg,' ',1)
                args[0] = string.strip(args[0])
-               #print '>'+args[0]+'|'
+               #print('>'+args[0]+'|')
                if (not(args[0]=='SCRAM') and not(args[0]=='RESTART')):
                    response = 'R'+string.rjust(str(me[0]),7)+' Invalid extra arguments' 
                if len(args)>1:
@@ -195,23 +204,24 @@ while 1:
         q = (y // 4) - (y // 100) + (y // 400) - 32045
         mjdi = int(math.floor( (p+q) - 2400000.5))
         mjd = string.rjust(str(mjdi),6)
-        #print '#'+mjd+'#'
+        #print('#'+mjd+'#')
 
         # compute MPM
         mpmi = int(math.floor( (hour*3600 + minute*60 + second)*1000 + millisecond ))
         mpm = string.rjust(str(mpmi),9) 
-        #print '#'+mpm+'#'
+        #print('#'+mpm+'#')
 
         # Build the payload
         # Note we are just using a single, non-updating REFERENCE number in this case
         payload = 'MCS'+me[3]+command+string.rjust(str(reference),9)
         payload = payload + string.rjust(str(len(response)),4)+str(mjd)+str(mpm)+' '
         payload = payload + response
-        #print '#'+payload+'#' 
+        #print('#'+payload+'#' )
 
-        t.send(payload)      # send it 
+        t.send(payload.encode())      # send it 
 
-    #print 'sent> '+payload+'|' # say what was sent 
+    if args.verbose:
+        print('sent> '+payload+'|' # say what was sent )
 
 # never get here, but what the heck.
 s.close()
@@ -220,6 +230,8 @@ t.close()
 #==================================================================================
 #=== HISTORY ======================================================================
 #==================================================================================
+# mch_minimal_server.py: J. Dowell, UNM, 2023 Feb 22
+#   .1: Convert to Python3
 # mch_minimal_server.py: S.W. Ellingson, Virginia Tech, 2010 Jun 21
 #   .1: Fixing bug in which extra space was inserted between R-SUMMARY and R-COMMENT
 # mch_minimal_server.py: S.W. Ellingson, Virginia Tech, 2009 Jul 22

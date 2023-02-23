@@ -4,6 +4,7 @@ Module for controlling MCS scheduler via UDP packets.
 
 import time
 import subprocess
+from typing import List, Union
 
 from lwa_mcs import mib
 from lwa_mcs._mcs import send_sch_command, MCS_TIMEOUT
@@ -13,18 +14,13 @@ __all__ = ['get_pids', 'is_replay', 'is_running', 'get_active_subsystems',
            'send_subsystem_command']
 
 
-def get_pids():
+def get_pids() -> List[int]:
     """
     Return a list process IDs for all MCS/sch processes found.
     """
     
-    p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output, error = p.communicate()
-    try:
-        output = output.decode('ascii', errors='backslashreplace')
-        error = error.decode('ascii', errors='backslashreplace')
-    except AttributeError:
-        pass
+    output = subprocess.check_output(['ps', 'aux'], stderr=subprocess.DEVNULL)
+    output = output.decode('ascii', errors='backslashreplace')
     output = output.split('\n')
         
     pids = []
@@ -41,18 +37,13 @@ def get_pids():
     return pids
 
 
-def is_replay():
+def is_replay() -> bool:
     """
     Determine if MCS/sch is running in "replay" mode.
     """
     
-    p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output, error = p.communicate()
-    try:
-        output = output.decode('ascii', errors='backslashreplace')
-        error = error.decode('ascii', errors='backslashreplace')
-    except AttributeError:
-        pass
+    output = subprocess.check_output(['ps', 'aux'], stderr=subprocess.DEVNULL)
+    output = output.decode('ascii', errors='backslashreplace')
     output = output.split('\n')
     
     pids = []
@@ -65,7 +56,7 @@ def is_replay():
     return (len(pids) == 2)
 
 
-def is_running():
+def is_running() -> bool:
     """
     Determine if MCS/sch should be considered operational.
     """
@@ -78,18 +69,13 @@ def is_running():
     return True if len(pids) >= min_active else False
 
 
-def get_active_subsystems():
+def get_active_subsystems() -> List[str]:
     """
     Return a list of subsystems with active 'ms_mcic' processes.
     """
     
-    p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output, error = p.communicate()
-    try:
-        output = output.decode('ascii', errors='backslashreplace')
-        error = error.decode('ascii', errors='backslashreplace')
-    except AttributeError:
-        pass
+    output = subprocess.check_output(['ps', 'aux'], stderr=subprocess.DEVNULL)
+    output = output.decode('ascii', errors='backslashreplace')
     output = output.split('\n')
     
     ss = []
@@ -103,7 +89,7 @@ def get_active_subsystems():
     return ss
 
 
-def send_subsystem_command(ss, cmd="RPT", data="SUMMARY"):
+def send_subsystem_command(ss: str, cmd: str="RPT", data: str="SUMMARY") -> Union[str,int,float,bytes,None]:
     """
     Use MCS/sch to send the given command to the specified subsystem.  For 
     'RPT' commands the value for the MIB is returned, otherwise the refernce
