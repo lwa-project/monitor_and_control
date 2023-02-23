@@ -14,7 +14,12 @@ common/config.h
 # Object files
 *.o
 
+# Libraries
+sofa/src/libsofa_c.a
+
 # Executables
+## sofa
+sofa/src/t_sofa_c
 ## scheduler
 sch/dat2dbm
 sch/ms_exec

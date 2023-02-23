@@ -37,7 +37,7 @@ int main ( int narg, char *argv[] ) {
   /* Open SSMIF */
   if (!(fp = fopen(filename_ssmif,"r"))) {
     printf("[%d/%d] FATAL: unable to fopen SSMIF '%s'\n",ME_ME_C,getpid(),filename_ssmif);
-    return;
+    exit(EXIT_FAILURE);
     }
  
   //strcpy(data,"");
@@ -45,7 +45,7 @@ int main ( int narg, char *argv[] ) {
 
   fclose(fp);
 
-  return 0;
+  exit(EXIT_SUCCESS);
   } /* main() */
 
 //==================================================================================
@@ -57,5 +57,3 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-
-

@@ -45,6 +45,8 @@
 #include <stdlib.h> /* needed for exit(); possibly other things */
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
+#include <unistd.h>
 #include <ncurses.h>
 #include <unistd.h>
 #include <time.h>

@@ -542,8 +542,8 @@ int main ( int narg, char *argv[] ) {
   struct ssmif_struct s; 
 
   long int mjd, mpm;
-  float ra, dec;
-  float dist;
+  double ra, dec;
+  double dist;
  
   double alt, az, last;
   double last_alt, last_az;
@@ -1350,19 +1350,19 @@ int main ( int narg, char *argv[] ) {
                   /* Updated: 2015 Aug 31                                            */
                   switch (osf.OBS_MODE) {
                     case LWA_OM_TRK_SOL:
-                      me_findsol( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist );
-                      ra = osf.OBS_RA;
-                      dec = osf.OBS_DEC;
+                      me_findsol( mjd, mpm, &ra, &dec, &dist );
+                      osf.OBS_RA = (float) ra;
+                      osf.OBS_DEC = (float) dec;
 	                    break;  
                     case LWA_OM_TRK_JOV:
-                      me_findjov( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist );
-                      ra = osf.OBS_RA;
-                      dec = osf.OBS_DEC;
+                      me_findjov( mjd, mpm, &ra, &dec, &dist );
+                      osf.OBS_RA = (float) ra;
+                      osf.OBS_DEC = (float) dec;
                       break;
                     case LWA_OM_TRK_LUN:
-                      me_findlun( mjd, mpm, &(osf.OBS_RA), &(osf.OBS_DEC), &dist );
-                      ra = osf.OBS_RA;
-                      dec = osf.OBS_DEC;
+                      me_findlun( mjd, mpm, &ra, &dec, &dist );
+                      osf.OBS_RA = (float) ra;
+                      osf.OBS_DEC = (float) dec;
                       break;
                     case LWA_OM_TRK_RADEC:
                       ra = osf.OBS_RA;

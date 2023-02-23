@@ -51,7 +51,7 @@ int main ( int narg, char *argv[] ) {
     printf("  <dist>: [AU] distnace from Earth\n");
     printf("  <mjd> : integer MJD\n");
     printf("  <mpm> : integer milliseconds past UTC midnight\n");
-    printf("  <lat> : [deg, +E] observer location\n");
+    printf("  <lat> : [deg, +N] observer location\n");
     printf("  <lon> : [deg, +E] observer location\n");
     printf("  <elev>: [m] observation location\n");
     exit(EXIT_FAILURE);

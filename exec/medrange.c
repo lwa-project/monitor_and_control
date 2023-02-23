@@ -116,7 +116,7 @@ int main ( int narg, char *argv[] ) {
     }
   fread(&s,sizeof(struct ssmif_struct),1,fp);
   fclose(fp);
-  //return;
+  //exit(EXIT_SUCCESS);
 
   /* cleanup */
   sprintf(cmd,"rm -rf %s/mindelay.txt",sSDir);
@@ -202,7 +202,7 @@ int main ( int narg, char *argv[] ) {
   //    s.iDP1Ant[m][p],
   //    s.iAntStd[s.iDP1Ant[m][p]-1]);
   //  }   
-  //return;
+  //exit(EXIT_SUCCESS);
 
   /***********************************/
   /* Figure out dc[] *****************/
@@ -255,7 +255,7 @@ int main ( int narg, char *argv[] ) {
   //    dc[i]*(c*.83)
   //    );
   //  }   
-  //return;
+  //exit(EXIT_SUCCESS);
 
 //  float  fRPDLeng[ME_MAX_NRPD];    /* RPD_LENG[] */
 //  float  fRPDVF[ME_MAX_NRPD];      /* RPD_VF[] */
@@ -347,7 +347,7 @@ int main ( int narg, char *argv[] ) {
   printf("[%d/%d] <sample min>=%d\n", ME_DRANGE, getpid(), smin);
   if( (smax-smin) > 1000 ) {
     printf("[%d/%d] FATAL: expected delay range (%d) > 1000\n", ME_DRANGE, getpid(), smax-smin);
-    return 1;
+    exit(EXIT_FAILURE);
     }
 
   sprintf(filename,"%s/mindelay.txt",sSDir);

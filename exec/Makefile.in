@@ -75,79 +75,56 @@ me_point_corr_x: me_point_corr_x.o me_point_corr.o
 	$(CC) $(CFLAGS) -o me_point_corr_x me_point_corr_x.o me_point_corr.o $(LDFLAGS) 
 
 #
-# Programs that rely on code from PyEphem/XEphem
+# Programs that rely on code from SOFA
 #
 
-EPHEM_OBJECTS := ephem_aberration.o ephem_deflect.o ephem_deltat.o ephem_eq_ecl.o ephem_mjd.o ephem_moon.o ephem_nutation.o ephem_obliq.o ephem_parallax.o ephem_precess.o ephem_sphcart.o ephem_sun.o ephem_utc_gst.o ephem_vsop87.o ephem_vsop87_data.o
+SOFA_CFLAGS := -I../sofa/src
+SOFA_LDFLAGS := -L../sofa/src -lsofa_c -lm
 
-me_inproc: me_inproc.o me_getaltaz.o me_point_corr.o me_findsol.o me_findjov.o me_findlun.o me_precess.o  $(EPHEM_OBJECTS) me.h ../common/mcs.h
-	$(CC) -o me_inproc me_inproc.o  me_getaltaz.o me_point_corr.o me_findsol.o me_findjov.o me_findlun.o me_precess.o  $(EPHEM_OBJECTS) $(LDFLAGS)
+me_inproc: me_inproc.o me_geteop.o me_getaltaz.o me_point_corr.o me_findsol.o me_findjov.o me_findlun.o me_precess.o me.h ../common/mcs.h
+	$(CC) -o me_inproc me_inproc.o  me_geteop.o me_getaltaz.o me_point_corr.o me_findsol.o me_findjov.o me_findlun.o me_precess.o $(LDFLAGS) $(SOFA_LDFLAGS)
 
-me_getaltaz_x: me_getaltaz_x.o me_getaltaz.o $(EPHEM_OBJECTS)
-	$(CC) -o me_getaltaz_x me_getaltaz_x.o me_getaltaz.o $(EPHEM_OBJECTS) $(LDFLAGS)
+me_geteop.o: me_geteop.c
+	$(CC) $(CFLAGS) $(SOFA_CFLAGS) -c -o me_geteop.o me_geteop.c
 
-me_getlst_x: me_getlst_x.o me_getlst.o $(EPHEM_OBJECTS)
-	$(CC) -o me_getlst_x me_getlst_x.o me_getlst.o $(EPHEM_OBJECTS) $(LDFLAGS) 
+me_getaltaz.o: me_getaltaz.c
+	$(CC) $(CFLAGS) $(SOFA_CFLAGS) -c -o me_getaltaz.o me_getaltaz.c
 
-me_findsol_x: me_findsol_x.o me_findsol.o $(EPHEM_OBJECTS)
-	$(CC) -o me_findsol_x me_findsol_x.o me_findsol.o $(EPHEM_OBJECTS) $(LDFLAGS) 
+me_getaltaz_x: me_getaltaz_x.o me_getaltaz.o me_geteop.o
+	$(CC) -o me_getaltaz_x me_getaltaz_x.o me_getaltaz.o me_geteop.o $(LDFLAGS) $(SOFA_LDFLAGS)
 
-me_findjov_x: me_findjov_x.o me_findjov.o $(EPHEM_OBJECTS)
-	$(CC) -o me_findjov_x me_findjov_x.o me_findjov.o $(EPHEM_OBJECTS) $(LDFLAGS)
+me_getlst.o: me_getlst.c
+	$(CC) $(CFLAGS) $(SOFA_CFLAGS) -c -o me_getlst.o me_getlst.c
 
-me_findlun_x: me_findlun_x.o me_findlun.o $(EPHEM_OBJECTS)
-	$(CC) -o me_findlun_x me_findlun_x.o me_findlun.o $(EPHEM_OBJECTS) $(LDFLAGS)
+me_getlst_x: me_getlst_x.o me_getlst.o
+	$(CC) -o me_getlst_x me_getlst_x.o me_getlst.o $(LDFLAGS) $(SOFA_LDFLAGS)
+
+me_findsol.o: me_findsol.c
+	$(CC) $(CFLAGS) $(SOFA_CFLAGS) -c -o me_findsol.o me_findsol.c
 	
-me_precess_x: me_precess_x.o me_precess.o $(EPHEM_OBJECTS)
-	$(CC) -o me_precess_x me_precess_x.o me_precess.o $(EPHEM_OBJECTS) $(LDFLAGS)
+me_findsol_x: me_findsol_x.o me_findsol.o
+	$(CC) -o me_findsol_x me_findsol_x.o me_findsol.o $(LDFLAGS) $(SOFA_LDFLAGS)
 
-ephem_aberration.o: ephem_aberration.c ephem_astro.h
-	$(CC) $(CFLAGS) -c -o ephem_aberration.o ephem_aberration.c
+me_findjov.o: me_findjov.c
+	$(CC) $(CFLAGS) $(SOFA_CFLAGS) -c -o me_findjov.o me_findjov.c
+	
+me_findjov_x: me_findjov_x.o me_findjov.o
+	$(CC) -o me_findjov_x me_findjov_x.o me_findjov.o $(LDFLAGS) $(SOFA_LDFLAGS)
 
-ephem_deflect.o: ephem_deflect.c ephem_astro.h
-	$(CC) $(CFLAGS) -c -o ephem_deflect.o ephem_deflect.c
+me_findlun.o: me_findlun.c
+	$(CC) $(CFLAGS) $(SOFA_CFLAGS) -c -o me_findlun.o me_findlun.c
 
-ephem_deltat.o: ephem_deltat.c ephem_astro.h
-	$(CC) $(CFLAGS) -c -o ephem_deltat.o ephem_deltat.c
+me_findlun_x: me_findlun_x.o me_findlun.o
+	$(CC) -o me_findlun_x me_findlun_x.o me_findlun.o $(LDFLAGS) $(SOFA_LDFLAGS)
 
-ephem_eq_ecl.o: ephem_eq_ecl.c ephem_astro.h
-	$(CC) $(CFLAGS) -c -o ephem_eq_ecl.o ephem_eq_ecl.c
-
-ephem_mjd.o: ephem_mjd.c ephem_astro.h
-	$(CC) $(CFLAGS) -c -o ephem_mjd.o ephem_mjd.c
-
-ephem_moon.o: ephem_moon.c ephem_astro.h
-	$(CC) $(CFLAGS) -c -o ephem_moon.o ephem_moon.c
-
-ephem_nutation.o: ephem_nutation.c ephem_astro.h
-	$(CC) $(CFLAGS) -c -o ephem_nutation.o ephem_nutation.c
-
-ephem_obliq.o: ephem_obliq.c ephem_astro.h
-	$(CC) $(CFLAGS) -c -o ephem_obliq.o ephem_obliq.c
-
-ephem_parallax.o: ephem_parallax.c ephem_astro.h
-	$(CC) $(CFLAGS) -c -o ephem_parallax.o ephem_parallax.c
-
-ephem_precess.o: ephem_precess.c ephem_astro.h
-	$(CC) $(CFLAGS) -c -o ephem_precess.o ephem_precess.c
-
-ephem_sphcart.o: ephem_sphcart.c ephem_astro.h
-	$(CC) $(CFLAGS) -c -o ephem_sphcart.o ephem_sphcart.c
-
-ephem_sun.o: ephem_sun.c ephem_astro.h ephem_vsop87.c ephem_vsop87_data.c ephem_vsop87.h
-	$(CC) $(CFLAGS) -c -o ephem_sun.o ephem_sun.c
-
-ephem_utc_gst.o: ephem_utc_gst.c ephem_astro.h
-	$(CC) $(CFLAGS) -c -o ephem_utc_gst.o ephem_utc_gst.c
-
-ephem_vsop87.o: ephem_vsop87.c ephem_vsop87_data.c ephem_vsop87.h ephem_astro.h
-	$(CC) $(CFLAGS) -c -o ephem_vsop87.o ephem_vsop87.c
-
-ephem_vsop87_data.o: ephem_vsop87_data.c ephem_vsop87.h ephem_astro.h
-	$(CC) $(CFLAGS) -c -o ephem_vsop87_data.o ephem_vsop87_data.c
+me_precess.o: me_precess.c
+	$(CC) $(CFLAGS) $(SOFA_CFLAGS) -c -o me_precess.o me_precess.c
+	
+me_precess_x: me_precess_x.o me_precess.o
+	$(CC) -o me_precess_x me_precess_x.o me_precess.o $(LDFLAGS) $(SOFA_LDFLAGS)
 
 #
-# End Programs that rely on code from PyEphem/XEphem
+# End Programs that rely on code from SOFA
 #
 
 .PHONY: install

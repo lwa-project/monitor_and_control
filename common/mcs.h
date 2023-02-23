@@ -4,9 +4,6 @@
 // LWA_MCS_subsytems.h deprecated
 // update readmes for sch, exec, tp
 
-// possible issues in accomodating LWA_MCS.h
-// LWA_MCS.h has "#include <string.h>" (after "#include <time.h>")
-
 #ifndef MCS_COMMON_H  /* this keeps this header from getting rolled in more than once */
 #define MCS_COMMON_H
 
@@ -14,6 +11,7 @@
 extern "C" {
 #endif
 
+#include <string.h>
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>     /* added 110309 to facilitate use of "stat()" in me_exec */
@@ -27,7 +25,6 @@ extern "C" {
 #include <arpa/inet.h>  /* for network sockets */
 #include <fcntl.h>      /* added 110309 for network sockets in me_exec; for F_GETFL, other possibly other stuff */
 #include <signal.h>     /* added 110312 to allow me_exec to send kill(SIGKILL) to me_tpcom */ 
-#include <string.h>
 
 #define LWA_MAX_REFERENCE 999999999 /* largest reference number before roll-over */
 #define LWA_MS_CMD_ADV_NOTICE_MS 5 /* [ms] required advance notice for time-scheduled commands */ 

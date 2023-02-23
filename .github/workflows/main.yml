@@ -1,0 +1,78 @@
+name: "Build and Test"
+on: [push, pull_request, release]
+jobs:
+  pre_build:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          concurrent_skipping: 'never'
+          skip_after_successful_duplicate: 'true'
+          do_not_skip: '["pull_request", "release", "workflow_dispatch", "schedule"]'
+  build:
+    needs: pre_build
+    if: ${{ needs.pre_build.outputs.should_skip != 'true' }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ['3.8', '3.10']
+        include:
+          - os: ubuntu-20.04
+            python-version: '3.6'
+      fail-fast: false
+    steps:
+      - name: "Software Install - Ubuntu"
+        if: ${{ matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-20.04' }}
+        run: |
+          sudo apt-get install -y \
+            build-essential \
+            ca-certificates \
+            coreutils \
+            curl \
+            git \
+            gpg \
+            gpgv \
+            gzip \
+            libfftw3-dev \
+            libgdbm-dev \
+            pkg-config \
+            software-properties-common
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/checkout@v3
+      - name: "Software Install - Python" 
+        run: |
+          python -m pip install \
+            setuptools \
+            numpy \
+            astropy \
+            "ephem<4.1.1" \
+            requests
+      - name: "Software Install - Python, Part 2" 
+        run: |
+          python -m pip install lsl
+      - name: "Build and Install - LWA1"
+        run: |
+          ./configure
+          make all
+          mkdir exec/state
+      - name: Test - LWA1
+        run: |
+          cd exec/tests
+          python -m unittest discover
+      - name: "Build and Install - LWA-SV"
+        run: |
+          cd ../..
+          make clean
+          ./configure --enable-adp
+          make all
+          mkdir exec/state
+      - name: Test - LWA-SV
+        run: |
+          cd exec/tests
+          python -m unittest discover

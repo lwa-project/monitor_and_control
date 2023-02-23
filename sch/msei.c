@@ -179,7 +179,7 @@ int main ( int narg, char *argv[] ) {
            printf("[%s] FATAL: %s/%s args are:\n TBF_BITS (number, uint8)\nTBF_TRIG_TIME (samples, int32)\n TBF_SAMPLES (samples, int32)\n DRX_TUNING_MASK (mask, uint64)\n",ME,dest,cmd);
            exit(EXIT_FAILURE);
            }
-         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;
+         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); exit(EXIT_SUCCESS);
          i2u.i = i2u1;                      c.data[ 0]=i2u.b[0]; 
          i4s.i = i4s1; c.data[ 1]=i4s.b[3]; c.data[ 2]=i4s.b[2]; c.data[ 3]=i4s.b[1]; c.data[ 4]=i4s.b[0];
          i4s.i = i4s2; c.data[ 5]=i4s.b[3]; c.data[ 6]=i4s.b[2]; c.data[ 7]=i4s.b[1]; c.data[ 8]=i4s.b[0];
@@ -202,7 +202,7 @@ int main ( int narg, char *argv[] ) {
            printf("[%s] FATAL: %s/%s args are:\n TBN_FREQ (Hz, float32)\n TBN_BW {5..11}\n TBN_GAIN {0..15}",ME,dest,cmd);
            exit(EXIT_FAILURE);
            }
-         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;
+         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); exit(EXIT_SUCCESS);
          f4.f  = f41;  c.data[0]= f4.b[3]; c.data[1]= f4.b[2]; c.data[2]= f4.b[1]; c.data[3]= f4.b[0];
          i2u.i = i2u1; c.data[4]=i2u.b[1]; c.data[5]=i2u.b[0]; 
          i2u.i = i2u2; c.data[6]=i2u.b[1]; c.data[7]=i2u.b[0]; 
@@ -224,7 +224,7 @@ int main ( int narg, char *argv[] ) {
            printf("[%s] FATAL: %s/%s args are:\n COR_NAVG (Number, int32)\n DRX_TUNING_MASK (mask, uint64)\n COR_GAIN {0..15}\n sub_slot {0..99}",ME,dest,cmd);
            exit(EXIT_FAILURE);
            }
-         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;
+         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); exit(EXIT_SUCCESS);
          i4s.i = i4s1; c.data[ 0]=i4s.b[3]; c.data[ 1]=i4s.b[2]; c.data[ 2]=i4s.b[1]; c.data[ 3]=i4s.b[0];
          i8u.i = i8u1; c.data[ 4]=i8u.b[7]; c.data[ 5]=i8u.b[6]; c.data[ 6]=i8u.b[5]; c.data[ 7]=i8u.b[4];
                        c.data[ 8]=i8u.b[3]; c.data[ 9]=i8u.b[2]; c.data[10]=i8u.b[1]; c.data[11]=i8u.b[0]; 
@@ -304,7 +304,7 @@ int main ( int narg, char *argv[] ) {
            printf("[%s] FATAL: %s/%s args are:\n TBW_BITS {0|1}\n TBW_TRIG_TIME (samples, uint32)\n TBW_SAMPLES (samples, uint32)\n",ME,dest,cmd);
            exit(EXIT_FAILURE);
            }
-         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;
+         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); exit(EXIT_SUCCESS);
          i2u.i = i2u1;                     c.data[0]=i2u.b[0]; 
          i4u.i = i4u1; c.data[1]=i4u.b[3]; c.data[2]=i4u.b[2]; c.data[3]=i4u.b[1]; c.data[4]=i4u.b[0];
          i4u.i = i4u2; c.data[5]=i4u.b[3]; c.data[6]=i4u.b[2]; c.data[7]=i4u.b[1]; c.data[8]=i4u.b[0];
@@ -325,7 +325,7 @@ int main ( int narg, char *argv[] ) {
            printf("[%s] FATAL: %s/%s args are:\n TBN_FREQ (Hz, float32)\n TBN_BW {1..7}\n TBN_GAIN {0..15}\n sub_slot {0..99}",ME,dest,cmd);
            exit(EXIT_FAILURE);
            }
-         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;
+         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); exit(EXIT_SUCCESS);
          f4.f  = f41;  c.data[0]= f4.b[3]; c.data[1]= f4.b[2]; c.data[2]= f4.b[1]; c.data[3]= f4.b[0];
          i2u.i = i2u1; c.data[4]=i2u.b[1]; c.data[5]=i2u.b[0]; 
          i2u.i = i2u2; c.data[6]=i2u.b[1]; c.data[7]=i2u.b[0]; 
