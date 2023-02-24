@@ -1466,7 +1466,7 @@
       } /* for (k */
     } /* for ( iARB */
 
-#if define(USE_NDP) && USE_NDP
+#if defined(USE_NDP) && USE_NDP
   /* reading N_SNAP */
   sprintf(keyword,"N_SNAP"); s.nSnap = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }

@@ -104,7 +104,7 @@ int main ( int narg, char *argv[] ) {
 #if !defined(USE_NDP) || !USE_NDP
         case LWA_OM_TBN: break;
 #endif
-#if (define(USE_NDP) && USE_NDP) || (defined(USE_ADP) && USE_ADP)
+#if (defined(USE_NDP) && USE_NDP) || (defined(USE_ADP) && USE_ADP)
         case LWA_OM_TBF: break;
 #else
         case LWA_OM_TBW: break;
@@ -281,7 +281,7 @@ int main ( int narg, char *argv[] ) {
       fprintf(fp,"OBS_BW+        100 kSPS\n"); 
       break;
 #endif
-#if (define(USE_NDP) && USE_NDP) || (defined(USE_ADP) && USE_ADP)
+#if (defined(USE_NDP) && USE_NDP) || (defined(USE_ADP) && USE_ADP)
     case LWA_OM_TBF:
       fprintf(fp,"OBS_FREQ1      %ld\n",iFreq);
       //fprintf(fp,"OBS_FREQ1+     19.999999955 MHz\n");
