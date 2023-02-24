@@ -13,11 +13,11 @@ extern "C" {
 #define NDP_IS_FULL_STATION @HAVE_FULL_NDP@
 
 /* Digital processor checks */
-#if defined(USE_ADP) && defined(USE_NDP)
+#if (defined(USE_NDP) && USE_NDP) && (defined(USE_ADP) && USE_ADP)
 #error "Can only choose one of using ADP or NDP"
 #endif
 
-#if !defined(USE_NDP) && defined(NDP_IS_FULL_STATION)
+#if (!defined(USE_NDP) || !USE_NDP) && (defined(NDP_IS_FULL_STATION) && NDP_IS_FULL_STATION)
 #warning "NDP_IS_FULL_STATION is defined but NDP is not selected"
 #endif
 
