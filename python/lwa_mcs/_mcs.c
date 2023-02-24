@@ -355,10 +355,15 @@ MOD_INIT(_mcs) {
     }
     
     // Version information
-    PyModule_AddObject(m, "__version__", PyString_FromString("0.4"));
+    PyModule_AddObject(m, "__version__", PyString_FromString("0.5"));
     
     // Constants
-#ifdef USE_ADP
+#if defined(USE_NDP) && USE_NDP
+    PyModule_AddObject(m, "IS_NDP", Py_True);
+#else
+    PyModule_AddObject(m, "IS_NDP", Py_False);
+#endif
+#if defined(USE_ADP) && USE_ADP
     PyModule_AddObject(m, "IS_ADP", Py_True);
 #else
     PyModule_AddObject(m, "IS_ADP", Py_False);
@@ -371,6 +376,7 @@ MOD_INIT(_mcs) {
     
     // Function listings
     all = PyList_New(0);
+    PyList_Append(all, PyString_FromString("IS_NDP"));
     PyList_Append(all, PyString_FromString("IS_ADP"));
     PyList_Append(all, PyString_FromString("MAX_NDR"));
     PyList_Append(all, PyString_FromString("SCH_PATH"));
