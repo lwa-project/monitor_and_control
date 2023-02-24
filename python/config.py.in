@@ -1,0 +1,17 @@
+__all__ = ['include_dirs', 'library_dirs', 'libraries']
+
+_CFLAGS = "@CFLAGS@"
+_LDFLAGS = "@LDFLAGS@"
+
+include_dirs = []
+for flag in _CFLAGS.split():
+    if flag.startswith('-I'):
+        include_dirs.append(flag.replace('-I', ''))
+
+library_dirs = []
+libraries = []
+for flag in _LDFLAGS.split():
+    if flag.startswith('-L'):
+        library_dirs.append(flag.replace('-L', ''))
+    elif flag.startswith('-l'):
+        libraries.append(flag.replace('-l', ''))

@@ -13225,7 +13225,7 @@ PACKAGE_VERSION_MICRO=`echo $PACKAGE_VERSION | $AWK -F. '{print $3}
 # Generate files
 #
 
-ac_config_files="$ac_config_files common/config.h Makefile sch/Makefile exec/Makefile tp/Makefile utils/Makefile python/Makefile share/lwa_mcs.pc"
+ac_config_files="$ac_config_files common/config.h Makefile sch/Makefile exec/Makefile tp/Makefile utils/Makefile python/Makefile python/config.py share/lwa_mcs.pc"
 
 
 cat >confcache <<\_ACEOF
@@ -14232,6 +14232,7 @@ do
     "tp/Makefile") CONFIG_FILES="$CONFIG_FILES tp/Makefile" ;;
     "utils/Makefile") CONFIG_FILES="$CONFIG_FILES utils/Makefile" ;;
     "python/Makefile") CONFIG_FILES="$CONFIG_FILES python/Makefile" ;;
+    "python/config.py") CONFIG_FILES="$CONFIG_FILES python/config.py" ;;
     "share/lwa_mcs.pc") CONFIG_FILES="$CONFIG_FILES share/lwa_mcs.pc" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
