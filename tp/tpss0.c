@@ -88,7 +88,7 @@
     int OBS_TBW_BITS;
     long int OBS_TBW_SAMPLES;
 #endif
-#if !defined(USE_NDP)
+#if !defined(USE_NDP) || !USE_NDP
     int OBS_TBN_GAIN;
 #endif
     int OBS_DRX_GAIN;

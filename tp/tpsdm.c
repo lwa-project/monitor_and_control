@@ -272,7 +272,7 @@ int main ( int narg, char *argv[] ) {
       if (!bStatic) printf(       " | %2hd",sdm.settings.tbf_gain);
       printf("\n");
 #endif
-#if !defined(USE_NDP)
+#if !defined(USE_NDP) || !USE_NDP
                     printf("TBN_GAIN: %2hd",  s.settings.tbn_gain);
       if (!bStatic) printf(       " | %2hd",sdm.settings.tbn_gain);
       printf("\n");

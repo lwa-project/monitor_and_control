@@ -776,7 +776,7 @@ int main ( int narg, char *argv[] ) {
     fprintf(fp,"OBS_TBW_BITS %d\n",obs[n].OBS_TBW_BITS);
     fprintf(fp,"OBS_TBW_SAMPLES %ld\n",obs[n].OBS_TBW_SAMPLES);
 #endif
-#if !defined(USE_NDP)
+#if !defined(USE_NDP) || !USE_NDP
     fprintf(fp,"OBS_TBN_GAIN %d\n",obs[n].OBS_TBN_GAIN);
 #endif
     fprintf(fp,"OBS_DRX_GAIN %d\n",obs[n].OBS_DRX_GAIN);
@@ -913,7 +913,7 @@ int main ( int narg, char *argv[] ) {
     osf2.OBS_TBW_BITS        = obs[n].OBS_TBW_BITS; 
     osf2.OBS_TBW_SAMPLES     = obs[n].OBS_TBW_SAMPLES;
 #endif
-#if !defined(USE_NDP)
+#if !defined(USE_NDP) || !USE_NDP
     osf2.OBS_TBN_GAIN        = obs[n].OBS_TBN_GAIN;
 #endif
     osf2.OBS_DRX_GAIN        = obs[n].OBS_DRX_GAIN;
