@@ -52,14 +52,14 @@ int main ( int narg, char *argv[] ) {
   int sockfd_sch;             /* socket file discriptor, to MCS/Sch */
   struct sockaddr_in address; /* for network sockets */
 
-  FILE* fp;
+  FILE* fp = NULL;
   int i;
   int iErr;
   int eQuit=0;  /* 1 means shutdown commanded; 2 means shutdown due to error */
   int bWriteMESS=0;
 
   /* log file stuff */
-  FILE* fpl; 
+  FILE* fpl = NULL;
   struct me_session_queue_struct *sq_ptr=NULL;  /* used as dummy argument in me_log() */
   char msg[ME_LOG_MAX_MSG_LENGTH]; 
 
@@ -150,6 +150,7 @@ int main ( int narg, char *argv[] ) {
     }
   fread(&s,sizeof(s),1,fp);
   fclose(fp);
+  fp = NULL;
   //printf("[%d/%d] Successfully read SSMIF '%s'\n",ME_ME_C,getpid(),filename_ssmif);
   sprintf(msg,"Successfully read state/ssmif.dat");
   me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 ); 
@@ -562,9 +563,17 @@ int main ( int narg, char *argv[] ) {
   /* close log file */
   me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "Shutdown complete. Bye.", sq_ptr, 0 );
   fclose(fpl);
+  fpl = NULL;
   
   /* just in case */
-  fcloseall();
+  if( fp != NULL ) {
+    fclose(fp);
+    fp = NULL;
+  }
+  if( fpl != NULL ) {
+    fclose(fpl);
+    fpl = NULL;
+  }
   
   /* put it somewhere safe */
   /* get the current time in conventional format */
