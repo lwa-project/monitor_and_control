@@ -101,7 +101,7 @@ int main ( int narg, char *argv[] ) {
         case LWA_OM_TRK_SOL: break;
         case LWA_OM_TRK_JOV: break;
         case LWA_OM_TRK_LUN: break;
-#if !defined(USE_NDP)
+#if !defined(USE_NDP) || !USE_NDP
         case LWA_OM_TBN: break;
 #endif
 #if (define(USE_NDP) && USE_NDP) || (defined(USE_ADP) && USE_ADP)

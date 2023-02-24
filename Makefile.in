@@ -14,6 +14,7 @@ sch:
 
 .PHONY: exec
 exec:
+	$(MAKE) -C sofa/src
 	$(MAKE) -C exec
 
 .PHONY: tp
@@ -45,6 +46,7 @@ install-services:
 
 .PHONY: clean
 clean:
+	$(MAKE) -C sofa/src clean
 	$(MAKE) -C sch clean
 	$(MAKE) -C exec clean
 	$(MAKE) -C tp clean

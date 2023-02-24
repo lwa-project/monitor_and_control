@@ -554,7 +554,7 @@ int me_action(
             case LWA_SID_SHL: break;
             case LWA_SID_ASP: break;
             
-#if defined USE_ADP && USE_ADP
+#if defined(USE_ADP) && USE_ADP
             case LWA_SID_ADP:
               bGo=1;
               break;
@@ -902,7 +902,7 @@ int me_init_sdm( struct ssmif_struct s,
   for (i=0;i<ME_MAX_NARB;i++) { 
     for (j=0;j<ME_MAX_NARBCH;j++) { 
       sdm->ssss.eARBStat[i][j] = s.eARBStat[i][j]; } }                   /* ARB_STAT[][] */
-#if defined USE_ADP && USE_ADP
+#if defined(USE_ADP) && USE_ADP
   for (i=0;i<ME_MAX_NROACH;i++) { 
     for (j=0;j<ME_MAX_NROACHCH;j++) { 
       sdm->ssss.eRoachStat[i][j] = s.eRoachStat[i][j]; } }                   /* ROACH_STAT[][] */

@@ -227,7 +227,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
         sscanf(data,"%d",&(obs[nobs].OBS_TBN_GAIN));
         printf("...converts to %d\n",obs[nobs].OBS_TBN_GAIN);
-#if defined USE_ADP && USE_ADP
+#if defined(USE_ADP) && USE_ADP
         if ( ( obs[nobs].OBS_TBN_GAIN<-1 ) || ( obs[nobs].OBS_TBN_GAIN>30 ) ) {  
           printf("[%d/%d] FATAL: OBS_TBN_GAIN out of range\n",MT_TPSS,getpid());  
           exit(EXIT_FAILURE);

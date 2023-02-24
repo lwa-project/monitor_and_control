@@ -1,0 +1,16 @@
+"""
+Stub module to provide typing for lwa_mcs._mcs.
+"""
+
+from typing import Tuple
+
+IS_ADP: bool
+MAX_NDR: bool
+SCH_PATH: str
+MCS_TIMEOUT: int
+
+def get_current_time() -> Tuple[int, int]: ...
+def send_sch_command(subsystem: str, command: str, data: str) -> Tuple[int, int]: ...
+def read_mib_ip(subsystem: str, label: str) -> Tuple[bytes, float]: ...
+def read_mib(subsystem: str, mib_label:str) -> Tuple[bytes, bytes, float]: ...
+def send_exec_command(command: str, data: str) -> int: ...

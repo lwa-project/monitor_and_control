@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 //#include "LWA_MCS.h"
 
@@ -39,7 +40,7 @@ int main ( int narg, char *argv[] ) {
   //  sscanf(argv[1],"%d",&n_ARXSUPPLY_NO);
   //  } else {
   //  printf("[%s] FATAL: ARXSUPPLY-NO not provided\n",ME);
-  //  return;
+  //  exit(EXIT_FAILURE);
   //  } 
 
   /* create file */

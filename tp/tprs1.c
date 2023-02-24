@@ -3254,7 +3254,7 @@
 
     } /* for ( iStd */
 
-#if defined USE_ADP && USE_ADP
+#if defined(USE_ADP) && USE_ADP
   /* reading TBF_GAIN */
   sprintf(keyword,"TBF_GAIN"); s.settings.tbn_gain = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }

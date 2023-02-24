@@ -6,7 +6,8 @@ import os
 import time
 import pytz
 import subprocess
-from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Tuple
+from datetime import datetime, timedelta, tzinfo
 
 from lwa_mcs.config import TP_PATH
 from lwa_mcs.utils import mjdmpm_to_datetime
@@ -20,18 +21,13 @@ __all__ = ['get_pids', 'is_running', 'send_command', 'get_queue', 'cancel_observ
 _UTC = pytz.utc
 
 
-def get_pids():
+def get_pids() -> List[int]:
     """
     Return a list process IDs for all MCS/exec processes found.
     """
     
-    p = subprocess.Popen(['ps', 'aux'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output, error = p.communicate()
-    try:
-        output = output.decode('ascii', errors='backslashreplace')
-        error = error.decode('ascii', errors='backslashreplace')
-    except AttributeError:
-        pass
+    output = subprocess.check_output(['ps', 'aux'], stderr=subprocess.DEVNULL)
+    output = output.decode('ascii', errors='backslashreplace')
     output = output.split('\n')
     
     pids = []
@@ -47,7 +43,7 @@ def get_pids():
     return pids
 
 
-def is_running():
+def is_running() -> bool:
     """
     Determine if MCS/exec should be considered operational.
     """
@@ -56,7 +52,7 @@ def is_running():
     return True if len(pids) == 3 else False
 
 
-def send_command(cmd, data=""):
+def send_command(cmd: str, data: str=""):
     """
     Use MCS/exec to execute the specified command.
     """
@@ -70,7 +66,7 @@ def send_command(cmd, data=""):
     return success
 
 
-def get_queue(tz=None):
+def get_queue(tz: Optional[tzinfo]=None) -> Dict[Tuple[str,int], Tuple[int,datetime,datetime]]:
     """
     Read in the current observation queue and return its contents as a 
     dictionary.  The dictionary is keyed using a two-element tuple of
@@ -130,7 +126,7 @@ def get_queue(tz=None):
     return queue
 
 
-def cancel_observation(project_id, session_id, stop_dr=True, remove_metadata=True):
+def cancel_observation(project_id: str, session_id: int, stop_dr: bool=True, remove_metadata: bool=True):
     """
     Cancel a scheduled observation and, optionally, stop the associated DR 
     recording if it the observation is in progress.  For observations that 
@@ -155,7 +151,7 @@ def cancel_observation(project_id, session_id, stop_dr=True, remove_metadata=Tru
     # Cancel it
     cancelled = send_command("STP", "%s %i" % (project_id, session_id))
     if not cancelled:
-        raise RuntimError("Cannot cancel observation")
+        raise RuntimeError("Cannot cancel observation")
     else:
         time.sleep(0.5)
 

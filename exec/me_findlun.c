@@ -6,51 +6,55 @@
 // ---
 // REQUIRES: 
 //   
-// Find RA and DEC of the Moon
+// Find the geocentric apparent RA and DEC of the Moon
 // See end of this file for history.
 
-/* The codes below are ported from Xephem */
-#include "ephem_astro.h"  /* mostly gutted, leaving only stuff needed for others */
+#include "sofa.h"
+#include "sofam.h"
 
 void me_findlun(
                  long int mjd,  /* (input) modified julian date */
                  long int mpm,  /* (input) milliseconds past UTC midnight */ 
-                 float *ra,     /* (output) [h] RA */
-                 float *dec,    /* (output) [deg] dec */
-                 float *dist    /* (output) [AU] distance from Earth */
+                 double *ra,    /* (output) [h] RA */
+                 double *dec,   /* (output) [deg] dec */
+                 double *dist   /* (output) [AU] distance from Earth */
                 ) {
-  double JD, H, JD0, TJD;
-  double ret[6]; /* this is how vsop87() returns output */
-  double L,  B,  R, msp, mdp;
-  double dRA, dDec;
+  double tai1, tai2, tt1, tt2;
+  double pv[2][3], tpv[2][3];
+  double L,  B,  R, dL, dB, dR;
+  double pmat[3][3], nmat[3][3];
   
-  /* Get JD from mjd/mpm */
-  JD0 = ((double)mjd) + 2400000.5;     /* ref: http://tycho.usno.navy.mil/mjd.html */
-  H   = ((double)mpm)/(3600.0*1000.0); /* mpm in hours */
-  JD = JD0 + H/24.0; /* days */
-  TJD = JD + deltat(JD-MJD0)/86400.0;
-
-  /* Get L, B, R for the Moon so we can figure out how far away it is */
-  moon (TJD-MJD0, &L, &B, &R, &msp, &mdp);
+  /* Get TAI from mjd/mpm */
+  iauUtctai(mjd+DJM0, mpm/1000.0/86400, &tai1, &tai2);
   
-  /* Correct L, B, and R for the light travel time by looking back in time a bit*/
-  moon (TJD-MJD0-R/173.144633, &L, &B, &R, &msp, &mdp);
-  //printf("me_findlun(): L =%lf rad, B =%lf rad, R =%lf AU\n",L,B,R);
+  /* Get TT from TAI */
+  iauTaitt(tai1, tai2, &tt1, &tt2);
   
-  /* to equatorial coordinates */
-  ecl_eq (TJD-MJD0, B, L, &dRA, &dDec);
+  /* Get the geocentric position of the Moon in spherical coordinates */
+  iauMoon98(tt1, tt2, &pv[0]);
+  iauPv2s(pv, &L, &B, &R, &dL, &dB, &dR);
   
-  /* Apply nutation */
-  nut_eq (TJD-MJD0, &dRA, &dDec);
+  /* Get the geocentric position of the Moon corrected for light travel time */
+  iauMoon98(tt1, tt2 - R/DC, &pv[0]);
   
-  /* Back to floats */
-  *ra = (float) radhr(dRA);
-  *dec = (float) raddeg(dDec);
-  *dist = (float) R;
-
-  return;
+  /* Apply precession and nutation */
+  iauPmat06(tt1, tt2, &pmat[0]);
+  iauNum06a(tt1, tt2, &nmat[0]);
+  iauRxpv(pmat, pv, &tpv[0]);
+  iauRxpv(nmat, tpv, &pv[0]);
+  iauPv2s(pv, &L, &B, &R, &dL, &dB, &dR);
+  
+  /* Cleanup */
+  L = iauAnp(L);
+  
+  *ra = L * (DR2D / 15);
+  *dec = B * DR2D;
+  *dist = R;
+  
   } /* me_findlun */
 
+// me_findlun.c: J. Dowell, UNM, 2022 Oct 7
+//  -- updated for the SOFA library
 // me_findlun.c: J. Dowell, UNM, 2022 Sep 30
 //  -- initial version, using me_getjov.c as a starting point 
 // me_findjov.c: J. Dowell, UNM, 2015 Sep 1
