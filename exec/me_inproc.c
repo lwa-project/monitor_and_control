@@ -51,7 +51,7 @@ int me_medfg( struct beam_struct beam,
 
   unsigned short int d[2*LWA_MAX_NSTD];
   int i;
-  FILE *fp;
+  FILE *fp = NULL;
   char cmd[256]; 
   char df_file[256];
 
@@ -79,6 +79,7 @@ int me_medfg( struct beam_struct beam,
    }  
   fwrite( d, sizeof(d[0]), sizeof(d)/sizeof(d[0]), fp );
   fclose(fp);
+  fp = NULL;
 
   /* Transfer the file */
   #ifdef ME_SCP2CP  /*see me.h */
@@ -104,7 +105,7 @@ int me_megfg( struct beam_struct beam,
 
   signed short int g[LWA_MAX_NSTD][2][2]; /* matches up with signed short int beam.OBS_BEAM_GAIN[LWA_MAX_NSTD][2][2]; */
   int i,j,k;
-  FILE *fp;
+  FILE *fp = NULL;
   char cmd[256]; 
   char gf_file[256];
 
@@ -144,6 +145,7 @@ int me_megfg( struct beam_struct beam,
    }  
   fwrite( g, sizeof(g[0][0][0]), sizeof(g)/sizeof(g[0][0][0]), fp );
   fclose(fp);
+  fp = NULL;
 
   /* Transfer the file */
   #ifdef ME_SCP2CP  /*see me.h */
@@ -170,8 +172,8 @@ int me_megfg( struct beam_struct beam,
 int me_beamspec( char *cs_filename, 
                  FILE *fpl ) {
   int err = 0;
-  FILE *fp;
-  FILE *fpo;
+  FILE *fp = NULL;
+  FILE *fpo = NULL;
   char bm_filename[1024];
   struct me_action_struct action;
   char data[16384];
@@ -193,6 +195,7 @@ int me_beamspec( char *cs_filename,
   if ((fpo=fopen(bm_filename,"w"))==NULL) {
     fprintf(fpl,"FATAL: me_beamspec() can't open bm_filename='%s'\n",bm_filename);
     fclose(fp);
+    fp = NULL;
     return 1;
     }
 
@@ -227,8 +230,10 @@ int me_beamspec( char *cs_filename,
     } /* while ( fread( */
 
   /* Close files */
-  fclose(fp);  /* .cs */
-  fclose(fpo); /* .bm */
+  fclose(fp);
+  fp = NULL;  /* .cs */
+  fclose(fpo);
+  fpo = NULL; /* .bm */
 
   if (m>0) { /* could be zero if all beams were "custom" beams */
 
@@ -275,8 +280,8 @@ int me_bdm_setup( char *OBS_BDM,
   float gd;
   char  pol[2];
 
-  FILE *fpi;
-  FILE *fpo;
+  FILE *fpi = NULL;
+  FILE *fpo = NULL;
 
   int i;
   float g[2][2];
@@ -343,8 +348,10 @@ int me_bdm_setup( char *OBS_BDM,
     fprintf(fpo,"%7.3f %7.3f %7.3f %7.3f\n",g[0][0],g[0][1],g[1][0],g[1][1]);
     } /* while (fscanf */
 
-  fclose(fpi); 
+  fclose(fpi);
+  fpi = NULL; 
   fclose(fpo);
+  fpo = NULL;
 
   /* Call megfg to convert ASCII to packed binary form */
   fprintf(fpl,"  running './megfg me_inproc_bm/temp.gft me_inproc_bm/%s'\n",gfile);
@@ -486,16 +493,16 @@ int main ( int narg, char *argv[] ) {
 
   /* other variables */
 
-  FILE *fp;
+  FILE *fp = NULL;
   struct ssf_struct ssf;
 
-  FILE *fpl; /* log file */
+  FILE *fpl = NULL; /* log file */
   char log_filename[ME_FILENAME_MAX_LENGTH];
 
-  FILE *fpc; /* command script file */
+  FILE *fpc = NULL; /* command script file */
   char cs_filename[ME_FILENAME_MAX_LENGTH];
 
-  FILE *fpo; /* obs file */
+  FILE *fpo = NULL; /* obs file */
   char osf_filename[ME_FILENAME_MAX_LENGTH];
 
   struct timeval tv;
@@ -568,7 +575,8 @@ int main ( int narg, char *argv[] ) {
   /* get SSMIF */  
   fp=fopen("state/ssmif.dat","rb");
   fread(&s,sizeof(struct ssmif_struct),1,fp);
-  fclose(fp); 
+  fclose(fp);
+  fp = NULL; 
   
   /* set the DRX state variables so that we only DRX when necessary */
   unsigned int last_drx_freq1 = 0;
@@ -616,7 +624,8 @@ int main ( int narg, char *argv[] ) {
           exit(EXIT_FAILURE);
           }
         fread(&ssf,sizeof(struct ssf_struct),1,fp);
-        fclose(fp);  
+        fclose(fp);
+        fp = NULL;  
         //printf("...ssf.PROJECT_ID='%s'\n",ssf.PROJECT_ID);
         //return;
 
@@ -626,7 +635,22 @@ int main ( int narg, char *argv[] ) {
         if ((fpl = fopen(log_filename,"w"))==NULL) {
           printf("[%d/%d] FATAL: me_inproc can't open '%s'\n",ME_INPROC,getpid(),log_filename);
           closedir(dir);
-          fcloseall();
+          if( fp != NULL ) {
+            fclose(fp);
+            fp = NULL;
+          }
+          if( fpl != NULL ) {
+            fclose(fpl);
+            fpl = NULL;
+          }
+          if( fpc != NULL ) {
+            fclose(fpc);
+            fpc = NULL;
+          }
+          if( fpo != NULL ) {
+            fclose(fpo);
+            fpo = NULL;
+          } 
           exit(EXIT_FAILURE);
           }
         fprintf(fpl,"[%d/%d] starting\n",ME_INPROC,getpid());
@@ -669,7 +693,22 @@ int main ( int narg, char *argv[] ) {
             printf(     "[%d/%d] FATAL: me_inproc can't open '%s'\n",ME_INPROC,getpid(),osf_filename);
             closedir(dir);
             fflush(fpl);
-            fcloseall();          
+            if( fp != NULL ) {
+              fclose(fp);
+              fp = NULL;
+            }
+            if( fpl != NULL ) {
+              fclose(fpl);
+              fpl = NULL;
+            }
+            if( fpc != NULL ) {
+              fclose(fpc);
+              fpc = NULL;
+            }
+            if( fpo != NULL ) {
+              fclose(fpo);
+              fpo = NULL;
+            }           
             exit(EXIT_FAILURE);   
             }
           fprintf(fpl,"opened '%s' (first pass)\n",osf_filename);
@@ -732,12 +771,28 @@ int main ( int narg, char *argv[] ) {
 
           if (eD==-1) { /* if this observation mode is bogus, zap command script */
             fclose(fpc);
+            fpc = NULL;
             fprintf(fpl,"cs file closed\n");
             if ((fpc=fopen(cs_filename,"wb"))==NULL) {
               fprintf(fpl,"[%d/%d] FATAL: me_inproc can't open '%s'\n",ME_INPROC,getpid(),cs_filename);
               printf(     "[%d/%d] FATAL: me_inproc can't open '%s'\n",ME_INPROC,getpid(),cs_filename);
               closedir(dir);
-              fcloseall();          
+              if( fp != NULL ) {
+                fclose(fp);
+                fp = NULL;
+              }
+              if( fpl != NULL ) {
+                fclose(fpl);
+                fpl = NULL;
+              }
+              if( fpc != NULL ) {
+                fclose(fpc);
+                fpc = NULL;
+              }
+              if( fpo != NULL ) {
+                fclose(fpo);
+                fpo = NULL;
+              }           
               exit(EXIT_FAILURE);    
               }  
             fprintf(fpl,"cs file is open\n"); 
@@ -758,7 +813,22 @@ int main ( int narg, char *argv[] ) {
               fprintf(fpl,"[%d/%d] FATAL: me_inproc doesn't see '2^32-2' marker\n",ME_INPROC,getpid()); 
               printf(     "[%d/%d] FATAL: me_inproc doesn't see '2^32-2' marker\n",ME_INPROC,getpid());
               closedir(dir); 
-              fcloseall();          
+              if( fp != NULL ) {
+                fclose(fp);
+                fp = NULL;
+              }
+              if( fpl != NULL ) {
+                fclose(fpl);
+                fpl = NULL;
+              }
+              if( fpc != NULL ) {
+                fclose(fpc);
+                fpc = NULL;
+              }
+              if( fpo != NULL ) {
+                fclose(fpo);
+                fpo = NULL;
+              }      
               exit(EXIT_FAILURE); 
               }
             } /* for m */
@@ -772,12 +842,28 @@ int main ( int narg, char *argv[] ) {
             fprintf(fpl,"[%d/%d] FATAL: me_inproc doesn't see '2^32-1' marker\n",ME_INPROC,getpid());
             printf(     "[%d/%d] FATAL: me_inproc doesn't see '2^32-1' marker\n",ME_INPROC,getpid()); 
             closedir(dir);
-            fcloseall();         
+            if( fp != NULL ) {
+              fclose(fp);
+              fp = NULL;
+            }
+            if( fpl != NULL ) {
+              fclose(fpl);
+              fpl = NULL;
+            }
+            if( fpc != NULL ) {
+              fclose(fpc);
+              fpc = NULL;
+            }
+            if( fpo != NULL ) {
+              fclose(fpo);
+              fpo = NULL;
+            }          
             exit(EXIT_FAILURE); 
             }
 
           /* close the .obs file */
           fclose(fpo);
+          fpo = NULL;
           fprintf(fpl,"closed '%s' (first pass)\n",osf_filename);
 
           /*************************************************/
@@ -894,7 +980,22 @@ int main ( int narg, char *argv[] ) {
                 printf(     "[%d/%d] FATAL: osf.SESSION_DRX_BEAM=%d is not in s.iDRDP[0..%d]\n",ME_INPROC,getpid(),osf.SESSION_DRX_BEAM,ME_MAX_NDR-1); 
                 fprintf(fpl,"[%d/%d] FATAL: osf.SESSION_DRX_BEAM=%d is not in s.iDRDP[0..%d]\n",ME_INPROC,getpid(),osf.SESSION_DRX_BEAM,ME_MAX_NDR-1);
                 closedir(dir);
-                fcloseall();
+                if( fp != NULL ) {
+                  fclose(fp);
+                  fp = NULL;
+                }
+                if( fpl != NULL ) {
+                  fclose(fpl);
+                  fpl = NULL;
+                }
+                if( fpc != NULL ) {
+                  fclose(fpc);
+                  fpc = NULL;
+                }
+                if( fpo != NULL ) {
+                  fclose(fpo);
+                  fpo = NULL;
+                } 
                 exit(EXIT_FAILURE);
                 }
 
@@ -939,7 +1040,22 @@ int main ( int narg, char *argv[] ) {
                   printf(     "[%d/%d] FATAL: During DR setup, osf.OBS_MODE=%d not recognized\n",ME_INPROC,getpid(),osf.OBS_MODE);
                   fprintf(fpl,"[%d/%d] FATAL: During DR setup, osf.OBS_MODE=%d not recognized\n",ME_INPROC,getpid(),osf.OBS_MODE);
                   closedir(dir);
-                  fcloseall();
+                  if( fp != NULL ) {
+                    fclose(fp);
+                    fp = NULL;
+                  }
+                  if( fpl != NULL ) {
+                    fclose(fpl);
+                    fpl = NULL;
+                  }
+                  if( fpc != NULL ) {
+                    fclose(fpc);
+                    fpc = NULL;
+                  }
+                  if( fpo != NULL ) {
+                    fclose(fpo);
+                    fpo = NULL;
+                  } 
                   exit(EXIT_FAILURE);  
                   break;
                 }
@@ -1468,7 +1584,22 @@ int main ( int narg, char *argv[] ) {
                 fprintf(fpl,"[%d/%d] FATAL: During DP setup, osf.OBS_MODE=%d not recognized\n",ME_INPROC,getpid(),osf.OBS_MODE);
 #endif
                 closedir(dir);
-                fcloseall();
+                if( fp != NULL ) {
+                  fclose(fp);
+                  fp = NULL;
+                }
+                if( fpl != NULL ) {
+                  fclose(fpl);
+                  fpl = NULL;
+                }
+                if( fpc != NULL ) {
+                  fclose(fpc);
+                  fpc = NULL;
+                }
+                if( fpo != NULL ) {
+                  fclose(fpo);
+                  fpo = NULL;
+                } 
                 exit(EXIT_FAILURE); 
                 break;
               } /* switch (osf.OBS_MODE) */
@@ -1510,7 +1641,22 @@ int main ( int narg, char *argv[] ) {
             fprintf(fpl,"[%d/%d] FATAL: me_inproc can't open '%s'\n",ME_INPROC,getpid(),osf_filename);
             printf(     "[%d/%d] FATAL: me_inproc can't open '%s'\n",ME_INPROC,getpid(),osf_filename);
             closedir(dir);
-            fcloseall();          
+            if( fp != NULL ) {
+              fclose(fp);
+              fp = NULL;
+            }
+            if( fpl != NULL ) {
+              fclose(fpl);
+              fpl = NULL;
+            }
+            if( fpc != NULL ) {
+              fclose(fpc);
+              fpc = NULL;
+            }
+            if( fpo != NULL ) {
+              fclose(fpo);
+              fpo = NULL;
+            }           
             exit(EXIT_FAILURE);   
             }
           fprintf(fpl,"opened '%s' (second pass)\n",osf_filename);
@@ -1789,7 +1935,22 @@ int main ( int narg, char *argv[] ) {
               fprintf(fpl,"[%d/%d] FATAL: me_inproc doesn't see '2^32-2' marker\n",ME_INPROC,getpid()); 
               printf(     "[%d/%d] FATAL: me_inproc doesn't see '2^32-2' marker\n",ME_INPROC,getpid());
               closedir(dir); 
-              fcloseall();          
+              if( fp != NULL ) {
+                fclose(fp);
+                fp = NULL;
+              }
+              if( fpl != NULL ) {
+                fclose(fpl);
+                fpl = NULL;
+              }
+              if( fpc != NULL ) {
+                fclose(fpc);
+                fpc = NULL;
+              }
+              if( fpo != NULL ) {
+                fclose(fpo);
+                fpo = NULL;
+              }         
               exit(EXIT_FAILURE);
               }
 
@@ -1811,6 +1972,7 @@ int main ( int narg, char *argv[] ) {
 
           /* close the .obs file; nothing else we need */
           fclose(fpo);
+          fpo = NULL;
           fprintf(fpl,"closed '%s' (second pass)\n",osf_filename);
 
           /* writing out contents of osf2 structure */
@@ -1917,7 +2079,22 @@ int main ( int narg, char *argv[] ) {
           fprintf(fpl,"[%d/%d] FATAL: me_inproc can't open '%s'\n",ME_INPROC,getpid(),cs_filename);
           printf(     "[%d/%d] FATAL: me_inproc can't open '%s'\n",ME_INPROC,getpid(),cs_filename);
           closedir(dir);
-          fcloseall();          
+          if( fp != NULL ) {
+            fclose(fp);
+            fp = NULL;
+          }
+          if( fpl != NULL ) {
+            fclose(fpl);
+            fpl = NULL;
+          }
+          if( fpc != NULL ) {
+            fclose(fpc);
+            fpc = NULL;
+          }
+          if( fpo != NULL ) {
+            fclose(fpo);
+            fpo = NULL;
+          }           
          exit(EXIT_FAILURE);    
           }  
         fprintf(fpl,"cs file is open\n"); 
@@ -1958,6 +2135,7 @@ int main ( int narg, char *argv[] ) {
 
         /* close command script file */
         fclose(fpc);
+        fpc = NULL;
         fprintf(fpl,"cs file closed\n");
 
         /* read through command script file and generate all beam definitions */
@@ -1976,6 +2154,7 @@ int main ( int narg, char *argv[] ) {
         fprintf(fpl,"Closing log file. Bye.\n");
         fflush(fpl);
         fclose(fpl);
+        fpl = NULL;
        
         } /* if (strstr(sDirEnt->d_name,".inp")!=NULL) */
       } /* while ( (sDirEnt=readdir(dir)) != NULL ) */
