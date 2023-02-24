@@ -7,6 +7,7 @@ extern "C" {
 #endif
 
 // Digital processor selection
+#define USE_DP @HAVE_DP@
 #define USE_ADP @HAVE_ADP@
 #define USE_NDP @HAVE_NDP@
 #define NDP_IS_FULL_STATION @HAVE_FULL_NDP@

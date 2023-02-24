@@ -53,6 +53,8 @@ AC_CHECK_LIB([ncurses], [initscr],
 # Station Options
 #
 
+AC_SUBST([HAVE_DP], [1])
+
 AC_ARG_ENABLE([adp],
               [AS_HELP_STRING([--enable-adp],
                               [enable support for ADP at LWA-SV (default=no)])],
@@ -60,7 +62,8 @@ AC_ARG_ENABLE([adp],
               [enable_adp=no])
 AC_SUBST([HAVE_ADP], [0])
 AS_IF([test x$enable_adp != xno],
-      [AC_SUBST([HAVE_ADP], [1])])
+      [AC_SUBST([HAVE_ADP], [1])
+       AC_SUBST([HAVE_DP], [0])])
 
 AC_ARG_ENABLE([ndp],
               [AS_HELP_STRING([--enable-ndp],
@@ -69,7 +72,8 @@ AC_ARG_ENABLE([ndp],
               [enable_ndp=no])
 AC_SUBST([HAVE_NDP], [0])
 AS_IF([test x$enable_ndp != xno],
-      [AC_SUBST([HAVE_NDP], [1])])
+      [AC_SUBST([HAVE_NDP], [1])
+       AC_SUBST([HAVE_DP], [0])])
 
 AC_ARG_ENABLE([full-ndp],
               [AS_HELP_STRING([--enable-ndp-as-full],

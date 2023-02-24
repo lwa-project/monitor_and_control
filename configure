@@ -676,6 +676,7 @@ BEAM_REPOINT_INTERVAL
 HAVE_FULL_NDP
 HAVE_NDP
 HAVE_ADP
+HAVE_DP
 HAVE_NCURSES
 HAVE_GDBM
 HAVE_MATH
@@ -12913,6 +12914,9 @@ fi
 # Station Options
 #
 
+HAVE_DP=1
+
+
 # Check whether --enable-adp was given.
 if test ${enable_adp+y}
 then :
@@ -12926,6 +12930,8 @@ HAVE_ADP=0
 if test x$enable_adp != xno
 then :
   HAVE_ADP=1
+
+       HAVE_DP=0
 
 fi
 
@@ -12942,6 +12948,8 @@ HAVE_NDP=0
 if test x$enable_ndp != xno
 then :
   HAVE_NDP=1
+
+       HAVE_DP=0
 
 fi
 
