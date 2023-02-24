@@ -1,4 +1,8 @@
 
+CC       ?= @CC@
+CFLAGS   ?= -I../common @CFLAGS@
+LDFLAGS  ?= @LDFLAGS@ @LIBS@
+
 .PHONY: all
 all: build
 

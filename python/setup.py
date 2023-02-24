@@ -1,12 +1,23 @@
-# Python2 compatibility
-from __future__ import print_function, division, absolute_import
 
 import os
 import glob
 
 from setuptools import setup, Extension, Distribution, find_packages
 
-ExtensionModules = [Extension('_mcs', ['lwa_mcs/_mcs.c',], include_dirs=['../common/', '../exec/', '/usr/include/gdbm'], extra_link_args=['-lgdbm',])]
+import config
+
+include_dirs = ['../common/', '../exec/', '/usr/include/gdbm']
+include_dirs.extend(config.include_dirs)
+
+libraries = ['gdbm']
+libraries.extend(config.libraries)
+
+extra_link_args = []
+extra_link_args.extend(['-L%s' % ldir for ldir in config.library_dirs])
+
+ExtensionModules = [Extension('_mcs', ['lwa_mcs/_mcs.c',],
+                              include_dirs=include_dirs, libraries=libraries,
+                              extra_link_args=extra_link_args),]
 
 setup(
     name                 = "lwa-mcs",
