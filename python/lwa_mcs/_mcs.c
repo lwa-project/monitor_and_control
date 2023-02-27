@@ -358,7 +358,7 @@ MOD_INIT(_mcs) {
     PyModule_AddObject(m, "__version__", PyString_FromString("0.4"));
     
     // Constants
-#ifdef USE_ADP
+#ifdef LWA_BACKEND_IS_ADP
     PyModule_AddObject(m, "IS_ADP", Py_True);
 #else
     PyModule_AddObject(m, "IS_ADP", Py_False);

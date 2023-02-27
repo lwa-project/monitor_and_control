@@ -456,7 +456,7 @@ int main ( int narg, char *argv[] ) {
     if ( LWA_timediff(tv,tv_last_poll_of_subsystems) > ME_INTERVAL_POLL_SUBSYSTEMS ) {
       gettimeofday( &tv_last_poll_of_subsystems, NULL );
 
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
       err = mesi(NULL,"ADP","RPT","SUMMARY",    "today","asap",&reference);
       err = mesi(NULL,"ADP","RPT","INFO",       "today","+1",  &reference);
 #else
@@ -470,7 +470,7 @@ int main ( int narg, char *argv[] ) {
       err = mesi(NULL,"SHL","RPT","SUMMARY",    "today","+4",  &reference);
       err = mesi(NULL,"SHL","RPT","INFO",       "today","+5",  &reference);
       err = mesi(NULL,"SHL","RPT","CURRENT-R1", "today","+6",  &reference);
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
       err = mesi(NULL,"SHL","RPT","CURRENT-R2", "today","+7",  &reference);
       err = mesi(NULL,"SHL","RPT","CURRENT-R3", "today","+8",  &reference);
       err = mesi(NULL,"SHL","RPT","CURRENT-R4", "today","+9",  &reference);
@@ -495,7 +495,7 @@ int main ( int narg, char *argv[] ) {
       err = mesi(NULL,"DR4","RPT","OP-TYPE",    "today","+51",  &reference);
       //err = mesi(NULL,"DR4","RPT","SYN",        "today","+52",  &reference);
 
-#if !defined(USE_ADP) || !USE_ADP
+#if !defined(LWA_BACKEND_IS_ADP) || !LWA_BACKEND_IS_ADP
       err = mesi(NULL,"DR5","RPT","SUMMARY",    "today","+60",  &reference);
       err = mesi(NULL,"DR5","RPT","OP-TYPE",    "today","+61",  &reference);
       //err = mesi(NULL,"DR5","RPT","SYN",        "today","+62",  &reference);

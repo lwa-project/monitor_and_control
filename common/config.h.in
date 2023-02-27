@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 // Digital processor selection
-#define USE_ADP @HAVE_ADP@
+#define LWA_BACKEND_IS_ADP @HAVE_ADP@
 
 // LAN configuration
 #define LWA_IP_MSE       "@MSE_IP@"                     /* IP address of MCS Scheduler "ms_exec" process */

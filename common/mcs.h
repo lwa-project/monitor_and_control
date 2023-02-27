@@ -667,7 +667,7 @@ double LWA_f8_swap( double x ) {
 /*** moved here from me.h *************/
 /**************************************/
 
-#if defined USE_ADP && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
 #define ME_SSMIF_FORMAT_VERSION 9
 #define ME_MAX_NSTD 256
 #define ME_MAX_NFEE 256
@@ -933,7 +933,7 @@ struct osfs_struct { /* one step within an observation */
   unsigned short int OBS_STP_B;
   };
 
-#if defined USE_ADP && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
 #define LWA_MAX_NSTD 256 /* FIXME should be reconciled with ME_MAX_NSTD */
 #else
 #define LWA_MAX_NSTD 260 /* FIXME should be reconciled with ME_MAX_NSTD */
@@ -949,7 +949,7 @@ struct osf2_struct { /* really just a continuation of osf_struct */
   signed short int   OBS_ASP_AT1[LWA_MAX_NSTD];
   signed short int   OBS_ASP_AT2[LWA_MAX_NSTD];
   signed short int   OBS_ASP_ATS[LWA_MAX_NSTD];
-#if defined USE_ADP && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
   unsigned int       OBS_TBF_SAMPLES;
   signed short int   OBS_TBF_GAIN;
 #else
@@ -993,7 +993,7 @@ struct station_settings_struct {
   signed short int asp_at1[LWA_MAX_NSTD]; // OBS_ASP_AT1[LWA_MAX_NSTD] // ASP_AT1[LWA_MAX_NSTD]
   signed short int asp_at2[LWA_MAX_NSTD]; // OBS_ASP_AT2[LWA_MAX_NSTD] // ASP_AT2[LWA_MAX_NSTD]
   signed short int asp_ats[LWA_MAX_NSTD]; // OBS_ASP_ATS[LWA_MAX_NSTD] // ASP_ATS[LWA_MAX_NSTD]
-#if defined USE_ADP && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
   signed short int tbf_gain; // OBS_TBF_GAIN // TBF_GAIN
 #endif
   signed short int tbn_gain; // OBS_TBN_GAIN // TBN_GAIN
@@ -1059,7 +1059,7 @@ struct ssmif_struct {
   int    iARBAnt[ME_MAX_NARB][ME_MAX_NARBCH];        /* ARB_ANT[][] */
   char   sARBIN[ME_MAX_NARB][ME_MAX_NARBCH][ME_MAX_ARBID_LENGTH+1]; /* ARB_IN[][] */
   char   sARBOUT[ME_MAX_NARB][ME_MAX_NARBCH][ME_MAX_ARBID_LENGTH+1]; /* ARB_OUT[][] */
-#if defined USE_ADP && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
   int    nRoach;                     /* N_ROACH */
   int    nRoachCh;                   /* N_ROACHCH */
   char   sRoachID[ME_MAX_NROACH][ME_MAX_ROACHID_LENGTH+1]; /* ROACH_ID[] */
@@ -1124,7 +1124,7 @@ struct subsubsystem_status_struct {
   int    eRPDStat[ME_MAX_NRPD];                /* RPD_STAT[] */
   int    eSEPStat[ME_MAX_NSEP];                /* SEP_STAT[] */
   int    eARBStat[ME_MAX_NARB][ME_MAX_NARBCH]; /* ARB_STAT[][] */
-#if defined USE_ADP && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
   int    eRoachStat[ME_MAX_NROACH][ME_MAX_NROACHCH]; /* ROACH_STAT[][] */
   int    eServerStat[ME_MAX_NSERVER];                /* SERVER_STAT[] */
 #else
@@ -1341,7 +1341,7 @@ int me_sc_MakeASM( struct ssmif_struct s, struct sc_struct *sc ) {
       } /* for c */ 
     } /* for i */
 
-#if defined USE_ADP && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
   /* load ROACH channel information into station config data structure */
   for ( i=0; i<s.nRoach; i++ ) {
     for ( c=0; c<s.nRoachCh; c++ ) {
@@ -1405,7 +1405,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
       sc->DPO[i].iStat = s.eDRStat[ sc->DPO[i].iDR -1 ]; 
       }
 
-#if defined USE_ADP && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
     /* consider the status of the ROACH boards */
     if (i<ME_MAX_NDPOUT) { /* i=0 to 1: These are standard beams */
        /* no basis for marking this anything other than "3" at the moment*/

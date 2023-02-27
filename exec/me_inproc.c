@@ -751,7 +751,7 @@ int main ( int narg, char *argv[] ) {
               eD=0;
               break;
             case LWA_OM_STEPPED:
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
             case LWA_OM_TBF:
 #else
             case LWA_OM_TBW:      
@@ -949,7 +949,7 @@ int main ( int narg, char *argv[] ) {
             /* === DR REC command === */
             /* ====================== */
             
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
             /* for ADP output 1, 2, 3 (beams) we do this once; i.e., one recording per session */
             /* for ADP output 1 (TBF) output we do a new recording for each observation */
             /* for ADP output 4 (TBN) output we do a new recording for each observation */
@@ -999,7 +999,7 @@ int main ( int narg, char *argv[] ) {
                 exit(EXIT_FAILURE);
                 }
 
-#if defined(USE_ADP) && USE_ADP                
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP                
               if ((osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) && (osf.OBS_MODE != LWA_OM_TBF)) {
                   dr_length_ms = ssf.SESSION_DUR; /* beam obs are recorded contiguously in one session */
                 } else {
@@ -1021,7 +1021,7 @@ int main ( int narg, char *argv[] ) {
                 case LWA_OM_STEPPED:   
                   sprintf(dr_format,"DRX_FILT_%1hu",osf.OBS_BW); 
                   break;
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
                 case LWA_OM_TBF:
                   sprintf(dr_format,"DEFAULT_TBF"); 
                   break;
@@ -1129,7 +1129,7 @@ int main ( int narg, char *argv[] ) {
 
             switch (osf.OBS_MODE) {
 
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
               case LWA_OM_TBF:
                 /* TBF trigger time is in units of samples from beginning of slot */
                 t0 = osf.OBS_START_MPM % 1000; /* number of ms beyond a second boundary */
@@ -1262,7 +1262,7 @@ int main ( int narg, char *argv[] ) {
                 //osf2.OBS_TBN_GAIN = 20; /* FIXME */
 
                 /* construct the command */ 
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
                 LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
                 cs[ncs].action.tv.tv_sec -= 2; /* Must be sent in slot N-4 instead of N-2 */
                 cs[ncs].action.bASAP = 0; 
@@ -1324,7 +1324,7 @@ int main ( int narg, char *argv[] ) {
 
                 //printf("debug: osf2.OBS_DRX_GAIN=%hd\n",osf2.OBS_DRX_GAIN);
 
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
                 /* ADP - DRX commands */
 //     For cmd="DRX": Args are beam          1..NUM_BEAMS(16)        (uint8 DRX_BEAM)
 //                             freq          [Hz]                   (float32 DRX_FREQ)
@@ -1512,7 +1512,7 @@ int main ( int narg, char *argv[] ) {
                     sprintf(dfile,"740_%03.0lf_%04.0lf.df",alt*10,az*10); /* FIXME */
                     //sprintf(dfile,"dfile.df"); 
                     
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
                     /* Must be sent in first 80% of slot N-2 */
                     cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2;
                     cs[ncs].action.tv.tv_usec = 20000; /* staggering send times for DP commands by 10 ms */
@@ -1576,7 +1576,7 @@ int main ( int narg, char *argv[] ) {
                 break;
 
               default:
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
                 printf(     "[%d/%d] FATAL: During ADP setup, osf.OBS_MODE=%d not recognized\n",ME_INPROC,getpid(),osf.OBS_MODE);
                 fprintf(fpl,"[%d/%d] FATAL: During ADP setup, osf.OBS_MODE=%d not recognized\n",ME_INPROC,getpid(),osf.OBS_MODE);
 #else
@@ -1701,7 +1701,7 @@ int main ( int narg, char *argv[] ) {
             if (eD==0) {
               /*=== BEGIN: STEPPED-mode processing added 120929 ==============================================*/
 
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
               /* Need to figure out what ADP subslot this corresponds to */
               
               /* NOTE: BEAM 1 is the master beam and the only beam that sets 
@@ -1873,7 +1873,7 @@ int main ( int narg, char *argv[] ) {
                 } /* if ( osfs.OBS_STP_B!=LWA_BT_SPEC_DELAYS_GAINS) {} else {} */
 
 
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
               /* so here's the BAM command: */
               cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
               cs[ncs].action.tv.tv_usec = 20000;         /* staggering send times for DP commands by 10 ms */
@@ -1986,7 +1986,7 @@ int main ( int narg, char *argv[] ) {
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_AT1[%d]=%hd\n",m,osf2.OBS_ASP_AT1[m]); }
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_AT2[%d]=%hd\n",m,osf2.OBS_ASP_AT2[m]); }
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_ATS[%d]=%hd\n",m,osf2.OBS_ASP_ATS[m]); }
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
           fprintf(fpl,"osf2.OBS_TBF_SAMPLES=%u\n",osf2.OBS_TBF_SAMPLES);
           fprintf(fpl,"osf2.OBS_TBF_GAIN=%hd\n",osf2.OBS_TBF_GAIN);
 #else
@@ -2008,7 +2008,7 @@ int main ( int narg, char *argv[] ) {
           /* Updated: 2015 Aug 31                         */
           esnTimeAdjust = 0;
           switch( osf.OBS_MODE ) {
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
               case LWA_OM_TBF:
                  last_drx_freq1 = 0;
                  last_drx_bw1 = 0;
@@ -2019,7 +2019,7 @@ int main ( int narg, char *argv[] ) {
               case LWA_OM_TRK_JOV:
               case LWA_OM_TRK_LUN:
               case LWA_OM_STEPPED:
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
                  cs[ncs].action.tv.tv_sec  = cs[ncs-1].action.tv.tv_sec;
                  cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec + 20000;
                  cs[ncs].action.sid = LWA_SID_ADP;  

@@ -22,7 +22,7 @@
 
 #define ME "megfg"
 
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
 #define MAX_STD 256           /* max number of stands */  
 #else
 #define MAX_STD 260           /* max number of stands */  

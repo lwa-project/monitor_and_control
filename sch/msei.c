@@ -152,7 +152,7 @@ int main ( int narg, char *argv[] ) {
   strcpy(c.data,data); /* changed in reply */
   c.datalen = -1; /* assumed to be a string */
   
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
   /* For ADP, c.data is raw binary, assembled from command line parameters. */
   /* the parameters are command-dependent */
   if (c.sid==LWA_SID_ADP) {
