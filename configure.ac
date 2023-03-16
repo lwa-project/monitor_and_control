@@ -164,7 +164,7 @@ AC_SUBST([PACKAGE_VERSION_MICRO], [`echo $PACKAGE_VERSION | $AWK -F. '{print $3}
 # Generate files
 #
 
-AC_CONFIG_FILES([common/config.h Makefile sch/Makefile exec/Makefile tp/Makefile utils/Makefile python/Makefile python/config.py share/lwa_mcs.pc])
+AC_CONFIG_FILES([common/config.h Makefile sofa/src/makefile sch/Makefile exec/Makefile tp/Makefile utils/Makefile python/Makefile python/config.py share/lwa_mcs.pc])
 
 AC_OUTPUT
 

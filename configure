@@ -13271,7 +13271,7 @@ PACKAGE_VERSION_MICRO=`echo $PACKAGE_VERSION | $AWK -F. '{print $3}
 # Generate files
 #
 
-ac_config_files="$ac_config_files common/config.h Makefile sch/Makefile exec/Makefile tp/Makefile utils/Makefile python/Makefile python/config.py share/lwa_mcs.pc"
+ac_config_files="$ac_config_files common/config.h Makefile sofa/src/makefile sch/Makefile exec/Makefile tp/Makefile utils/Makefile python/Makefile python/config.py share/lwa_mcs.pc"
 
 
 cat >confcache <<\_ACEOF
@@ -14273,6 +14273,7 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "common/config.h") CONFIG_FILES="$CONFIG_FILES common/config.h" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+    "sofa/src/makefile") CONFIG_FILES="$CONFIG_FILES sofa/src/makefile" ;;
     "sch/Makefile") CONFIG_FILES="$CONFIG_FILES sch/Makefile" ;;
     "exec/Makefile") CONFIG_FILES="$CONFIG_FILES exec/Makefile" ;;
     "tp/Makefile") CONFIG_FILES="$CONFIG_FILES tp/Makefile" ;;

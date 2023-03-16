@@ -5,6 +5,7 @@
 #include <string.h>
 #include <time.h>
 #include <sys/stat.h>
+#include <curl/curl.h>
 
 int iauDat(int iy, int im, int id, double fd, double *deltat)
 /*
@@ -194,7 +195,30 @@ int iauDat(int iy, int im, int id, double fd, double *deltat)
    memset(&fstats, 0, sizeof(fstats));
    stat("state/leapsec.txt", &fstats);
    if( now - fstats.st_mtime > 7*86400 ) {
-    ret = system("wget --quiet --no-use-server-timestamps -FO ./state/leapsec.txt https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat");
+     // cURL setup
+     CURL *curl_handle;
+     curl_global_init(CURL_GLOBAL_ALL);
+     curl_handle = curl_easy_init();
+     curl_easy_setopt(curl_handle, CURLOPT_URL, "https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat");
+     curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
+     
+     // Download the file
+     fh = fopen("./state/leapsec.txt.temp", "wb");
+     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, fh);
+     CURLcode res = curl_easy_perform(curl_handle);
+     if (res == CURLE_OK) {
+       // Great, it worked
+       fclose(fh);
+       rename("./state/leapsec.txt.temp", "./state/leapsec.txt");
+     } else {
+       // Boo, it didn't
+       fclose(fh);
+       remove("./state/leapsec.txt");
+     }
+     
+     // cURL cleanup
+     curl_easy_cleanup(curl_handle);
+     curl_global_cleanup();
    }
 
 /* Update the value of IYV */
