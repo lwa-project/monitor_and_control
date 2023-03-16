@@ -514,7 +514,7 @@ iauD2dtf.o  : d2dtf.c  sofa.h sofam.h
 iauD2tf.o   : d2tf.c   sofa.h sofam.h
 	$(CCOMPC) $(CFLAGF) -o $@ d2tf.c
 iauDat.o    : dat.c    sofa.h sofam.h
-	$(CCOMPC) $(CFLAGF) @LIBS@ -o $@ dat.c
+	$(CCOMPC) $(CFLAGF) -o $@ dat.c
 iauDtdb.o   : dtdb.c   sofa.h sofam.h
 	$(CCOMPC) $(CFLAGF) -o $@ dtdb.c
 iauDtf2d.o  : dtf2d.c  sofa.h sofam.h
