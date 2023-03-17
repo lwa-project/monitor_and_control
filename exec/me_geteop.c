@@ -44,17 +44,17 @@ int me_geteop(
     curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
     
     // Download the file
-    fh = fopen("state/eop.txt.temp", "wb");
+    fh = fopen("state/eop.txt.temp", "w");
     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, fh);
     CURLcode res = curl_easy_perform(curl_handle);
     if (res == CURLE_OK) {
       // Great, it worked
-      printf(stderr, "INFO: Updating Earth orientation parameters successful\n");
+      fprintf(stderr, "INFO: Updating Earth orientation parameters - successful\n");
       fclose(fh);
       rename("state/eop.txt.temp", "state/eop.txt");
     } else {
       // Boo, it didn't
-      fprintf(stderr, "WARNING: Updating Earth orientation parameters failed\n");
+      fprintf(stderr, "WARNING: Updating Earth orientation parameters - failed\n");
       fclose(fh);
       remove("state/eop.txt.temp");
     }
