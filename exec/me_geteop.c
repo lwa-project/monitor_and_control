@@ -32,8 +32,10 @@ int me_geteop(
   // if (a) there is no "eop.txt" file or (b) if the file is more than seven days
   // old.
   memset(&fstats, 0, sizeof(fstats));
-  stat("state/eop.txt", &fstats);
+  stat("./state/eop.txt", &fstats);
   if( now - fstats.st_mtime > 7*86400 ) {
+    fprintf(stderr, "INFO: Updating Earth orientation parameters\n");
+    
     // cURL setup
     CURL *curl_handle;
     curl_global_init(CURL_GLOBAL_ALL);
@@ -47,10 +49,12 @@ int me_geteop(
     CURLcode res = curl_easy_perform(curl_handle);
     if (res == CURLE_OK) {
       // Great, it worked
+      printf(stderr, "INFO: Updating Earth orientation parameters successful\n");
       fclose(fh);
       rename("state/eop.txt.temp", "state/eop.txt");
     } else {
       // Boo, it didn't
+      fprintf(stderr, "WARNING: Updating Earth orientation parameters failed\n");
       fclose(fh);
       remove("state/eop.txt.temp");
     }
