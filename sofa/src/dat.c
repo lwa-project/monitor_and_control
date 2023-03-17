@@ -203,7 +203,7 @@ int iauDat(int iy, int im, int id, double fd, double *deltat)
      curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
      
      // Download the file
-     fh = fopen("./state/leapsec.txt.temp", "wb");
+     fh = fopen("./state/leapsec.txt.temp", "w");
      curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, fh);
      CURLcode res = curl_easy_perform(curl_handle);
      if (res == CURLE_OK) {
