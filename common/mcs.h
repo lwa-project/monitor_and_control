@@ -598,7 +598,6 @@ signed long int LWA_i8s_swap( signed long int x ) {
   
 float LWA_f4_swap( float x ) {
   /* changes endianness of a float (assumes 4 bytes) */
-  unsigned char c;
   union {
     float f;
     unsigned int i;
@@ -610,7 +609,6 @@ float LWA_f4_swap( float x ) {
 
 double LWA_f8_swap( double x ) {
   /* changes endianness of a double (assumes 8 bytes) */
-  unsigned char c;
   union {
     double f;
     unsigned long int i;
