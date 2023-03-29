@@ -26,6 +26,21 @@ extern "C" {
 #include <fcntl.h>      /* added 110309 for network sockets in me_exec; for F_GETFL, other possibly other stuff */
 #include <signal.h>     /* added 110312 to allow me_exec to send kill(SIGKILL) to me_tpcom */ 
 
+#if defined(__linux__)
+
+/* Linux */
+#include <byteswap.h>
+
+#elif defined(__APPLE__)
+
+/* OSX */
+#include <libkern/OSByteOrder.h>
+#define __bswap_16 OSSwapInt16
+#define __bswap_32 OSSwapInt32
+#define __bswap_64 OSSwapInt64
+
+#endif
+
 #define LWA_MAX_REFERENCE 999999999 /* largest reference number before roll-over */
 #define LWA_MS_CMD_ADV_NOTICE_MS 5 /* [ms] required advance notice for time-scheduled commands */ 
 
@@ -553,82 +568,32 @@ int LWA_isMCSRSVD(char *label) {
 
 unsigned short int LWA_i2u_swap( unsigned short int x) {
   /* changes endianness of an unsigned short int */
-  unsigned char c;
-  union {
-    unsigned short int i;
-    unsigned char b[2];
-    } i2u;
-  i2u.i = x;
-  c = i2u.b[0]; i2u.b[0] = i2u.b[1]; i2u.b[1] = c;
-  return i2u.i;
+  return __bswap_16(x);
   }
 
 signed short int LWA_i2s_swap( signed short int x) {
   /* changes endianness of an signed short int */
-  unsigned char c;
-  union {
-    signed short int i;
-    unsigned char b[2];
-    } i2s;
-  i2s.i = x;
-  c = i2s.b[0]; i2s.b[0] = i2s.b[1]; i2s.b[1] = c;
-  return i2s.i;
+  return __bswap_16(x);
   }
 
 unsigned int LWA_i4u_swap( unsigned int x ) {
   /* changes endianness of an unsigned int */
-  unsigned char c;
-  union {
-    unsigned int i;
-    unsigned char b[4];
-    } i4u;
-  i4u.i = x;
-  c = i4u.b[0]; i4u.b[0] = i4u.b[3]; i4u.b[3] = c;
-  c = i4u.b[1]; i4u.b[1] = i4u.b[2]; i4u.b[2] = c;
-  return i4u.i;
+  return __bswap_32(x);
   }
   
 signed int LWA_i4s_swap( signed int x ) {
   /* changes endianness of an signed int */
-  unsigned char c;
-  union {
-    signed int i;
-    unsigned char b[4];
-    } i4s;
-  i4s.i = x;
-  c = i4s.b[0]; i4s.b[0] = i4s.b[3]; i4s.b[3] = c;
-  c = i4s.b[1]; i4s.b[1] = i4s.b[2]; i4s.b[2] = c;
-  return i4s.i;
+  return __bswap_32(x);
   }
 
 unsigned long int LWA_i8u_swap( unsigned long int x ) {
   /* changes endianness of an unsigned long int */
-  unsigned char c;
-  union {
-    unsigned long int i;
-    unsigned char b[8];
-    } i8u;
-  i8u.i = x;
-  c = i8u.b[0]; i8u.b[0] = i8u.b[7]; i8u.b[7] = c;
-  c = i8u.b[1]; i8u.b[1] = i8u.b[6]; i8u.b[6] = c;
-  c = i8u.b[2]; i8u.b[2] = i8u.b[5]; i8u.b[5] = c;
-  c = i8u.b[3]; i8u.b[3] = i8u.b[4]; i8u.b[4] = c;
-  return i8u.i;
+  return __bswap_64(x);
   }
 
 signed long int LWA_i8s_swap( signed long int x ) {
   /* changes endianness of an signed long int */
-  unsigned char c;
-  union {
-    signed long int i;
-    unsigned char b[8];
-    } i8s;
-  i8s.i = x;
-  c = i8s.b[0]; i8s.b[0] = i8s.b[7]; i8s.b[7] = c;
-  c = i8s.b[1]; i8s.b[1] = i8s.b[6]; i8s.b[6] = c;
-  c = i8s.b[2]; i8s.b[2] = i8s.b[5]; i8s.b[5] = c;
-  c = i8s.b[3]; i8s.b[3] = i8s.b[4]; i8s.b[4] = c;
-  return i8s.i;
+  return __bswap_64(x);
   }
   
 float LWA_f4_swap( float x ) {
@@ -636,11 +601,10 @@ float LWA_f4_swap( float x ) {
   unsigned char c;
   union {
     float f;
-    unsigned char b[4];
+    unsigned int i;
     } f4;
   f4.f = x;
-  c = f4.b[0]; f4.b[0] = f4.b[3]; f4.b[3] = c;
-  c = f4.b[1]; f4.b[1] = f4.b[2]; f4.b[2] = c;
+  f4.i = __bswap_32(f4.i);
   return f4.f;
   }
 
@@ -649,13 +613,10 @@ double LWA_f8_swap( double x ) {
   unsigned char c;
   union {
     double f;
-    unsigned char b[8];
+    unsigned long int i;
     } f8;
   f8.f = x;
-  c = f8.b[0]; f8.b[0] = f8.b[7]; f8.b[7] = c;
-  c = f8.b[1]; f8.b[1] = f8.b[6]; f8.b[6] = c;
-  c = f8.b[2]; f8.b[2] = f8.b[5]; f8.b[5] = c;
-  c = f8.b[3]; f8.b[3] = f8.b[4]; f8.b[4] = c;
+  f8.i = __bswap_64(f8.i);
   return f8.f;
   }
 
