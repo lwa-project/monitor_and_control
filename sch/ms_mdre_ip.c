@@ -106,8 +106,8 @@ int main ( int narg, char *argv[] ) {
     } f8;
  
   /* Imported from ms_exec.c */
-  int server_len;
-  int client_len;  
+  socklen_t server_len;
+  socklen_t client_len;
   int server_sockfd;                
   int client_sockfd;   
   struct sockaddr_in server_address; /* for network sockets */

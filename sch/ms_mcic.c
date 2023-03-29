@@ -87,7 +87,7 @@ int main ( int narg, char *argv[] ) {
   int eResult;
 
   /* probably left over stuff...*/
-  int len;
+  socklen_t len;
   char message_string[B];
 
   long int mjd;
