@@ -241,11 +241,11 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
 #endif
         strcpy(data,"");   
         break;
-#endif
       case TPSS_PL_EOF:                                                                                                        break;
       case TPSS_PL_KEYWORD_MISMATCH:                                                                                           break;
       case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
       }
+#endif
 
     sprintf(keyword,"OBS_DRX_GAIN");  obs[nobs].OBS_DRX_GAIN=-1; 
     while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
