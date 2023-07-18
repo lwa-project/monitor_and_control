@@ -61,7 +61,7 @@ jobs:
         run: |
           ./configure
           make all
-          mkdir exec/state
+          mkdir -p exec/state
       - name: Test - LWA1
         run: |
           cd exec/tests
@@ -72,7 +72,7 @@ jobs:
           make clean
           ./configure --enable-adp
           make all
-          mkdir exec/state
+          mkdir -p exec/state
       - name: Test - LWA-SV
         run: |
           cd exec/tests
@@ -83,7 +83,7 @@ jobs:
           make clean
           ./configure --enable-ndp
           make all
-          mkdir exec/state
+          mkdir -p exec/state
       - name: Test - LWA-NA
         run: |
           cd exec/tests
