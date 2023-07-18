@@ -3256,7 +3256,7 @@
 
 #if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
   /* reading TBF_GAIN */
-  sprintf(keyword,"TBF_GAIN"); s.settings.tbn_gain = 0;
+  sprintf(keyword,"TBF_GAIN"); s.settings.tbf_gain = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
   switch (i) {
     case MERS_PL_KEYWORD_MATCH: 
