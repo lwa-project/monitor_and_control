@@ -1253,6 +1253,7 @@ int main ( int narg, char *argv[] ) {
 //    printf("[%d/%d] DP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
 //    }
 
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
               case LWA_OM_TBN:
 
                 /* TBN trigger time is in units of "subslots" (1/100ths of a second) */
@@ -1279,7 +1280,7 @@ int main ( int narg, char *argv[] ) {
                 cs[ncs].action.len = strlen(cs[ncs].data)+1;
                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                 ncs++;
-#elif !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
+#else
                 LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
                 cs[ncs].action.bASAP = 0; 
                 cs[ncs].action.sid = LWA_SID_DP_;
@@ -1294,6 +1295,7 @@ int main ( int narg, char *argv[] ) {
                 ncs++;
 #endif
                 break; /* LWA_OM_TBN */ 
+#endif
 
               case LWA_OM_TRK_RADEC:
               case LWA_OM_TRK_SOL:
