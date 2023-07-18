@@ -11,6 +11,8 @@
 // needs to see state/ssmif.dat
 // See end of this file for history.
 
+
+#include "mcs.h"
 #include "me.h"
 #include <math.h>
 #include <stdlib.h>
@@ -83,13 +85,6 @@ int main ( int narg, char *argv[] ) {
   unsigned short int ddc;
   unsigned short int ddf;
   unsigned short int ddm[MAX_DP_CH];
-
-  /* the following used for little- to big-endian conversions */
-  union {
-    unsigned short int i;
-    char b[2];
-    } i2u;
-  char bb;
 
   int bDone=0;
   FILE *fpl;
@@ -470,9 +465,7 @@ int main ( int narg, char *argv[] ) {
       ddm[i] = (ddc<<4) + ddf;
         
       /* convert to big-endian */
-      i2u.i = ddm[i]; 
-      bb=i2u.b[0]; i2u.b[0]=i2u.b[1]; i2u.b[1]=bb;
-      ddm[i] = i2u.i; 
+      ddm[i] = LWA_i2u_swap(ddm[i]);
 
       }
 

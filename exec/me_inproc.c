@@ -27,6 +27,7 @@
 #include <math.h>        /* needed for me_getaltaz.c + others */
 #include <dirent.h>      /* this is listing files in a directory */
 
+#include "mcs.h"
 #include "me.h"
 #include "me_astro.h"
 /* NOTE: the above also pulls in several additional files "ephem_*" */
@@ -55,17 +56,9 @@ int me_medfg( struct beam_struct beam,
   char cmd[256]; 
   char df_file[256];
 
-  union {
-    unsigned short int i;
-    char b[2];
-    } i2u;
-  char bb;
-
   /* convert to big-endian while packing into d[] */
   for (i=0; i<2*LWA_MAX_NSTD; i++) {
-      i2u.i = beam.OBS_BEAM_DELAY[i]; 
-      bb=i2u.b[0]; i2u.b[0]=i2u.b[1]; i2u.b[1]=bb;
-      d[i] = i2u.i;  
+      d[i] = LWA_i2u_swap(beam.OBS_BEAM_DELAY[i]);
       //printf("%hu\n",d[i]);
       } /* for i */
 
@@ -109,12 +102,6 @@ int me_megfg( struct beam_struct beam,
   char cmd[256]; 
   char gf_file[256];
 
-  union {
-    signed short int i;
-    char b[2];
-    } i2s;
-  char bb;
-
   /* zero out input matrix */
   for (i=0; i<LWA_MAX_NSTD; i++) {
     g[i][0][0] = 0;
@@ -127,9 +114,7 @@ int me_megfg( struct beam_struct beam,
   for (i=0; i<LWA_MAX_NSTD; i++) {
     for (j=0; j<2; j++) {
       for (k=0; k<2; k++) {
-        i2s.i = beam.OBS_BEAM_GAIN[i][j][k]; 
-        bb=i2s.b[0]; i2s.b[0]=i2s.b[1]; i2s.b[1]=bb;
-        g[i][j][k] = i2s.i;  
+        g[i][j][k] = LWA_i2s_swap(beam.OBS_BEAM_GAIN[i][j][k]);  
         }
       }
     //printf("%hd %hd %hd %hd\n",g[i][0][0],g[i][0][1],g[i][1][0],g[i][1][1]);

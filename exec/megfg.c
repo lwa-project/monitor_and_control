@@ -16,6 +16,7 @@
 // ---
 
 
+#include "mcs.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,13 +42,6 @@ int main( int narg, char *argv[] ) {
   int i,j,k;
 
   FILE *fp;
-
-  union {
-    signed short int i;
-    char b[2];
-    } i2s;
-
-  char bb;
 
   /* Parse command line */
   if (narg<3) {
@@ -95,9 +89,7 @@ int main( int narg, char *argv[] ) {
   for (i=0; i<MAX_STD; i++) {
     for (j=0; j<2; j++) {
       for (k=0; k<2; k++) {
-        i2s.i = g[i][j][k]; 
-        bb=i2s.b[0]; i2s.b[0]=i2s.b[1]; i2s.b[1]=bb;
-        g[i][j][k] = i2s.i;  
+        g[i][j][k] = LWA_i2s_swap(g[i][j][k]);  
         }
       }
     //printf("%hd %hd %hd %hd\n",g[i][0][0],g[i][0][1],g[i][1][0],g[i][1][1]);
