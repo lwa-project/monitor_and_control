@@ -292,7 +292,12 @@ int main ( int narg, char *argv[] ) {
     sdm.settings.asp_at2[i] = -1;
     sdm.settings.asp_ats[i] = -1;
     }
-  sdm.settings.tbn_gain = -1;
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
+    sdm.settings.tbf_gain = -1;
+#endif
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
+    sdm.settings.tbn_gain = -1;
+#endif
   sdm.settings.drx_gain = -1;
 
   /* write it */
