@@ -2,6 +2,7 @@
 aclocal.m4
 autom4te.cache
 config.status
+config.log
 config.mk
 Makefile
 sch/Makefile
@@ -79,7 +80,9 @@ utils/test_tp_connection
 
 # Python stuff
 *.pyc
-
 python/build/
 python/dist/
 python/lwa_mcs.egg-info/
+
+# State directories
+exec/state
