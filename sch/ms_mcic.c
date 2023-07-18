@@ -87,7 +87,7 @@ int main ( int narg, char *argv[] ) {
   int eResult;
 
   /* probably left over stuff...*/
-  int len;
+  socklen_t len;
   char message_string[B];
 
   long int mjd;
@@ -375,7 +375,7 @@ int main ( int narg, char *argv[] ) {
 
       bErr=0;
 
-#if defined(USE_NDP) && USE_NDP
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
       /* In the case of the NDP commands FST, ... , we need to replace the mq_msg.data part */
       /* of message_string with the binary/raw data representation.  However, we want to keep */
       /* the variables "mq_msg.data" and "mq_msg.datalen" as is, for logging purposes. */
@@ -451,7 +451,7 @@ int main ( int narg, char *argv[] ) {
         
         } /* if (mq_msg.sid==LWA_SID_NDP) */
         
-#elif defined(USE_ADP) && USE_ADP
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
       /* In the case of the ADP commands FST, ... , we need to replace the mq_msg.data part */
       /* of message_string with the binary/raw data representation.  However, we want to keep */
       /* the variables "mq_msg.data" and "mq_msg.datalen" as is, for logging purposes. */

@@ -358,12 +358,12 @@ MOD_INIT(_mcs) {
     PyModule_AddObject(m, "__version__", PyString_FromString("0.5"));
     
     // Constants
-#if defined(USE_NDP) && USE_NDP
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
     PyModule_AddObject(m, "IS_NDP", Py_True);
 #else
     PyModule_AddObject(m, "IS_NDP", Py_False);
 #endif
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
     PyModule_AddObject(m, "IS_ADP", Py_True);
 #else
     PyModule_AddObject(m, "IS_ADP", Py_False);

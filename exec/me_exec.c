@@ -52,14 +52,14 @@ int main ( int narg, char *argv[] ) {
   int sockfd_sch;             /* socket file discriptor, to MCS/Sch */
   struct sockaddr_in address; /* for network sockets */
 
-  FILE* fp = NULL;
+  FILE *fp = NULL;
   int i;
   int iErr;
   int eQuit=0;  /* 1 means shutdown commanded; 2 means shutdown due to error */
   int bWriteMESS=0;
 
   /* log file stuff */
-  FILE* fpl = NULL;
+  FILE *fpl = NULL;
   struct me_session_queue_struct *sq_ptr=NULL;  /* used as dummy argument in me_log() */
   char msg[ME_LOG_MAX_MSG_LENGTH]; 
 
@@ -456,10 +456,10 @@ int main ( int narg, char *argv[] ) {
     if ( LWA_timediff(tv,tv_last_poll_of_subsystems) > ME_INTERVAL_POLL_SUBSYSTEMS ) {
       gettimeofday( &tv_last_poll_of_subsystems, NULL );
 
-#if defined(USE_NDP) && USE_NDP
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
       err = mesi(NULL,"NDP","RPT","SUMMARY",    "today","asap",&reference);
       err = mesi(NULL,"NDP","RPT","INFO",       "today","+1",  &reference);
-#elif defined(USE_ADP) && USE_ADP
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
       err = mesi(NULL,"ADP","RPT","SUMMARY",    "today","asap",&reference);
       err = mesi(NULL,"ADP","RPT","INFO",       "today","+1",  &reference);
 #else
@@ -473,7 +473,7 @@ int main ( int narg, char *argv[] ) {
       err = mesi(NULL,"SHL","RPT","SUMMARY",    "today","+4",  &reference);
       err = mesi(NULL,"SHL","RPT","INFO",       "today","+5",  &reference);
       err = mesi(NULL,"SHL","RPT","CURRENT-R1", "today","+6",  &reference);
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
       err = mesi(NULL,"SHL","RPT","CURRENT-R2", "today","+7",  &reference);
       err = mesi(NULL,"SHL","RPT","CURRENT-R3", "today","+8",  &reference);
       err = mesi(NULL,"SHL","RPT","CURRENT-R4", "today","+9",  &reference);
@@ -498,7 +498,7 @@ int main ( int narg, char *argv[] ) {
       err = mesi(NULL,"DR4","RPT","OP-TYPE",    "today","+51",  &reference);
       //err = mesi(NULL,"DR4","RPT","SYN",        "today","+52",  &reference);
 
-#if (!defined(USE_NDP) || !USE_NDP) && (!defined(USE_ADP) || !USE_ADP)
+#if defined(LWA_BACKEND_IS_DP) && LWA_BACKEND_IS_DP
       err = mesi(NULL,"DR5","RPT","SUMMARY",    "today","+60",  &reference);
       err = mesi(NULL,"DR5","RPT","OP-TYPE",    "today","+61",  &reference);
       //err = mesi(NULL,"DR5","RPT","SYN",        "today","+62",  &reference);

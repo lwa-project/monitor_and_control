@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <sys/stat.h>
+#include <curl/curl.h>
 
 #define ME_LOAD_MAX_DAYS 60
 
@@ -31,9 +32,36 @@ int me_geteop(
   // if (a) there is no "eop.txt" file or (b) if the file is more than seven days
   // old.
   memset(&fstats, 0, sizeof(fstats));
-  stat("state/eop.txt", &fstats);
+  stat("./state/eop.txt", &fstats);
   if( now - fstats.st_mtime > 7*86400 ) {
-    ret = system("wget --quiet --no-use-server-timestamps -FO ./state/eop.txt https://datacenter.iers.org/data/latestVersion/6_BULLETIN_A_V2013_016.txt");
+    fprintf(stderr, "INFO: Updating Earth orientation parameters\n");
+    
+    // cURL setup
+    CURL *curl_handle;
+    curl_global_init(CURL_GLOBAL_ALL);
+    curl_handle = curl_easy_init();
+    curl_easy_setopt(curl_handle, CURLOPT_URL, "https://datacenter.iers.org/data/latestVersion/6_BULLETIN_A_V2013_016.txt");
+    curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
+    
+    // Download the file
+    fh = fopen("state/eop.txt.temp", "w");
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, fh);
+    CURLcode res = curl_easy_perform(curl_handle);
+    if (res == CURLE_OK) {
+      // Great, it worked
+      fprintf(stderr, "INFO: Updating Earth orientation parameters - successful\n");
+      fclose(fh);
+      rename("state/eop.txt.temp", "state/eop.txt");
+    } else {
+      // Boo, it didn't
+      fprintf(stderr, "WARNING: Updating Earth orientation parameters - failed\n");
+      fclose(fh);
+      remove("state/eop.txt.temp");
+    }
+    
+    // cURL cleanup
+    curl_easy_cleanup(curl_handle);
+    curl_global_cleanup();
   }
   
   // Load in the contents of the file and save lists of MJD, x, y, and DUT

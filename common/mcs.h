@@ -26,6 +26,21 @@ extern "C" {
 #include <fcntl.h>      /* added 110309 for network sockets in me_exec; for F_GETFL, other possibly other stuff */
 #include <signal.h>     /* added 110312 to allow me_exec to send kill(SIGKILL) to me_tpcom */ 
 
+#if defined(__linux__)
+
+/* Linux */
+#include <byteswap.h>
+
+#elif defined(__APPLE__)
+
+/* OSX */
+#include <libkern/OSByteOrder.h>
+#define __bswap_16 OSSwapInt16
+#define __bswap_32 OSSwapInt32
+#define __bswap_64 OSSwapInt64
+
+#endif
+
 #define LWA_MAX_REFERENCE 999999999 /* largest reference number before roll-over */
 #define LWA_MS_CMD_ADV_NOTICE_MS 5 /* [ms] required advance notice for time-scheduled commands */ 
 
@@ -556,109 +571,53 @@ int LWA_isMCSRSVD(char *label) {
 
 unsigned short int LWA_i2u_swap( unsigned short int x) {
   /* changes endianness of an unsigned short int */
-  unsigned char c;
-  union {
-    unsigned short int i;
-    unsigned char b[2];
-    } i2u;
-  i2u.i = x;
-  c = i2u.b[0]; i2u.b[0] = i2u.b[1]; i2u.b[1] = c;
-  return i2u.i;
+  return __bswap_16(x);
   }
 
 signed short int LWA_i2s_swap( signed short int x) {
   /* changes endianness of an signed short int */
-  unsigned char c;
-  union {
-    signed short int i;
-    unsigned char b[2];
-    } i2s;
-  i2s.i = x;
-  c = i2s.b[0]; i2s.b[0] = i2s.b[1]; i2s.b[1] = c;
-  return i2s.i;
+  return __bswap_16(x);
   }
 
 unsigned int LWA_i4u_swap( unsigned int x ) {
   /* changes endianness of an unsigned int */
-  unsigned char c;
-  union {
-    unsigned int i;
-    unsigned char b[4];
-    } i4u;
-  i4u.i = x;
-  c = i4u.b[0]; i4u.b[0] = i4u.b[3]; i4u.b[3] = c;
-  c = i4u.b[1]; i4u.b[1] = i4u.b[2]; i4u.b[2] = c;
-  return i4u.i;
+  return __bswap_32(x);
   }
   
 signed int LWA_i4s_swap( signed int x ) {
   /* changes endianness of an signed int */
-  unsigned char c;
-  union {
-    signed int i;
-    unsigned char b[4];
-    } i4s;
-  i4s.i = x;
-  c = i4s.b[0]; i4s.b[0] = i4s.b[3]; i4s.b[3] = c;
-  c = i4s.b[1]; i4s.b[1] = i4s.b[2]; i4s.b[2] = c;
-  return i4s.i;
+  return __bswap_32(x);
   }
 
 unsigned long int LWA_i8u_swap( unsigned long int x ) {
   /* changes endianness of an unsigned long int */
-  unsigned char c;
-  union {
-    unsigned long int i;
-    unsigned char b[8];
-    } i8u;
-  i8u.i = x;
-  c = i8u.b[0]; i8u.b[0] = i8u.b[7]; i8u.b[7] = c;
-  c = i8u.b[1]; i8u.b[1] = i8u.b[6]; i8u.b[6] = c;
-  c = i8u.b[2]; i8u.b[2] = i8u.b[5]; i8u.b[5] = c;
-  c = i8u.b[3]; i8u.b[3] = i8u.b[4]; i8u.b[4] = c;
-  return i8u.i;
+  return __bswap_64(x);
   }
 
 signed long int LWA_i8s_swap( signed long int x ) {
   /* changes endianness of an signed long int */
-  unsigned char c;
-  union {
-    signed long int i;
-    unsigned char b[8];
-    } i8s;
-  i8s.i = x;
-  c = i8s.b[0]; i8s.b[0] = i8s.b[7]; i8s.b[7] = c;
-  c = i8s.b[1]; i8s.b[1] = i8s.b[6]; i8s.b[6] = c;
-  c = i8s.b[2]; i8s.b[2] = i8s.b[5]; i8s.b[5] = c;
-  c = i8s.b[3]; i8s.b[3] = i8s.b[4]; i8s.b[4] = c;
-  return i8s.i;
+  return __bswap_64(x);
   }
   
 float LWA_f4_swap( float x ) {
   /* changes endianness of a float (assumes 4 bytes) */
-  unsigned char c;
   union {
     float f;
-    unsigned char b[4];
+    unsigned int i;
     } f4;
   f4.f = x;
-  c = f4.b[0]; f4.b[0] = f4.b[3]; f4.b[3] = c;
-  c = f4.b[1]; f4.b[1] = f4.b[2]; f4.b[2] = c;
+  f4.i = __bswap_32(f4.i);
   return f4.f;
   }
 
 double LWA_f8_swap( double x ) {
   /* changes endianness of a double (assumes 8 bytes) */
-  unsigned char c;
   union {
     double f;
-    unsigned char b[8];
+    unsigned long int i;
     } f8;
   f8.f = x;
-  c = f8.b[0]; f8.b[0] = f8.b[7]; f8.b[7] = c;
-  c = f8.b[1]; f8.b[1] = f8.b[6]; f8.b[6] = c;
-  c = f8.b[2]; f8.b[2] = f8.b[5]; f8.b[5] = c;
-  c = f8.b[3]; f8.b[3] = f8.b[4]; f8.b[4] = c;
+  f8.i = __bswap_64(f8.i);
   return f8.f;
   }
 
@@ -670,7 +629,7 @@ double LWA_f8_swap( double x ) {
 /*** moved here from me.h *************/
 /**************************************/
 
-#if defined(USE_NDP) && USE_NDP
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
 #define ME_SSMIF_FORMAT_VERSION 10
 #  define ME_MAX_NSTD 256
 #  define ME_MAX_NFEE 256
@@ -695,7 +654,7 @@ double LWA_f8_swap( double x ) {
 #define ME_MAX_NPWRPORT 50
 #define ME_MAX_SSNAME_LENGTH 3 /* for codes used for PWR_NAME */
 #define ME_MAX_NDPOUT 4 /* ADP outputs; 1,2,3,4 */
-#elif defined(USE_ADP) && USE_ADP
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
 #define ME_SSMIF_FORMAT_VERSION 9
 #define ME_MAX_NSTD 256
 #define ME_MAX_NFEE 256
@@ -961,9 +920,9 @@ struct osfs_struct { /* one step within an observation */
   unsigned short int OBS_STP_B;
   };
 
-#if defined(USE_NDP) && USE_NDP
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
 #define LWA_MAX_NSTD 256 /* FIXME should be reconciled with ME_MAX_NSTD */
-#elif defined(USE_ADP) && USE_ADP
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
 #define LWA_MAX_NSTD 256 /* FIXME should be reconciled with ME_MAX_NSTD */
 #else
 #define LWA_MAX_NSTD 260 /* FIXME should be reconciled with ME_MAX_NSTD */
@@ -979,14 +938,14 @@ struct osf2_struct { /* really just a continuation of osf_struct */
   signed short int   OBS_ASP_AT1[LWA_MAX_NSTD];
   signed short int   OBS_ASP_AT2[LWA_MAX_NSTD];
   signed short int   OBS_ASP_ATS[LWA_MAX_NSTD];
-#if (defined(USE_NDP) && USE_NDP) || (defined(USE_ADP) && USE_ADP)
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
   unsigned int       OBS_TBF_SAMPLES;
   signed short int   OBS_TBF_GAIN;
 #else
   unsigned short int OBS_TBW_BITS;
   unsigned int       OBS_TBW_SAMPLES;
 #endif
-#if !defined(USE_NDP) || !USE_NDP
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
   signed short int   OBS_TBN_GAIN;
 #endif
   signed short int   OBS_DRX_GAIN;
@@ -1025,10 +984,10 @@ struct station_settings_struct {
   signed short int asp_at1[LWA_MAX_NSTD]; // OBS_ASP_AT1[LWA_MAX_NSTD] // ASP_AT1[LWA_MAX_NSTD]
   signed short int asp_at2[LWA_MAX_NSTD]; // OBS_ASP_AT2[LWA_MAX_NSTD] // ASP_AT2[LWA_MAX_NSTD]
   signed short int asp_ats[LWA_MAX_NSTD]; // OBS_ASP_ATS[LWA_MAX_NSTD] // ASP_ATS[LWA_MAX_NSTD]
-#if (defined(USE_NDP) && USE_NDP) || (defined(USE_ADP) && USE_ADP)
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
   signed short int tbf_gain; // OBS_TBF_GAIN // TBF_GAIN
 #endif
-#if !defined(USE_NDP) || !USE_NDP
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
   signed short int tbn_gain; // OBS_TBN_GAIN // TBN_GAIN
 #endif
   signed short int drx_gain; // OBS_DRX_GAIN // DRX_GAIN
@@ -1093,7 +1052,7 @@ struct ssmif_struct {
   int    iARBAnt[ME_MAX_NARB][ME_MAX_NARBCH];        /* ARB_ANT[][] */
   char   sARBIN[ME_MAX_NARB][ME_MAX_NARBCH][ME_MAX_ARBID_LENGTH+1]; /* ARB_IN[][] */
   char   sARBOUT[ME_MAX_NARB][ME_MAX_NARBCH][ME_MAX_ARBID_LENGTH+1]; /* ARB_OUT[][] */
-#if defined(USE_NDP) && USE_NDP
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
   int    nSnap;                     /* N_SNAP */
   int    nSnapCh;                   /* N_SNAPCH */
   char   sSnapID[ME_MAX_NSNAP][ME_MAX_SNAPID_LENGTH+1]; /* SNAP_ID[] */
@@ -1108,7 +1067,7 @@ struct ssmif_struct {
   char   sServerSlot[ME_MAX_NSERVER][ME_MAX_SERVERID_LENGTH+1]; /* SERVER_SLOT[] */
   int    eServerStat[ME_MAX_NSERVER];       /* SERVER_STAT[] */
   int    eServerDesi[ME_MAX_NSERVER];       /* SERVER_DESI[] */
-#elfi defined(USE_ADP) && USE_ADP
+#elfi defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
   int    nRoach;                     /* N_ROACH */
   int    nRoachCh;                   /* N_ROACHCH */
   char   sRoachID[ME_MAX_NROACH][ME_MAX_ROACHID_LENGTH+1]; /* ROACH_ID[] */
@@ -1173,10 +1132,10 @@ struct subsubsystem_status_struct {
   int    eRPDStat[ME_MAX_NRPD];                /* RPD_STAT[] */
   int    eSEPStat[ME_MAX_NSEP];                /* SEP_STAT[] */
   int    eARBStat[ME_MAX_NARB][ME_MAX_NARBCH]; /* ARB_STAT[][] */
-#if defined(USE_NDP) && USE_NDP
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
   int    eSnapStat[ME_MAX_NSNAP][ME_MAX_NSNAPCH]; /* SNAP_STAT[][] */
   int    eServerStat[ME_MAX_NSERVER];             /* SERVER_STAT[] */
-#elif defined(USE_ADP) && USE_ADP
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
   int    eRoachStat[ME_MAX_NROACH][ME_MAX_NROACHCH]; /* ROACH_STAT[][] */
   int    eServerStat[ME_MAX_NSERVER];                /* SERVER_STAT[] */
 #else
@@ -1393,7 +1352,7 @@ int me_sc_MakeASM( struct ssmif_struct s, struct sc_struct *sc ) {
       } /* for c */ 
     } /* for i */
 
-#if defined(USE_NDP) && USE_NDP
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
   /* load SNAP channel information into station config data structure */
   for ( i=0; i<s.nSnap; i++ ) {
     for ( c=0; c<s.nSnapCh; c++ ) {
@@ -1404,7 +1363,7 @@ int me_sc_MakeASM( struct ssmif_struct s, struct sc_struct *sc ) {
       sc->Stand[k].Ant[s.iAntOrie[m]].DP.iStat = s.eSnapStat[i][c];
       } /* for c */
     } /* for i */
-#elif defined(USE_ADP) && USE_ADP
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
   /* load ROACH channel information into station config data structure */
   for ( i=0; i<s.nRoach; i++ ) {
     for ( c=0; c<s.nRoachCh; c++ ) {
@@ -1468,7 +1427,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
       sc->DPO[i].iStat = s.eDRStat[ sc->DPO[i].iDR -1 ]; 
       }
 
-#if (defined(USE_NDP) && USE_NDP) || (defined(USE_ADP) && USE_ADP)
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
     /* consider the status of the ROACH/SNAP boards */
     if (i<ME_MAX_NDPOUT) { /* i=0 to 1: These are standard beams */
        /* no basis for marking this anything other than "3" at the moment*/

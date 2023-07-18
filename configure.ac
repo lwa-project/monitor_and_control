@@ -39,6 +39,11 @@ AC_CHECK_LIB([m], [cos],
               LIBS="$LIBS -lm"],
              [AC_MSG_ERROR([no])])
 
+AC_CHECK_LIB([curl], [curl_easy_init],
+            [AC_SUBST([HAVE_CURL], [1])
+             LIBS="$LIBS -lcurl"],
+            [AC_MSG_ERROR([no])])
+
 AC_CHECK_LIB([gdbm], [gdbm_open],
              [AC_SUBST([HAVE_GDBM], [1])
               LIBS="$LIBS -lgdbm"],

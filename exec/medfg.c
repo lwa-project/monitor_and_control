@@ -23,10 +23,10 @@
 
 #define ME "medfg"
 
-#if defined(USE_NDP) && USE_NDP
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
 #  define MAX_ANT 512           /* number of antennas ("channels") */  
 #  define MAX_COARSE_DELAY 1023 /* maximum coarse delay, in sample periods */
-#elif defined(USE_ADP) && USE_ADP
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
 #  define MAX_ANT 512           /* number of antennas ("channels") */  
 #  define MAX_COARSE_DELAY 1023 /* maximum coarse delay, in sample periods */
 #else

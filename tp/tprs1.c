@@ -1466,7 +1466,7 @@
       } /* for (k */
     } /* for ( iARB */
 
-#if defined(USE_NDP) && USE_NDP
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
   /* reading N_SNAP */
   sprintf(keyword,"N_SNAP"); s.nSnap = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
@@ -1776,7 +1776,7 @@
     printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.eServerDesi[iDP2]);    
 
     } /* for ( iDP2 */
-#elif defined(USE_ADP) && USE_ADP
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
   /* reading N_ROACH */
   sprintf(keyword,"N_ROACH"); s.nRoach = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
@@ -3254,7 +3254,7 @@
 
     } /* for ( iStd */
 
-#if defined(USE_ADP) && USE_ADP
+#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
   /* reading TBF_GAIN */
   sprintf(keyword,"TBF_GAIN"); s.settings.tbn_gain = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }

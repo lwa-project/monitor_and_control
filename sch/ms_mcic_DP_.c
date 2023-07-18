@@ -178,8 +178,10 @@ int LWA_mibupdate_DP_(
       //memcpy( (&freq)+3, cmdata+2, 1 );
 
       memcpy( &ebw,      cmdata+6, 1 ); 
-      memcpy( (&gain)+0, cmdata+8, 1 ); /* flipping endian-ness of gain */
-      memcpy( (&gain)+1, cmdata+7, 1 ); 
+      memcpy(&gain, cmdata+7, 2);
+      gain = LWA_i2u_swap(gain); /* swapping endianness */
+      //memcpy( (&gain)+0, cmdata+8, 1 ); /* flipping endian-ness of gain */
+      //memcpy( (&gain)+1, cmdata+7, 1 );
       /* ignoring cmdata[9] = subslot */
 
       //printf("freq=%f %hhu %hhu %hhu %hhu\n",freq, cmdata[5], cmdata[4], cmdata[3], cmdata[2] );

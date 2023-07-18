@@ -101,10 +101,10 @@ int main ( int narg, char *argv[] ) {
         case LWA_OM_TRK_SOL: break;
         case LWA_OM_TRK_JOV: break;
         case LWA_OM_TRK_LUN: break;
-#if !defined(USE_NDP) || !USE_NDP
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
         case LWA_OM_TBN: break;
 #endif
-#if (defined(USE_NDP) && USE_NDP) || (defined(USE_ADP) && USE_ADP)
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
         case LWA_OM_TBF: break;
 #else
         case LWA_OM_TBW: break;
@@ -149,7 +149,7 @@ int main ( int narg, char *argv[] ) {
       printf("[%d/%d] INPUT: iFreq2=%ld\n",MT_TPMS,getpid(),iFreq2);
       printf("[%d/%d] INPUT: iBW=%d\n",MT_TPMS,getpid(),iBW);
       break;
-#if !defined(USE_NDP) || !USE_NDP
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
     case LWA_OM_TBN:
       iDur=10000;      if (narg>=4) sscanf(argv[3],"%ld",&iDur);   
       iFreq=832697741; if (narg>=5) sscanf(argv[4],"%ld",&iFreq); 
@@ -157,7 +157,7 @@ int main ( int narg, char *argv[] ) {
       printf("[%d/%d] INPUT: iFreq=%ld\n",MT_TPMS,getpid(),iFreq);
       break;
 #endif
-#if (defined(USE_NDP) && USE_NDP) || (defined(USE_ADP) && USE_ADP)
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
     case LWA_OM_TBF:
       iDur=10000;      if (narg>=4) sscanf(argv[3],"%ld",&iDur);
       iFreq=832697741; if (narg>=5) sscanf(argv[4],"%ld",&iFreq); 
@@ -239,11 +239,11 @@ int main ( int narg, char *argv[] ) {
 
   /* Specifying beam 1 for modes other than TBN or TBW */
   switch (eMode) {
-#if !defined(USE_NDP) || !USE_NDP
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
     case LWA_OM_TBN:
       break;
 #endif
-#if (!defined(USE_NDP) || !USE_NDP) && (!defined(USE_ADP) || !USE_ADP)
+#if (!defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP) && (!defined(LWA_BACKEND_IS_ADP) || !LWA_BACKEND_IS_ADP)
     case LWA_OM_TBW:
       break;
 #endif
@@ -273,7 +273,7 @@ int main ( int narg, char *argv[] ) {
   switch (eMode) {
     case LWA_OM_DIAG1:
       break;
-#if !defined(USE_NDP) || !USE_NDP
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
     case LWA_OM_TBN:
       fprintf(fp,"OBS_FREQ1      %ld\n",iFreq);
       //fprintf(fp,"OBS_FREQ1+     19.999999955 MHz\n");
@@ -281,7 +281,7 @@ int main ( int narg, char *argv[] ) {
       fprintf(fp,"OBS_BW+        100 kSPS\n"); 
       break;
 #endif
-#if (defined(USE_NDP) && USE_NDP) || (defined(USE_ADP) && USE_ADP)
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
     case LWA_OM_TBF:
       fprintf(fp,"OBS_FREQ1      %ld\n",iFreq);
       //fprintf(fp,"OBS_FREQ1+     19.999999955 MHz\n");

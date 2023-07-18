@@ -37,6 +37,7 @@ jobs:
             gpg \
             gpgv \
             gzip \
+            libcurl4-openssl-dev \
             libfftw3-dev \
             libgdbm-dev \
             pkg-config \

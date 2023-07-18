@@ -152,7 +152,7 @@ int main ( int narg, char *argv[] ) {
   strcpy(c.data,data); /* changed in reply */
   c.datalen = -1; /* assumed to be a string */
   
-#if defined(USE_NDP) && USE_NDP
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
   /* For NDP, c.data is raw binary, assembled from command line parameters. */
   /* the parameters are command-dependent */
   if (c.sid==LWA_SID_NDP) {
@@ -257,7 +257,7 @@ int main ( int narg, char *argv[] ) {
     }
 
   } /* if (c.sid==LWA_SID_NDP) */
-#elif defined(USE_ADP) && USE_ADP
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
   /* For ADP, c.data is raw binary, assembled from command line parameters. */
   /* the parameters are command-dependent */
   if (c.sid==LWA_SID_ADP) {

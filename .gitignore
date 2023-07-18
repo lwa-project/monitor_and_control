@@ -8,6 +8,7 @@ sch/Makefile
 exec/Makefile
 tp/Makefile
 python/Makefile
+python/config.py
 share/lwa_mcs.pc
 common/config.h
 

@@ -36,7 +36,7 @@ void me_getaltaz(
   /* Get TAI from mjd/mpm */
   int status = iauUtctai(mjd+DJM0, mpm/1000.0/86400, &tai1, &tai2);
   if( status == 1 ) {
-    printf("WARNING: iauUtctai returned 1 - dubious year\n");
+    fprintf(stderr, "WARNING: iauUtctai returned 1 - dubious year\n");
   }
   
   /* Get TT from TAI */
@@ -64,7 +64,7 @@ void me_getaltaz(
   /* Get the Earth orientation parameters for the day */
   status = me_geteop(mjd, mpm, &xp, &yp, &dut);
   if( status == 1 ) {
-    printf("WARNING: me_geteop returned 1 - MJD/MPM out of range of table\n");
+    fprintf(stderr, "WARNING: me_geteop returned 1 - MJD/MPM out of range of table\n");
   }
   
   /* Parallax from the geocenter to the observer */

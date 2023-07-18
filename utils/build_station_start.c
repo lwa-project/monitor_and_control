@@ -1,19 +1,28 @@
 #include "mcs.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <arpa/inet.h>
 
 int main(int argc, char *argv[]) {
   // Load in the base IP address for the MCS network
-  char ipaddr[17];
+  char ipaddr[INET_ADDRSTRLEN];
   strcpy(&ipaddr[0], "10.1.1.1");
   if( argc == 2 ) {
     if( (strncmp(argv[1], "-h", 2) == 0) \
         || (strncmp(argv[1], "--help", 6) == 0) ) {
           printf("./build_station_start [MCS IP address base]\n");
-          printf("where [MCS IP address base] defaults to %s\n", ipaddr);
+          printf("where [MCS IP address base] defaults to '%s'\n", ipaddr);
           return 1;
         }
-    strcpy(&ipaddr[0], argv[1]);
+    strncpy(&ipaddr[0], argv[1], INET_ADDRSTRLEN-1);
+    ipaddr[INET_ADDRSTRLEN-1] = '\0';
+  }
+  
+  // Validate
+  struct sockaddr_in *addr_in;
+  if( inet_pton(AF_INET, &ipaddr[0], &addr_in) != 1 ){
+    printf("Invalid IP address provided: '%s'\n", ipaddr);
+    return 1;
   }
   
   // Trim it down to the first three octets
@@ -35,10 +44,10 @@ int main(int argc, char *argv[]) {
   printf("echo \\\n'");
   printf("mibinit ASP %s.40 1740 1741\n", ipaddr);
   printf("mcic    ASP\n\n");
-  #if defined(USE_NDP) && USE_NDP
+  #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
     printf("mibinit NDP %s.10 1742 1743\n", ipaddr);
     printf("mcic    NDP\n\n");
-  #elif defined(USE_ADP) && USE_ADP
+  #elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
     printf("mibinit ADP %s.10 1742 1743\n", ipaddr);
     printf("mcic    ADP\n\n");
   #else
