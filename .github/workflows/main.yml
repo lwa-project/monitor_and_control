@@ -69,6 +69,8 @@ jobs:
       - name: "Build and Install - LWA-SV"
         run: |
           cd ../..
+          pwd
+          ls
           make clean
           ./configure --enable-adp
           make all
