@@ -736,7 +736,7 @@ int main ( int narg, char *argv[] ) {
               eD=0;
               break;
             case LWA_OM_STEPPED:
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
             case LWA_OM_TBF:
 #else
             case LWA_OM_TBW:      
