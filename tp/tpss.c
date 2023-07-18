@@ -361,9 +361,9 @@ int main ( int narg, char *argv[] ) {
       }
 #endif
 #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
-    if ( ( obs[n].OBS_MODE==LWA_OM_TBN ) {
+    if ( obs[n].OBS_MODE==LWA_OM_TBN ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_MODE TBN is not supported\n",MT_TPSS,getpid(),n);
-      return;
+      exit(EXIT_FAILURE);
       }
 #elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
     if ( ( obs[n].OBS_MODE==LWA_OM_TBN ) && ( obs[n].OBS_FREQ1<65739295 ) ) {
