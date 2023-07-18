@@ -106,7 +106,7 @@ class CelestialTests(unittest.TestCase):
     _ras = (0, 2, 4, 8, 16)
     _decs = (-60, -30, 0, 30, 60, 89)
     
-    def run_ephem_values(self, ra, dec, lat=35.0, lng=-180.0, hgt=2000.0):
+    def run_ephem_values(self, ra, dec, lat=35.0, lng=-108.0, hgt=2000.0):
         observer = ephem.Observer()
         observer.lat = str(lat)
         observer.lon = str(lng)
@@ -159,7 +159,7 @@ class CelestialTests(unittest.TestCase):
                                           (value['mcs_az'], value['mcs_alt']))
                         self.assertLess(sep, TEST_TOLERANCE_ARCSEC)
                         
-    def run_astropy_values(self, ra, dec, lat=35.0, lng=-180.0, hgt=2000.0):
+    def run_astropy_values(self, ra, dec, lat=35.0, lng=-108.0, hgt=2000.0):
         observer = EarthLocation.from_geodetic(lng, lat, height=hgt)
         tStart = Time('%04i-%02i-%02i 00:00:00' % TEST_DATE_START, format='iso', scale='utc')
         tStop = Time('%04i-%02i-%02i 00:00:00' % TEST_DATE_END, format='iso', scale='utc')
