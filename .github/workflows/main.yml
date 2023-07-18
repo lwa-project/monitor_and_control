@@ -69,8 +69,6 @@ jobs:
       - name: "Build and Install - LWA-SV"
         run: |
           cd $GITHUB_WORKSPACE
-          pwd
-          ls
           make clean
           ./configure --enable-adp
           make all
@@ -81,7 +79,7 @@ jobs:
           python -m unittest discover
       - name: "Build and Install - LWA-NA"
         run: |
-          cd ../..
+          cd $GITHUB_WORKSPACE
           make clean
           ./configure --enable-ndp
           make all
