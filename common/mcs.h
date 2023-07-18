@@ -1067,7 +1067,7 @@ struct ssmif_struct {
   char   sServerSlot[ME_MAX_NSERVER][ME_MAX_SERVERID_LENGTH+1]; /* SERVER_SLOT[] */
   int    eServerStat[ME_MAX_NSERVER];       /* SERVER_STAT[] */
   int    eServerDesi[ME_MAX_NSERVER];       /* SERVER_DESI[] */
-#elfi defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
   int    nRoach;                     /* N_ROACH */
   int    nRoachCh;                   /* N_ROACHCH */
   char   sRoachID[ME_MAX_NROACH][ME_MAX_ROACHID_LENGTH+1]; /* ROACH_ID[] */
