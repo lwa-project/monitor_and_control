@@ -75,15 +75,6 @@ AS_IF([test x$enable_ndp != xno],
       [AC_SUBST([HAVE_NDP], [1])
        AC_SUBST([HAVE_DP], [0])])
 
-AC_ARG_ENABLE([full-ndp],
-              [AS_HELP_STRING([--enable-ndp-as-full],
-                              [enable support for a full station with NDP at LWA-NA (default=no)])],
-              [enable_full_ndp=yes],
-              [enable_full_ndp=no])
-AC_SUBST([HAVE_FULL_NDP], [0])
-AS_IF([test x$enable_full_ndp != xno],
-      [AC_SUBST([HAVE_FULL_NDP], [1])])
-
 AC_ARG_WITH([repoint-check],
             [AS_HELP_STRING([--with-repoint-check=N],
                             [default interval in seconds for repointing check (default=1)])],

@@ -394,18 +394,10 @@ int main ( int narg, char *argv[] ) {
             if (!fp) {
                 bErr=1;
               } else {
-                #if defined(NDP_IS_FULL_STATION) && NDP_IS_FULL_STATION
                 fread(&(message_string[40]),1,1024,fp); /* load message_string[40..] with 1024 bytes from file */
-                #else
-                fread(&(message_string[40]),1,256,fp); /* load message_string[40..] with 256 bytes from file */
-                #endif
                 fclose(fp);
               }
-            #if defined(NDP_IS_FULL_STATION) && NDP_IS_FULL_STATION
             len=1026; /* 2 + 512 */
-            #else
-            len=258; /* 2 + 128 */
-            #endif
             //printf("-2- %d %hd %hhd %hhd '%s'\n",bErr,i2s1,message_string[38],message_string[39],full_filename);
             break;
 
@@ -421,11 +413,7 @@ int main ( int narg, char *argv[] ) {
             if (!fp) {
                 bErr=1;
               } else {
-                #if defined(NDP_IS_FULL_STATION) && NDP_IS_FULL_STATION
                 fread(&(message_string[40]),1,1024,fp); /* load message_string[40..] with 1024 bytes from file */
-                #else
-                fread(&(message_string[40]),1,256,fp); /* load message_string[40..] with 256 bytes from file */
-                #endif
                 fclose(fp);
               }       
             if (!bErr) {
@@ -436,27 +424,14 @@ int main ( int narg, char *argv[] ) {
               if (!fp) {
                   bErr=1;
                 } else {
-                  #if defined(NDP_IS_FULL_STATION) && NDP_IS_FULL_STATION
                   fread(&(message_string[1064]),1,2048,fp); /* load message_string[1064..] with 2048 bytes from file */
-                  #else
-                  fread(&(message_string[296]),1,512,fp); /* load message_string[296..] with 512 bytes from file */
-                  #endif
                   fclose(fp);
                 }  
               /* load the tuning into the next-to-last byte */
-              #if defined(NDP_IS_FULL_STATION) && NDP_IS_FULL_STATION
               message_string[3112]=i1u1;
-              #else
-              message_string[808]=i1u1; 
-              #endif
               /* load subslot into last byte */
-              #if defined(NDP_IS_FULL_STATION) && NDP_IS_FULL_STATION
               message_string[3113]=i1u2;
               len=3076; /* 2 + 1024 + 2048 + 1 + 1 */
-              #else
-              message_string[809]=i1u2;
-              len=772; /* 2 + 256 + 512 + 1 + 1 */
-              #endif
               }
             break;
 

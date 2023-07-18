@@ -672,7 +672,6 @@ double LWA_f8_swap( double x ) {
 
 #if defined(USE_NDP) && USE_NDP
 #define ME_SSMIF_FORMAT_VERSION 10
-#if defined(NDP_IS_FULL_STATION)
 #  define ME_MAX_NSTD 256
 #  define ME_MAX_NFEE 256
 #  define ME_MAX_NRPD 512
@@ -680,15 +679,6 @@ double LWA_f8_swap( double x ) {
 #  define ME_MAX_NARB 32
 #  define ME_MAX_NSNAP 8
 #  define ME_MAX_NSERVER 9
-#else
-#  define ME_MAX_NSTD 64
-#  define ME_MAX_NFEE 64
-#  define ME_MAX_NRPD 128
-#  define ME_MAX_NSEP 128
-#  define ME_MAX_NARB 8
-#  define ME_MAX_NSNAP 2
-#  define ME_MAX_NSERVER 3
-#endif
 #define ME_MAX_FEEID_LENGTH 10
 #define ME_MAX_RACK 6
 #define ME_MAX_PORT 50
@@ -972,11 +962,7 @@ struct osfs_struct { /* one step within an observation */
   };
 
 #if defined(USE_NDP) && USE_NDP
-#  if defined(NDP_IS_FULL_STATION)
-#    define LWA_MAX_NSTD 256 /* FIXME should be reconciled with ME_MAX_NSTD */
-#  else
-#    define LWA_MAX_NSTD 64 /* FIXME should be reconciled with ME_MAX_NSTD */
-#  endif
+#define LWA_MAX_NSTD 256 /* FIXME should be reconciled with ME_MAX_NSTD */
 #elif defined(USE_ADP) && USE_ADP
 #define LWA_MAX_NSTD 256 /* FIXME should be reconciled with ME_MAX_NSTD */
 #else

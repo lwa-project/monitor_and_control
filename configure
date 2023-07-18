@@ -673,7 +673,6 @@ MSE_USERNAME
 MSE_IP
 BEAM_REPOINT_RES
 BEAM_REPOINT_INTERVAL
-HAVE_FULL_NDP
 HAVE_NDP
 HAVE_ADP
 HAVE_DP
@@ -778,7 +777,6 @@ with_sysroot
 enable_libtool_lock
 enable_adp
 enable_ndp
-enable_full_ndp
 with_repoint_check
 with_repoint_res
 with_sch_ip
@@ -1430,8 +1428,6 @@ Optional Features:
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --enable-adp            enable support for ADP at LWA-SV (default=no)
   --enable-ndp            enable support for NDP at LWA-NA (default=no)
-  --enable-ndp-as-full    enable support for a full station with NDP at LWA-NA
-                          (default=no)
   --disable-python        disable building the Python bindings (default=no)
 
 Optional Packages:
@@ -12950,22 +12946,6 @@ then :
   HAVE_NDP=1
 
        HAVE_DP=0
-
-fi
-
-# Check whether --enable-full-ndp was given.
-if test ${enable_full_ndp+y}
-then :
-  enableval=$enable_full_ndp; enable_full_ndp=yes
-else $as_nop
-  enable_full_ndp=no
-fi
-
-HAVE_FULL_NDP=0
-
-if test x$enable_full_ndp != xno
-then :
-  HAVE_FULL_NDP=1
 
 fi
 

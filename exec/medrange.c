@@ -20,11 +20,7 @@
 #define FLAG_VAL (1e+20)
 
 #if defined(USE_NDP) && USE_NDP
-#  if defined(NPD_IS_FULL_STATION) && NDP_IS_FULL_STATION
-#    define MAX_DP_CH 512      /* number of SNAP channel inputs (per NDP ICD) */
-#  else
-#    define MAX_DP_CH 128      /* number of SNAP channel inputs (per NDP ICD) */
-#  endif
+#  define MAX_DP_CH 512      /* number of SNAP channel inputs (per NDP ICD) */
 #elif defined(USE_ADP) && USE_ADP
 #  define MAX_DP_CH 512      /* number of ROACH channel inputs (per ADP ICD) */
 #else
