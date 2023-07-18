@@ -77,3 +77,14 @@ jobs:
         run: |
           cd exec/tests
           python -m unittest discover
+      - name: "Build and Install - LWA-NA"
+        run: |
+          cd ../..
+          make clean
+          ./configure --enable-ndp
+          make all
+          mkdir exec/state
+      - name: Test - LWA-NA
+        run: |
+          cd exec/tests
+          python -m unittest discover
