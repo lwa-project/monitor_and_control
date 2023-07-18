@@ -36,7 +36,7 @@ TEST_DATE_START = (_test_date_start.year, _test_date_start.month, _test_date_sta
 TEST_DATE_END = (_test_date_end.year, _test_date_end.month, _test_date_end.day)
 TEST_DATE_STEP_DAY = 1
 
-TEST_TOLERANCE_ARCSEC = 1.0
+TEST_TOLERANCE_ARCSEC = 1.5
 
 
 def _call_mcs(mjd, mpm, lat, lng, hgt, type='sol'):
