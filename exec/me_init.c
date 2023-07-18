@@ -242,7 +242,11 @@ int main ( int narg, char *argv[] ) {
   for (i=0;i<ME_MAX_NARB;i++) { 
     for (j=0;j<ME_MAX_NARBCH;j++) { 
       sdm.ssss.eARBStat[i][j] = 0; } }                   /* ARB_STAT[][] */
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+  for (i=0;i<ME_MAX_NSNAP;i++) { 
+    for (j=0;j<ME_MAX_NSNAPCH;j++) { 
+      sdm.ssss.eSnapStat[i][j] = 0; } }                   /* SNAP_STAT[][] */
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
   for (i=0;i<ME_MAX_NROACH;i++) { 
     for (j=0;j<ME_MAX_NROACHCH;j++) { 
       sdm.ssss.eRoachStat[i][j] = 0; } }                   /* ROACH_STAT[][] */
