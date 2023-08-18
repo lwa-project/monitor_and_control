@@ -193,7 +193,7 @@ char *LWA_saysum( int sidsum ) {
 
 
 /* === LWA Subsystem IDs === */
-#define LWA_MAX_SID 19 /* maximum subsystem code; also maximum number of subsystems */
+#define LWA_MAX_SID 20 /* maximum subsystem code; also maximum number of subsystems */
 #define LWA_SID_NU1  1 /* null subsystem #1 (used for testing) */
 #define LWA_SID_NU2  2 /* null subsystem #2 (used for testing) */
 #define LWA_SID_NU3  3 /* null subsystem #3 (used for testing) */
