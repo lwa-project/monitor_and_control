@@ -2611,25 +2611,8 @@
                   MT_TPRS,getpid(),data,iRack+1,iPort+1);   
                 exit(EXIT_FAILURE);
                 }
-              break; 
-            case LWA_SID_DP_:
-              b = (!strncmp(data,"MCS",3)) || (!strncmp(data,"DC1",3)) || (!strncmp(data,"DC1",2)) ||
-                  (!strncmp(data,"FAN",2)) || (!strncmp(data,"SYN",2)) || (!strncmp(data,"SWI",2))  ;
-              if (!b) {
-                printf("[%d/%d] FATAL: PWR_NAME='%s' not valid for PWR_SS[%d][%d]='DP_'\n",
-                  MT_TPRS,getpid(),data,iRack+1,iPort+1);   
-                exit(EXIT_FAILURE);
-                }
               break;
-            case LWA_SID_ADP:
-              b = (!strncmp(data,"MCS",3)) || (!strncmp(data,"DC1",3)) || (!strncmp(data,"DC1",2)) ||
-                  (!strncmp(data,"FAN",2)) || (!strncmp(data,"SYN",2)) || (!strncmp(data,"SWI",2))  ;
-              if (!b) {
-                printf("[%d/%d] FATAL: PWR_NAME='%s' not valid for PWR_SS[%d][%d]='ADP'\n",
-                  MT_TPRS,getpid(),data,iRack+1,iPort+1);   
-                exit(EXIT_FAILURE);
-                }
-              break;
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
             case LWA_SID_NDP:
               b = (!strncmp(data,"MCS",3)) || (!strncmp(data,"DC1",3)) || (!strncmp(data,"DC1",2)) ||
                   (!strncmp(data,"FAN",2)) || (!strncmp(data,"SYN",2)) || (!strncmp(data,"SWI",2))  ;
@@ -2639,6 +2622,27 @@
                 exit(EXIT_FAILURE);
                 }
               break;
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+            case LWA_SID_ADP:
+              b = (!strncmp(data,"MCS",3)) || (!strncmp(data,"DC1",3)) || (!strncmp(data,"DC1",2)) ||
+                  (!strncmp(data,"FAN",2)) || (!strncmp(data,"SYN",2)) || (!strncmp(data,"SWI",2))  ;
+              if (!b) {
+                printf("[%d/%d] FATAL: PWR_NAME='%s' not valid for PWR_SS[%d][%d]='ADP'\n",
+                  MT_TPRS,getpid(),data,iRack+1,iPort+1);   
+                exit(EXIT_FAILURE);
+                }
+              break;
+#else
+            case LWA_SID_DP_:
+              b = (!strncmp(data,"MCS",3)) || (!strncmp(data,"DC1",3)) || (!strncmp(data,"DC1",2)) ||
+                  (!strncmp(data,"FAN",2)) || (!strncmp(data,"SYN",2)) || (!strncmp(data,"SWI",2))  ;
+              if (!b) {
+                printf("[%d/%d] FATAL: PWR_NAME='%s' not valid for PWR_SS[%d][%d]='DP_'\n",
+                  MT_TPRS,getpid(),data,iRack+1,iPort+1);   
+                exit(EXIT_FAILURE);
+                }
+              break;
+#endif
             case LWA_SID_DR1:
             case LWA_SID_DR2:
             case LWA_SID_DR3:
