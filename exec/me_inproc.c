@@ -193,7 +193,7 @@ int me_beamspec( char *cs_filename,
     strcpy(data,"");
     if (action.len>0) fread( data, action.len, 1, fp );
 
-    if ((action.sid==LWA_SID_DP_ || action.sid==LWA_SID_ADP) && (action.cid==LWA_CMD_BAM)) {
+    if ((action.sid==LWA_SID_DP_ || action.sid==LWA_SID_ADP || action.sid==LWA_SID_NDP) && (action.cid==LWA_CMD_BAM)) {
 
       if (data[2]!=99) { /* ASCII 99 ("c") denotes custom beams -- those are already dealt with */
         m++;
@@ -1034,9 +1034,11 @@ int main ( int narg, char *argv[] ) {
                   sprintf(dr_format,"DEFAULT_TBW"); 
                   break;
 #endif
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
                 case LWA_OM_TBN:       
                   sprintf(dr_format,"DEFAULT_TBN"); 
                   break;
+#endif
                 case LWA_OM_DIAG1:
                   printf(     "[%d/%d] DR setup: osf.OBS_MODE=%d: How'd I get here?\n",ME_INPROC,getpid(),osf.OBS_MODE);
                   fprintf(fpl,"[%d/%d] DR setup: osf.OBS_MODE=%d: How'd I get here?\n",ME_INPROC,getpid(),osf.OBS_MODE);
@@ -1423,7 +1425,11 @@ int main ( int narg, char *argv[] ) {
                        (gain2 != last_drx_gain2) ) ) {
                   LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 ); /* staggering send times for DP commands by 10 ms */
                   cs[ncs].action.bASAP = 0;                   
+                  #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+                  cs[ncs].action.sid = LWA_SID_NDP;
+                  #else
                   cs[ncs].action.sid = LWA_SID_DP_;  
+                  #endif
                   cs[ncs].action.cid = LWA_CMD_DRX; 
                   sprintf( cs[ncs].data, "%hd 2 %8.0f %hu %hd %ld",
                                   osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
