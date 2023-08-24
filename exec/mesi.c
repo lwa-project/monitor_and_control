@@ -292,9 +292,8 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
        case LWA_CMD_BAM:
          // DATA field structure:
          // uint16 BEAM_ID;
-         // uint16 BEAM_DELAY[520];
-         // sint16 BEAM_GAIN[260][2][2];
-         // uint8 DRX_TUNING;
+         // uint16 BEAM_DELAY[512];
+         // sint16 BEAM_GAIN[256][2][2];
          // uint8 sub_slot;
 
          // What we will send in this case is simply the string "data" as provided.
@@ -309,28 +308,31 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          // float32 DRX_FREQ;
          // unit8 DRX_BW;
          // uint16 DRX_GAIN;
+         // uint8 sub_slot;
 
          // parse the input string into parameters
-         sscanf(data,"%hhu %f %hhu %hu", &tuning, &freq, &ebw, &gain);
-         //printf("%f %1hhu %1hhu %1hhu %1hhu\n",freq,c.data[1],c.data[2],c.data[3],c.data[4]);
+         sscanf(data,"%hhu %hhu %f %hhu %hu %hhu", &beam, &tuning, &freq, &ebw, &gain, &subslot);
+         //printf("%f %1hhu %1hhu %1hhu %1hhu\n",freq,c.data[2],c.data[3],c.data[4],c.data[5]);
 
          // assemble into c.data:
-         memcpy( &(c.data[0]), &tuning,   1 );
+         memcpy( &(c.data[0]), &beam,     1 );
+         memcpy( &(c.data[1]), &tuning,   1 );
 
          /* flipping endian-ness of freq: */
-         f4.f  = freq;  c.data[1]= f4.b[3]; c.data[2]= f4.b[2]; c.data[3]= f4.b[1]; c.data[4]= f4.b[0]; 
+         f4.f  = freq;  c.data[2]= f4.b[3]; c.data[3]= f4.b[2]; c.data[4]= f4.b[1]; c.data[5]= f4.b[0]; 
 
          /* flipping endian-ness of gain: */
-         i2u.i  = gain;  c.data[6]= i2u.b[1]; c.data[7]= i2u.b[0];  
+         i2u.i  = gain;  c.data[7]= i2u.b[1]; c.data[8]= i2u.b[0];  
 
-         memcpy( &(c.data[5]), &ebw,      1 );
+         memcpy( &(c.data[6]), &ebw,      1 );
          //memcpy( &(c.data[7]), (&gain)+1, 1 ); /* flipping endian-ness of gain */
          //memcpy( &(c.data[8]), (&gain)+0, 1 ); /* flipping endian-ness of gain */
+         memcpy( &(c.data[9]), &subslot,  1 );
 
-         f4.b[3] = c.data[1]; f4.b[2] = c.data[2]; f4.b[1] = c.data[3]; f4.b[0] = c.data[4]; freq = f4.f;  
-         //printf("%f %1hhu %1hhu %1hhu %1hhu\n",freq,c.data[1],c.data[2],c.data[3],c.data[4]);
+         f4.b[3] = c.data[2]; f4.b[2] = c.data[3]; f4.b[1] = c.data[4]; f4.b[0] = c.data[5]; freq = f4.f;  
+         //printf("%f %1hhu %1hhu %1hhu %1hhu\n",freq,c.data[2],c.data[3],c.data[4],c.data[5]);
 
-         c.datalen=8;
+         c.datalen=10;
 
          break;
 

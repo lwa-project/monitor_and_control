@@ -403,12 +403,12 @@ int main ( int narg, char *argv[] ) {
 
           case LWA_CMD_BAM:
             /* mesi() passes a string argument containing <BEAM_ID> <dfile> <gfile> <SUBSLOT> */
-            sscanf(mq_msg.data,"%hu %s %s %hhu %hhu",&i2u1,dfile,gfile,&i1u1,&i1u2);
+            sscanf(mq_msg.data,"%hu %s %s %hhu",&i2u1,dfile,gfile,&i1u1);
             /* load BEAM_ID into first two bytes of "c" (also converting to big-endian) */
             i2u.i = i2u1; message_string[38]=i2u.b[1]; message_string[39]=i2u.b[0];  
             /* construct filename for BEAM_DELAY data */
             sprintf(full_filename,"%s/%s",MCS_DFILES_PATH,dfile); /* construct full filename */
-            /* retrieve BEAM_DELAY from the specified .df file */             
+            /* retrieve BEAM_DELAY from the specified .df file */     
             fp = fopen(full_filename,"rb");
             if (!fp) {
                 bErr=1;
@@ -427,11 +427,9 @@ int main ( int narg, char *argv[] ) {
                   fread(&(message_string[1064]),1,2048,fp); /* load message_string[1064..] with 2048 bytes from file */
                   fclose(fp);
                 }  
-              /* load the tuning into the next-to-last byte */
-              message_string[3112]=i1u1;
               /* load subslot into last byte */
-              message_string[3113]=i1u2;
-              len=3076; /* 2 + 1024 + 2048 + 1 + 1 */
+              message_string[3112]=i1u1;
+              len=3075; /* 2 + 1024 + 2048 + 1 */
               }
             break;
 
