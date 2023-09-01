@@ -36,7 +36,7 @@ int LWA_mibupdate_NDP(
   unsigned long int ul;
   char tbf_tuning_mask[20];
 
-  char sData[10];
+  char sData[13];
   long int mjd, mpm;
 
   float f4;
