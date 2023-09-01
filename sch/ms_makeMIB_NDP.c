@@ -33,7 +33,7 @@ main ( int narg, char *argv[] ) {
   /*=================*/
 
   FILE *fp;
-  int i;
+  int i,j;
 
 
   /*==================*/
