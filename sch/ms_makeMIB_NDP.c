@@ -76,22 +76,20 @@ main ( int narg, char *argv[] ) {
     fprintf(fp,"V 0.7.%d\tMCS_CF%03d\t\t\tUNK 	a32 	NUL\n",i,i);
     }
   
-  fprintf(fp,"B 0.8           MCS_TUNING_CONFIG 		NUL 	NUL 	NUL\n");
-  for ( i=1; i<=2; i++ ) {
-    fprintf(fp,"B 0.8.%d         MCS_TUNING%d 			NUL 	NUL 	NUL\n", i, i); /* corresponds to DRX_BEAM in DRX commands, BEAM_ID in BAM commands */
-    fprintf(fp,"V 0.8.%d.1     MCS_TUNING%d_FREQ 		0.000 	a12 	NUL\n", i, i); /* corresponds to DRX_FREQ in DRX commands [Hz] */
-    fprintf(fp,"V 0.8.%d.2     MCS_TUNING%d_BW 		0 	a1 	NUL\n", i, i); /* 1-8 */
-    fprintf(fp,"V 0.8.%d.3     MCS_TUNING%d_GAIN 		0 	a2 	NUL\n", i, i); /* 0-15 */
+  fprintf(fp,"B 0.7           MCS_BEAM_CONFIG 		NUL 	NUL 	NUL\n");
+  for ( i=0; i<4; i++ ) {
+    fprintf(fp,"B 0.7.%d         MCS_BEAM%d 			NUL 	NUL 	NUL\n",i+1,i+1); /* corresponds to DRX_BEAM in DRX commands, BEAM_ID in BAM commands */
+    fprintf(fp,"V 0.7.%d.1       MCS_BEAM%d_DFILE 		UNK 	a32 	NUL\n",i+1,i+1); /* name of file of delays (BEAM_DELAY[520] in BAM command */
+    fprintf(fp,"V 0.7.%d.2       MCS_BEAM%d_GFILE 		UNK 	a32 	NUL\n",i+1,i+1); /* name of file of gains (sint16 BEAM_GAIN[260][2][2] in BAM command */
+    fprintf(fp,"B 0.7.%d.3       MCS_BEAM%d_T1		UNK 	NUL 	NUL\n",i+1,i+1); /* corresponds to DRX_TUNING in DRX commands */
+    fprintf(fp,"V 0.7.%d.3.1     MCS_BEAM%d_T1_FREQ 		0.000 	a12 	NUL\n",i+1,i+1); /* corresponds to DRX_FREQ in DRX commands [Hz] */
+    fprintf(fp,"V 0.7.%d.3.2     MCS_BEAM%d_T1_BW 		0 	a1 	NUL\n",i+1,i+1); /* 1-7 */
+    fprintf(fp,"V 0.7.%d.3.3     MCS_BEAM%d_T1_GAIN 		0 	a2 	NUL\n",i+1,i+1); /* 0-15 */
+    fprintf(fp,"B 0.7.%d.4       MCS_BEAM%d_T2		UNK 	NUL 	NUL\n",i+1,i+1); 
+    fprintf(fp,"V 0.7.%d.4.1     MCS_BEAM%d_T2_FREQ 		0.000 	a12 	NUL\n",i+1,i+1); 
+    fprintf(fp,"V 0.7.%d.4.2     MCS_BEAM%d_T2_BW 		0 	a1 	NUL\n",i+1,i+1); 
+    fprintf(fp,"V 0.7.%d.4.3     MCS_BEAM%d_T2_GAIN 		0 	a2 	NUL\n",i+1,i+1); 
     }
-    
-  fprintf(fp,"B 0.9           MCS_BEAM_CONFIG 		NUL 	NUL 	NUL\n");
-  for ( i=1; i<=2; i++ ) {
-    fprintf(fp,"B 0.9.%d         MCS_BEAM%d 			NUL 	NUL 	NUL\n", i, i); /* corresponds to DRX_BEAM in DRX commands, BEAM_ID in BAM commands */
-    fprintf(fp,"V 0.9.%d.1       MCS_BEAM%d_DFILE 		UNK 	a32 	NUL\n", i, i); /* name of file of delays (BEAM_DELAY[520] in BAM command */
-    fprintf(fp,"V 0.9.%d.2       MCS_BEAM%d_GFILE 		UNK 	a32 	NUL\n", i, i); /* name of file of gains (sint16 BEAM_GAIN[260][2][2] in BAM command */
-    fprintf(fp,"B 0.9.%d.3       MCS_BEAM%d_TUNING		UNK 	NUL 	NUL\n", i, i); /* corresponds to DRX_TUNING in DRX commands */
-    }
-
   /* lay in MCS-RESERVED */
 
   fprintf(fp,"B 1 		MCS-RESERVED 		NUL 	NUL 	NUL\n");
@@ -150,12 +148,14 @@ main ( int narg, char *argv[] ) {
   
   fprintf(fp,"V 9 		CMD_STAT 		0 	r606 	r606\n"); 
   
-  fprintf(fp,"B 11		DRX_CONFIG		NUL	NUL	NUL\n");
-  for ( i=0; i<2; i++ ) {
+  for ( i=0; i<4; i++ ) {
     fprintf(fp,"B 11.%d		DRX_CONFIG_%d		NUL	NUL	NUL\n",i+1,i+1);
-    fprintf(fp,"V 11.%d.1	DRX_CONFIG_%d_FREQ		0	f4r	f4r\n",i+1,i+1);
-    fprintf(fp,"V 11.%d.2	DRX_CONFIG_%d_FILTER		0	i2ur	i2ur\n",i+1,i+1);
-    fprintf(fp,"V 11.%d.3	DRX_CONFIG_%d_GAIN		0	i2ur	i2ur\n",i+1,i+1);
+    for ( j=0; j<2; j++ ) {
+      fprintf(fp,"B 11.%d.%d		DRX_CONFIG_%d_%d		NUL	NUL	NUL\n",i+1,j+1,i+1,j+1);
+      fprintf(fp,"V 11.%d.%d.1	DRX_CONFIG_%d_%d_FREQ		0	f4r	f4r\n",i+1,j+1,i+1,j+1);
+      fprintf(fp,"V 11.%d.%d.2	DRX_CONFIG_%d_%d_FILTER		0	i2ur	i2ur\n",i+1,j+1,i+1,j+1);
+      fprintf(fp,"V 11.%d.%d.3	DRX_CONFIG_%d_%d_GAIN		0	i2ur	i2ur\n",i+1,j+1,i+1,j+1);
+      }
     }
   
   fprintf(fp,"B 12 		SERVER_STAT		NUL	NUL	NUL\n");

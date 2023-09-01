@@ -179,32 +179,33 @@ int LWA_mibupdate_NDP(
       //printf("freq=%f %hhu %hhu %hhu %hhu\n",freq, cmdata[5], cmdata[4], cmdata[3], cmdata[2] );
 
       /* recovering parameters from packed binary argument */
-      memcpy( &tuning,   cmdata+0, 1 );
+      memcpy( &beam,     cmdata+0, 1 );
+      memcpy( &tuning,   cmdata+1, 1 );
       
       memset(&freq,0,4);                  
-        memcpy(&freq,cmdata+1,4);          
+        memcpy(&freq,cmdata+2,4);          
         freq = LWA_f4_swap(freq); /* swapping endianness */
       //memcpy( (&freq)+0, cmdata+5, 1 ); /* flipping endian-ness of freq */
       //memcpy( (&freq)+1, cmdata+4, 1 );
       //memcpy( (&freq)+2, cmdata+3, 1 );
       //memcpy( (&freq)+3, cmdata+2, 1 );
 
-      memcpy( &ebw,      cmdata+5, 1 ); 
-      memcpy( (&gain)+0, cmdata+7, 1 ); /* flipping endian-ness of gain */
-      memcpy( (&gain)+1, cmdata+6, 1 ); 
+      memcpy( &ebw,      cmdata+6, 1 ); 
+      memcpy(&gain, cmdata+7, 2);
+      gain = LWA_i2u_swap(gain); /* swapping endianness */
       /* ignoring cmdata[9] = subslot */
 
       //printf("freq=%f %hhu %hhu %hhu %hhu\n",freq, cmdata[5], cmdata[4], cmdata[3], cmdata[2] );
 
-      sprintf(sMIBlabel,"MCS_TUNING%1hhu_FREQ",tuning);
+      sprintf(sMIBlabel,"MCS_BEAM%1hhu_T%1hhu_FREQ",beam,tuning);
       sprintf(sData,"%12.3f",freq);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
 
-      sprintf(sMIBlabel,"MCS_TUNING%1hhu_BW",tuning);
+      sprintf(sMIBlabel,"MCS_BEAM%1hhu_T%1hhu_BW",beam,tuning);
       sprintf(sData,"%1hhu",ebw);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
 
-      sprintf(sMIBlabel,"MCS_TUNING%1hhu_GAIN",tuning);
+      sprintf(sMIBlabel,"MCS_BEAM%1hhu_T%1hhu_GAIN",beam,tuning);
       sprintf(sData,"%2hu",gain);
       eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
 
