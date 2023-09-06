@@ -32,17 +32,17 @@ int LWA_mibupdate_NDP(
   signed int si;
   unsigned long int uli;
   char tbf_trig_time[10];
-  char tbf_samples[9];
+  char tbf_samples[10];
   unsigned long int ul;
-  char tbf_tuning_mask[20];
+  char tbf_tuning_mask[21];
 
   char sData[13];
   long int mjd, mpm;
 
   float f4;
   
-  char cor_navg[10];
-  char cor_tuning_mask[20];
+  char cor_navg[13];
+  char cor_tuning_mask[21];
   char cor_gain[3];
   char cor_sub_slot[3];
 
