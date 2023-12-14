@@ -16,16 +16,19 @@
 // ---
 
 
+#include "mcs.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define ME "megfg"
 
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-#define MAX_STD 256           /* max number of stands */  
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+#  define MAX_STD 256           /* max number of stands */
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#  define MAX_STD 256           /* max number of stands */  
 #else
-#define MAX_STD 260           /* max number of stands */  
+#  define MAX_STD 260           /* max number of stands */  
 #endif
 
 int main( int narg, char *argv[] ) {
@@ -39,13 +42,6 @@ int main( int narg, char *argv[] ) {
   int i,j,k;
 
   FILE *fp;
-
-  union {
-    signed short int i;
-    char b[2];
-    } i2s;
-
-  char bb;
 
   /* Parse command line */
   if (narg<3) {
@@ -93,9 +89,7 @@ int main( int narg, char *argv[] ) {
   for (i=0; i<MAX_STD; i++) {
     for (j=0; j<2; j++) {
       for (k=0; k<2; k++) {
-        i2s.i = g[i][j][k]; 
-        bb=i2s.b[0]; i2s.b[0]=i2s.b[1]; i2s.b[1]=bb;
-        g[i][j][k] = i2s.i;  
+        g[i][j][k] = LWA_i2s_swap(g[i][j][k]);  
         }
       }
     //printf("%hd %hd %hd %hd\n",g[i][0][0],g[i][0][1],g[i][1][0],g[i][1][1]);
@@ -116,6 +110,8 @@ int main( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// megfg.c: J. Dowell, UNM, 2022 May 3
+//   .1: Added support for NDP
 // megfg.c: J. Dowell, UNM, 2015 Aug 28
 //   .1: Added support for ADP
 // megfg.c: S.W. Ellingson, Virginia Tech, 2014 Mar 11

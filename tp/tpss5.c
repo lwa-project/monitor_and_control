@@ -42,7 +42,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
         printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
         sscanf(data,"%d",&(obs[nobs].OBS_ASP_FLT[n]));
         printf("...converts to %d\n",obs[nobs].OBS_ASP_FLT[n]);
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
         if ( ( obs[nobs].OBS_ASP_FLT[n]<-1 ) || ( obs[nobs].OBS_ASP_FLT[n]>5 ) ) {   
 #else
         if ( ( obs[nobs].OBS_ASP_FLT[n]<-1 ) || ( obs[nobs].OBS_ASP_FLT[n]>3 ) ) {
@@ -140,7 +140,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
 
   } /* for n */
 
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
     sprintf(keyword,"OBS_TBF_SAMPLES");  
     obs[nobs].OBS_TBF_SAMPLES=12000000;  /* default values */
     while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
@@ -220,6 +220,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
       }
 #endif
 
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
     sprintf(keyword,"OBS_TBN_GAIN");  obs[nobs].OBS_TBN_GAIN=-1; 
     while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
     switch (i) {
@@ -244,6 +245,7 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
       case TPSS_PL_KEYWORD_MISMATCH:                                                                                           break;
       case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
       }
+#endif
 
     sprintf(keyword,"OBS_DRX_GAIN");  obs[nobs].OBS_DRX_GAIN=-1; 
     while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }

@@ -44,7 +44,10 @@ int main(int argc, char *argv[]) {
   printf("echo \\\n'");
   printf("mibinit ASP %s.40 1740 1741\n", ipaddr);
   printf("mcic    ASP\n\n");
-  #if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+  #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+    printf("mibinit NDP %s.10 1742 1743\n", ipaddr);
+    printf("mcic    NDP\n\n");
+  #elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
     printf("mibinit ADP %s.10 1742 1743\n", ipaddr);
     printf("mcic    ADP\n\n");
   #else

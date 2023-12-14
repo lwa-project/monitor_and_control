@@ -2,6 +2,7 @@
 aclocal.m4
 autom4te.cache
 config.status
+config.log
 config.mk
 Makefile
 sch/Makefile
@@ -31,6 +32,7 @@ sch/ms_makeMIB_ADP
 sch/ms_makeMIB_ASP
 sch/ms_makeMIB_DP
 sch/ms_makeMIB_DR
+sch/ms_makeMIB_NDP
 sch/ms_makeMIB_SHL
 sch/ms_mb
 sch/ms_mcic
@@ -78,7 +80,9 @@ utils/test_tp_connection
 
 # Python stuff
 *.pyc
-
 python/build/
 python/dist/
 python/lwa_mcs.egg-info/
+
+# State directories
+exec/state

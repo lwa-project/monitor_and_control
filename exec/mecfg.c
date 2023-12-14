@@ -14,6 +14,7 @@
 // suitable for DP "sint16 COEFF_DATA[16][32]" arguments
 // See end of this file for history.
 
+#include "mcs.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,13 +34,6 @@ int main( int narg, char *argv[] ) {
   //char line[1024];
 
   FILE *fp;
-
-  union {
-    signed short int i;
-    char b[2];
-    } i2s;
-
-  char bb;
 
   /* Parse command line */
   if (narg<3) {
@@ -78,9 +72,7 @@ int main( int narg, char *argv[] ) {
   /* convert to big-endian */
   for (i=0; i<MAX_DELAYS; i++) {
     for (j=0; j<MAX_COEFFS; j++) {
-      i2s.i = c[i][j]; 
-      bb=i2s.b[0]; i2s.b[0]=i2s.b[1]; i2s.b[1]=bb;
-      c[i][j] = i2s.i;  
+      c[i][j] = LWA_i2s_swap(c[i][j]);
       printf("%hd ",c[i][j]);
       }
     printf("\n");

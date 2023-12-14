@@ -31,10 +31,12 @@
 
 #include "mt.h"
 
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-#define TPSS_FORMAT_VERSION 6            /* version of MCS0030 used here - ADP */
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+#  define TPSS_FORMAT_VERSION 7            /* version of MCS0030 used here - NDP */
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#  define TPSS_FORMAT_VERSION 6            /* version of MCS0030 used here - ADP */
 #else
-#define TPSS_FORMAT_VERSION 5            /* version of MCS0030 used here - DP */
+#  define TPSS_FORMAT_VERSION 5            /* version of MCS0030 used here - DP */
 #endif
 #define MAX_SDF_LINE_LENGTH 4096
 #define MAX_SDF_NOTE_LENGTH 32
@@ -335,7 +337,7 @@ int main ( int narg, char *argv[] ) {
     }
 
   for (n=1;n<=nobs;n++) {
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
     if ( (obs[n].OBS_DUR==0) && ( ! ( (obs[n].OBS_MODE==LWA_OM_TBF)     || 
                                       (obs[n].OBS_MODE==LWA_OM_DIAG1)     ) ) )  {
       printf("[%d/%d] FATAL: obs[%d].OBS_DUR==0 for a mode other than TBF or DIAG\n",MT_TPSS,getpid(),n);
@@ -352,13 +354,18 @@ int main ( int narg, char *argv[] ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_RA<0 when mode is TRK_RADEC\n",MT_TPSS,getpid(),n);
       exit(EXIT_FAILURE);
       }
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
     if ( ( obs[n].OBS_MODE==LWA_OM_TBF ) && ( obs[n].OBS_FREQ1<222417950 ) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TBF\n",MT_TPSS,getpid(),n);
       exit(EXIT_FAILURE);
       }
 #endif
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+    if ( obs[n].OBS_MODE==LWA_OM_TBN ) {
+      printf("[%d/%d] FATAL: obs[%d].OBS_MODE TBN is not supported\n",MT_TPSS,getpid(),n);
+      exit(EXIT_FAILURE);
+      }
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
     if ( ( obs[n].OBS_MODE==LWA_OM_TBN ) && ( obs[n].OBS_FREQ1<65739295 ) ) {
       printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TBN\n",MT_TPSS,getpid(),n);
       exit(EXIT_FAILURE);
@@ -369,7 +376,7 @@ int main ( int narg, char *argv[] ) {
       exit(EXIT_FAILURE);
       }
 #endif
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
@@ -400,7 +407,7 @@ int main ( int narg, char *argv[] ) {
       exit(EXIT_FAILURE);
       }
 #endif
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
@@ -434,7 +441,7 @@ int main ( int narg, char *argv[] ) {
       exit(EXIT_FAILURE);
       }
 #endif
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
     if ( (obs[n].OBS_MODE==LWA_OM_TBF      ) && (SESSION_DRX_BEAM!=1) ) {
       printf("[%d/%d] FATAL: SESSION_DRX_BEAM!=1 when obs[%d].OBS_MODE is TBF\n",MT_TPSS,getpid(),n);
       exit(EXIT_FAILURE);
@@ -452,7 +459,7 @@ int main ( int narg, char *argv[] ) {
 #endif
     } /* for n */
 
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
   /* check to make sure that session doesn't mix TBF/TBN with other observing modes */
   b_TB_requested = 0;
   b_DRX_requested = 0;
@@ -492,7 +499,7 @@ int main ( int narg, char *argv[] ) {
   if (b_TB_requested) SESSION_DRX_BEAM=ME_MAX_NDPOUT;
 #endif
 
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
    /* if mode = TBF, OBS_DUR needs to be computed */
   for (n=1;n<=nobs;n++) {
     if (obs[n].OBS_MODE==LWA_OM_TBF) {
@@ -762,14 +769,16 @@ int main ( int narg, char *argv[] ) {
       }
 
     fprintf(fp,"\n");
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
     fprintf(fp,"OBS_TBF_SAMPLES %ld\n",obs[n].OBS_TBF_SAMPLES);
     fprintf(fp,"OBS_TBF_GAIN %d\n",obs[n].OBS_TBF_GAIN);
 #else
     fprintf(fp,"OBS_TBW_BITS %d\n",obs[n].OBS_TBW_BITS);
     fprintf(fp,"OBS_TBW_SAMPLES %ld\n",obs[n].OBS_TBW_SAMPLES);
 #endif
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
     fprintf(fp,"OBS_TBN_GAIN %d\n",obs[n].OBS_TBN_GAIN);
+#endif
     fprintf(fp,"OBS_DRX_GAIN %d\n",obs[n].OBS_DRX_GAIN);
 
     } /* for n */
@@ -897,14 +906,16 @@ int main ( int narg, char *argv[] ) {
     for (m=1;m<=LWA_MAX_NSTD;m++) { osf2.OBS_ASP_AT1[m-1] = obs[n].OBS_ASP_AT1[m]; }
     for (m=1;m<=LWA_MAX_NSTD;m++) { osf2.OBS_ASP_AT2[m-1] = obs[n].OBS_ASP_AT2[m]; }
     for (m=1;m<=LWA_MAX_NSTD;m++) { osf2.OBS_ASP_ATS[m-1] = obs[n].OBS_ASP_ATS[m]; }
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
     osf2.OBS_TBF_SAMPLES     = obs[n].OBS_TBF_SAMPLES;
     osf2.OBS_TBF_GAIN        = obs[n].OBS_TBF_GAIN;
 #else
     osf2.OBS_TBW_BITS        = obs[n].OBS_TBW_BITS; 
     osf2.OBS_TBW_SAMPLES     = obs[n].OBS_TBW_SAMPLES;
 #endif
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
     osf2.OBS_TBN_GAIN        = obs[n].OBS_TBN_GAIN;
+#endif
     osf2.OBS_DRX_GAIN        = obs[n].OBS_DRX_GAIN;
 
     fwrite(&osf2,sizeof(struct osf2_struct),1,fp);

@@ -101,8 +101,10 @@ int main ( int narg, char *argv[] ) {
         case LWA_OM_TRK_SOL: break;
         case LWA_OM_TRK_JOV: break;
         case LWA_OM_TRK_LUN: break;
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
         case LWA_OM_TBN: break;
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#endif
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
         case LWA_OM_TBF: break;
 #else
         case LWA_OM_TBW: break;
@@ -147,13 +149,15 @@ int main ( int narg, char *argv[] ) {
       printf("[%d/%d] INPUT: iFreq2=%ld\n",MT_TPMS,getpid(),iFreq2);
       printf("[%d/%d] INPUT: iBW=%d\n",MT_TPMS,getpid(),iBW);
       break;
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
     case LWA_OM_TBN:
       iDur=10000;      if (narg>=4) sscanf(argv[3],"%ld",&iDur);   
       iFreq=832697741; if (narg>=5) sscanf(argv[4],"%ld",&iFreq); 
       printf("[%d/%d] INPUT: iDur=%ld\n",MT_TPMS,getpid(),iDur);
       printf("[%d/%d] INPUT: iFreq=%ld\n",MT_TPMS,getpid(),iFreq);
       break;
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#endif
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
     case LWA_OM_TBF:
       iDur=10000;      if (narg>=4) sscanf(argv[3],"%ld",&iDur);
       iFreq=832697741; if (narg>=5) sscanf(argv[4],"%ld",&iFreq); 
@@ -235,9 +239,11 @@ int main ( int narg, char *argv[] ) {
 
   /* Specifying beam 1 for modes other than TBN or TBW */
   switch (eMode) {
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
     case LWA_OM_TBN:
       break;
-#if !defined(LWA_BACKEND_IS_ADP) || !LWA_BACKEND_IS_ADP
+#endif
+#if (!defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP) && (!defined(LWA_BACKEND_IS_ADP) || !LWA_BACKEND_IS_ADP)
     case LWA_OM_TBW:
       break;
 #endif
@@ -267,13 +273,15 @@ int main ( int narg, char *argv[] ) {
   switch (eMode) {
     case LWA_OM_DIAG1:
       break;
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
     case LWA_OM_TBN:
       fprintf(fp,"OBS_FREQ1      %ld\n",iFreq);
       //fprintf(fp,"OBS_FREQ1+     19.999999955 MHz\n");
       fprintf(fp,"OBS_BW         7\n");
       fprintf(fp,"OBS_BW+        100 kSPS\n"); 
       break;
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#endif
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
     case LWA_OM_TBF:
       fprintf(fp,"OBS_FREQ1      %ld\n",iFreq);
       //fprintf(fp,"OBS_FREQ1+     19.999999955 MHz\n");
@@ -334,6 +342,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 // tpms.c: J. Dowell, UNM, 2022 Sep 30
 //   .1 Added support for TRK_LUN
+// tpms.c: J. Dowell, UNM, 2022 May 2
+//   .1 Updated for MCS-NDP
 // tpms.c: J. Dowell, UNM, 2018 Jan 29
 //   .1 Cleaned up a few compiler warnings
 // tpms.c: S.W. Ellingson, Virginia Tech, 2012 Oct 07

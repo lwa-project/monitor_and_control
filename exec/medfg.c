@@ -17,18 +17,22 @@
 // ---
 
 
+#include "mcs.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define ME "medfg"
 
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-#define MAX_ANT 512           /* number of antennas ("channels") */  
-#define MAX_COARSE_DELAY 1023 /* maximum coarse delay, in sample periods */
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+#  define MAX_ANT 512           /* number of antennas ("channels") */  
+#  define MAX_COARSE_DELAY 1023 /* maximum coarse delay, in sample periods */
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#  define MAX_ANT 512           /* number of antennas ("channels") */  
+#  define MAX_COARSE_DELAY 1023 /* maximum coarse delay, in sample periods */
 #else
-#define MAX_ANT 520           /* number of antennas ("channels") */  
-#define MAX_COARSE_DELAY 4095 /* maximum coarse delay, in sample periods */
+#  define MAX_ANT 520           /* number of antennas ("channels") */  
+#  define MAX_COARSE_DELAY 4095 /* maximum coarse delay, in sample periods */
 #endif
 
 int main( int narg, char *argv[] ) {
@@ -42,13 +46,6 @@ int main( int narg, char *argv[] ) {
   int i;
 
   FILE *fp;
-
-  union {
-    unsigned short int i;
-    char b[2];
-    } i2u;
-
-  char bb;
 
   /* Parse command line */
   if (narg<3) {
@@ -85,9 +82,7 @@ int main( int narg, char *argv[] ) {
       d[i] = (d[i]<<4) + f[i];
       //printf("%hu\n",d[i]);
 
-      i2u.i = d[i]; 
-      bb=i2u.b[0]; i2u.b[0]=i2u.b[1]; i2u.b[1]=bb;
-      d[i] = i2u.i;  
+      d[i] = LWA_i2u_swap(d[i]); 
       //printf("%hu\n",d[i]);
 
       }
@@ -107,6 +102,8 @@ int main( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// medfg.c: J. Dowell, UNM, 2022 May 3
+//   .1: Updated for NDP
 // medfg.c: J. Dowell, UNM, 2015 Aug 28
 //   .1: Updated for ADP
 // medfg.c: S.W. Ellingson, Virginia Tech, 2010 Nov 11

@@ -11,6 +11,8 @@
 // needs to see state/ssmif.dat
 // See end of this file for history.
 
+
+#include "mcs.h"
 #include "me.h"
 #include <math.h>
 #include <stdlib.h>
@@ -18,10 +20,13 @@
 #define FS (196.0e+6)      /* [samples/s] sample rate */
 #define DTR 0.017453292520 /* pi/180 */
 #define FLAG_VAL (1e+20)
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-#define MAX_DP_CH 512      /* number of ROACH channel inputs (per ADP ICD) */
+
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+#  define MAX_DP_CH 512      /* number of SNAP channel inputs (per NDP ICD) */
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#  define MAX_DP_CH 512      /* number of ROACH channel inputs (per ADP ICD) */
 #else
-#define MAX_DP_CH 520      /* number of DP1 channel inputs (per DP ICD) */
+#  define MAX_DP_CH 520      /* number of DP1 channel inputs (per DP ICD) */
 #endif
 
 /*==============================================================*/
@@ -80,13 +85,6 @@ int main ( int narg, char *argv[] ) {
   unsigned short int ddc;
   unsigned short int ddf;
   unsigned short int ddm[MAX_DP_CH];
-
-  /* the following used for little- to big-endian conversions */
-  union {
-    unsigned short int i;
-    char b[2];
-    } i2u;
-  char bb;
 
   int bDone=0;
   FILE *fpl;
@@ -229,7 +227,24 @@ int main ( int narg, char *argv[] ) {
     id[i] = -1;
     }
 
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+  /* figure out antenna positions, indexed by NDP channel */
+  for (i=0;i<s.nSnap;i++) { 
+    for (k=0;k<s.nSnapCh;k++) { 
+
+      if (s.iSnapAnt[i][k]!=0) { /* otherwise this Snap input is not connected to an antenna */      
+        ia = s.iSnapAnt[i][k] - 1;
+        px[i*s.nSnapCh+k] = s.fStdLx[ s.iAntStd[ia] - 1 ];
+        py[i*s.nSnapCh+k] = s.fStdLy[ s.iAntStd[ia] - 1 ];
+        pz[i*s.nSnapCh+k] = s.fStdLz[ s.iAntStd[ia] - 1 ];
+        id[ia] = i*s.nSnapCh+k; /* reverse lookup (NDP input channel index given antenna index); simplifies work later */
+        }
+
+      //printf("%d %d | %d | %d %d | %f\n",i,k,i*s.nDP1Ch+k,ia+1,s.iAntStd[ia],px[i*s.nDP1Ch+k]);
+
+      } /* for k */
+    } /* for i */
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
   /* figure out antenna positions, indexed by ADP channel */
   for (i=0;i<s.nRoach;i++) { 
     for (k=0;k<s.nRoachCh;k++) { 
@@ -450,9 +465,7 @@ int main ( int narg, char *argv[] ) {
       ddm[i] = (ddc<<4) + ddf;
         
       /* convert to big-endian */
-      i2u.i = ddm[i]; 
-      bb=i2u.b[0]; i2u.b[0]=i2u.b[1]; i2u.b[1]=bb;
-      ddm[i] = i2u.i; 
+      ddm[i] = LWA_i2u_swap(ddm[i]);
 
       }
 
@@ -504,6 +517,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// mefsdfg.c: J. Dowell, UNM, 2022 May 3
+//   .1: Added support for NDP
 // mefsdfg.c: J. Dowell, UNM, 2021 Jan 25
 //   .1: Updated to look for a mindelay.txt file in the same directory as the SSMIF
 // mefsdfg.c: J. Dowell, UNM, 2015 Aug 28

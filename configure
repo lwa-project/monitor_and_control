@@ -673,7 +673,9 @@ MSE_USERNAME
 MSE_IP
 BEAM_REPOINT_RES
 BEAM_REPOINT_INTERVAL
+HAVE_NDP
 HAVE_ADP
+HAVE_DP
 HAVE_NCURSES
 HAVE_GDBM
 HAVE_CURL
@@ -775,6 +777,7 @@ with_gnu_ld
 with_sysroot
 enable_libtool_lock
 enable_adp
+enable_ndp
 with_repoint_check
 with_repoint_res
 with_sch_ip
@@ -1425,6 +1428,7 @@ Optional Features:
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --enable-adp            enable support for ADP at LWA-SV (default=no)
+  --enable-ndp            enable support for NDP at LWA-NA (default=no)
   --disable-python        disable building the Python bindings (default=no)
 
 Optional Packages:
@@ -12952,6 +12956,9 @@ fi
 # Station Options
 #
 
+HAVE_DP=1
+
+
 # Check whether --enable-adp was given.
 if test ${enable_adp+y}
 then :
@@ -12965,6 +12972,26 @@ HAVE_ADP=0
 if test x$enable_adp != xno
 then :
   HAVE_ADP=1
+
+       HAVE_DP=0
+
+fi
+
+# Check whether --enable-ndp was given.
+if test ${enable_ndp+y}
+then :
+  enableval=$enable_ndp; enable_ndp=yes
+else $as_nop
+  enable_ndp=no
+fi
+
+HAVE_NDP=0
+
+if test x$enable_ndp != xno
+then :
+  HAVE_NDP=1
+
+       HAVE_DP=0
 
 fi
 
@@ -15310,13 +15337,19 @@ printf "%s\n" "$as_me:   executive - $MEE_IP" >&6;}
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}:   task processor - $MTE_IP" >&5
 printf "%s\n" "$as_me:   task processor - $MTE_IP" >&6;}
 
-if test x$HAVE_ADP = x1
+if test x$HAVE_NDP = x1
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: digital backend: NDP" >&5
+printf "%s\n" "$as_me: digital backend: NDP" >&6;}
+else $as_nop
+  if test x$HAVE_ADP = x1
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: digital backend: ADP" >&5
 printf "%s\n" "$as_me: digital backend: ADP" >&6;}
 else $as_nop
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: digital backend: DP" >&5
 printf "%s\n" "$as_me: digital backend: DP" >&6;}
+fi
 fi
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: beam repointing control:" >&5

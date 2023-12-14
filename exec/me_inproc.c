@@ -27,6 +27,7 @@
 #include <math.h>        /* needed for me_getaltaz.c + others */
 #include <dirent.h>      /* this is listing files in a directory */
 
+#include "mcs.h"
 #include "me.h"
 #include "me_astro.h"
 /* NOTE: the above also pulls in several additional files "ephem_*" */
@@ -55,17 +56,9 @@ int me_medfg( struct beam_struct beam,
   char cmd[256]; 
   char df_file[256];
 
-  union {
-    unsigned short int i;
-    char b[2];
-    } i2u;
-  char bb;
-
   /* convert to big-endian while packing into d[] */
   for (i=0; i<2*LWA_MAX_NSTD; i++) {
-      i2u.i = beam.OBS_BEAM_DELAY[i]; 
-      bb=i2u.b[0]; i2u.b[0]=i2u.b[1]; i2u.b[1]=bb;
-      d[i] = i2u.i;  
+      d[i] = LWA_i2u_swap(beam.OBS_BEAM_DELAY[i]);
       //printf("%hu\n",d[i]);
       } /* for i */
 
@@ -109,12 +102,6 @@ int me_megfg( struct beam_struct beam,
   char cmd[256]; 
   char gf_file[256];
 
-  union {
-    signed short int i;
-    char b[2];
-    } i2s;
-  char bb;
-
   /* zero out input matrix */
   for (i=0; i<LWA_MAX_NSTD; i++) {
     g[i][0][0] = 0;
@@ -127,9 +114,7 @@ int me_megfg( struct beam_struct beam,
   for (i=0; i<LWA_MAX_NSTD; i++) {
     for (j=0; j<2; j++) {
       for (k=0; k<2; k++) {
-        i2s.i = beam.OBS_BEAM_GAIN[i][j][k]; 
-        bb=i2s.b[0]; i2s.b[0]=i2s.b[1]; i2s.b[1]=bb;
-        g[i][j][k] = i2s.i;  
+        g[i][j][k] = LWA_i2s_swap(beam.OBS_BEAM_GAIN[i][j][k]);  
         }
       }
     //printf("%hd %hd %hd %hd\n",g[i][0][0],g[i][0][1],g[i][1][0],g[i][1][1]);
@@ -208,7 +193,7 @@ int me_beamspec( char *cs_filename,
     strcpy(data,"");
     if (action.len>0) fread( data, action.len, 1, fp );
 
-    if ((action.sid==LWA_SID_DP_ || action.sid==LWA_SID_ADP) && (action.cid==LWA_CMD_BAM)) {
+    if ((action.sid==LWA_SID_DP_ || action.sid==LWA_SID_ADP || action.sid==LWA_SID_NDP) && (action.cid==LWA_CMD_BAM)) {
 
       if (data[2]!=99) { /* ASCII 99 ("c") denotes custom beams -- those are already dealt with */
         m++;
@@ -751,7 +736,7 @@ int main ( int narg, char *argv[] ) {
               eD=0;
               break;
             case LWA_OM_STEPPED:
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
             case LWA_OM_TBF:
 #else
             case LWA_OM_TBW:      
@@ -949,7 +934,20 @@ int main ( int narg, char *argv[] ) {
             /* === DR REC command === */
             /* ====================== */
             
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+            /* for NDP output 1, 2, 3, 4 (beams) we do this once; i.e., one recording per session */
+            /* for NDP output 1 (TBF) output we do a new recording for each observation */
+            if ( ( (osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) && (osf.OBS_MODE != LWA_OM_TBF) && (i==1) ) || 
+                 ( (osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) && (osf.OBS_MODE == LWA_OM_TBF) ) ||
+                 (  osf.SESSION_DRX_BEAM==ME_MAX_NDPOUT           )   ) {
+              dr_sid=-1;
+              for( j=0; j<ME_MAX_NDR; j++ ) {
+                 if( osf.SESSION_DRX_BEAM == s.iDRDP[j] ) {
+                    dr_sid = LWA_SID_DR1 + j;
+                    break;
+                    }
+                 }
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
             /* for ADP output 1, 2, 3 (beams) we do this once; i.e., one recording per session */
             /* for ADP output 1 (TBF) output we do a new recording for each observation */
             /* for ADP output 4 (TBN) output we do a new recording for each observation */
@@ -999,7 +997,13 @@ int main ( int narg, char *argv[] ) {
                 exit(EXIT_FAILURE);
                 }
 
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP                
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP                
+              if ((osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) && (osf.OBS_MODE != LWA_OM_TBF)) {
+                  dr_length_ms = ssf.SESSION_DUR; /* beam obs are recorded contiguously in one session */
+                } else {
+                  dr_length_ms = osf.OBS_DUR; /* each TBF observation is a separate recording */ 
+                }
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP                
               if ((osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) && (osf.OBS_MODE != LWA_OM_TBF)) {
                   dr_length_ms = ssf.SESSION_DUR; /* beam obs are recorded contiguously in one session */
                 } else {
@@ -1021,7 +1025,7 @@ int main ( int narg, char *argv[] ) {
                 case LWA_OM_STEPPED:   
                   sprintf(dr_format,"DRX_FILT_%1hu",osf.OBS_BW); 
                   break;
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
                 case LWA_OM_TBF:
                   sprintf(dr_format,"DEFAULT_TBF"); 
                   break;
@@ -1030,9 +1034,11 @@ int main ( int narg, char *argv[] ) {
                   sprintf(dr_format,"DEFAULT_TBW"); 
                   break;
 #endif
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
                 case LWA_OM_TBN:       
                   sprintf(dr_format,"DEFAULT_TBN"); 
                   break;
+#endif
                 case LWA_OM_DIAG1:
                   printf(     "[%d/%d] DR setup: osf.OBS_MODE=%d: How'd I get here?\n",ME_INPROC,getpid(),osf.OBS_MODE);
                   fprintf(fpl,"[%d/%d] DR setup: osf.OBS_MODE=%d: How'd I get here?\n",ME_INPROC,getpid(),osf.OBS_MODE);
@@ -1129,7 +1135,7 @@ int main ( int narg, char *argv[] ) {
 
             switch (osf.OBS_MODE) {
 
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
               case LWA_OM_TBF:
                 /* TBF trigger time is in units of samples from beginning of slot */
                 t0 = osf.OBS_START_MPM % 1000; /* number of ms beyond a second boundary */
@@ -1249,6 +1255,7 @@ int main ( int narg, char *argv[] ) {
 //    printf("[%d/%d] DP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
 //    }
 
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
               case LWA_OM_TBN:
 
                 /* TBN trigger time is in units of "subslots" (1/100ths of a second) */
@@ -1290,6 +1297,7 @@ int main ( int narg, char *argv[] ) {
                 ncs++;
 #endif
                 break; /* LWA_OM_TBN */ 
+#endif
 
               case LWA_OM_TRK_RADEC:
               case LWA_OM_TRK_SOL:
@@ -1389,7 +1397,11 @@ int main ( int narg, char *argv[] ) {
                      (gain1 != last_drx_gain1) ) {
                   LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
                   cs[ncs].action.bASAP = 0;
-                  cs[ncs].action.sid = LWA_SID_DP_;  
+                  #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+                  cs[ncs].action.sid = LWA_SID_NDP;
+                  #else
+                  cs[ncs].action.sid = LWA_SID_DP_;
+                  #endif
                   cs[ncs].action.cid = LWA_CMD_DRX; 
                   sprintf( cs[ncs].data, "%hd 1 %8.0f %hu %hd %ld",
                                   osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
@@ -1413,7 +1425,11 @@ int main ( int narg, char *argv[] ) {
                        (gain2 != last_drx_gain2) ) ) {
                   LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 ); /* staggering send times for DP commands by 10 ms */
                   cs[ncs].action.bASAP = 0;                   
+                  #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+                  cs[ncs].action.sid = LWA_SID_NDP;
+                  #else
                   cs[ncs].action.sid = LWA_SID_DP_;  
+                  #endif
                   cs[ncs].action.cid = LWA_CMD_DRX; 
                   sprintf( cs[ncs].data, "%hd 2 %8.0f %hu %hd %ld",
                                   osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
@@ -1548,7 +1564,11 @@ int main ( int narg, char *argv[] ) {
                     cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2;
                     cs[ncs].action.tv.tv_usec = 20000; /* staggering send times for DP commands by 10 ms */
                     cs[ncs].action.bASAP = 0;
-                    cs[ncs].action.sid = LWA_SID_DP_;  
+                    #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+                    cs[ncs].action.sid = LWA_SID_NDP;
+                    #else
+                    cs[ncs].action.sid = LWA_SID_DP_; 
+                    #endif 
                     cs[ncs].action.cid = LWA_CMD_BAM; 
                     sprintf( cs[ncs].data, "%hd %s %s %ld",
                                     osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
@@ -1576,7 +1596,10 @@ int main ( int narg, char *argv[] ) {
                 break;
 
               default:
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+                printf(     "[%d/%d] FATAL: During NDP setup, osf.OBS_MODE=%d not recognized\n",ME_INPROC,getpid(),osf.OBS_MODE);
+                fprintf(fpl,"[%d/%d] FATAL: During NDP setup, osf.OBS_MODE=%d not recognized\n",ME_INPROC,getpid(),osf.OBS_MODE);
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
                 printf(     "[%d/%d] FATAL: During ADP setup, osf.OBS_MODE=%d not recognized\n",ME_INPROC,getpid(),osf.OBS_MODE);
                 fprintf(fpl,"[%d/%d] FATAL: During ADP setup, osf.OBS_MODE=%d not recognized\n",ME_INPROC,getpid(),osf.OBS_MODE);
 #else
@@ -1767,8 +1790,12 @@ int main ( int narg, char *argv[] ) {
                 /* here's the DRX command setting FREQ1: */
                 cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
                 cs[ncs].action.tv.tv_usec = 0; 
-                cs[ncs].action.bASAP = 0; 
+                cs[ncs].action.bASAP = 0;
+                #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+                cs[ncs].action.sid = LWA_SID_NDP;
+                #else
                 cs[ncs].action.sid = LWA_SID_DP_;  
+                #endif
                 cs[ncs].action.cid = LWA_CMD_DRX; 
                 sprintf( cs[ncs].data, "%hd 1 %8.0f %hu %hd %ld",
                                 osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
@@ -1793,7 +1820,11 @@ int main ( int narg, char *argv[] ) {
                 cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
                 cs[ncs].action.tv.tv_usec = 10000;         /* staggering send times for DP commands by 10 ms */
                 cs[ncs].action.bASAP = 0;
+                #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+                cs[ncs].action.sid = LWA_SID_NDP;
+                #else
                 cs[ncs].action.sid = LWA_SID_DP_;  
+                #endif  
                 cs[ncs].action.cid = LWA_CMD_DRX; 
                 sprintf( cs[ncs].data, "%hd 2 %8.0f %hu %hd %ld",
                                 osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
@@ -1910,7 +1941,11 @@ int main ( int narg, char *argv[] ) {
               cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
               cs[ncs].action.tv.tv_usec = 20000;         /* staggering send times for DP commands by 10 ms */
               cs[ncs].action.bASAP = 0;
+              #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+              cs[ncs].action.sid = LWA_SID_NDP;
+              #else
               cs[ncs].action.sid = LWA_SID_DP_;  
+              #endif
               cs[ncs].action.cid = LWA_CMD_BAM; 
               sprintf( cs[ncs].data, "%hd %s %s %ld",
                                       osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
@@ -1986,16 +2021,17 @@ int main ( int narg, char *argv[] ) {
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_AT1[%d]=%hd\n",m,osf2.OBS_ASP_AT1[m]); }
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_AT2[%d]=%hd\n",m,osf2.OBS_ASP_AT2[m]); }
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_ATS[%d]=%hd\n",m,osf2.OBS_ASP_ATS[m]); }
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
           fprintf(fpl,"osf2.OBS_TBF_SAMPLES=%u\n",osf2.OBS_TBF_SAMPLES);
           fprintf(fpl,"osf2.OBS_TBF_GAIN=%hd\n",osf2.OBS_TBF_GAIN);
 #else
           fprintf(fpl,"osf2.OBS_TBW_BITS=%hu\n",osf2.OBS_TBW_BITS); 
           fprintf(fpl,"osf2.OBS_TBW_SAMPLES=%u\n",osf2.OBS_TBW_SAMPLES);   
 #endif
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
           fprintf(fpl,"osf2.OBS_TBN_GAIN=%hd\n",osf2.OBS_TBN_GAIN);  
           fprintf(fpl,"osf2.OBS_DRX_GAIN=%hd\n",osf2.OBS_DRX_GAIN);
-
+#endif
           } /* for ( i=1, i<=ssf.SESSION_NOBS; i++ ) */
 
         /*******************************************************/
@@ -2008,7 +2044,7 @@ int main ( int narg, char *argv[] ) {
           /* Updated: 2015 Aug 31                         */
           esnTimeAdjust = 0;
           switch( osf.OBS_MODE ) {
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
               case LWA_OM_TBF:
                  last_drx_freq1 = 0;
                  last_drx_bw1 = 0;
@@ -2041,7 +2077,11 @@ int main ( int narg, char *argv[] ) {
 #else
                  cs[ncs].action.tv.tv_sec  = cs[ncs-1].action.tv.tv_sec;
                  cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec + 20000;
+                 #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+                 cs[ncs].action.sid = LWA_SID_NDP;
+                 #else
                  cs[ncs].action.sid = LWA_SID_DP_;  
+                 #endif
                  cs[ncs].action.cid = LWA_CMD_STP; 
                  sprintf( cs[ncs].data, "BEAM%d",
                                       osf.SESSION_DRX_BEAM); //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)

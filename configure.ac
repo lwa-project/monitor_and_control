@@ -58,6 +58,8 @@ AC_CHECK_LIB([ncurses], [initscr],
 # Station Options
 #
 
+AC_SUBST([HAVE_DP], [1])
+
 AC_ARG_ENABLE([adp],
               [AS_HELP_STRING([--enable-adp],
                               [enable support for ADP at LWA-SV (default=no)])],
@@ -65,7 +67,18 @@ AC_ARG_ENABLE([adp],
               [enable_adp=no])
 AC_SUBST([HAVE_ADP], [0])
 AS_IF([test x$enable_adp != xno],
-      [AC_SUBST([HAVE_ADP], [1])])
+      [AC_SUBST([HAVE_ADP], [1])
+       AC_SUBST([HAVE_DP], [0])])
+
+AC_ARG_ENABLE([ndp],
+              [AS_HELP_STRING([--enable-ndp],
+                              [enable support for NDP at LWA-NA (default=no)])],
+              [enable_ndp=yes],
+              [enable_ndp=no])
+AC_SUBST([HAVE_NDP], [0])
+AS_IF([test x$enable_ndp != xno],
+      [AC_SUBST([HAVE_NDP], [1])
+       AC_SUBST([HAVE_DP], [0])])
 
 AC_ARG_WITH([repoint-check],
             [AS_HELP_STRING([--with-repoint-check=N],
@@ -181,9 +194,11 @@ AC_MSG_NOTICE([  scheduler - $MSE_IP])
 AC_MSG_NOTICE([  executive - $MEE_IP])
 AC_MSG_NOTICE([  task processor - $MTE_IP])
 
-AS_IF([test x$HAVE_ADP = x1],
-      [AC_MSG_NOTICE(digital backend: ADP)],
-      [AC_MSG_NOTICE(digital backend: DP)])
+AS_IF([test x$HAVE_NDP = x1],
+      [AC_MSG_NOTICE(digital backend: NDP)],
+      [AS_IF([test x$HAVE_ADP = x1],
+             [AC_MSG_NOTICE(digital backend: ADP)],
+             [AC_MSG_NOTICE(digital backend: DP)])])
 
 AC_MSG_NOTICE(beam repointing control:)
 AC_MSG_NOTICE([  check interval - $BEAM_REPOINT_INTERVAL s])

@@ -114,7 +114,7 @@ int meos (
 
   /* parse mode/args */
   bDone=0;
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
   if (!strncmp(mode,"TBF",3)) {\
     sscanf(args,"%ld %lu",&nsamp,&tuning_mask);
     printf("[%d/%d] mode='%s', nsamp=%ld, tuning_mask=%lu\n",ME_MEOS,getpid(),mode,nsamp,tuning_mask);
@@ -130,6 +130,7 @@ int meos (
     bDone=1;
     }
 #endif
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
   if (!strncmp(mode,"TBN",3)) {
     //printf("[%d/%d] args='%s'\n",ME_MEOS,getpid(),args);
     sscanf(args,"%f %d %d %d %ld",&tbn_f,&tbn_r,&tbn_g,&tbn_s,&tbn_d);
@@ -137,6 +138,7 @@ int meos (
     sprintf(dr_format,"TBN");
     bDone=1;
     }
+#endif
   if (!strncmp(mode,"DRX",3)) {
     //printf("[%d/%d] args='%s'\n",ME_MEOS,getpid(),args);
     sscanf(args,"%ld",&drx_d);
@@ -213,7 +215,7 @@ int meos (
 #if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
     sprintf(data,"%8.0f %d %d",tbn_f,tbn_r,tbn_g);
     err = mesi( NULL, "ADP", "TBN", data, "today", "asap", &reference );
-#else
+#elif !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
     sprintf(data,"%8.0f %d %d %d",tbn_f,tbn_r,tbn_g,tbn_s);
     err = mesi( NULL, "DP_", "TBN", data, "today", "asap", &reference );
 #endif
@@ -222,7 +224,10 @@ int meos (
       eResult += MEOS_ERR_DP_TBX;
       return eResult;  
       } 
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+    printf("[%d/%d] NDP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
     printf("[%d/%d] ADP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
 #else
     printf("[%d/%d] DP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
@@ -247,7 +252,7 @@ int meos (
   /* sleep until past estimated DR start time  */
   usleep((MEOS_DR_START_DELAY_MS+1000)*1000); /* 1 s after start-delay */
 
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
   /* if TBF, now tell ADP to start. */
   if (!strncmp(mode,"TBF",3)) {
     sprintf(data,"16 0 %ld %lu",nsamp,tuning_mask);

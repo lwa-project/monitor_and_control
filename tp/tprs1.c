@@ -1466,7 +1466,317 @@
       } /* for (k */
     } /* for ( iARB */
 
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+  /* reading N_SNAP */
+  sprintf(keyword,"N_SNAP"); s.nSnap = 0;
+  while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+  switch (i) {
+    case MERS_PL_KEYWORD_MATCH: 
+      sscanf(data,"%d",&(s.nSnap));     
+      strcpy(data,"");  
+      break;
+    case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+    case MERS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: MERS_PL_KEYWORD_MISMATCH\n",MT_TPRS,getpid()); return; break;
+    case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+    }       
+  if ((s.nSnap<0) || (s.nSnap>ME_MAX_NSNAP)) {
+    printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.nSnap);
+    return;
+    } 
+  printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.nSnap); 
+
+  /* reading N_SNAPCH */
+  sprintf(keyword,"N_SNAPCH"); s.nSnapCh = 0;
+  while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+  switch (i) {
+    case MERS_PL_KEYWORD_MATCH: 
+      sscanf(data,"%d",&(s.nSnapCh));     
+      strcpy(data,"");  
+      break;
+    case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+    case MERS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: MERS_PL_KEYWORD_MISMATCH\n",MT_TPRS,getpid()); return; break;
+    case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+    }       
+  if ((s.nSnapCh<0) || (s.nSnapCh>ME_MAX_NSNAPCH)) {
+    printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.nSnapCh);
+    return;
+    } 
+  printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.nSnapCh); 
+
+  /* reading SNAP_ID[] */
+  for ( iDP1=0; iDP1<s.nSnap; iDP1++ ) {
+
+    sprintf(keyword,"SNAP_ID[%d]",iDP1+1); sprintf(s.sSnapID[iDP1],"UNK");
+    while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+    switch (i) {
+      case MERS_PL_KEYWORD_MATCH: 
+        if (strlen(data)>ME_MAX_SNAPID_LENGTH) {
+          printf("[%d/%d] FATAL: SNAP_ID[%d]='%s' is greater than %d characters\n",
+            MT_TPRS,getpid(),iDP1,data,ME_MAX_SNAPID_LENGTH);   
+          return;
+          }
+        sprintf(s.sSnapID[iDP1],"%s",data);     
+        strcpy(data,"");  
+        break;
+      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+      case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+      }        
+    printf("[%d/%d] %s='%s'\n",MT_TPRS,getpid(),keyword,s.sSnapID[iDP1]);   
+ 
+    } /* for ( iDP1 */
+
+  /* reading SNAP_SLOT[] */
+  for ( iDP1=0; iDP1<s.nSnap; iDP1++ ) {
+
+    sprintf(keyword,"SNAP_SLOT[%d]",iDP1+1); sprintf(s.sSnapSlot[iDP1],"UNK");
+    while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+    switch (i) {
+      case MERS_PL_KEYWORD_MATCH: 
+        if (strlen(data)>ME_MAX_SNAPID_LENGTH) {
+          printf("[%d/%d] FATAL: SNAP_SLOT[%d]='%s' is greater than %d characters\n",
+            MT_TPRS,getpid(),iDP1,data,ME_MAX_SNAPID_LENGTH);   
+          return;
+          }
+        sprintf(s.sSnapSlot[iDP1],"%s",data);     
+        strcpy(data,"");  
+        break;
+      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+      case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+      }        
+    printf("[%d/%d] %s='%s'\n",MT_TPRS,getpid(),keyword,s.sSnapSlot[iDP1]);   
+ 
+    } /* for ( iDP1 */
+
+  /* reading SNAP_DESI[] */
+  for ( iDP1=0; iDP1<s.nSnap; iDP1++ ) {
+
+    sprintf(keyword,"SNAP_DESI[%d]",iDP1+1); s.eSnapDesi[iDP1] = 1;
+    while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+    switch (i) {
+      case MERS_PL_KEYWORD_MATCH: 
+        sscanf(data,"%d",&(s.eSnapDesi[iDP1]));     
+        strcpy(data,"");  
+        break;
+      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+      case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+      }       
+    if (s.eSnapDesi[iDP1]<0) {
+      printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.eSnapDesi[iDP1]);
+      return;
+      } 
+    printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.eSnapDesi[iDP1]);    
+
+    } /* for ( iDP1 */
+
+  /* reading SNAP_STAT[] */
+  for ( iDP1=0; iDP1<(s.nSnap); iDP1++ ) {
+    for (k=0;k<s.nSnapCh;k++) {
+
+      sprintf(keyword,"SNAP_STAT[%d][%d]",iDP1+1,k+1); s.eSnapStat[iDP1][k] = 3;
+      while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+      switch (i) {
+        case MERS_PL_KEYWORD_MATCH: 
+          sscanf(data,"%d",&(s.eSnapStat[iDP1][k]));  
+          strcpy(data,"");  
+          break;
+        case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+        case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+        case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+        }        
+      if ( (s.eSnapStat[iDP1][k]<0) || (s.eSnapStat[iDP1][k]>3) ) {
+        printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.eSnapStat[iDP1][k]);
+        return;
+        }   
+      printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.eSnapStat[iDP1][k]);    
+
+      } /* for (k */
+    } /* for ( iDP1 */
+
+  /* reading SNAP_INR[] */
+  for ( iDP1=0; iDP1<s.nSnap; iDP1++ ) {
+    for (k=0;k<s.nSnapCh;k++) {
+
+      sprintf(keyword,"SNAP_INR[%d][%d]",iDP1+1,k+1); sprintf(s.sSnapINR[iDP1][k],"UNK");
+      while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+      switch (i) {
+        case MERS_PL_KEYWORD_MATCH: 
+          if (strlen(data)>ME_MAX_SNAPID_LENGTH) {
+            printf("[%d/%d] FATAL: SNAP_INR[%d]='%s' is greater than %d characters\n",
+              MT_TPRS,getpid(),iDP1,data,ME_MAX_SNAPID_LENGTH);   
+            return;
+            }
+          sprintf(s.sSnapINR[iDP1][k],"%s",data);     
+          strcpy(data,"");  
+          break;
+        case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+        case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+        case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+        }        
+      printf("[%d/%d] %s='%s'\n",MT_TPRS,getpid(),keyword,s.sSnapINR[iDP1][k]);   
+ 
+      } /* for (k */
+    } /* for ( iDP1 */
+
+  /* reading SNAP_INC[] */
+  for ( iDP1=0; iDP1<s.nSnap; iDP1++ ) {
+    for (k=0;k<s.nSnapCh;k++) {
+
+      sprintf(keyword,"SNAP_INC[%d][%d]",iDP1+1,k+1); sprintf(s.sSnapINC[iDP1][k],"UNK");
+      while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+      switch (i) {
+        case MERS_PL_KEYWORD_MATCH: 
+          if (strlen(data)>ME_MAX_SNAPID_LENGTH) {
+            printf("[%d/%d] FATAL: SNAP_INC[%d]='%s' is greater than %d characters\n",
+              MT_TPRS,getpid(),iDP1,data,ME_MAX_SNAPID_LENGTH);   
+            return;
+            }
+          sprintf(s.sSnapINC[iDP1][k],"%s",data);     
+          strcpy(data,"");  
+          break;
+        case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+        case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+        case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+        }        
+      printf("[%d/%d] %s='%s'\n",MT_TPRS,getpid(),keyword,s.sSnapINC[iDP1][k]);   
+ 
+      } /* for (k */
+    } /* for ( iDP1 */
+
+  /* reading SNAP_ANT[][] */
+  for ( iDP1=0; iDP1<s.nSnap; iDP1++ ) {
+    for (k=0;k<s.nSnapCh;k++) {
+
+      sprintf(keyword,"SNAP_ANT[%d][%d]",iDP1+1,k+1); s.iSnapAnt[iDP1][k] = 0;
+      while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+      switch (i) {
+        case MERS_PL_KEYWORD_MATCH: 
+          sscanf(data,"%d",&(s.iSnapAnt[iDP1][k]));
+          if ( (s.iSnapAnt[iDP1][k]<0) || (s.iSnapAnt[iDP1][k]>2*s.nStd) ) {
+            printf("[%d/%d] FATAL: SNAP_ANT[%d][%d]=%d is invalid\n",MT_TPRS,getpid(),iDP1+1,k+1,s.iSnapAnt[iDP1][k]);   
+            return; 
+            }     
+          strcpy(data,"");  
+          break;
+        case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+        case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+        case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+        }       
+      printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.iSnapAnt[iDP1][k]);   
+ 
+      } /* for (k */
+    } /* for ( iDP1 */
+    
+  /* reading N_SERVER */
+  sprintf(keyword,"N_SERVER"); s.nServer = 0;
+  while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+  switch (i) {
+    case MERS_PL_KEYWORD_MATCH: 
+      sscanf(data,"%d",&(s.nServer));     
+      strcpy(data,"");  
+      break;
+    case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+    case MERS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: MERS_PL_KEYWORD_MISMATCH\n",MT_TPRS,getpid()); return; break;
+    case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+    }       
+  if ((s.nServer<0) || (s.nServer>ME_MAX_NSERVER)) {
+    printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.nServer);
+    return;
+    } 
+  printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.nServer); 
+
+  /* reading SERVER_ID[] */
+  for ( iDP2=0; iDP2<s.nServer; iDP2++ ) {
+
+    sprintf(keyword,"SERVER_ID[%d]",iDP2+1); sprintf(s.sServerID[iDP2],"UNK");
+    while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+    switch (i) {
+      case MERS_PL_KEYWORD_MATCH: 
+        if (strlen(data)>ME_MAX_SERVERID_LENGTH) {
+          printf("[%d/%d] FATAL: SERVER_ID[%d]='%s' is greater than %d characters\n",
+            MT_TPRS,getpid(),iDP2+1,data,ME_MAX_SERVERID_LENGTH);   
+          return;
+          }
+        sprintf(s.sServerID[iDP2],"%s",data);     
+        strcpy(data,"");  
+        break;
+      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+      case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+      }        
+    printf("[%d/%d] %s='%s'\n",MT_TPRS,getpid(),keyword,s.sServerID[iDP2]);   
+ 
+    } /* for ( iDP2 */
+
+  /* reading SERVER_SLOT[] */
+  for ( iDP2=0; iDP2<s.nServer; iDP2++ ) {
+
+    sprintf(keyword,"SERVER_SLOT[%d]",iDP2+1); sprintf(s.sServerSlot[iDP2],"UNK");
+    while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+    switch (i) {
+      case MERS_PL_KEYWORD_MATCH: 
+        if (strlen(data)>ME_MAX_SERVERID_LENGTH) {
+          printf("[%d/%d] FATAL: SERVER_SLOT[%d]='%s' is greater than %d characters\n",
+            MT_TPRS,getpid(),iDP2+1,data,ME_MAX_SERVERID_LENGTH);   
+          return;
+          }
+        sprintf(s.sServerSlot[iDP2],"%s",data);     
+        strcpy(data,"");  
+        break;
+      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+      case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+      }        
+    printf("[%d/%d] %s='%s'\n",MT_TPRS,getpid(),keyword,s.sServerSlot[iDP2]);   
+ 
+    } /* for ( iDP2 */
+
+  /* reading SERVER_STAT[] */
+  for ( iDP2=0; iDP2<(s.nServer); iDP2++ ) {
+
+    sprintf(keyword,"SERVER_STAT[%d]",iDP2+1); s.eServerStat[iDP2] = 3;
+    while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+    switch (i) {
+      case MERS_PL_KEYWORD_MATCH: 
+        sscanf(data,"%d",&(s.eServerStat[iDP2]));  
+        strcpy(data,"");  
+        break;
+      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+      case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+      }        
+    if ( (s.eServerStat[iDP2]<0) || (s.eServerStat[iDP2]>3) ) {
+      printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.eServerStat[iDP2]);
+      return;
+      }   
+    printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.eServerStat[iDP2]);    
+
+    } /* for ( iDP2 */
+
+  /* reading SERVER_DESI[] */
+  for ( iDP2=0; iDP2<s.nServer; iDP2++ ) {
+
+    sprintf(keyword,"SERVER_DESI[%d]",iDP2+1); s.eServerDesi[iDP2] = 1;
+    while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
+    switch (i) {
+      case MERS_PL_KEYWORD_MATCH: 
+        sscanf(data,"%d",&(s.eServerDesi[iDP2]));     
+        strcpy(data,"");  
+        break;
+      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
+      case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
+      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+      }       
+    if (s.eServerDesi[iDP2]<0) {
+      printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.eServerDesi[iDP2]);
+      return;
+      } 
+    printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.eServerDesi[iDP2]);    
+
+    } /* for ( iDP2 */
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
   /* reading N_ROACH */
   sprintf(keyword,"N_ROACH"); s.nRoach = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
@@ -2301,16 +2611,18 @@
                   MT_TPRS,getpid(),data,iRack+1,iPort+1);   
                 exit(EXIT_FAILURE);
                 }
-              break; 
-            case LWA_SID_DP_:
+              break;
+#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+            case LWA_SID_NDP:
               b = (!strncmp(data,"MCS",3)) || (!strncmp(data,"DC1",3)) || (!strncmp(data,"DC1",2)) ||
                   (!strncmp(data,"FAN",2)) || (!strncmp(data,"SYN",2)) || (!strncmp(data,"SWI",2))  ;
               if (!b) {
-                printf("[%d/%d] FATAL: PWR_NAME='%s' not valid for PWR_SS[%d][%d]='DP_'\n",
+                printf("[%d/%d] FATAL: PWR_NAME='%s' not valid for PWR_SS[%d][%d]='NDP'\n",
                   MT_TPRS,getpid(),data,iRack+1,iPort+1);   
                 exit(EXIT_FAILURE);
                 }
               break;
+#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
             case LWA_SID_ADP:
               b = (!strncmp(data,"MCS",3)) || (!strncmp(data,"DC1",3)) || (!strncmp(data,"DC1",2)) ||
                   (!strncmp(data,"FAN",2)) || (!strncmp(data,"SYN",2)) || (!strncmp(data,"SWI",2))  ;
@@ -2320,6 +2632,17 @@
                 exit(EXIT_FAILURE);
                 }
               break;
+#else
+            case LWA_SID_DP_:
+              b = (!strncmp(data,"MCS",3)) || (!strncmp(data,"DC1",3)) || (!strncmp(data,"DC1",2)) ||
+                  (!strncmp(data,"FAN",2)) || (!strncmp(data,"SYN",2)) || (!strncmp(data,"SWI",2))  ;
+              if (!b) {
+                printf("[%d/%d] FATAL: PWR_NAME='%s' not valid for PWR_SS[%d][%d]='DP_'\n",
+                  MT_TPRS,getpid(),data,iRack+1,iPort+1);   
+                exit(EXIT_FAILURE);
+                }
+              break;
+#endif
             case LWA_SID_DR1:
             case LWA_SID_DR2:
             case LWA_SID_DR3:
@@ -2944,9 +3267,9 @@
 
     } /* for ( iStd */
 
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
   /* reading TBF_GAIN */
-  sprintf(keyword,"TBF_GAIN"); s.settings.tbn_gain = 0;
+  sprintf(keyword,"TBF_GAIN"); s.settings.tbf_gain = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
   switch (i) {
     case MERS_PL_KEYWORD_MATCH: 
@@ -2964,6 +3287,7 @@
   printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.settings.tbf_gain);
 #endif
   
+#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
   /* reading TBN_GAIN */
   sprintf(keyword,"TBN_GAIN"); s.settings.tbn_gain = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
@@ -2981,7 +3305,7 @@
     exit(EXIT_FAILURE);
     } 
   printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.settings.tbn_gain);
-
+#endif
 
   /* reading DRX_GAIN */
   sprintf(keyword,"DRX_GAIN"); s.settings.drx_gain = 0;
