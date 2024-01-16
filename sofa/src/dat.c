@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <errno.h>
 #include <sys/stat.h>
 #include <curl/curl.h>
 
@@ -199,11 +200,21 @@ int iauDat(int iy, int im, int id, double fd, double *deltat)
      CURL *curl_handle;
      curl_global_init(CURL_GLOBAL_ALL);
      curl_handle = curl_easy_init();
+     if( curl_handle == NULL ) {
+       curl_global_cleanup();
+       return -5;
+     }
      curl_easy_setopt(curl_handle, CURLOPT_URL, "https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat");
      curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
      
      // Download the file
      fh = fopen("./state/leapsec.txt.temp", "w");
+     if( fh == NULL ) {
+       perror("Cannot open leap second temporary file for writing");
+       curl_easy_cleanup(curl_handle);
+       curl_global_cleanup();
+       return -5;
+     }
      curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, fh);
      CURLcode res = curl_easy_perform(curl_handle);
      if (res == CURLE_OK) {
@@ -222,7 +233,10 @@ int iauDat(int iy, int im, int id, double fd, double *deltat)
    }
 
 /* Update the value of IYV */
-   stat("state/leapsec.txt", &fstats);
+   if( stat("state/leapsec.txt", &fstats) != 0 ) {
+     perror("Cannot stat leap second file");
+     return -5;
+   }
    struct tm *now_gm = gmtime(&(fstats.st_mtime));
    IYV = now_gm->tm_year + 1900;
    
@@ -231,6 +245,10 @@ int iauDat(int iy, int im, int id, double fd, double *deltat)
    double entry_mjd;
 
    fh = fopen("state/leapsec.txt", "r");
+   if( fh == NULL ) {
+     perror("Cannot open leap second file for reading");
+     return -5;
+   }
    while( fgets(&line[0], 256, fh) != NULL ) {
      ret = sscanf(&line[0], \
                   "%lf %i %i %i %i", \
@@ -245,6 +263,7 @@ int iauDat(int iy, int im, int id, double fd, double *deltat)
        break;
      }
    }
+   fclose(fh);
 
 /* Number of Delta(AT) changes */
    int NDAT = count;
