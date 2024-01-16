@@ -201,6 +201,7 @@ int iauDat(int iy, int im, int id, double fd, double *deltat)
      curl_global_init(CURL_GLOBAL_ALL);
      curl_handle = curl_easy_init();
      if( curl_handle == NULL ) {
+       fprintf(stderr, "Cannot create cURL handle: curl_easy_init() returned NULL");
        curl_global_cleanup();
        return -5;
      }
