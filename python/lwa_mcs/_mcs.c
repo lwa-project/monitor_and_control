@@ -8,41 +8,6 @@
 #include <netinet/in.h> /* for network sockets */
 #include <arpa/inet.h>  /* for network sockets */
 
-#if PY_MAJOR_VERSION >= 3
-    #define PyMIB_RETURN "y"
-
-    #define PyInt_FromLong PyLong_FromLong
-    #define PyString_AS_STRING PyBytes_AS_STRING
-    #define PyString_FromString PyUnicode_FromString
-    inline char* PyString_AsString(PyObject *ob) {
-        PyObject *enc;
-        char *cstr;
-        enc = PyUnicode_AsEncodedString(ob, "utf-8", "Error");
-        if( enc == NULL ) {
-            PyErr_Format(PyExc_ValueError, "Cannot encode string");
-            return NULL;
-        }
-        cstr = PyBytes_AsString(enc);
-        Py_XDECREF(enc);
-        return cstr;
-    }
-    #define MOD_ERROR_VAL NULL
-    #define MOD_SUCCESS_VAL(val) val
-    #define MOD_INIT(name) PyMODINIT_FUNC PyInit_##name(void)
-    #define MOD_DEF(ob, name, methods, doc) \
-        static struct PyModuleDef moduledef = { \
-            PyModuleDef_HEAD_INIT, name, doc, -1, methods, }; \
-        ob = PyModule_Create(&moduledef);
-#else
-    #define PyMIB_RETURN "s"
-
-    #define MOD_ERROR_VAL
-    #define MOD_SUCCESS_VAL(val)
-    #define MOD_INIT(name) PyMODINIT_FUNC init##name(void)
-    #define MOD_DEF(ob, name, methods, doc) \
-        ob = Py_InitModule3(name, methods, doc);
-#endif
-
 
 static PyObject *get_current_time(PyObject *self, PyObject *args, PyObject *kwds) {
     long int mjd, mpm;
@@ -177,7 +142,7 @@ static PyObject *read_mib_ip(
     
     tv = record.last_change;
     ts = tv.tv_sec + tv.tv_usec/1e6;
-    output = Py_BuildValue("(" PyMIB_RETURN "#f)", record.val, MIB_VAL_FIELD_LENGTH, ts);
+    output = Py_BuildValue("(y#f)", record.val, MIB_VAL_FIELD_LENGTH, ts);
     close(sockfd);
     return output;
 
@@ -238,7 +203,7 @@ static PyObject *read_mib(PyObject *self, PyObject *args, PyObject *kwds) {
     tv = record.last_change;
     ts = tv.tv_sec + tv.tv_usec/1e6;
     
-    output = Py_BuildValue("(" PyMIB_RETURN PyMIB_RETURN "#f)", record.type_dbm, record.val, MIB_VAL_FIELD_LENGTH, ts);
+    output = Py_BuildValue("(yy#f)", record.type_dbm, record.val, MIB_VAL_FIELD_LENGTH, ts);
     gdbm_close(dbm_ptr);
     return output;
     
@@ -343,19 +308,21 @@ PyDoc_STRVAR(mcs_doc, \
   Module Setup - Initialization
 */
 
-MOD_INIT(_mcs) {
+PyMODINIT_FUNC PyInit__mcs(void) {
     PyObject *m, *all;
     
     Py_Initialize();
 
     // Module definitions and functions
-    MOD_DEF(m, "_mcs", McsMethods, mcs_doc);
+    static struct PyModuleDef moduledef = { \
+            PyModuleDef_HEAD_INIT, "_mcs", mcs_doc, -1, McsMethods, }; \
+    m = PyModule_Create(&moduledef);
     if( m == NULL ) {
-        return MOD_ERROR_VAL;
+        return NULL;
     }
     
     // Version information
-    PyModule_AddObject(m, "__version__", PyString_FromString("0.5"));
+    PyModule_AddObject(m, "__version__", PyUnicode_FromString("0.5"));
     
     // Constants
 #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
@@ -368,25 +335,25 @@ MOD_INIT(_mcs) {
 #else
     PyModule_AddObject(m, "IS_ADP", Py_False);
 #endif
-    PyModule_AddObject(m, "MAX_NDR", PyInt_FromLong(ME_MAX_NDR));
+    PyModule_AddObject(m, "MAX_NDR", PyLong_FromLong(ME_MAX_NDR));
     
-    PyModule_AddObject(m, "SCH_PATH", PyString_FromString(LWA_SCH_SCP_DIR));
+    PyModule_AddObject(m, "SCH_PATH", PyUnicode_FromString(LWA_SCH_SCP_DIR));
     
-    PyModule_AddObject(m, "MCS_TIMEOUT", PyInt_FromLong(LWA_PTQ_TIMEOUT));
+    PyModule_AddObject(m, "MCS_TIMEOUT", PyLong_FromLong(LWA_PTQ_TIMEOUT));
     
     // Function listings
     all = PyList_New(0);
-    PyList_Append(all, PyString_FromString("IS_NDP"));
-    PyList_Append(all, PyString_FromString("IS_ADP"));
-    PyList_Append(all, PyString_FromString("MAX_NDR"));
-    PyList_Append(all, PyString_FromString("SCH_PATH"));
-    PyList_Append(all, PyString_FromString("MCS_TIMEOUT"));
-    PyList_Append(all, PyString_FromString("get_current_time"));
-    PyList_Append(all, PyString_FromString("send_sch_command"));
-    PyList_Append(all, PyString_FromString("read_mib_ip"));
-    PyList_Append(all, PyString_FromString("read_mib"));
-    PyList_Append(all, PyString_FromString("send_exec_command"));
+    PyList_Append(all, PyUnicode_FromString("IS_NDP"));
+    PyList_Append(all, PyUnicode_FromString("IS_ADP"));
+    PyList_Append(all, PyUnicode_FromString("MAX_NDR"));
+    PyList_Append(all, PyUnicode_FromString("SCH_PATH"));
+    PyList_Append(all, PyUnicode_FromString("MCS_TIMEOUT"));
+    PyList_Append(all, PyUnicode_FromString("get_current_time"));
+    PyList_Append(all, PyUnicode_FromString("send_sch_command"));
+    PyList_Append(all, PyUnicode_FromString("read_mib_ip"));
+    PyList_Append(all, PyUnicode_FromString("read_mib"));
+    PyList_Append(all, PyUnicode_FromString("send_exec_command"));
     PyModule_AddObject(m, "__all__", all);
 
-    return MOD_SUCCESS_VAL(m);
+    return m;
 }
