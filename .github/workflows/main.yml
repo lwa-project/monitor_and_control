@@ -49,7 +49,7 @@ jobs:
             setuptools \
             numpy \
             astropy \
-            "ephem<4.1.1" \
+            ephem \
             requests
       - name: "Software Install - Python, Part 2" 
         run: |
