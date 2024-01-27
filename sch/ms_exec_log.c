@@ -67,7 +67,7 @@ int LWA_mse_log(
   long int mjd;
   long int mpm;
   int bSuccess=0;
-  char comment_field[LWA_MSELOG_COMMENT_FIELD_LENGTH+1];
+  char comment_field[LWA_MSELOG_COMMENT_FIELD_LENGTH+1] = {'\0'};
   char hex[LWA_MSELOG_COMMENT_FIELD_LENGTH];
   int i;
 
@@ -89,7 +89,12 @@ int LWA_mse_log(
 
   /* construct comment field */
   if (datalen==-1) { /* data is a string */
-       strncpy( comment_field, data, LWA_MSELOG_COMMENT_FIELD_LENGTH ); 
+       strncpy( comment_field, data, LWA_MSELOG_COMMENT_FIELD_LENGTH );
+       if (strlen(data) > LWA_MSELOG_COMMENT_FIELD_LENGTH ) { /* If the message is too long, add a truncation marker */
+         comment_field[LWA_MSELOG_COMMENT_FIELD_LENGTH-3] = '.';
+         comment_field[LWA_MSELOG_COMMENT_FIELD_LENGTH-2] = '.';
+         comment_field[LWA_MSELOG_COMMENT_FIELD_LENGTH-1] = '.';
+       }
      } else {        /* data is not a string; convert to printable hex form */  
        i=datalen;
        if ((2*i)>LWA_MSELOG_COMMENT_FIELD_LENGTH) { i = LWA_MSELOG_COMMENT_FIELD_LENGTH/2; }
