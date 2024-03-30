@@ -27,15 +27,16 @@ def read(ss: str, label: str, trim_nulls: bool=True) -> Tuple[Union[str,bytes,in
         value = value.decode('ascii')
         if trim_nulls:
             value = value.replace('\0', '').strip().rstrip()
-            
-        try:
-            value = int(value, 10)
-        except ValueError:
+
+        if value.find('_') == -1:
             try:
-                value = float(value)
+                value = int(value, 10)
             except ValueError:
-                pass
-                
+                try:
+                    value = float(value)
+                except ValueError:
+                    pass
+                    
     except (AttributeError, UnicodeDecodeError):
         if trim_nulls:
             value = value.replace(b'\0', b'').strip().rstrip()
