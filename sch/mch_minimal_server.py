@@ -53,7 +53,7 @@ parser.add_argument('-a', '--accept-all', action='store_true',
                     help='respond to all incoming commands whether they are valid or not')
 parser.add_argument('-v', '--verbose', action='store_true',
                     help='be verbose about what is happening')
-args = parse.parse_args()
+args = parser.parse_args()
 
 
 # --------------------------
@@ -159,7 +159,7 @@ while 1:
             for i in range(len(ml)):
                 if ml[i]==mib_label:
                     response = 'A'+string.rjust(str(me[0]),7)+me[i] 
-	            bDone=1;
+                    bDone=1;
 
         if command=='SHT':
             response = 'A'+string.rjust(str(me[0]),7)  # use this until we find otherwis
@@ -221,7 +221,7 @@ while 1:
         t.send(payload.encode())      # send it 
 
     if args.verbose:
-        print('sent> '+payload+'|' # say what was sent )
+        print('sent> '+payload+'|') # say what was sent
 
 # never get here, but what the heck.
 s.close()
