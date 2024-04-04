@@ -1398,6 +1398,7 @@ int main ( int narg, char *argv[] ) {
                   LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
                   cs[ncs].action.bASAP = 0;
                   #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+                  cs[ncs].action.tv.tv_sec -= 2; /* Must be sent in slot N-4 instead of N-2 */
                   cs[ncs].action.sid = LWA_SID_NDP;
                   #else
                   cs[ncs].action.sid = LWA_SID_DP_;
@@ -1426,6 +1427,7 @@ int main ( int narg, char *argv[] ) {
                   LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 ); /* staggering send times for DP commands by 10 ms */
                   cs[ncs].action.bASAP = 0;                   
                   #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+                  cs[ncs].action.tv.tv_sec -= 2; /* Must be sent in slot N-4 instead of N-2 */
                   cs[ncs].action.sid = LWA_SID_NDP;
                   #else
                   cs[ncs].action.sid = LWA_SID_DP_;  
@@ -1792,6 +1794,7 @@ int main ( int narg, char *argv[] ) {
                 cs[ncs].action.tv.tv_usec = 0; 
                 cs[ncs].action.bASAP = 0;
                 #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+                cs[ncs].action.tv.tv_sec  = tv.tv_sec - 4; /* Must be sent in first 80% of slot N-4 */
                 cs[ncs].action.sid = LWA_SID_NDP;
                 #else
                 cs[ncs].action.sid = LWA_SID_DP_;  
@@ -1821,6 +1824,7 @@ int main ( int narg, char *argv[] ) {
                 cs[ncs].action.tv.tv_usec = 10000;         /* staggering send times for DP commands by 10 ms */
                 cs[ncs].action.bASAP = 0;
                 #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+                cs[ncs].action.tv.tv_sec  = tv.tv_sec - 4; /* Must be sent in first 80% of slot N-4 */
                 cs[ncs].action.sid = LWA_SID_NDP;
                 #else
                 cs[ncs].action.sid = LWA_SID_DP_;  
