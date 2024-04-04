@@ -99,7 +99,7 @@ def schedule_sdfs(filenames: List[str], max_retries: int=5, fast_submit: bool=Fa
         filename = os.path.abspath(filename)
         psID = _get_sdf_id(filename)
         if logfile is not None:
-            logfile.write("Submitting SDF for %s, session %i\n" % psID)
+            logfile.write(("Submitting SDF for %s, session %i\n" % psID).encode())
         ids[psID] = filename
         tpss = subprocess.Popen(['./tpss', filename, '5', '0', 'mbox'], 
                                 cwd=TP_PATH, stdout=logfile, stderr=errorfile)
@@ -127,7 +127,7 @@ def schedule_sdfs(filenames: List[str], max_retries: int=5, fast_submit: bool=Fa
             ### Resubmit what is missing
             for psID,filename in missing_files:
                 if errorfile is not None:
-                    errorfile.write("Resubmitting SDF for %s, session %i\n" % psID)
+                    errorfile.write(("Resubmitting SDF for %s, session %i\n" % psID).encode())
                 tpss = subprocess.Popen(['./tpss', filename, '5', '0', 'mbox'], 
                                         cwd=TP_PATH, stdout=logfile, stderr=errorfile)
                 tpss.wait()
