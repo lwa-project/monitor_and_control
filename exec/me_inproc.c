@@ -1909,6 +1909,9 @@ int main ( int narg, char *argv[] ) {
 
 
 #if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
+              /* Trigger time is in units of "subslots" (1/100ths of a second) */
+              t0 = mpm % 1000;                /* number of ms beyond a second boundary */
+              t0 /= 10; if (t0>99) t0=99;     /* now in subslots */
               /* so here's the BAM command: */
               cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
               cs[ncs].action.tv.tv_usec = 20000;         /* staggering send times for DP commands by 10 ms */
@@ -1941,6 +1944,9 @@ int main ( int narg, char *argv[] ) {
               me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
               ncs++;
 #else
+              /* Trigger time is in units of "subslots" (1/100ths of a second) */
+              t0 = mpm % 1000;                /* number of ms beyond a second boundary */
+              t0 /= 10; if (t0>99) t0=99;     /* now in subslots */
               /* so here's the BAM command: */
               cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
               cs[ncs].action.tv.tv_usec = 20000;         /* staggering send times for DP commands by 10 ms */
