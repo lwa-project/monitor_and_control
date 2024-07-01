@@ -997,7 +997,7 @@ int main ( int narg, char *argv[] ) {
                 }
 
 #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP                
-              if ((osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) && (osf.OBS_MODE != LWA_OM_TBF)) {
+              if ((osf.SESSION_DRX_BEAM<=ME_MAX_NDPOUT) && (osf.OBS_MODE != LWA_OM_TBF)) {
                   dr_length_ms = ssf.SESSION_DUR; /* beam obs are recorded contiguously in one session */
                 } else {
                   dr_length_ms = osf.OBS_DUR; /* each TBF observation is a separate recording */ 
