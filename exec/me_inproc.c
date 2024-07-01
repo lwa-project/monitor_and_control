@@ -937,9 +937,8 @@ int main ( int narg, char *argv[] ) {
 #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
             /* for NDP output 1, 2, 3, 4 (beams) we do this once; i.e., one recording per session */
             /* for NDP output 1 (TBF) output we do a new recording for each observation */
-            if ( ( (osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) && (osf.OBS_MODE != LWA_OM_TBF) && (i==1) ) || 
-                 ( (osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) && (osf.OBS_MODE == LWA_OM_TBF) ) ||
-                 (  osf.SESSION_DRX_BEAM==ME_MAX_NDPOUT           )   ) {
+            if ( ( (osf.SESSION_DRX_BEAM<=ME_MAX_NDPOUT) && (osf.OBS_MODE != LWA_OM_TBF) && (i==1) ) || 
+                 ( (osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) && (osf.OBS_MODE == LWA_OM_TBF) ) ) {
               dr_sid=-1;
               for( j=0; j<ME_MAX_NDR; j++ ) {
                  if( osf.SESSION_DRX_BEAM == s.iDRDP[j] ) {
