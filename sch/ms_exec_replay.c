@@ -276,7 +276,7 @@ int main ( int narg, char *argv[] ) {
 
 
   /* initialize reference number */
-  reference = 1; /* reference number = 0 reserved for error condition */
+  reference = 1; /* reference number = 0 reserved for error condition; LWA_MAX_REFERENCE for unsolicited RPT updates */
 
   /* Set up for receiving from message queue */
   if (nsid>1) { /* if there is at least one subsystem other than MCS... */
@@ -389,7 +389,7 @@ int main ( int narg, char *argv[] ) {
 
           /* Two possibilities: */
           /* (1) This is the response to a command sent earlier, or */
-          /* (2) This is an unsolicited message (as implemented now, this is an error) */
+          /* (2) This is an unsolicited message */
           
           /* check to see if is a response.  */
           /* Do this by matching reference numbers: */
@@ -397,8 +397,17 @@ int main ( int narg, char *argv[] ) {
           while ( (tqp2<tql) && !(task[tqp2].ref==mq_msg.ref) ) tqp2++;
           if (tqp2==tql) { /* We didn't find a match */
 
-               sprintf(logmsg,"ms_mcic used an unrecognized REF: %ld (ignoring it)",mq_msg.ref);
-               LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
+               if (mq_msg.ref == LWA_MAX_REFERENCE) {
+                 /* Unsolicited MIB update */
+                 /* LWA_MSELOG_TP_UNSOLICITED */
+                 LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, mq_msg.ref,
+                                  LWA_MSELOG_TP_UNSOLICITED,
+                                  mq_msg.sid, mq_msg.cid, mq_msg.data, mq_msg.datalen, 
+                                  &mselog_line_ctr );
+               } else {
+                 sprintf(logmsg,"ms_mcic used an unrecognized REF: %ld (ignoring it)",mq_msg.ref);
+                 LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
+               }
 
              } else { /* we DID find a match */
 
@@ -851,6 +860,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_exec_replay.c: J. Dowell, UNM, 2025 Jan 21
+//   .1: Updated for unsolicited MIB updates
 // ms_exec_replay.c: J. Dowell, UNM, 2020 Jun 23
 //   .1: Created from ms_exec.c
 // ms_exec.c: J. Dowell, UNM, 2018 Jan 29

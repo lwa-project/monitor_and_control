@@ -199,13 +199,13 @@ int main ( int narg, char *argv[] ) {
       found = 0;
       while(fgets(&(line[0]), sizeof(line), fpr[sid]) != NULL) {
         /* Basic unpak to get the queuing status, subsystem ID, and command ID */
-        strncpy(&(temp[0]), &(line[45]), 1);
+        strncpy(&(temp[0]), &(line[45]), 2);
         temp[1] = '\0';
         status = atoi(&(temp[0]));
-        strncpy(&(temp[0]), &(line[47]), 3);
+        strncpy(&(temp[0]), &(line[48]), 3);
         temp[3] = '\0';
         lsid = LWA_getsid(&(temp[0]));
-        strncpy(&(temp[0]), &(line[51]), 3);
+        strncpy(&(temp[0]), &(line[52]), 3);
         temp[3] = '\0';
         lcid = LWA_getcmd(&(temp[0]));
         
@@ -223,7 +223,7 @@ int main ( int narg, char *argv[] ) {
              -> save the response to the message
         */ 
         if( ( (status < LWA_MSELOG_TP_SUCCESS ) \
-             && (strncmp(label, &(line[55]), strlen(label)) == 0) ) ) {
+             && (strncmp(label, &(line[56]), strlen(label)) == 0) ) ) {
             strncpy(&(temp[0]), &(line[35]), 9);
             temp[9] = '\0';
             ref = atol(&(temp[0]));
@@ -237,8 +237,8 @@ int main ( int narg, char *argv[] ) {
                 LWA_time(&mjd, &mpm);
                 LWA_time2tv(&c.last_change, mjd, mpm);
                 for(i=0; i<MIB_VAL_FIELD_LENGTH; i++) {
-                    if( line[55+i] != '|' && line[55+i] != '\0') {
-                        c.val[i] = line[55+i];
+                    if( line[56+i] != '|' && line[56+i] != '\0') {
+                        c.val[i] = line[56+i];
                         c.val[i+1] = '\0';
                     } else {
                         break;
@@ -289,6 +289,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mdre_replay.c: J. Dowell, UNM, 2025 Jan 21
+//   .1 Updated for unsolicited MIB updates and the new mselog.txt line format
 // ms_mdre_replay.c: J. Dowell, UNM, 2020 Jun 24
 //   .1 Created from ms_mdre_ip.c
 // ms_mdre_ip.c: J. Dowell, UNM, 2019 Oct 30
