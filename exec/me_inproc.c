@@ -1166,7 +1166,7 @@ int main ( int narg, char *argv[] ) {
                   cs[ncs].action.bASAP = 0;
                   cs[ncs].action.sid = LWA_SID_ADP;  
                   cs[ncs].action.cid = LWA_CMD_DRX; 
-                  sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
+                  sprintf( cs[ncs].data, "%hd %12.3f %hu %hd",
                                   1, //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
                                         (4.563480616e-02)*(osf.OBS_FREQ1), /* center freq in Hz */
                                               osf.OBS_BW,                  /* 0-8 */
@@ -1190,7 +1190,7 @@ int main ( int narg, char *argv[] ) {
                   cs[ncs].action.bASAP = 0;                   
                   cs[ncs].action.sid = LWA_SID_ADP;  
                   cs[ncs].action.cid = LWA_CMD_DRX; 
-                  sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
+                  sprintf( cs[ncs].data, "%hd %12.3f %hu %hd",
                                   2, //tuning 2..NUM_TUNINGS(2) (uint8 DRX_TUNING)
                                         (4.563480616e-02)*(osf.OBS_FREQ2), /* center freq in Hz */
                                               osf.OBS_BW,                  /* 0-8 */
@@ -1347,7 +1347,7 @@ int main ( int narg, char *argv[] ) {
                   cs[ncs].action.bASAP = 0;
                   cs[ncs].action.sid = LWA_SID_ADP;  
                   cs[ncs].action.cid = LWA_CMD_DRX; 
-                  sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
+                  sprintf( cs[ncs].data, "%hd %12.3f %hu %hd",
                                   1, //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
                                         (4.563480616e-02)*(osf.OBS_FREQ1), /* center freq in Hz */
                                               osf.OBS_BW,                  /* 0-8 */
@@ -1371,7 +1371,7 @@ int main ( int narg, char *argv[] ) {
                   cs[ncs].action.bASAP = 0;                   
                   cs[ncs].action.sid = LWA_SID_ADP;  
                   cs[ncs].action.cid = LWA_CMD_DRX; 
-                  sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
+                  sprintf( cs[ncs].data, "%hd %12.3f %hu %hd",
                                   2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                         (4.563480616e-02)*(osf.OBS_FREQ2), /* center freq in Hz */
                                               osf.OBS_BW,                  /* 0-8 */
@@ -1403,7 +1403,7 @@ int main ( int narg, char *argv[] ) {
                   cs[ncs].action.sid = LWA_SID_DP_;
                   #endif
                   cs[ncs].action.cid = LWA_CMD_DRX; 
-                  sprintf( cs[ncs].data, "%hd 1 %8.0f %hu %hd %ld",
+                  sprintf( cs[ncs].data, "%hd 1 %12.3f %hu %hd %ld",
                                   osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                       //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
                                         (4.563480616e-02)*(osf.OBS_FREQ1), /* center freq in Hz */
@@ -1432,7 +1432,7 @@ int main ( int narg, char *argv[] ) {
                   cs[ncs].action.sid = LWA_SID_DP_;  
                   #endif
                   cs[ncs].action.cid = LWA_CMD_DRX; 
-                  sprintf( cs[ncs].data, "%hd 2 %8.0f %hu %hd %ld",
+                  sprintf( cs[ncs].data, "%hd 2 %12.3f %hu %hd %ld",
                                   osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                       //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
                                         (4.563480616e-02)*(osf.OBS_FREQ2), /* center freq in Hz */
@@ -1744,7 +1744,7 @@ int main ( int narg, char *argv[] ) {
                 cs[ncs].action.bASAP = 0; 
                 cs[ncs].action.sid = LWA_SID_ADP;  
                 cs[ncs].action.cid = LWA_CMD_DRX; 
-                sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
+                sprintf( cs[ncs].data, "%hd %12.3f %hu %hd",
                                 1, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                       (4.563480616e-02)*(osfs.OBS_STP_FREQ1), /* center freq in Hz */
                                             osf.OBS_BW,                       /* 0-8 */
@@ -1768,7 +1768,7 @@ int main ( int narg, char *argv[] ) {
                 cs[ncs].action.bASAP = 0;    
                 cs[ncs].action.sid = LWA_SID_ADP;  
                 cs[ncs].action.cid = LWA_CMD_DRX; 
-                sprintf( cs[ncs].data, "%hd %8.0f %hu %hd",
+                sprintf( cs[ncs].data, "%hd %12.3f %hu %hd",
                                 2, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                       (4.563480616e-02)*(osfs.OBS_STP_FREQ2), /* center freq in Hz */
                                             osf.OBS_BW,                       /* 0-8 */
@@ -1799,7 +1799,7 @@ int main ( int narg, char *argv[] ) {
                 cs[ncs].action.sid = LWA_SID_DP_;  
                 #endif
                 cs[ncs].action.cid = LWA_CMD_DRX; 
-                sprintf( cs[ncs].data, "%hd 1 %8.0f %hu %hd %ld",
+                sprintf( cs[ncs].data, "%hd 1 %12.3f %hu %hd %ld",
                                 osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                     //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
                                       (4.563480616e-02)*(osfs.OBS_STP_FREQ1), /* center freq in Hz */
@@ -1829,7 +1829,7 @@ int main ( int narg, char *argv[] ) {
                 cs[ncs].action.sid = LWA_SID_DP_;  
                 #endif  
                 cs[ncs].action.cid = LWA_CMD_DRX; 
-                sprintf( cs[ncs].data, "%hd 2 %8.0f %hu %hd %ld",
+                sprintf( cs[ncs].data, "%hd 2 %12.3f %hu %hd %ld",
                                 osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                     //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
                                       (4.563480616e-02)*(osfs.OBS_STP_FREQ2), /* center freq in Hz */
