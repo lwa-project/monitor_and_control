@@ -114,7 +114,7 @@ int LWA_mse_log(
   switch (msg_type) {
     
     case LWA_MSELOG_MTYPE_TASK:
-      fprintf( fp, "%s %6ld %9ld T %9ld %1d %3s %3s %s|\n", time_string, mjd, mpm, ref, tp, 
+      fprintf( fp, "%s %6ld %9ld T %9ld %2d %3s %3s %s|\n", time_string, mjd, mpm, ref, tp, 
                LWA_sid2str(sid), 
                LWA_cmd2str(cid), 
                comment_field 
