@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # test2.sh: S.W. Ellingson, Virginia Tech, 2009 Aug 14
 # 
 # 1. Launches a subsystem emulator for a minimal subsystem called NU1.
@@ -10,8 +12,36 @@
 # Note this script assumes all software running on the same computer
 # (Otherwise, change 127.0.0.1 to appropriate IPs)
 
+# Exit on any error
+set -e 
+
+# Cleanup function to ensure we always kill the server and remove temp files
+cleanup() {
+    local exit_code=$?
+    echo "Cleaning up..."
+    
+    # Kill Python server if running
+    if [ ! -z "$SERVER_PID" ]; then
+        echo "Killing Python server (PID: $SERVER_PID)"
+        kill $SERVER_PID 2>/dev/null || true
+    fi
+
+    # Remove temp files
+    rm -f test2.dat
+
+    # Report exit status
+    if [ $exit_code -ne 0 ]; then
+        echo "Test failed with exit code $exit_code"
+    fi
+    exit $exit_code
+}
+
+# Set trap for cleanup
+trap cleanup EXIT INT TERM
+
 # Fire up a subsystem emulator for NU1
-python mch_minimal_server.py NU1 127.0.0.1 1739 1738 &
+python3 mch_minimal_server.py NU1 127.0.0.1 1739 1738 &
+SERVER_PID=$!
 sleep 1
 
 # Create an ms_init initialization file called "test2.dat" 
@@ -35,9 +65,3 @@ sleep 5
 
 # Send MCS/Scheduler shutdown command 
 ./msei MCS SHT
-
-# Shut down the subsystem emulator
-killall -v python
-
-
-

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # test7.sh: S.W. Ellingson, Virginia Tech, 2009 Aug 25
 #
 # This script tests MCS/Scheduler's handling of DP
@@ -18,18 +20,53 @@
 # Note this script assumes all software running on the same computer
 # (Otherwise, change 127.0.0.1 to appropriate IPs)
 
-# Figure out if we are DP or ADP-compatible
+# Exit on any error
+set -e 
+
+# Cleanup function to ensure we always kill the server and remove temp files
+cleanup() {
+    local exit_code=$?
+    echo "Cleaning up..."
+    
+    # Kill Python server if running
+    if [ ! -z "$SERVER_PID" ]; then
+        echo "Killing Python server (PID: $SERVER_PID)"
+        kill $SERVER_PID 2>/dev/null || true
+    fi
+
+    # Remove temp files
+    rm -f test7.dat
+
+    # Report exit status
+    if [ $exit_code -ne 0 ]; then
+        echo "Test failed with exit code $exit_code"
+    fi
+    exit $exit_code
+}
+
+# Set trap for cleanup
+trap cleanup EXIT INT TERM
+
+# Figure out if we are DP, ADP, or NDP-compatible
 usingADP=`strings msei | grep ADP `
-if [ "${usingADP}" == "" ]; then
-	# DP
-	dpName="DP_"
-else
+usingNDP=`strings msei | grep NDP `
+if [ "${usingADP}" != "" ]; then
 	# ADP
 	dpName="ADP"
+else
+	if [ "${usingNDP}" != "" ]; then
+		# NDP
+		dpName="NDP"
+	else
+		# DP
+		dpName="DP_"
+	fi
 fi
 
 # Fire up an emulator to play the role of DP/ADP
-python mch_minimal_server.py ${dpName} 127.0.0.1 1739 1738 &
+python3 mch_minimal_server.py ${dpName} 127.0.0.1 1739 1738 &
+SERVER_PID=$!
+sleep 1
 
 # Create a DP/ADP MIB initialization file 
 if [ "${dpName}" == "DP_" ]; then
@@ -75,9 +112,3 @@ sleep 5
 
 # Send MCS/Scheduler shutdown command 
 ./msei MCS SHT
-
-# Shut down the subsystem emulator
-killall -v python
-
-
-
