@@ -772,8 +772,12 @@ int main ( int narg, char *argv[] ) {
          i++; 
          }
        if ( ptq_ref[i] != ref ) { /* we don't recognize this reference number */
-            strcpy( cmdata, "" ); /* don't know nothin' about what was sent */
-            if ( ref != LWA_MAX_REFERENCE ) {
+            
+            if ( ref == LWA_MAX_REFERENCE ) {
+              memset( cmdata, '\0', sizeof(cmdata));
+              memcpy( cmdata, mq_msg.data, LWA_PTQ_MAX_DATA_FIELD_LENGTH); /* should be safe */
+            } else {
+              strcpy( cmdata, "" ); /* don't know nothin' about what was sent */
               mq_msg.eMIBerror += LWA_MIBERR_REF_UNK;
               printf("[%s/%d] REFERENCE=%ld not recognized.\n",ME,getpid(),ref);
             }
