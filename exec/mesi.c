@@ -180,6 +180,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
   unsigned char beam;
   unsigned char tuning;
   float freq;
+  double freq8;
   unsigned char ebw;
   unsigned short int gain;
   unsigned char subslot;
@@ -311,7 +312,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          // uint8 sub_slot;
 
          // parse the input string into parameters
-         sscanf(data,"%hhu %hhu %f %hhu %hu %hhu", &beam, &tuning, &freq, &ebw, &gain, &subslot);
+         sscanf(data,"%hhu %hhu %lf %hhu %hu %hhu", &beam, &tuning, &freq8, &ebw, &gain, &subslot);
          //printf("%f %1hhu %1hhu %1hhu %1hhu\n",freq,c.data[2],c.data[3],c.data[4],c.data[5]);
 
          // assemble into c.data:
@@ -319,6 +320,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          memcpy( &(c.data[1]), &tuning,   1 );
 
          /* flipping endian-ness of freq: */
+         freq = (float) freq8;
          f4.f  = freq;  c.data[2]= f4.b[3]; c.data[3]= f4.b[2]; c.data[4]= f4.b[1]; c.data[5]= f4.b[0]; 
 
          /* flipping endian-ness of gain: */
@@ -452,13 +454,14 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          // uint16 DRX_GAIN;
 
          // parse the input string into parameters
-         sscanf(data,"%hhu %f %hhu %hu", &tuning, &freq, &ebw, &gain);
+         sscanf(data,"%hhu %lf %hhu %hu", &tuning, &freq8, &ebw, &gain);
          //printf("%f %1hhu %1hhu %1hhu %1hhu\n",freq,c.data[1],c.data[2],c.data[3],c.data[4]);
 
          // assemble into c.data:
          memcpy( &(c.data[0]), &tuning,   1 );
 
          /* flipping endian-ness of freq: */
+         freq = (float) freq8;
          f4.f  = freq;  c.data[1]= f4.b[3]; c.data[2]= f4.b[2]; c.data[3]= f4.b[1]; c.data[4]= f4.b[0]; 
 
          /* flipping endian-ness of gain: */
@@ -612,7 +615,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          // uint8 sub_slot;
 
          // parse the input string into parameters
-         sscanf(data,"%hhu %hhu %f %hhu %hu %hhu", &beam, &tuning, &freq, &ebw, &gain, &subslot);
+         sscanf(data,"%hhu %hhu %lf %hhu %hu %hhu", &beam, &tuning, &freq8, &ebw, &gain, &subslot);
          //printf("%f %1hhu %1hhu %1hhu %1hhu\n",freq,c.data[2],c.data[3],c.data[4],c.data[5]);
 
          // assemble into c.data:
@@ -620,6 +623,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          memcpy( &(c.data[1]), &tuning,   1 );
 
          /* flipping endian-ness of freq: */
+         freq = (float) freq8;
          f4.f  = freq;  c.data[2]= f4.b[3]; c.data[3]= f4.b[2]; c.data[4]= f4.b[1]; c.data[5]= f4.b[0]; 
 
          /* flipping endian-ness of gain: */
