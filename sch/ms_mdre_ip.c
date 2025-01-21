@@ -147,6 +147,7 @@ int main ( int narg, char *argv[] ) {
   server_address.sin_addr.s_addr = inet_addr(LWA_IP_MSE);   /* network sockets */
   server_address.sin_port        = htons(LWA_PORT_MSE2);    /* network sockets */
   server_len = sizeof(server_address);
+  printf("[%s] Binding to %s (%i), port %i\n", ME, LWA_IP_MSE, server_address.sin_addr.s_addr, LWA_PORT_MSE2);
 
   i = bind( server_sockfd, 
            (struct sockaddr *) &server_address, 

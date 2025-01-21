@@ -134,6 +134,8 @@ struct LWA_mib_entry {
                                   /* (task considered done) */
 #define LWA_MSELOG_TP_FAIL_FILE 9 /* ms_mcic reporting unable to read file needed for FST or BAM command */ 
 
+#define LWA_MSELOG_TP_UNSOLICITED 10 /* Response received without a corresponding request */
+
 /* Using approach of bit-flagging (note power-of-two values) so these can be added: */
 #define LWA_MIBERR_OK         0 /* no error to report */
 #define LWA_MIBERR_CANTOPEN   1 /* couldn't open MIB dbm */
@@ -1506,6 +1508,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// Jan 21, 2025: Added LWA_MSELOG_TP_UNSOLICITED
 // Feb 21, 2023: Moved some configuration parameters into config.h
 // Sep 30, 2022: Added support for the moon tracking mode TRK_LUN
 // May 2, 2022:  Added new SIDs and CMDs for the Next Generation Digital Processor (NDP)

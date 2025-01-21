@@ -172,7 +172,7 @@ int main ( int narg, char *argv[] ) {
     fclose(fpr);
    
     reference += 10; /* advance by 10 to avoid duplicates */ 
-    if (reference > LWA_MAX_REFERENCE) reference=1; /* reference=0  used for error flag */
+    if (reference >= LWA_MAX_REFERENCE) reference=1; /* reference=0  used for error flag; LWA_MAX_REFERENCE for unsolicited RPT updates */
     
     printf("[%s] Initial reference ID found, will be %ld\n",ME,reference);
     perror("ms_exec");
@@ -228,6 +228,7 @@ int main ( int narg, char *argv[] ) {
   server_address.sin_addr.s_addr = inet_addr(LWA_IP_MSE);  /* network sockets */
   server_address.sin_port        = htons(LWA_PORT_MSE);    /* network sockets */
   server_len = sizeof(server_address);
+  printf("[%s] Binding to %s (%i), port %i\n", ME, LWA_IP_MSE, server_address.sin_addr.s_addr, LWA_PORT_MSE);
 
   i = bind( server_sockfd, 
            (struct sockaddr *) &server_address, 
@@ -304,17 +305,24 @@ int main ( int narg, char *argv[] ) {
 
           /* Two possibilities: */
           /* (1) This is the response to a command sent earlier, or */
-          /* (2) This is an unsolicited message (as implemented now, this is an error) */
+          /* (2) This is an unsolicited message */
           
           /* check to see if is a response.  */
           /* Do this by matching reference numbers: */
           tqp2 = 0;
           while ( (tqp2<tql) && !(task[tqp2].ref==mq_msg.ref) ) tqp2++;
           if (tqp2==tql) { /* We didn't find a match */
-
-               sprintf(logmsg,"ms_mcic used an unrecognized REF: %ld (ignoring it)",mq_msg.ref);
-               LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
-
+               if (mq_msg.ref == LWA_MAX_REFERENCE) {
+                 /* Unsolicited MIB update */
+                 /* LWA_MSELOG_TP_UNSOLICITED */
+                 LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, mq_msg.ref,
+                                  LWA_MSELOG_TP_UNSOLICITED,
+                                  mq_msg.sid, mq_msg.cid, mq_msg.data, mq_msg.datalen, 
+                                  &mselog_line_ctr );
+               } else {
+                 sprintf(logmsg,"ms_mcic used an unrecognized REF: %ld (ignoring it)",mq_msg.ref);
+                 LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr ); 
+               }
              } else { /* we DID find a match */
 
                tq[tqp2] = LWA_MSELOG_TP_AVAIL; /* flag this slot in queue as being available */    
@@ -441,7 +449,7 @@ int main ( int narg, char *argv[] ) {
 
                   /* assign reference number */
                   reference += 1;
-                  if (reference > LWA_MAX_REFERENCE) reference=1; /* reference=0  used for error flag */
+                  if (reference >= LWA_MAX_REFERENCE) reference=1; /* reference=0  used for error flag; LWA_MAX_REFERENCE for unsolicited RPT updates */
                   
                   /* save the reference number */
                   if(fpr) {
@@ -553,7 +561,7 @@ int main ( int narg, char *argv[] ) {
 
           /* assign reference number */
           reference += 1;
-          if (reference > LWA_MAX_REFERENCE) reference=1; /* reference=0  used for error flag */
+          if (reference >= LWA_MAX_REFERENCE) reference=1; /* reference=0  used for error flag; LWA_MAX_REFERENCE for unsolicited RPT updates */
           c.ref = reference; 
 
           /* save the reference number */
@@ -791,6 +799,9 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_exec.c: J. Dowell, UNM, 2025 Jan 21
+//   .1: Changed reference counting so that LWA_MAX_REFERENCE can be used for
+//       unsolicited MIB updates from subsystems
 // ms_exec.c: J. Dowell, UNM, 2018 Jan 29
 //   .1: Increased the queue size for listen()
 // ms_exec.c: S.W. Ellingson, Virginia Tech, 2011 Apr 12

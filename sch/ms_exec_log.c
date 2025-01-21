@@ -19,12 +19,13 @@
 // The character "T" to signal that this is a task progress message
 // c  = REFERENCE (9 characters, right justified)
 // d  = task progress (see also LWA_MSELOG_TP_* macro defines): 
-//      "1"= queued 
-//      "2"= sent; no response yet
-//      "3"= success: received response, accepted by subsystem
-//      "4"= failure: not sent, failed at ms_exec
-//      "5"= failure: sent, but failed ms_mcic
-//      "6"= failure: sent, but rejected by subsystem 
+//      "1"=  queued 
+//      "2"=  sent; no response yet
+//      "3"=  success: received response, accepted by subsystem
+//      "4"=  failure: not sent, failed at ms_exec
+//      "5"=  failure: sent, but failed ms_mcic
+//      "6"=  failure: sent, but rejected by subsystem
+//      "10"= unsolicited response received from subsystem
 // e  = DESTINATION (subsystem identified in associated command message)
 // f  = TYPE (i.e., command send)
 // g* = DATA. 

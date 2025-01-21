@@ -731,6 +731,10 @@ int main ( int narg, char *argv[] ) {
          memcpy( data, &(message_string[46]), len-8 ); /* copy remaining bytes from message into character array */
          }
 
+       if (ref == LWA_MAX_REFERENCE) {
+         /* This is an unsolicited response - mark it with 'U' */
+         r_response[0] = 'U';
+       }
        //printf("[%s/%d] message_string: <%s>, strlen=%d\n",ME,getpid(),message_string,(int)strlen(message_string)); 
        //printf("[%s/%d] dest <%s> sids <%s> cids <%s> ref %ld len %d mjd %ld mpm %ld r_response <%s> r_summary <%s> data <%s>\n",ME,getpid(),
        //       dest,sids,cids,ref,len,mjd,mpm,r_response,r_summary,data); 
@@ -743,6 +747,7 @@ int main ( int narg, char *argv[] ) {
        switch (r_response[0]) { /* should be either "A" or "R" */
          case 'A': mq_msg.bAccept = LWA_MSELOG_TP_SUCCESS;   break; /* accepted by subsystem */
          case 'R': mq_msg.bAccept = LWA_MSELOG_TP_FAIL_REJD; break; /* rejected by subsystem */
+         case 'U': mq_msg.bAccept = LWA_MSELOG_TP_UNSOLICITED; break; /* unsolicited update */
 	 default:  mq_msg.bAccept = LWA_MSELOG_TP_DONE_UNK;  break; /* subsystem response not clear */
          } /* switch() */
        mq_msg.eMIBerror = LWA_MIBERR_OK;
@@ -761,21 +766,24 @@ int main ( int narg, char *argv[] ) {
 
        /* Look it up in the pending task queue */
        i = 0;
+       struct timeval cmd_time = mq_msg.tv;
        while( (ptq_ref[i] != ref ) && ( i < (LWA_PTQ_SIZE-1) ) ) { 
          //printf("[%s/%d] i=%d ptq_ref[i]=%ld ref=%ld.\n",ME,getpid(),i,ptq_ref[i],ref);        
          i++; 
          }
        if ( ptq_ref[i] != ref ) { /* we don't recognize this reference number */
-
             strcpy( cmdata, "" ); /* don't know nothin' about what was sent */
-            mq_msg.eMIBerror += LWA_MIBERR_REF_UNK;
-            printf("[%s/%d] REFERENCE=%ld not recognized.\n",ME,getpid(),ref);
+            if ( ref != LWA_MAX_REFERENCE ) {
+              mq_msg.eMIBerror += LWA_MIBERR_REF_UNK;
+              printf("[%s/%d] REFERENCE=%ld not recognized.\n",ME,getpid(),ref);
+            }
 
          } else { /* we recognize this reference number */
 
             //strcpy( cmdata, ptq_data[i] );
             memset( cmdata, '\0', sizeof(cmdata)); /* added this 100701 for v.0.6.1 */
             memcpy( cmdata, ptq_data[i], LWA_PTQ_MAX_DATA_FIELD_LENGTH);
+            cmd_time = ptq_tv[i];
             ptq_ref[i] = 0; /* clear that spot in the queue */
 
          } 
@@ -791,7 +799,7 @@ int main ( int narg, char *argv[] ) {
                                       mq_msg.sid,      /* subsystem, so we know what handler to use */
                                       mq_msg.cid,      /* command, so handler knows how to deal with it */
                                       ref,             /* REFERENCE field (uniquely identifying message/response) */
-                                      ptq_tv[i],       /* Time of command message */  
+                                      cmd_time,        /* Time of command message */  
                                       mq_msg.tv,       /* Time given in response message */
                                       mq_msg.bAccept,  /* R-RESPONSE, except enumerated */
                                       r_summary,       /* R-SUMMARY */
@@ -893,6 +901,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// ms_mcic.c: J. Dowell, UNM, 2025 Jan 21
+//   .1: Allow unsolicited MIB updates from subsystems
 // ms_mcic.c: J. Dowell, UNM, 2022 May 2
 //   .1: Updated for NDP
 // ms_mcic.c: J. Dowell, UNM, 2019 Oct 30
