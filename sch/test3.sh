@@ -99,5 +99,17 @@ sleep 5
 ./msei NU4 RPT VERSION
 sleep 5
 
+# Wait and check for unsolicited updates (checking every 2 seconds for 12 seconds total)
+for i in {1..6}; do
+    sleep 2
+    echo
+    echo "Check $i for unsolicited updates:"
+    ./ms_mdre NU1 SUMMARY
+    ./ms_mdre NU2 SUMMARY
+    ./ms_mdre NU3 SUMMARY
+    ./ms_mdre NU4 SUMMARY
+    
+done
+
 # Send MCS/Scheduler shutdown command 
 ./msei MCS SHT
