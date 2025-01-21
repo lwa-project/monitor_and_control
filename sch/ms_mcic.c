@@ -731,8 +731,8 @@ int main ( int narg, char *argv[] ) {
          memcpy( data, &(message_string[46]), len-8 ); /* copy remaining bytes from message into character array */
          }
 
-       if (ref == LWA_MAX_REFERENCE) {
-         /* This is an unsolicited response - mark it with 'U' */
+       if (ref == LWA_MAX_REFERENCE && r_response[0] == 'A') {
+         /* This is a successful unsolicited response - mark it with 'U' */
          r_response[0] = 'U';
        }
        //printf("[%s/%d] message_string: <%s>, strlen=%d\n",ME,getpid(),message_string,(int)strlen(message_string)); 
