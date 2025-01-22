@@ -52,7 +52,8 @@ class SchedulerTests(unittest.TestCase):
             
         if not cmd_success:
             print("Full command output:")
-            print(output)
+            for line in output.split('\n'):
+                print(f"> {line}")
             print(f"Command error: {cmd_error}")
         self.assertTrue(cmd_success)
         
@@ -84,7 +85,8 @@ class SchedulerTests(unittest.TestCase):
         if (found_png == 0 and found_rpt == 0) or (expect_unsolicited and found_uns == 0):
             print("Full mselog.txt")
             with open(os.path.join(self._sch_path, 'mselog.txt'), 'r') as fh:
-                print(fh.read())
+                for line in fh:
+                    print(f"> {line}")
         self.assertTrue(found_png + found_rpt > 0)
         if expect_unsolicited:
             self.assertTrue(found_uns > 0)
