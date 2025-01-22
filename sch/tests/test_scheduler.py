@@ -41,7 +41,7 @@ class SchedulerTests(unittest.TestCase):
         cmd_error = ''
         output = ''
         try:
-            output = subprocess.check_output(['/bin/bash', 'test1.sh'],
+            output = subprocess.check_output(['/bin/bash', scriptname],
                                              timeout=120,
                                              cwd=self._sch_path,
                                              stderr=subprocess.DEVNULL,
