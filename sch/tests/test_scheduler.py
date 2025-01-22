@@ -38,18 +38,21 @@ class SchedulerTests(unittest.TestCase):
     def _run_test(self, scriptname, expect_unsolicited=False):
         # Run the provided test script
         cmd_success = False
+        cmd_error = ''
         try:
             output = subprocess.check_output(['/bin/bash', 'test1.sh'],
+                                             timeout=120,
                                              cwd=self._sch_path,
                                              stderr=subprocess.DEVNULL,
                                              text=True)
             cmd_success = True
-        except subprocess.CalledProcessError:
-            pass
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
+            cmd_error = str(e)
             
         if not cmd_success:
             print("Full command output:")
             print(output)
+            print(f"Command error: {cmd_error}")
         self.assertTrue(cmd_success)
         
         # Count RPTs and unsolicited RPTs
