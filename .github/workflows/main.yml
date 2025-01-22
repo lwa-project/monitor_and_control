@@ -62,6 +62,9 @@ jobs:
           mkdir -p exec/state
       - name: Test - LWA1
         run: |
+          cd sch/tests
+          python -m unittest discover
+          cd $GITHUB_WORKSPACE
           cd exec/tests
           python -m unittest discover
       - name: "Build and Install - LWA-SV"
