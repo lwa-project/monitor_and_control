@@ -57,7 +57,7 @@ jobs:
           python -m pip install lsl
       - name: "Build and Install - LWA1"
         run: |
-          ./configure
+          ./configure --with-sch-ip=127.0.0.1
           make all
           mkdir -p exec/state
       - name: Test - LWA1
