@@ -39,6 +39,7 @@ class SchedulerTests(unittest.TestCase):
         # Run the provided test script
         cmd_success = False
         cmd_error = ''
+        output = ''
         try:
             output = subprocess.check_output(['/bin/bash', 'test1.sh'],
                                              timeout=120,
