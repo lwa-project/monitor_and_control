@@ -43,8 +43,6 @@ int main ( int narg, char *argv[] ) {
 
   char line[MAX_LINE_LENGTH];       /* used in parsing init file */
   char *snippet; 
-  char token[MAX_LINE_LENGTH];
-  int ntok;
 
   int err;
   pid_t ms_exec_pid; /* PID for ms_exec process */
@@ -119,22 +117,24 @@ int main ( int narg, char *argv[] ) {
     /* read next line */
     strcpy(line,""); /* keep last-line junk from screwing this up... */
     fgets(line, sizeof(line), fid);
-    //printf("line = <%s>\n",line);
-
-    /* parse line - the only thing we care about is the subsystem name */
-    strncpy(&(token[0]), &(line[47]), 3);
-    token[3] = '\0';
     
+    /* parse line - the only thing we really care about is the subsystem name */
+    int ymd, status;
+    long int mjd, mpm, ref;
+    char hms[9], ltype[2], sname[4], cname[4], cdata[MAX_LINE_LENGTH];
+    sscanf(line, "%d %8s %ld %ld %1s %ld %d %3s %3s %[^|]",
+                 &ymd, hms, &mjd, &mpm, ltype, &ref, &status, sname, cname, cdata);
+
     found = 0;
     for(i=0; i<nsid; i++) {
-        if( sid[i] == LWA_getsid(token) ) {
+        if( sid[i] == LWA_getsid(sname) ) {
             found = 1;
             break;
         }
     }
     
     if( ( (!found) \
-         && (LWA_getsid(token) != 0) ) ) {
+         && (LWA_getsid(sname) != 0) ) ) {
         nsid = nsid+1; /* one more subsystem has been defined */
         if (nsid>LWA_MAX_SID) {
             printf("[%s] FATAL: nsid=%d is greater than LWA_MAX_SID\n",ME,nsid);      
@@ -142,7 +142,7 @@ int main ( int narg, char *argv[] ) {
         }
         
         /* get system ID */
-        sid[nsid-1] = LWA_getsid(token);
+        sid[nsid-1] = LWA_getsid(sname);
     } 
     
     } /* while (!feof(fid)) */

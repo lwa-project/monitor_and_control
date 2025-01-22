@@ -57,9 +57,9 @@ int main ( int narg, char *argv[] ) {
   struct timeval tv;  /* from sys/time.h; included via LWA_MCS.h */
   struct tm *tm;      /* from sys/time.h; included via LWA_MCS.h */
   
-  int sid, status, lsid, lcid, found;
-  long int ref, mjd, mpm;
-  char line[255], temp[10];
+  int ymd, sid, status, lsid, lcid, found;
+  long int ref, mjd, mpm, lref;
+  char line[255], hms[9], ltype[2], sname[4], cname[4], cdata[MIB_VAL_FIELD_LENGTH];
   char label[MIB_LABEL_FIELD_LENGTH];     /* this is the key for dbm */
   char key[MIB_LABEL_FIELD_LENGTH];
   
@@ -192,27 +192,26 @@ int main ( int narg, char *argv[] ) {
       /* figure out what we need from this */
       sid = LWA_getsid(c.ss);
       sprintf(label,"%s",c.label);     /* and the label is the label... */
-      //printf("Looking for '%s'\n", label);
+      printf("Looking for '%s'\n", label);
       
       /* Look for the entry */
       /* Read through the file until we find what we are looking for */
       found = 0;
       while(fgets(&(line[0]), sizeof(line), fpr[sid]) != NULL) {
         /* Basic unpak to get the queuing status, subsystem ID, and command ID */
-        strncpy(&(temp[0]), &(line[45]), 2);
-        temp[1] = '\0';
-        status = atoi(&(temp[0]));
-        strncpy(&(temp[0]), &(line[48]), 3);
-        temp[3] = '\0';
-        lsid = LWA_getsid(&(temp[0]));
-        strncpy(&(temp[0]), &(line[52]), 3);
-        temp[3] = '\0';
-        lcid = LWA_getcmd(&(temp[0]));
+        memset(cdata, '\0', sizeof(cdata));
+        int nfield = sscanf(line, "%d %8s %ld %ld %1s %ld %d %3s %3s %[^|]",
+                                  &ymd, hms, &mjd, &mpm, ltype, &lref, &status, sname, cname, cdata);
+
+        if ( (nfield < 5) || (ltype[0] != 'T') ){
+          continue;
+        }
+        lsid = LWA_getsid(sname);
+        lcid = LWA_getcmd(cname);
         
         /* Ignore lines that don't have the right subsystem or command */
-        if( ( (lsid != sid) \
-              || (lcid != LWA_CMD_RPT) ) ) {
-            continue;
+        if ( (lsid != sid) || (lcid != LWA_CMD_RPT) ){
+          continue;
         }
         
         /*
@@ -222,39 +221,25 @@ int main ( int narg, char *argv[] ) {
              else if the status is TP_SUCCESS or higher and we have the right reference
              -> save the response to the message
         */ 
-        if( ( (status < LWA_MSELOG_TP_SUCCESS ) \
-             && (strncmp(label, &(line[56]), strlen(label)) == 0) ) ) {
-            strncpy(&(temp[0]), &(line[35]), 9);
-            temp[9] = '\0';
-            ref = atol(&(temp[0]));
-            //printf("Found '%s' at '%li'\n", label, ref);
+        if( (status < LWA_MSELOG_TP_SUCCESS) && strncmp(label, cdata, strlen(label)) ){
+          ref = lref;
         } else {
-            strncpy(&(temp[0]), &(line[35]), 9);
-            temp[9] = '\0';
-            
-            if( ref == atol(&(temp[0])) ) {
-                found = 1;
-                LWA_time(&mjd, &mpm);
-                LWA_time2tv(&c.last_change, mjd, mpm);
-                for(i=0; i<MIB_VAL_FIELD_LENGTH; i++) {
-                    if( line[56+i] != '|' && line[56+i] != '\0') {
-                        c.val[i] = line[56+i];
-                        c.val[i+1] = '\0';
-                    } else {
-                        break;
-                    }
-                }
-                /* catch for binary temperatures (the most common "@4" in the logs) */
-                if( strncmp(c.val, "@4", 2) == 0 ) {
-                    c.val[0] = '7';  c.val[1] = '8';
-                    c.val[2] = '.';
-                    c.val[3] = '3';  c.val[4] = '5';
-                    c.val[5] = '\0';
-                }
-                break;
+          if( ref == lref ){
+            found = 1;
+            LWA_time(&mjd, &mpm);
+            LWA_time2tv(&c.last_change, mjd, mpm);
+            strcpy(c.val, cdata);
+            /* catch for binary temperatures (the most common "@4" in the logs) */
+            if( strncmp(c.val, "@4", 2) == 0 ) {
+              c.val[0] = '7';  c.val[1] = '8';
+              c.val[2] = '.';
+              c.val[3] = '3';  c.val[4] = '5';
+              c.val[5] = '\0';
+              }
+            break;
             }
+          }
         }
-      }
     
       /* If we found something, send it back to the main thread so that it can be logged */
       if( found ) {
