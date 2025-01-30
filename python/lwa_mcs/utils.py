@@ -7,6 +7,8 @@ import re
 import sys
 import math
 import pytz
+import shlex
+import tempfile
 import subprocess
 from typing import Dict, Tuple, Union
 from datetime import datetime, timedelta
@@ -195,37 +197,60 @@ def schedule_at_command(execution_time: Union[int, float, datetime], command: st
     # Command processing
     # Read the command and figure out the working directory to use
     cwd, name = os.path.split(command)
+    if cwd == '':
+        cwd = '.'
     ## Is the command to be executed a Python script?
     isPython = False
     if command.find('.py') != -1:
         isPython = True
         cwd, name = os.path.split(command.split('.py', 1)[0])
         name = "%s.py" % name
+    else:
+        name = shlex.split(command)[0]
+        name = os.path.basename(name)
         
     # Schedule
     ## Build up the command sequence
-    if isPython:
-        echoc = subprocess.Popen(['/bin/echo', '%s %s' % (sys.executable, command,)], stdout=subprocess.PIPE)
-        echoc.wait()
-        atc = subprocess.Popen(['/usr/bin/at',  "%s" % execution_time.strftime("%H:%M %m/%d/%Y")], 
-                                cwd=cwd, stdin=echoc.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    else:
-        atc = subprocess.Popen(['/usr/bin/at', "%s" % execution_time.strftime("%H:%M %m/%d/%Y"), "-f", name], 
+    wrapper_body = f"""#!/bin/bash
+# AT_METADATA: {shlex.quote(command)}
+# AT_TYPE: {'python' if isPython else 'shell'}
+# AT_CWD: {shlex.quote(cwd)}
+# AT_NAME: {shlex.quote(name)}
+cd {cwd}
+if [ "{isPython}" == "True" ]; then
+    {sys.executable} {command}
+else
+    {command}
+fi
+"""
+    
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.sh', delete=False) as wrapper:
+        wrapper.write(wrapper_body)
+        wrapper_path = wrapper.name
+    print(wrapper_path)
+    with open(wrapper_path, 'r') as fh:
+        print(fh.read())
+    
+    jobID = -1
+    try:
+        atc = subprocess.Popen(['/usr/bin/at', "%s" % execution_time.strftime("%H:%M %m/%d/%Y"), "-f", wrapper_path], 
                                 cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    ## Execute						
-    atco, atce = atc.communicate()
-    try:
-        atco = atco.decode('ascii', errors='backslashreplace')
-        atce = atce.decode('ascii', errors='backslashreplace')
-    except AttributeError:
-        pass  
-    ## Interpret the results
-    jobInfo = atce.split('\n')[-2]
-    jobID = jobInfo.split(None, 2)[1]
-    try:
-        jobID = int(jobID)
-    except ValueError:
-        jobID = -1
+        ## Execute
+        atco, atce = atc.communicate()
+        try:
+            atco = atco.decode('ascii', errors='backslashreplace')
+            atce = atce.decode('ascii', errors='backslashreplace')
+        except AttributeError:
+            pass  
+        ## Interpret the results
+        jobInfo = atce.split('\n')[-2]
+        jobID = jobInfo.split(None, 2)[1]
+        try:
+            jobID = int(jobID)
+        except ValueError:
+            jobID = -1
+    finally:
+        os.unlink(wrapper_path)
         
     # Done
     return jobID
