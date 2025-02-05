@@ -59,6 +59,7 @@ int LWA_mibupdate_NDP(
   float freq=1.0;
   unsigned char ebw;
   unsigned short int gain;
+  unsigned char high_dr;
   
   char output[1024];
   
@@ -193,7 +194,8 @@ int LWA_mibupdate_NDP(
       memcpy( &ebw,      cmdata+6, 1 ); 
       memcpy(&gain, cmdata+7, 2);
       gain = LWA_i2u_swap(gain); /* swapping endianness */
-      /* ignoring cmdata[9] = subslot */
+      /* ignoring cmdata[9] = high_dr */
+      /* ignoring cmdata[10] = subslot */
 
       //printf("freq=%f %hhu %hhu %hhu %hhu\n",freq, cmdata[5], cmdata[4], cmdata[3], cmdata[2] );
 

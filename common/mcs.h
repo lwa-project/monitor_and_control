@@ -751,7 +751,7 @@ void LWA_saymode( unsigned short int mode, char *ssc ) {
 
 /* defined beam types (MCS0030) */
 #define LWA_BT_SIMPLE            1
-#define LWA_BT_MAX_SNR           2
+#define LWA_BT_HIGH_DR           2
 #define LWA_BT_SPEC_DELAYS_GAINS 3
 
 int LWA_getbeamtype( char *ssc ) {
@@ -759,7 +759,7 @@ int LWA_getbeamtype( char *ssc ) {
   /* returns the LWA beam type ("LWA_BT_"), or 0 if there is an error */
   int mode = 0;
   if (!strncmp(ssc,"SIMPLE", 6)) mode = LWA_BT_SIMPLE;
-  if (!strncmp(ssc,"MAX_SNR",7)) mode = LWA_BT_MAX_SNR;
+  if (!strncmp(ssc,"HIGH_DR",7)) mode = LWA_BT_HIGH_DR;
   if (!strncmp(ssc,"SPEC_DELAYS_GAINS",16)) mode = LWA_BT_SPEC_DELAYS_GAINS;
   return mode;
   } /* LWA_getbeamtype() */
@@ -769,7 +769,7 @@ void LWA_saybeamtype( int mode, char *ssc ) {
   /* ssc is the associated text description */
   strcpy(ssc,"");
   if (mode==LWA_BT_SIMPLE ) strcpy(ssc,"SIMPLE");
-  if (mode==LWA_BT_MAX_SNR) strcpy(ssc,"MAX_SNR");
+  if (mode==LWA_BT_HIGH_DR) strcpy(ssc,"HIGH_DR");
   if (mode==LWA_BT_SPEC_DELAYS_GAINS) strcpy(ssc,"SPEC_DELAYS_GAINS");
   return;
   } /* LWA_saybeamtype() */

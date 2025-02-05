@@ -61,6 +61,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 //                             freq            [Hz]                   (float32 DRX_FREQ)
 //                             ebw             Bandwidth setting 0..8 (unit8 DRX_BW)
 //                             gain            0..15                  (uint16 DRX_GAIN)
+//                             high_dr         0 or 1                 (uint8 OBS_B)
 //     For cmd="COR": Args are COR_NAVG        integration time in sub-slots (sint32 COR_NAVG)
 //                             DRX_TUNING_MASK (drx tunings to pull data from, uint64)
 //                             COR_GAIN        {0..15}
@@ -184,6 +185,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
   unsigned char ebw;
   unsigned short int gain;
   unsigned char subslot;
+  unsigned char high_dr;
 
   long int mpm,mjd;
   
@@ -312,7 +314,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          // uint8 sub_slot;
 
          // parse the input string into parameters
-         sscanf(data,"%hhu %hhu %lf %hhu %hu %hhu", &beam, &tuning, &freq8, &ebw, &gain, &subslot);
+         sscanf(data,"%hhu %hhu %lf %hhu %hu %hhu %hhu", &beam, &tuning, &freq8, &ebw, &gain, &high_dr, &subslot);
          //printf("%f %1hhu %1hhu %1hhu %1hhu\n",freq,c.data[2],c.data[3],c.data[4],c.data[5]);
 
          // assemble into c.data:
@@ -329,12 +331,13 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          memcpy( &(c.data[6]), &ebw,      1 );
          //memcpy( &(c.data[7]), (&gain)+1, 1 ); /* flipping endian-ness of gain */
          //memcpy( &(c.data[8]), (&gain)+0, 1 ); /* flipping endian-ness of gain */
-         memcpy( &(c.data[9]), &subslot,  1 );
+         memcpy( &(c.data[9]), &high_dr, 1 );
+         memcpy( &(c.data[10]), &subslot,  1 );
 
          f4.b[3] = c.data[2]; f4.b[2] = c.data[3]; f4.b[1] = c.data[4]; f4.b[0] = c.data[5]; freq = f4.f;  
          //printf("%f %1hhu %1hhu %1hhu %1hhu\n",freq,c.data[2],c.data[3],c.data[4],c.data[5]);
 
-         c.datalen=10;
+         c.datalen=11;
 
          break;
 
