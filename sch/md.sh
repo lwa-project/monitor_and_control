@@ -1,22 +1,27 @@
 #!/bin/bash
 
-#echo Sending $2 command to $1, with argument $3 
+# Convert input arguments to uppercase
+ARG1=$(echo "$1" | tr '[:lower:]' '[:upper:]')
+ARG2=$(echo "$2" | tr '[:lower:]' '[:upper:]')
+ARG3=$(echo "$3" | tr '[:lower:]' '[:upper:]')
 
-if [ $2 == "RPT" ]; then
-	echo Report on $1s MIB entry $3 ...
-	./msei $1 $2 $3 > tmp.txt
+#echo "Sending ${ARG2} command to ${ARG1}, with argument ${ARG3}"
+
+if [ "${ARG2}" == "RPT" ]; then
+	echo "Report on ${ARG1}'s MIB entry $ARG3 ..."
+	./msei $ARG1 $ARG2 $ARG3 > tmp.txt
 	sleep 1
-	out=`./ms_mdre $1 $3 2>&1 | grep -v FATAL `
+	out=`./ms_mdre $ARG1 $ARG3 2>&1 | grep -v FATAL `
 	while [ "${out}" == "" ]; do
-		out=`./ms_mdre $1 $3 2>&1 | grep -v FATAL `
+		out=`./ms_mdre $ARG1 $ARG3 2>&1 | grep -v FATAL `
 		sleep 1
 	done
 	echo "${out}"
 else
-	echo Command $1 to $2 $3 ...
-	./msei $1 $2 $3 > tmp.txt
+	echo "Command $ARG1 to $ARG2 $ARG3 ..."
+	./msei $ARG1 $ARG2 $ARG3 > tmp.txt
 	sleep 3
-	echo $1 replied ...
+	echo "${ARG1} replied ..."
 	tail -n 1 mselog.txt
 fi
 rm -f tmp.txt
