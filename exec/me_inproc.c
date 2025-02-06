@@ -1023,8 +1023,16 @@ int main ( int narg, char *argv[] ) {
                 case LWA_OM_TRK_SOL:   
                 case LWA_OM_TRK_JOV:   
                 case LWA_OM_TRK_LUN:   
-                case LWA_OM_STEPPED:   
+                case LWA_OM_STEPPED:
+              #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
+                  if (osf.OBS_B == LWA_BT_HIGH_DR) {
+                    sprintf(dr_format,"DRX8_FILT_%1hu",osf.OBS_BW);
+                  } else {
+                    sprintf(dr_format,"DRX_FILT_%1hu",osf.OBS_BW);
+                  }
+              #else
                   sprintf(dr_format,"DRX_FILT_%1hu",osf.OBS_BW); 
+              #endif
                   break;
 #if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
                 case LWA_OM_TBF:
