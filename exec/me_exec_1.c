@@ -626,8 +626,18 @@ int me_action(
               } else {
                 sprintf(longmsg,"me_action(): above cmd accepted; ref=%ld",reference);
                 me_log( fpl, ME_LOG_SCOPE_SESSION, ME_LOG_TYPE_INFO, longmsg, sq, i );
-                if (action.cid==LWA_CMD_REC) { sprintf(sq->sTag[i],"%06ld_%09ld",mjd,reference); } 
-                if (action.cid==LWA_CMD_SPC) { sprintf(sq->sTag[i],"%06ld_%09ld",mjd,reference); }
+                if (action.cid==LWA_CMD_REC) {
+                  long int drmjd, drmpm, drdur;
+                  drmjd = mjd;
+                  sscanf(data, "%ld %ld %ld", &drmjd, &drmpm, &drdur);
+                  sprintf(sq->sTag[i],"%06ld_%09ld",drmjd,reference);
+                  }
+                if (action.cid==LWA_CMD_SPC) {
+                  long int drmjd, drmpm, drdur;
+                  drmjd = mjd;
+                  sscanf(data, "%ld %ld %ld", &drmjd, &drmpm, &drdur);
+                  sprintf(sq->sTag[i],"%06ld_%09ld",drmjd,reference);
+                  }
               }
 
             } /* if (bGo && (!nFlg_NoSch)) */
