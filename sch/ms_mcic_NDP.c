@@ -138,7 +138,7 @@ int LWA_mibupdate_NDP(
         memcpy(&si,cmdata+0,4);          
         sprintf(cor_navg,"%12d",LWA_i4s_swap(si)); /* (12345678.123); swapping endianness */
       memset(&uli,0,8);
-        memcpy(&usi,cmdata+4,8);
+        memcpy(&uli,cmdata+4,8);
         sprintf(cor_tuning_mask,"%20d",LWA_i8u_swap(uli));
       memset(&usi,0,2);
         memcpy(&usi,cmdata+12,2);
