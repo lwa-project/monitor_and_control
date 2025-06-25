@@ -183,15 +183,11 @@ int LWA_mibupdate_NDP(
       memcpy( &beam,     cmdata+0, 1 );
       memcpy( &tuning,   cmdata+1, 1 );
       
-      memset(&freq,0,4);                  
-        memcpy(&freq,cmdata+2,4);          
-        freq = LWA_f4_swap(freq); /* swapping endianness */
-      //memcpy( (&freq)+0, cmdata+5, 1 ); /* flipping endian-ness of freq */
-      //memcpy( (&freq)+1, cmdata+4, 1 );
-      //memcpy( (&freq)+2, cmdata+3, 1 );
-      //memcpy( (&freq)+3, cmdata+2, 1 );
-
-      memcpy( &ebw,      cmdata+6, 1 ); 
+      memset(&freq,0,4);
+      memcpy(&freq,cmdata+2,4);
+      freq = LWA_f4_swap(freq); /* swapping endianness */
+      
+      memcpy(&ebw,  cmdata+6, 1);
       memcpy(&gain, cmdata+7, 2);
       gain = LWA_i2u_swap(gain); /* swapping endianness */
       /* ignoring cmdata[9] = high_dr */

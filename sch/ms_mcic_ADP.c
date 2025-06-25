@@ -229,17 +229,13 @@ int LWA_mibupdate_ADP(
       /* recovering parameters from packed binary argument */
       memcpy( &tuning,   cmdata+0, 1 );
       
-      memset(&freq,0,4);                  
-        memcpy(&freq,cmdata+1,4);          
-        freq = LWA_f4_swap(freq); /* swapping endianness */
-      //memcpy( (&freq)+0, cmdata+5, 1 ); /* flipping endian-ness of freq */
-      //memcpy( (&freq)+1, cmdata+4, 1 );
-      //memcpy( (&freq)+2, cmdata+3, 1 );
-      //memcpy( (&freq)+3, cmdata+2, 1 );
-
-      memcpy( &ebw,      cmdata+5, 1 ); 
-      memcpy( (&gain)+0, cmdata+7, 1 ); /* flipping endian-ness of gain */
-      memcpy( (&gain)+1, cmdata+6, 1 ); 
+      memset(&freq,0,4);
+      memcpy(&freq,cmdata+1,4);
+      freq = LWA_f4_swap(freq); /* swapping endianness */
+      
+      memcpy( &ebw,  cmdata+5, 1);
+      memcpy( &gain, cmdata+6, 2);
+      gain = LWA_i2u_swap(gain); /* swapping endianness */
       /* ignoring cmdata[9] = subslot */
 
       //printf("freq=%f %hhu %hhu %hhu %hhu\n",freq, cmdata[5], cmdata[4], cmdata[3], cmdata[2] );
