@@ -79,6 +79,7 @@ int main ( int narg, char *argv[] ) {
 
   char display[33];
 
+  int ret;
   char cmd_line[768];
 
   union {
@@ -134,7 +135,11 @@ int main ( int narg, char *argv[] ) {
   /* Process command line arguments */
   if (narg>1) { 
       //printf("[%s/%d] %s specified\n",ME,getpid(),argv[1]);
-      sprintf(dbm_filename,"%s.gdb",argv[1]);
+      ret = snprintf(dbm_filename,sizeof(dbm_filename),"%s.gdb",argv[1]);
+      if (ret >= sizeof(dbm_filename)) {
+        printf("[%s/%d] FATAL: subsystem is too long\n",ME,getpid());
+        exit(EXIT_FAILURE);
+        }
     } else {
       printf("[%s/%d] FATAL: subsystem not specified\n",ME,getpid());
       exit(EXIT_FAILURE);
@@ -152,11 +157,15 @@ int main ( int narg, char *argv[] ) {
   nlabels++; sprintf(label0[nlabels-1],"MCH_RX_PORT");
 
   /* Open dat file that was used to initialize the MIB */
-  sprintf(dat_filename,"%s_MIB_init.dat",argv[1]);
+  ret = snprintf(dat_filename,sizeof(dat_filename),"%s_MIB_init.dat",argv[1]);
+  if (ret >= sizeof(dat_filename)) {
+    printf("[%s/%d] FATAL: Filename is too long\n",ME,getpid());
+    exit(EXIT_FAILURE);
+    } 
   fid_dat = fopen(dat_filename,"r");
   if (!fid_dat) { 
-    printf("[%s/%d] FATAL: Can't read file <%s>\n",ME,getpid(),dat_filename); 
-    exit(EXIT_FAILURE); 
+    printf("[%s/%d] FATAL: Can't read file <%s>\n",ME,getpid(),dat_filename);
+    exit(EXIT_FAILURE);
     }  
 
   /* Extract labels */
@@ -196,11 +205,15 @@ int main ( int narg, char *argv[] ) {
   /* while MCS/Scheduler is running */
 
   /* make copy of the MIB; same root filename but with "_temp" added */
-  sprintf(cmd_line,"cp %s.gdb %s_temp.gdb",dbm_filename,dbm_filename);
+  sprintf(cmd_line,"cp '%s.gdb' '%s_temp.gdb'",dbm_filename,dbm_filename);
   system(cmd_line);
 
   /* now use *this* copy of MIB */
-  sprintf(dbm_filename,"%s_temp.gdb",argv[1]); 
+  ret = snprintf(dbm_filename,sizeof(dbm_filename),"%s_temp.gdb",argv[1]);
+  if (ret >= sizeof(dbm_filename)) {
+    printf("[%s/%d] FATAL: Failed to open dbm - filename is too long",ME,getpid());
+    exit(EXIT_FAILURE);
+    }
 
   /*======================================*/
   /*=== Initialize: dbm file =============*/
@@ -211,8 +224,7 @@ int main ( int narg, char *argv[] ) {
   if (!dbm_ptr) {
     printf("[%s/%d] FATAL: Failed to open dbm <%s> - %s\n",ME,getpid(),dbm_filename,gdbm_strerror(gdbm_errno));
     /* delete _temp copy of the MIB */
-    sprintf(cmd_line,"rm %s",dbm_filename);
-    system(cmd_line);
+    unlink(dbm_filename);
     exit(EXIT_FAILURE);
     }
 
@@ -376,8 +388,7 @@ int main ( int narg, char *argv[] ) {
   /*======================================*/
 
   /* delete _temp copy of the MIB */
-  sprintf(cmd_line,"rm %s",dbm_filename);
-  system(cmd_line);
+  unlink(dbm_filename);
   
   //printf("[%s/%d] exit(EXIT_SUCCESS)\n",ME,getpid());
   exit(EXIT_SUCCESS);

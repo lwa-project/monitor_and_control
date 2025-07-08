@@ -81,6 +81,7 @@ int main ( int narg, char *argv[] ) {
 
   //char display[33];
 
+  int ret;
   char cmd_line[768];
   int bUpdate = 0;
   int nUpdate = 0;
@@ -96,7 +97,11 @@ int main ( int narg, char *argv[] ) {
   /* Process command line arguments */
   if (narg>1) { 
       //printf("[%s/%d] subsystem = <%s> specified\n",ME,getpid(),argv[1]);
-      sprintf(subsystem,"%s",argv[1]);
+      ret = snprintf(subsystem,sizeof(subsystem),"%s",argv[1]);
+      if (ret >= sizeof(subsystem)) {
+        printf("[%s/%d] FATAL: subsystem is too long\n",ME,getpid());
+        exit(EXIT_FAILURE);
+        }
       printf("[%s/%d] subsystem = <%s> specified\n",ME,getpid(),subsystem);
     } else {
       printf("[%s/%d] FATAL: subsystem not specified\n",ME,getpid());
@@ -119,7 +124,7 @@ int main ( int narg, char *argv[] ) {
   /* while MCS/Scheduler is running */
 
   /* make copy of the MIB; same root filename but with "_temp" added */
-  sprintf(cmd_line,"cp %s.gdb %s_%d.gdb",dbm_filename,dbm_filename,getpid());
+  sprintf(cmd_line,"cp '%s.gdb' '%s_%d.gdb'",dbm_filename,dbm_filename,getpid());
   printf("[%s/%d] system(%s)\n",ME,getpid(),cmd_line);
   system(cmd_line);
   

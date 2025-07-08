@@ -77,7 +77,7 @@ int LWA_mse_log(
   struct tm *tm;
   char time_string[256];
 
-  char cmd[1024];
+  char filename[1024];
 
   /* get the current time in conventional format */
   gettimeofday(&tv,&tz); 
@@ -136,8 +136,8 @@ int LWA_mse_log(
   (*line_ctr)++;
   if ( (*line_ctr) >= LWA_MSELOG_LINES ) {
     fclose(fp);
-    sprintf(cmd,"cp %s mselog_%06ld_%09ld.txt",LWA_MSELOG_FILENAME,mjd,mpm);
-    system(cmd);
+    sprintf(filename,"mselog_%06ld_%09ld.txt",mjd,mpm);
+    rename(LWA_MSELOG_FILENAME, filename);
     fp = fopen(LWA_MSELOG_FILENAME,"w");
     (*line_ctr)=0;
     }
