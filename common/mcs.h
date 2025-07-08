@@ -13,6 +13,7 @@ extern "C" {
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 #include <unistd.h>     /* added 110309 to facilitate use of "stat()" in me_exec */
 #include <sys/socket.h>
@@ -168,7 +169,7 @@ int LWA_getsum( char *summary ) {
   char summary2[8];
   int eSummary = LWA_SIDSUM_NULL;
 
-  sscanf(summary,"%s",summary2); /* strips off any leading or trailing whitespace */
+  sscanf(summary,"%7s",summary2); /* strips off any leading or trailing whitespace */
 
   if (!strcmp( summary2 ,"NULL"   )) eSummary = LWA_SIDSUM_NULL;
   if (!strcmp( summary2 ,"NORMAL" )) eSummary = LWA_SIDSUM_NORMAL;
@@ -787,7 +788,7 @@ int LWA_dpoavail(
   /* -3: time conflict */ 
   {
   FILE *fp;
-  char filename[256];
+  char *filename;
   char line[256];
   int dpos[ME_MAX_NDPOUT];
   int i;
@@ -804,9 +805,16 @@ int LWA_dpoavail(
     return -1;
     }
     
-  sprintf(filename,"%s/mess.dat",path);
+  filename = (char*) malloc(strlen(path)+strlen("/mess.dat")+1);
+  if (!filename) {
+    sprintf(msg,"can't open file '%s'",filename);
+    return -2;
+    }
+  strcpy(filename, path);
+  strcat(filename, "/mess.dat");
   if (!(fp=fopen(filename,"r"))) {
     sprintf(msg,"can't open file '%s'",filename);
+    free(filename);
     return -2;
     }
     
@@ -824,7 +832,7 @@ int LWA_dpoavail(
   fgets(line,256,fp);
   while (!feof(fp)) {
 
-    sscanf(line,"%ld %ld %d %ld %d %s %s",&mjd,&mpm,&dpox,&durx,&cra,project_id,session_id);
+    sscanf(line,"%ld %ld %d %ld %d %255s %255s",&mjd,&mpm,&dpox,&durx,&cra,project_id,session_id);
     //printf("LWA_dpoavail: %ld %ld %d %ld %d <%s> <%s>\n",mjd,mpm,dpox,durx,cra,project_id,session_id);
 
     if (dpox==dpo) {
@@ -835,6 +843,7 @@ int LWA_dpoavail(
       if ( ( LWA_timediff(t3,t0)>0 ) && ( LWA_timediff(t1,t2)>0 ) ) {
         fclose(fp);
         sprintf(msg,"conflict with project '%s' session '%s'",project_id,session_id);
+        free(filename);
         return -3;
         }
       }
@@ -845,6 +854,7 @@ int LWA_dpoavail(
     }
 
   fclose(fp); 
+  free(filename);
 
   if (dpos[dpo-1]<1) {
     sprintf(msg,"UNAVAILABLE (status = %d)",dpos[dpo-1]);
