@@ -51,6 +51,8 @@
 #include <unistd.h>
 #include <time.h>
 
+#include "fileutils.h"
+
 #define MY_NAME "ms_mb (v.20100531.2)"
 #define ME "13" 
 
@@ -84,6 +86,7 @@ int main ( int narg, char *argv[] ) {
   int ay[MAX_ANNOTATIONS];
   char at[MAX_ANNOTATIONS][MAX_FIELD_LENGTH];
 
+  int ret;
   char cmd_line[768];
 
   char label0[MAX_FIELD_LENGTH];
@@ -122,14 +125,22 @@ int main ( int narg, char *argv[] ) {
 
   /* Process command line arguments */
   if (narg>1) { 
-      sprintf(subsystem,"%s",argv[1]);
+      ret = snprintf(subsystem,sizeof(subsystem),"%s",argv[1]);
+      if (ret >= sizeof(subsystem)) {
+        printf("[%s/%d] FATAL: subsystem is too long\n",ME,getpid());
+        exit(EXIT_FAILURE);
+        }
       //printf("[%s/%d] %s specified\n",ME,getpid(),subsystem);
     } else {
       printf("[%s/%d] FATAL: subsystem not specified\n",ME,getpid());
       exit(EXIT_FAILURE);
     } 
   if (narg>2) { 
-      sprintf(template_file,"%s",argv[2]);
+      ret = snprintf(template_file,sizeof(template_file),"%s",argv[2]);
+      if (ret >= sizeof(template_file)) {
+        printf("[%s/%d] FATAL: template is too long\n",ME,getpid());
+        exit(EXIT_FAILURE);
+        }
       //printf("[%s/%d] %s specified\n",ME,getpid(),template_file);
     } else {
       printf("[%s/%d] FATAL: template not specified\n",ME,getpid());
@@ -150,8 +161,12 @@ int main ( int narg, char *argv[] ) {
       exit(EXIT_FAILURE);
     } 
   if (narg>5) { 
-      sscanf(argv[5],"%s",ann_file);
-      bAnn = 1;
+      ret = snprintf(ann_file,sizeof(ann_file),"%s",argv[5]);
+      if (ret >= sizeof(ann_file)) {
+        bAnn = 0;
+        } else {
+        bAnn = 1;
+        }
     } else {
       bAnn = 0;
     } 
@@ -213,7 +228,7 @@ int main ( int narg, char *argv[] ) {
     nann=0;
     while (!feof(fid)) {
 
-      if (nitems>MAX_ANNOTATIONS) {
+      if (nann>MAX_ANNOTATIONS) {
         printf("[%s/%d] FATAL: nann > MAX_ANNOTATIONS\n",ME,getpid()); 
         exit(EXIT_FAILURE); 
         }
@@ -222,15 +237,19 @@ int main ( int narg, char *argv[] ) {
       fgets( test_string, MAX_FIELD_LENGTH, fid);
       //printf("<%s>\n",test_string);
 
+      char *saveptr;
       if (strlen(test_string)>1) {    
-        sscanf(strtok(test_string, " "),"%d",&ax[nann]);
-        sscanf(strtok(NULL,        " "),"%d",&ay[nann]);
-        memset(at[nann],'\0',MAX_FIELD_LENGTH);
-          memcpy(at[nann],strtok(NULL,"\n"),MAX_FIELD_LENGTH);
-  
-        //printf("%d %d <%s>\n",ax[nann],ay[nann],at[nann]);
+        sscanf(strtok_r(test_string, " ", &saveptr),"%d",&ax[nann]);
+        sscanf(strtok_r(NULL,        " ", &saveptr),"%d",&ay[nann]);
+        char *ann_text = strtok_r(NULL,"\n",&saveptr);
+        if (ann_text != NULL) {
+          memset(at[nann],'\0',MAX_FIELD_LENGTH);
+          memcpy(at[nann],ann_text,MAX_FIELD_LENGTH);
 
-        nann++;  
+          //printf("%d %d <%s>\n",ax[nann],ay[nann],at[nann]);
+
+          nann++;
+          } /* if ann_text != NULL */
         } /* if strlen(test_string)>0 */
       } /* while (!feof(fid)) */
 
@@ -362,9 +381,8 @@ int main ( int narg, char *argv[] ) {
   endwin();
 
   /* delete temp files */
-  sprintf(cmd_line,"rm %s",tempfile);
-  system(cmd_line);
-
+  LWA_remove_file(tempfile);
+  
   printf("[%s/%d] exit(EXIT_SUCCESS)\n",ME,getpid());
   //printf("%d %d\n",LINES,COLS);
   exit(EXIT_SUCCESS);

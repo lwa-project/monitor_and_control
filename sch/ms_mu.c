@@ -37,6 +37,7 @@
 
 //#include "LWA_MCS.h" 
 #include "mcs.h"
+#include "fileutils.h"
 
 #define MAX_LABELS 9999        /* max number of MIB entries supported */
 #define MAX_UPDATES_PER_SEC 30 /* do no more than this many updates in a row */
@@ -144,8 +145,7 @@ int main ( int narg, char *argv[] ) {
     dbm_ptr = gdbm_open(dbm_filename, 0, GDBM_READER, 0, NULL);
     if (!dbm_ptr) {
       printf("[%s/%d] FATAL: Failed to open dbm <%s> - %s\n",ME,getpid(),dbm_filename,gdbm_strerror(gdbm_errno));
-      sprintf(cmd_line,"rm %s",dbm_filename);
-      system(cmd_line);
+      LWA_remove_file(dbm_filename);
       exit(EXIT_FAILURE);
       }
 
@@ -226,9 +226,7 @@ int main ( int narg, char *argv[] ) {
   /*======================================*/
 
   /* delete _temp copy of the MIB */
-  sprintf(cmd_line,"rm %s",dbm_filename);
-  printf("[%s/%d] system(%s)\n",ME,getpid(),cmd_line);
-  system(cmd_line);
+  LWA_remove_file(dbm_filename);
   
   //printf("[%s/%d] exit(EXIT_SUCCESS)\n",ME,getpid());
   exit(EXIT_SUCCESS);

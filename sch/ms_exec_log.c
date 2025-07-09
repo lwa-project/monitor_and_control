@@ -42,6 +42,8 @@
 
 #include <ctype.h>  /* for isgraph() */
 
+#include "fileutils.h"
+
 #define LWA_MSELOG_FILENAME "mselog.txt"
 #define LWA_MSELOG_LENGTH 139
 #define LWA_MSELOG_LINES 10000 /* number of lines before starting a new file */
@@ -137,7 +139,7 @@ int LWA_mse_log(
   if ( (*line_ctr) >= LWA_MSELOG_LINES ) {
     fclose(fp);
     sprintf(filename,"mselog_%06ld_%09ld.txt",mjd,mpm);
-    rename(LWA_MSELOG_FILENAME, filename);
+    LWA_move_file(LWA_MSELOG_FILENAME, filename);
     fp = fopen(LWA_MSELOG_FILENAME,"w");
     (*line_ctr)=0;
     }

@@ -118,14 +118,16 @@ int main ( int narg, char *argv[] ) {
     /* the arguments */
     ntok = 0;
     strcpy(token[ntok],""); /* initialize just in case */
-    snippet = strtok( line, " \n"); /* delimiter will be any space, or \n */
+    char *saveptr;
+    snippet = strtok_r( line, " \n", &saveptr); /* delimiter will be any space, or \n */
     while (snippet != NULL) {
       //printf( "snippet = <%s>\n",snippet);
       //sscanf(token[ntok],"%s",snippet);
-      strcpy(token[ntok],snippet);
+      strncpy(token[ntok],snippet,MAX_LINE_LENGTH-1);
+      token[ntok][MAX_LINE_LENGTH-1] = '\0';
       ntok++;
       //printf("token[%d] = <%s> from <%s>\n",ntok-1,token[ntok-1],snippet);     
-      snippet = strtok( NULL, " \n"); /* note "NULL" is now the first argument! */
+      snippet = strtok_r( NULL, " \n", &saveptr); /* note "NULL" is now the first argument! */
       }
     //printf("[%s] parsed line (%d): |",ME,ntok);
     //for (n=0;n<ntok;n++) {
