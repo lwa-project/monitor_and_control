@@ -81,16 +81,7 @@
     int OBS_ASP_AT1[LWA_MAX_NSTD+1];
     int OBS_ASP_AT2[LWA_MAX_NSTD+1];
     int OBS_ASP_ATS[LWA_MAX_NSTD+1];
-#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
-    long int OBS_TBF_SAMPLES;
-    int OBS_TBF_GAIN;
-#else
-    int OBS_TBW_BITS;
-    long int OBS_TBW_SAMPLES;
-#endif
-#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
-    int OBS_TBN_GAIN;
-#endif
+    int OBS_TBT_SAMPLES;
     int OBS_DRX_GAIN;
     long int ASP_setup_time; // not part of SDF 
     };

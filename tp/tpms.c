@@ -33,12 +33,11 @@
 //                <arg4> FREQ1 [tuning word].  DEFAULT is  832697741 (37.999999997 MHz)
 //                <arg5> FREQ2 [tuning word].  DEFAULT is 1621569285 (73.999999990 MHz)
 //                <arg6> BW [filter code].  DEFAULT is 7.
-//     TBN:       <arg3> OBS_DUR [ms], integer.  DEFAULT is 10000.
+//     TBS:       <arg3> OBS_DUR [ms], integer.  DEFAULT is 10000.
 //                <arg4> FREQ1 [tuning word].  DEFAULT is 832697741 (37.999999997 MHz)
-//                (OBS_BW is assumed to be 7 (100 kSPS) 
-//     TBF:       arg3> OBS_DUR [ms], integer.  DEFAULT is 10000.
-//                <arg4> FREQ1 [tuning word].  DEFAULT is 832697741 (37.999999997 MHz)
-//                (OBS_BW is assumed to be 7 (19.6 MSPS) 
+//                (OBS_BW is assumed to be 8 (200 kSPS) 
+//     TBT:       arg3> OBS_DUR [ms], integer.  DEFAULT is 10000.
+//                (TBT_TUNING_MASK is assumed to be 255 (maximum bandwidth) 
 //     TBW:       <arg3> OBS_DUR [ms], integer.  DEFAULT is 10000.
 //     DIAG1:     (none)
 // ---
@@ -101,14 +100,8 @@ int main ( int narg, char *argv[] ) {
         case LWA_OM_TRK_SOL: break;
         case LWA_OM_TRK_JOV: break;
         case LWA_OM_TRK_LUN: break;
-#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
-        case LWA_OM_TBN: break;
-#endif
-#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
-        case LWA_OM_TBF: break;
-#else
-        case LWA_OM_TBW: break;
-#endif
+        case LWA_OM_TBS: break;
+        case LWA_OM_TBT: break;
         case LWA_OM_DIAG1: break;
         default: printf("[%d/%d] FATAL: This <mode> not yet implemented\n",MT_TPSS,getpid()); exit(EXIT_FAILURE); break;
         }
@@ -149,27 +142,16 @@ int main ( int narg, char *argv[] ) {
       printf("[%d/%d] INPUT: iFreq2=%ld\n",MT_TPMS,getpid(),iFreq2);
       printf("[%d/%d] INPUT: iBW=%d\n",MT_TPMS,getpid(),iBW);
       break;
-#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
-    case LWA_OM_TBN:
+    case LWA_OM_TBS:
       iDur=10000;      if (narg>=4) sscanf(argv[3],"%ld",&iDur);   
       iFreq=832697741; if (narg>=5) sscanf(argv[4],"%ld",&iFreq); 
       printf("[%d/%d] INPUT: iDur=%ld\n",MT_TPMS,getpid(),iDur);
       printf("[%d/%d] INPUT: iFreq=%ld\n",MT_TPMS,getpid(),iFreq);
       break;
-#endif
-#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
-    case LWA_OM_TBF:
+    case LWA_OM_TBT:
       iDur=10000;      if (narg>=4) sscanf(argv[3],"%ld",&iDur);
-      iFreq=832697741; if (narg>=5) sscanf(argv[4],"%ld",&iFreq); 
       printf("[%d/%d] INPUT: iDur=%ld\n",MT_TPMS,getpid(),iDur);
       break;
-#else
-    case LWA_OM_TBW:
-      iDur=10000;      if (narg>=4) sscanf(argv[3],"%ld",&iDur);  
-      printf("[%d/%d] INPUT: iDur=%ld\n",MT_TPMS,getpid(),iDur);
-      printf("[%d/%d] INPUT: iFreq=%ld\n",MT_TPMS,getpid(),iFreq);
-      break;
-#endif
     case LWA_OM_DIAG1:
       break;
     case LWA_OM_STEPPED:
@@ -237,16 +219,11 @@ int main ( int narg, char *argv[] ) {
   fprintf(fp,"SESSION_REMPI  (none)\n");
   fprintf(fp,"SESSION_REMPO  (none)\n");
 
-  /* Specifying beam 1 for modes other than TBN or TBW */
+  /* Specifying beam 1 for modes other than TBS or TBT */
   switch (eMode) {
-#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
-    case LWA_OM_TBN:
+    case LWA_OM_TBS:
+    case LWA_OM_TBT:
       break;
-#endif
-#if (!defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP) && (!defined(LWA_BACKEND_IS_ADP) || !LWA_BACKEND_IS_ADP)
-    case LWA_OM_TBW:
-      break;
-#endif
     default:
       fprintf(fp,"SESSION_DRX_BEAM  1\n");
       break;
@@ -273,25 +250,14 @@ int main ( int narg, char *argv[] ) {
   switch (eMode) {
     case LWA_OM_DIAG1:
       break;
-#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
     case LWA_OM_TBN:
       fprintf(fp,"OBS_FREQ1      %ld\n",iFreq);
       //fprintf(fp,"OBS_FREQ1+     19.999999955 MHz\n");
-      fprintf(fp,"OBS_BW         7\n");
-      fprintf(fp,"OBS_BW+        100 kSPS\n"); 
+      fprintf(fp,"OBS_BW         8\n");
+      fprintf(fp,"OBS_BW+        200 kSPS\n"); 
       break;
-#endif
-#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
-    case LWA_OM_TBF:
-      fprintf(fp,"OBS_FREQ1      %ld\n",iFreq);
-      //fprintf(fp,"OBS_FREQ1+     19.999999955 MHz\n");
-      fprintf(fp,"OBS_BW         7\n");
-      fprintf(fp,"OBS_BW+        19.6 MSPS\n"); 
+    case LWA_OM_TBT:
       break;
-#else
-    case LWA_OM_TBW:
-      break;
-#endif
     case LWA_OM_TRK_RADEC:
       fprintf(fp,"OBS_RA         %6.3f\n",fRA);
       fprintf(fp,"OBS_DEC        %+6.3f\n",fDEC);

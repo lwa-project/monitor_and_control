@@ -23,13 +23,7 @@
 
 #define ME "megfg"
 
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
-#  define MAX_STD 256           /* max number of stands */
-#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-#  define MAX_STD 256           /* max number of stands */  
-#else
-#  define MAX_STD 260           /* max number of stands */  
-#endif
+#define MAX_STD 256           /* max number of stands */
 
 int main( int narg, char *argv[] ) {
 

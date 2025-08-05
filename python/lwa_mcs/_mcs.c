@@ -325,16 +325,6 @@ PyMODINIT_FUNC PyInit__mcs(void) {
     PyModule_AddObject(m, "__version__", PyUnicode_FromString("0.5"));
     
     // Constants
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
-    PyModule_AddObject(m, "IS_NDP", Py_True);
-#else
-    PyModule_AddObject(m, "IS_NDP", Py_False);
-#endif
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-    PyModule_AddObject(m, "IS_ADP", Py_True);
-#else
-    PyModule_AddObject(m, "IS_ADP", Py_False);
-#endif
     PyModule_AddObject(m, "MAX_NDR", PyLong_FromLong(ME_MAX_NDR));
     
     PyModule_AddObject(m, "SCH_PATH", PyUnicode_FromString(LWA_SCH_SCP_DIR));
@@ -343,8 +333,6 @@ PyMODINIT_FUNC PyInit__mcs(void) {
     
     // Function listings
     all = PyList_New(0);
-    PyList_Append(all, PyUnicode_FromString("IS_NDP"));
-    PyList_Append(all, PyUnicode_FromString("IS_ADP"));
     PyList_Append(all, PyUnicode_FromString("MAX_NDR"));
     PyList_Append(all, PyUnicode_FromString("SCH_PATH"));
     PyList_Append(all, PyUnicode_FromString("MCS_TIMEOUT"));

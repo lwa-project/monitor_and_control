@@ -21,13 +21,7 @@
 #define DTR 0.017453292520 /* pi/180 */
 #define FLAG_VAL (1e+20)
 
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
-#  define MAX_DP_CH 512      /* number of SNAP channel inputs (per NDP ICD) */
-#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-#  define MAX_DP_CH 512      /* number of ROACH channel inputs (per ADP ICD) */
-#else
-#  define MAX_DP_CH 520      /* number of DP1 channel inputs (per DP ICD) */
-#endif
+#define MAX_DP_CH 512      /* number of SNAP channel inputs (per NDP ICD) */
 
 /*==============================================================*/
 /*=== main() ===================================================*/
@@ -227,7 +221,6 @@ int main ( int narg, char *argv[] ) {
     id[i] = -1;
     }
 
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
   /* figure out antenna positions, indexed by NDP channel */
   for (i=0;i<s.nSnap;i++) { 
     for (k=0;k<s.nSnapCh;k++) { 
@@ -244,41 +237,6 @@ int main ( int narg, char *argv[] ) {
 
       } /* for k */
     } /* for i */
-#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-  /* figure out antenna positions, indexed by ADP channel */
-  for (i=0;i<s.nRoach;i++) { 
-    for (k=0;k<s.nRoachCh;k++) { 
-
-      if (s.iRoachAnt[i][k]!=0) { /* otherwise this Roach input is not connected to an antenna */      
-        ia = s.iRoachAnt[i][k] - 1;
-        px[i*s.nRoachCh+k] = s.fStdLx[ s.iAntStd[ia] - 1 ];
-        py[i*s.nRoachCh+k] = s.fStdLy[ s.iAntStd[ia] - 1 ];
-        pz[i*s.nRoachCh+k] = s.fStdLz[ s.iAntStd[ia] - 1 ];
-        id[ia] = i*s.nRoachCh+k; /* reverse lookup (ADP input channel index given antenna index); simplifies work later */
-        }
-
-      //printf("%d %d | %d | %d %d | %f\n",i,k,i*s.nDP1Ch+k,ia+1,s.iAntStd[ia],px[i*s.nDP1Ch+k]);
-
-      } /* for k */
-    } /* for i */
-#else
-  /* figure out antenna positions, indexed by DP channel */
-  for (i=0;i<s.nDP1;i++) { 
-    for (k=0;k<s.nDP1Ch;k++) { 
-
-      if (s.iDP1Ant[i][k]!=0) { /* otherwise this DP1 input is not connected to an antenna */      
-        ia = s.iDP1Ant[i][k] - 1;
-        px[i*s.nDP1Ch+k] = s.fStdLx[ s.iAntStd[ia] - 1 ];
-        py[i*s.nDP1Ch+k] = s.fStdLy[ s.iAntStd[ia] - 1 ];
-        pz[i*s.nDP1Ch+k] = s.fStdLz[ s.iAntStd[ia] - 1 ];
-        id[ia] = i*s.nDP1Ch+k; /* reverse lookup (DP input channel index given antenna index); simplifies work later */
-        }
-
-      //printf("%d %d | %d | %d %d | %f\n",i,k,i*s.nDP1Ch+k,ia+1,s.iAntStd[ia],px[i*s.nDP1Ch+k]);
-
-      } /* for k */
-    } /* for i */
-#endif
 
   /* check for un-determined stand positions */
   if (inpm!=2) {

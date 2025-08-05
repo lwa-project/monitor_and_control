@@ -55,14 +55,18 @@ main ( int narg, char *argv[] ) {
 
   /* lay in ADP-specific entries used by MCS (not part of ADP ICD) */
 
-  fprintf(fp,"B 0.4           MCS_TBF_TRIGGER 		NUL 	NUL 	NUL\n");
-  fprintf(fp,"V 0.4.1         MCS_TBF_BITS                0       a2      NUL\n");
-  fprintf(fp,"V 0.4.2         MCS_TBF_TRIG_TIME           0       a9      NUL\n");
-  fprintf(fp,"V 0.4.3         MCS_TBF_SAMPLES             0       a8      NUL\n");
-  fprintf(fp,"V 0.4.4         MCS_TBF_TUNING_MASK         0       i8ur    NUL\n");
-  fprintf(fp,"V 0.4.5         MCS_TBF_REFERENCE           0       a9      NUL\n");
-  fprintf(fp,"V 0.4.6         MCS_TBF_CMD_SENT_MPM        0       a9      NUL\n");  
+  fprintf(fp,"B 0.4           MCS_TBT_TRIGGER 		NUL 	NUL 	NUL\n");
+  fprintf(fp,"V 0.4.1         MCS_TBT_TRIG_TIME           0       a9      NUL\n");
+  fprintf(fp,"V 0.4.2         MCS_TBT_SAMPLES             0       a8      NUL\n");
+  fprintf(fp,"V 0.4.3         MCS_TBT_TUNING_MASK         0       i8ur    NUL\n");
+  fprintf(fp,"V 0.4.4         MCS_TBT_REFERENCE           0       a9      NUL\n");
+  fprintf(fp,"V 0.4.5         MCS_TBT_CMD_SENT_MPM        0       a9      NUL\n");  
 
+  fprintf(fp,"B 0.5           MCS_TBS_CONFIG 		NUL 	NUL 	NUL\n");
+  fprintf(fp,"V 0.5.1         MCS_TBS_FREQ                0.000\ta12     NUL\n");
+  fprintf(fp,"V 0.5.2         MCS_TBN_REFERENCE           0       a9      NUL\n");
+  fprintf(fp,"V 0.5.3         MCS_TBN_CMD_SENT_MPM        0       a9      NUL\n");
+  
   fprintf(fp,"B 0.6           MCS_COR_CONFIG		NUL 	NUL 	NUL\n");
   fprintf(fp,"V 0.6.1         MCS_COR_NAVG                0      a10      NUL\n");
   fprintf(fp,"V 0.6.2         MCS_COR_TUNING_MASK         0      i8u      NUL\n");
@@ -100,10 +104,10 @@ main ( int narg, char *argv[] ) {
   fprintf(fp,"V 1.5 		SERIALNO  		UNK	a5	a5\n");
   fprintf(fp,"V 1.6 		VERSION   		UNK	a256	a256\n");
 
-  /* ADP-specific */
+  /* NDP-specific */
 
-  fprintf(fp,"V 2.1 		TBF_STATUS		0	i1ur	i1ur\n");
-  fprintf(fp,"V 2.2			TBF_TUNING_MASK	0	i8ur	i8ur\n");
+  fprintf(fp,"V 2.1 		TBT_STATUS		0	i1ur	i1ur\n");
+  fprintf(fp,"V 2.2			TBT_TUNING_MASK	0	i8ur	i8ur\n");
 
   fprintf(fp,"V 4.1.1		NUM_DRX_TUNINGS		0	i1ur	i1ur\n");
   fprintf(fp,"V 4.1.2		NUM_FREQ_CHANS			0	i2ur	i2ur\n");

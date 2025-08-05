@@ -58,8 +58,7 @@ int main ( int narg, char *argv[] ) {
   if (narg>3) { 
     sscanf(argv[3],"%s",sDestDir);
     }
-#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
-  sprintf(mode,"TBF");
+  sprintf(mode,"TBT");
   if (narg>4) { 
     sscanf(argv[4],"%s",mode);
     } 
@@ -67,16 +66,6 @@ int main ( int narg, char *argv[] ) {
   if (narg>5) { 
     memcpy(args,argv[5],strlen(argv[5])+1);
     }
-#else
-  sprintf(mode,"TBW");
-  if (narg>4) { 
-    sscanf(argv[4],"%s",mode);
-    } 
-  sprintf(args,"12 12000000");
-  if (narg>5) { 
-    memcpy(args,argv[5],strlen(argv[5])+1);
-    }
-#endif
 
   eResult = meos(nDR,sExtDev,sDestDir,mode,args);
   printf("[%d/%d] meos() returned code %d\n",ME_MEOSX,getpid(),eResult);

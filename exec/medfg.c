@@ -24,16 +24,8 @@
 
 #define ME "medfg"
 
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
-#  define MAX_ANT 512           /* number of antennas ("channels") */  
-#  define MAX_COARSE_DELAY 1023 /* maximum coarse delay, in sample periods */
-#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-#  define MAX_ANT 512           /* number of antennas ("channels") */  
-#  define MAX_COARSE_DELAY 1023 /* maximum coarse delay, in sample periods */
-#else
-#  define MAX_ANT 520           /* number of antennas ("channels") */  
-#  define MAX_COARSE_DELAY 4095 /* maximum coarse delay, in sample periods */
-#endif
+#define MAX_ANT 512           /* number of antennas ("channels") */  
+#define MAX_COARSE_DELAY 1023 /* maximum coarse delay, in sample periods */
 
 int main( int narg, char *argv[] ) {
 
