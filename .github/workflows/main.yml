@@ -65,6 +65,7 @@ jobs:
           cd sch/tests
           python -m unittest discover
       - name: Test - Executive
+        run: |
           cd $GITHUB_WORKSPACE
           cd exec/tests
           python -m unittest discover
