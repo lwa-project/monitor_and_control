@@ -937,7 +937,7 @@ int main ( int narg, char *argv[] ) {
                  (  osf.SESSION_DRX_BEAM==ME_MAX_NDPOUT           )   ) {
               dr_sid=-1;
               for( j=0; j<ME_MAX_NDR; j++ ) {
-                 if( osf.SESSION_DRX_BEAM == s.iDRDP[j] ) {
+                 if( osf.SESSION_DRX_BEAM == s.iDRNDP[j] ) {
                     dr_sid = LWA_SID_DR1 + j;
                     break;
                     }

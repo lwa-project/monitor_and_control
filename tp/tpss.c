@@ -443,10 +443,10 @@ int main ( int narg, char *argv[] ) {
     printf("[%d/%d] Obs#%d ASP setup time is %ld [ms]\n",MT_TPSS,getpid(),i,obs[i].ASP_setup_time);
     } /* for i */
 
-  /* t0 = (start time of first observation) - (obs#1 ASP setup time) - (DP+DR setup time) */
+  /* t0 = (start time of first observation) - (obs#1 ASP setup time) - (NDP+DR setup time) */
   LWA_time2tv( &t0, obs[1].OBS_START_MJD, obs[1].OBS_START_MPM ); /* t0 is now start time as a timeval */
   LWA_timeadd( &t0,-obs[1].ASP_setup_time-LWA_SESS_DRDP_INIT_TIME_MS );
-  printf("[%d/%d] Time allocated for session DR+DP setup is %d [ms]\n",MT_TPSS,getpid(),LWA_SESS_DRDP_INIT_TIME_MS);
+  printf("[%d/%d] Time allocated for session DR+NDP setup is %d [ms]\n",MT_TPSS,getpid(),LWA_SESS_DRDP_INIT_TIME_MS);
   printf("[%d/%d] Time allocated for session ASP   setup is %ld [ms]\n",MT_TPSS,getpid(),obs[1].ASP_setup_time);
   LWA_timeval( &t0, &SESSION_START_MJD, &SESSION_START_MPM ); /* remember this (session start time */
   printf("[%d/%d] Session start will be MJD=%ld MPM=%ld\n",MT_TPSS,getpid(),SESSION_START_MJD,SESSION_START_MPM);
@@ -472,7 +472,7 @@ int main ( int narg, char *argv[] ) {
   /* check defined session against mess.dat */
   if (SESSION_DRX_BEAM>0) {  /* a particular DRX output has been requested */
      
-     err = LWA_dpoavail( SESSION_DRX_BEAM, t0, d, mbox, msg );
+     err = LWA_ndpoavail( SESSION_DRX_BEAM, t0, d, mbox, msg );
      printf("[%d/%d] LWA_dpoavail says: %s\n",MT_TPSS,getpid(),msg); 
      if (err<=0) {
        printf("[%d/%d] FATAL: SESSION_DRX_BEAM==%hd cannot be accommodated\n",MT_TPSS,getpid(),SESSION_DRX_BEAM);
@@ -489,7 +489,7 @@ int main ( int narg, char *argv[] ) {
       //  i_max = 0;
       //  for (i=1;i<=4;i++) {
       //    err = LWA_dpoavail( i, t0, d, mbox, msg );
-      //    printf("[%d/%d] For DP output %d of 4, LWA_dpoavail says: %s\n",MT_TPSS,getpid(),i,msg);
+      //    printf("[%d/%d] For NDP output %d of 4, LWA_dpoavail says: %s\n",MT_TPSS,getpid(),i,msg);
       //    if (err>err_max) { err_max = err; i_max = i; }
       //    }
       //  if (err_max<1) {
@@ -497,7 +497,7 @@ int main ( int narg, char *argv[] ) {
       //    exit(EXIT_FAILURE);
       //    }
       //  SESSION_DRX_BEAM = i_max;
-      //  printf("[%d/%d] Selected DP output %hd of 4\n",MT_TPSS,getpid(),SESSION_DRX_BEAM);
+      //  printf("[%d/%d] Selected NDP output %hd of 4\n",MT_TPSS,getpid(),SESSION_DRX_BEAM);
       //  } /* if (b_DRX_requested) */
 
     }
@@ -539,7 +539,7 @@ int main ( int narg, char *argv[] ) {
   fprintf(fp,"\n");
 
   fprintf(fp,"SESSION_MRP_ASP %d\n",SESSION_MRP_ASP);
-  fprintf(fp,"SESSION_MRP_DP_ %d\n",SESSION_MRP_DP_);
+  fprintf(fp,"SESSION_MRP_NDP %d\n",SESSION_MRP_NDP);
   fprintf(fp,"SESSION_MRP_DR1 %d\n",SESSION_MRP_DR1);
   fprintf(fp,"SESSION_MRP_DR2 %d\n",SESSION_MRP_DR2);
   fprintf(fp,"SESSION_MRP_DR3 %d\n",SESSION_MRP_DR3);
@@ -549,7 +549,7 @@ int main ( int narg, char *argv[] ) {
   fprintf(fp,"SESSION_MRP_MCS %d\n",SESSION_MRP_MCS);
   
   fprintf(fp,"SESSION_MUP_ASP %d\n",SESSION_MUP_ASP);
-  fprintf(fp,"SESSION_MUP_DP_ %d\n",SESSION_MUP_DP_);
+  fprintf(fp,"SESSION_MUP_NDP %d\n",SESSION_MUP_NDP);
   fprintf(fp,"SESSION_MUP_DR1 %d\n",SESSION_MUP_DR1);
   fprintf(fp,"SESSION_MUP_DR2 %d\n",SESSION_MUP_DR2);
   fprintf(fp,"SESSION_MUP_DR3 %d\n",SESSION_MUP_DR3);
@@ -678,7 +678,7 @@ int main ( int narg, char *argv[] ) {
   ssf.SESSION_DUR = d;
   ssf.SESSION_NOBS = nobs;
   ssf.SESSION_MRP_ASP = SESSION_MRP_ASP;
-  ssf.SESSION_MRP_DP_ = SESSION_MRP_DP_;
+  ssf.SESSION_MRP_NDP = SESSION_MRP_NDP;
   ssf.SESSION_MRP_DR1 = SESSION_MRP_DR1;
   ssf.SESSION_MRP_DR2 = SESSION_MRP_DR2;
   ssf.SESSION_MRP_DR3 = SESSION_MRP_DR3;
@@ -687,7 +687,7 @@ int main ( int narg, char *argv[] ) {
   ssf.SESSION_MRP_SHL = SESSION_MRP_SHL;
   ssf.SESSION_MRP_MCS = SESSION_MRP_MCS;
   ssf.SESSION_MUP_ASP = SESSION_MUP_ASP;
-  ssf.SESSION_MUP_DP_ = SESSION_MUP_DP_;
+  ssf.SESSION_MUP_NDP = SESSION_MUP_NDP;
   ssf.SESSION_MUP_DR1 = SESSION_MUP_DR1;
   ssf.SESSION_MUP_DR2 = SESSION_MUP_DR2;
   ssf.SESSION_MUP_DR3 = SESSION_MUP_DR3;

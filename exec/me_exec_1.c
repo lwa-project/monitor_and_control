@@ -835,7 +835,7 @@ int me_write_mess( struct ssmif_struct s,
   fprintf(fp,"%d\n",s.eCRA);
 
   for (i=0;i<ME_MAX_NDPOUT;i++) {
-    fprintf(fp,"%d ",sc.DPO[i].iStat);
+    fprintf(fp,"%d ",sc.NDPO[i].iStat);
     }
   fprintf(fp,"\n");
 
@@ -863,7 +863,7 @@ int me_write_mess( struct ssmif_struct s,
 //line 0 is MCS_CRA
 //line 1 is n n n n n (state of functioning beams 1-5, based on SSMIF)
 //Each line is a session, sorted by Start MJD, Start MPM, then DP_output
-//StartMJD/MPM, DP-output# (1-5), DURATION, CRA, PROJECTID/SESSION_ID
+//StartMJD/MPM, NDP-output# (1-5), DURATION, CRA, PROJECTID/SESSION_ID
 
 /*******************************************************************/
 /*** me_init_sdm() *************************************************/
@@ -895,7 +895,7 @@ int me_init_sdm( struct ssmif_struct s,
   sdm->station.summary = LWA_SIDSUM_BOOTING; strcpy(sdm->station.info,""); sdm->station.tv = tv; /* station */
   sdm->shl.summary     = LWA_SIDSUM_UNK;     strcpy(sdm->shl.info,    ""); sdm->shl.tv     = tv; /* SHL */
   sdm->asp.summary     = LWA_SIDSUM_UNK;     strcpy(sdm->asp.info,    ""); sdm->asp.tv     = tv; /* ASP */
-  sdm->dp.summary      = LWA_SIDSUM_UNK;     strcpy(sdm->dp.info,     ""); sdm->dp.tv      = tv; /* DP */
+  sdm->ndp.summary     = LWA_SIDSUM_UNK;     strcpy(sdm->ndp.info,    ""); sdm->ndp.tv     = tv; /* NDP */
   for (i=0;i<ME_MAX_NDR;i++) {
     sdm->dr[i].summary = LWA_SIDSUM_UNK; strcpy(sdm->dr[i].info,""); sdm->dr[i].tv   = tv; /* DR# */
     }
@@ -908,14 +908,14 @@ int me_init_sdm( struct ssmif_struct s,
       sdm->ssss.eARBStat[i][j] = s.eARBStat[i][j]; } }                   /* ARB_STAT[][] */
   for (i=0;i<ME_MAX_NSNAP;i++) { 
     for (j=0;j<ME_MAX_NSNAPCH;j++) { 
-      sdm->ssss.eSnapStat[i][j] = s.eSnapStat[i][j]; } }                   /* SNAP_STAT[][] */
+      sdm->ssss.eSnapStat[i][j] = s.eSnapStat[i][j]; } }                 /* SNAP_STAT[][] */
   for (i=0;i<ME_MAX_NDR;i++)  { sdm->ssss.eDRStat[i]  = s.eDRStat[i];  } /* DR_STAT[] */
 
   for (i=0;i<s.nStd;i++) { 
     for (j=0;j<2;j++) {    
       sdm->ant_stat[i][j] = sc.Stand[i].Ant[j].iSS; } }
   for (i=0;i<ME_MAX_NDR;i++)  { 
-      sdm->dpo_stat[i]    = sc.DPO[i].iStat;  } 
+      sdm->ndpo_stat[i]    = sc.NDPO[i].iStat;  } 
 
   /* .settings are left alone */ 
 

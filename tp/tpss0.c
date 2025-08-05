@@ -17,7 +17,7 @@
   char SESSION_SPC[32];
 
   int  SESSION_MRP_ASP=-1;
-  int  SESSION_MRP_DP_=-1;
+  int  SESSION_MRP_NDP=-1;
   int  SESSION_MRP_DR1=-1;
   int  SESSION_MRP_DR2=-1;
   int  SESSION_MRP_DR3=-1;
@@ -27,7 +27,7 @@
   int  SESSION_MRP_MCS=-1;
 
   int  SESSION_MUP_ASP=-1;
-  int  SESSION_MUP_DP_=-1;
+  int  SESSION_MUP_NDP=-1;
   int  SESSION_MUP_DR1=-1;
   int  SESSION_MUP_DR2=-1;
   int  SESSION_MUP_DR3=-1;

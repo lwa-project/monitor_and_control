@@ -121,15 +121,15 @@
     case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
-  strcpy(keyword,"SESSION_MRP_DP_"); SESSION_MRP_DP_=-1;
+  strcpy(keyword,"SESSION_MRP_NDP"); SESSION_MRP_NDP=-1;
   while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
   switch (i) {
     case TPSS_PL_KEYWORD_MATCH:    
       printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data);
-      sscanf(data,"%d",&SESSION_MRP_DP_);
-      printf("...converts to %d\n",SESSION_MRP_DP_);
-      if (SESSION_MRP_DP_<-1) {   
-        printf("[%d/%d] FATAL: SESSION_MRP_DP_ not valid\n",MT_TPSS,getpid());  
+      sscanf(data,"%d",&SESSION_MRP_NDP);
+      printf("...converts to %d\n",SESSION_MRP_NDP);
+      if (SESSION_MRP_NDP<-1) {   
+        printf("[%d/%d] FATAL: SESSION_MRP_NDP not valid\n",MT_TPSS,getpid());  
         exit(EXIT_FAILURE);
         }
       strcpy(data,"");                     
@@ -283,15 +283,15 @@
     case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
     }
 
-  strcpy(keyword,"SESSION_MUP_DP_"); SESSION_MUP_DP_=-1;
+  strcpy(keyword,"SESSION_MUP_NDP"); SESSION_MUP_NDP=-1;
   while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
   switch (i) {
     case TPSS_PL_KEYWORD_MATCH:    
       printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data);
-      sscanf(data,"%d",&SESSION_MUP_DP_);
-      printf("...converts to %d\n",SESSION_MUP_DP_);
-      if (SESSION_MUP_DP_<-1) {   
-        printf("[%d/%d] FATAL: SESSION_MUP_DP_ not valid\n",MT_TPSS,getpid());  
+      sscanf(data,"%d",&SESSION_MUP_NDP);
+      printf("...converts to %d\n",SESSION_MUP_NDP);
+      if (SESSION_MUP_NDP<-1) {   
+        printf("[%d/%d] FATAL: SESSION_MUP_NDP not valid\n",MT_TPSS,getpid());  
         exit(EXIT_FAILURE);
         }
       strcpy(data,"");                     

@@ -1862,16 +1862,16 @@
  
     } /* for ( iDR */
 
-  /* reading DR_DP[] */
+  /* reading DR_NDP[] */
   for ( iDR=0; iDR<s.nDR; iDR++ ) {
 
-    sprintf(keyword,"DR_DP[%d]",iDR+1); s.iDRDP[iDR]=0;
+    sprintf(keyword,"DR_NDP[%d]",iDR+1); s.iDRNDP[iDR]=0;
     while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
     switch (i) {
       case MERS_PL_KEYWORD_MATCH: 
-        sscanf(data,"%d",&(s.iDRDP[iDR]));
-        if ( (s.iDRDP[iDR]<0) || (s.iDRDP[iDR]>5) ) {
-          printf("[%d/%d] FATAL: DR_DP[%d]=%d not valid\n",MT_TPRS,getpid(),iDR+1,s.iDRDP[iDR]);   
+        sscanf(data,"%d",&(s.iDRNDP[iDR]));
+        if ( (s.iDRNDP[iDR]<0) || (s.iDRNDP[iDR]>5) ) {
+          printf("[%d/%d] FATAL: DR_NDP[%d]=%d not valid\n",MT_TPRS,getpid(),iDR+1,s.iDRNDP[iDR]);   
           exit(EXIT_FAILURE);
           }    
         strcpy(data,"");  
@@ -1880,7 +1880,7 @@
       case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
       case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
       }        
-    printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.iDRDP[iDR]);   
+    printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.iDRNDP[iDR]);   
  
     } /* for ( iDR */
 
@@ -1990,8 +1990,8 @@
                 }
               break;
             case LWA_SID_NDP:
-              b = (!strncmp(data,"MCS",3)) || (!strncmp(data,"DC1",3)) || (!strncmp(data,"DC1",2)) ||
-                  (!strncmp(data,"FAN",2)) || (!strncmp(data,"SYN",2)) || (!strncmp(data,"SWI",2))  ;
+              b = (!strncmp(data,"MCS",3)) || (!strncmp(data,"FPG",3)) || (!strncmp(data,"SVR",3)) ||
+                  (!strncmp(data,"FAN",3)) || (!strncmp(data,"SYN",3)) || (!strncmp(data,"SWI",3))  ;
               if (!b) {
                 printf("[%d/%d] FATAL: PWR_NAME='%s' not valid for PWR_SS[%d][%d]='NDP'\n",
                   MT_TPRS,getpid(),data,iRack+1,iPort+1);   
@@ -2116,23 +2116,23 @@
     } 
   printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.settings.mrp_asp); 
 
-  /* reading MRP_DP_ */
-  sprintf(keyword,"MRP_DP_"); s.settings.mrp_dp = 0;
+  /* reading MRP_NDP */
+  sprintf(keyword,"MRP_NDP"); s.settings.mrp_ndp = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
   switch (i) {
     case MERS_PL_KEYWORD_MATCH: 
-      sscanf(data,"%hd",&(s.settings.mrp_dp));     
+      sscanf(data,"%hd",&(s.settings.mrp_ndp));     
       strcpy(data,"");  
       break;
     case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
     case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
     case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
     }       
-  if (s.settings.mrp_dp<0) {
-    printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.settings.mrp_dp);
+  if (s.settings.mrp_ndp<0) {
+    printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.settings.mrp_ndp);
     exit(EXIT_FAILURE);
     } 
-  printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.settings.mrp_dp); 
+  printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.settings.mrp_ndp); 
 
   /* reading MRP_DR1 */
   sprintf(keyword,"MRP_DR1"); s.settings.mrp_dr1 = 0;
@@ -2279,22 +2279,22 @@
   printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.settings.mup_asp); 
 
   /* reading MUP_DP_ */
-  sprintf(keyword,"MUP_DP_"); s.settings.mup_dp = 0;
+  sprintf(keyword,"MUP_NDP"); s.settings.mup_ndp = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
   switch (i) {
     case MERS_PL_KEYWORD_MATCH: 
-      sscanf(data,"%hd",&(s.settings.mup_dp));     
+      sscanf(data,"%hd",&(s.settings.mup_ndp));     
       strcpy(data,"");  
       break;
     case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
     case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
     case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
     }       
-  if (s.settings.mup_dp<0) {
-    printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.settings.mup_dp);
+  if (s.settings.mup_ndp<0) {
+    printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.settings.mup_ndp);
     exit(EXIT_FAILURE);
     } 
-  printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.settings.mup_dp); 
+  printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.settings.mup_ndp); 
 
   /* reading MUP_DR1 */
   sprintf(keyword,"MUP_DR1"); s.settings.mup_dr1 = 0;

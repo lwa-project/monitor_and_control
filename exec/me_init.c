@@ -230,7 +230,7 @@ int main ( int narg, char *argv[] ) {
   sdm.station.summary = LWA_SIDSUM_BOOTING; strcpy(sdm.station.info,""); sdm.station.tv = tv; /* station */
   sdm.shl.summary     = LWA_SIDSUM_UNK;     strcpy(sdm.shl.info,    ""); sdm.shl.tv     = tv; /* SHL */
   sdm.asp.summary     = LWA_SIDSUM_UNK;     strcpy(sdm.asp.info,    ""); sdm.asp.tv     = tv; /* ASP */
-  sdm.dp.summary      = LWA_SIDSUM_UNK;     strcpy(sdm.dp.info,     ""); sdm.dp.tv      = tv; /* DP */
+  sdm.ndp.summary     = LWA_SIDSUM_UNK;     strcpy(sdm.ndp.info,    ""); sdm.ndp.tv     = tv; /* NDP */
   for (i=0;i<ME_MAX_NDR;i++) {
     sdm.dr[i].summary = LWA_SIDSUM_UNK; strcpy(sdm.dr[i].info,""); sdm.dr[i].tv   = tv; /* DR# */
     }
@@ -252,10 +252,10 @@ int main ( int narg, char *argv[] ) {
     for (j=0;j<2;j++) {    
       sdm.ant_stat[i][j] = 0; } }
   for (i=0;i<ME_MAX_NDR;i++)  { 
-      sdm.dpo_stat[i]    = 0;  } 
+      sdm.ndpo_stat[i]    = 0;  } 
 
   sdm.settings.mrp_asp = 0;
-  sdm.settings.mrp_dp  = 0;
+  sdm.settings.mrp_ndp = 0;
   sdm.settings.mrp_dr1 = 0;
   sdm.settings.mrp_dr2 = 0;
   sdm.settings.mrp_dr3 = 0;
@@ -265,7 +265,7 @@ int main ( int narg, char *argv[] ) {
   sdm.settings.mrp_mcs = 0;
 
   sdm.settings.mup_asp = 0;
-  sdm.settings.mup_dp  = 0;
+  sdm.settings.mup_ndp = 0;
   sdm.settings.mup_dr1 = 0;
   sdm.settings.mup_dr2 = 0;
   sdm.settings.mup_dr3 = 0;

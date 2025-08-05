@@ -79,7 +79,7 @@ int main ( int narg, char *argv[] ) {
     printf("          'ana': List FEE power state and ARX filter & atten settings by stand\n");
     printf("          'ans': List status, other info about analog paths by STATUS\n");
     printf("          'anp': List status, other info about analog paths by PATH\n");
-    printf("          'dpp': List status, other info about DP output paths by PATH\n");
+    printf("          'dpp': List status, other info about NDP output paths by PATH\n");
     printf("          'pwr': Power rack/port to subsystem mapping table (<static>=1 only)\n");
     printf("  <static>: =0 means use SDM (current info from sdm.dat) [default]\n"); 
     printf("            =1 means use only SSMIF (initialization info from ssmif.dat)\n");
@@ -205,16 +205,16 @@ int main ( int narg, char *argv[] ) {
            (tm->tm_year)-100, (tm->tm_mon)+1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
       printf( "%s ASP: %-7s '%s'\n", time_string, LWA_saysum(sdm.asp.summary    ), sdm.asp.info     );
 
-      tm = gmtime(&(sdm.dp.tv.tv_sec));
+      tm = gmtime(&(sdm.ndp.tv.tv_sec));
       sprintf(time_string,"%02d%02d%02d %02d:%02d:%02d", 
            (tm->tm_year)-100, (tm->tm_mon)+1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
-      printf( "%s DP_: %-7s '%s'\n", time_string, LWA_saysum(sdm.dp.summary     ), sdm.dp.info      );
+      printf( "%s NDP: %-7s '%s'\n", time_string, LWA_saysum(sdm.ndp.summary    ), sdm.ndp.info      );
 
       for (i=0;i<s.nDR;i++) {
         tm = gmtime(&(sdm.dr[i].tv.tv_sec));
         sprintf(time_string,"%02d%02d%02d %02d:%02d:%02d", 
              (tm->tm_year)-100, (tm->tm_mon)+1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec);
-        printf( "%s DP%1d: %-7s '%s'\n", time_string, i+1, LWA_saysum(sdm.dr[i].summary), sdm.dr[i].info );
+        printf( "%s DR%1d: %-7s '%s'\n", time_string, i+1, LWA_saysum(sdm.dr[i].summary), sdm.dr[i].info );
         }
   
       break;
@@ -241,8 +241,8 @@ int main ( int narg, char *argv[] ) {
                     printf("ASP: MRP=%hd MUP=%hd",  s.settings.mrp_asp,  s.settings.mup_asp);
       if (!bStatic) printf(  " | MRP=%hd MUP=%hd",sdm.settings.mrp_asp,sdm.settings.mup_asp);
       printf("\n");   
-                    printf("DP_: MRP=%hd MUP=%hd",  s.settings.mrp_dp,   s.settings.mup_dp );
-      if (!bStatic) printf(  " | MRP=%hd MUP=%hd",sdm.settings.mrp_dp, sdm.settings.mup_dp );
+                    printf("NDP: MRP=%hd MUP=%hd",  s.settings.mrp_ndp,  s.settings.mup_ndp);
+      if (!bStatic) printf(  " | MRP=%hd MUP=%hd",sdm.settings.mrp_ndp,sdm.settings.mup_ndp);
       printf("\n");   
                     printf("DR1: MRP=%hd MUP=%hd",  s.settings.mrp_dr1,  s.settings.mup_dr1);
       if (!bStatic) printf(  " | MRP=%hd MUP=%hd",sdm.settings.mrp_dr1,sdm.settings.mup_dr1);
@@ -434,8 +434,8 @@ int main ( int narg, char *argv[] ) {
       printf("| SNAP_DESI\n");
       printf("  SNAP_SLOT\n");
       printf("  SNAP_ID\n");
-      printf("| SNAP_INR (label on input connector for this channel on DP rack)\n");
-      printf("  SNAP_INC (label on input connector for this channel on DP chassis)\n");
+      printf("| SNAP_INR (label on input connector for this channel on NDP rack)\n");
+      printf("  SNAP_INC (label on input connector for this channel on NDP chassis)\n");
       break;
       
     case TPSDM_RPT_SERVER: /* Server */
@@ -461,7 +461,7 @@ int main ( int narg, char *argv[] ) {
         printf( "%2d %1d",i+1,s.eDRStat[i]);
         if (!bStatic) printf( " %1d",sdm.ssss.eDRStat[i]);  
         printf(" | %1d %10s %10s\n", 
-                   s.iDRDP[i],
+                   s.iDRNDP[i],
                        s.sDRID[i],    
                             s.sDRPC[i] );  
         }
@@ -469,7 +469,7 @@ int main ( int narg, char *argv[] ) {
       printf("  DR #\n");
       printf("  stat (static)\n");
       if (!bStatic) printf("  stat (dynamic)\n");
-      printf("| DR_DP (DP output that this DR is connected to (1-4 are beams, 5=TBW/TBN)\n");
+      printf("| DR_NDP (NDP output that this DR is connected to (1-4 are beams, 5=TBT/TBS)\n");
       printf("  DR_ID\n");
       printf("  DP_PC\n");
       break;
@@ -555,9 +555,9 @@ int main ( int narg, char *argv[] ) {
                             sc.Stand[i].Ant[k].ARX.c+1,
                                 sc.Stand[i].Ant[k].ARX.iStat);
             printf(" |D %2d %2d %1d",
-                        sc.Stand[i].Ant[k].DP.i+1,
-                            sc.Stand[i].Ant[k].DP.c+1,
-                                sc.Stand[i].Ant[k].DP.iStat);
+                        sc.Stand[i].Ant[k].NDP.i+1,
+                            sc.Stand[i].Ant[k].NDP.c+1,
+                                sc.Stand[i].Ant[k].NDP.iStat);
             printf("\n");
             } /* for k */
           } /* for i */
@@ -613,15 +613,15 @@ int main ( int narg, char *argv[] ) {
         for ( i=0; i<ME_MAX_NDPOUT; i++ ) {
           if (i<ME_MAX_NDPOUT-1)              { sprintf(st1," Beam #%d",i+1);     }
           if (i>ME_MAX_NDPOUT-2)              { sprintf(st1," TBT/TBS ");         }
-          if ( sc.DPO[i].iDR > 0 ) { 
-              sprintf(st2," DR%1d %1d",sc.DPO[i].iDR,s.eDRStat[sc.DPO[i].iDR-1]); 
-              //printf("<%1d>",s.eDRStat[sc.DPO[i].iDR]); 
+          if ( sc.NDPO[i].iDR > 0 ) { 
+              sprintf(st2," DR%1d %1d",sc.NDPO[i].iDR,s.eDRStat[sc.NDPO[i].iDR-1]); 
+              //printf("<%1d>",s.eDRStat[sc.NDPO[i].iDR]); 
             } else {
               strcpy(st2,"");
             }
           printf("%1d %1d |%s |%s\n",
                   i+1, 
-                      sc.DPO[i].iStat,
+                      sc.NDPO[i].iStat,
                            st1,st2    );
           } /* for i */
 
@@ -637,13 +637,13 @@ int main ( int narg, char *argv[] ) {
         } else {
 
           for (i=0;i<s.nDR;i++) {
-            printf( "%2d %1d", i+1, sc.DPO[i].iStat ); 
-            if (!bStatic) printf( " %1d", sdm.dpo_stat[i] ); 
+            printf( "%2d %1d", i+1, sc.NDPO[i].iStat ); 
+            if (!bStatic) printf( " %1d", sdm.ndpo_stat[i] ); 
             printf("\n");     
             }
 
         printf("key:\n");
-        printf("  DP output #\n");
+        printf("  NDP output #\n");
         printf("  stat (for this path) (static)\n");
         printf("  stat (for this path) (dynamic)\n");
  
