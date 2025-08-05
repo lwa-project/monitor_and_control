@@ -61,6 +61,7 @@ int main ( int narg, char *argv[] ) {
   short int i2u1, i2u2, i2u3;
   int i4u1, i4u2, i4s1, i4s2;
   float f41; /* assuming this is 32 bits */
+  double f81; /* assuming this is 64 bits */
   long int i8u1;
 
   union {
@@ -83,6 +84,10 @@ int main ( int narg, char *argv[] ) {
     float f;
     unsigned char b[4];
     } f4;
+  union {
+    double f;
+    unsigned char b[8];
+    } f8;
 
   /*==================*/
   /*=== Initialize ===*/
@@ -188,14 +193,16 @@ int main ( int narg, char *argv[] ) {
          // DATA field structure:
          // float32 TBS_FREQ;
          bError=0;
-         if (narg>3) { sscanf(argv[3],"%f", &f41 ); } else {bError=1;}
+         if (narg>3) { sscanf(argv[3],"%lf", &f81 ); } else {bError=1;}
          if (bError) {
-           printf("[%s] FATAL: %s/%s args are:\n TBS_FREQ (Hz, float32)",ME,dest,cmd);
+           printf("[%s] FATAL: %s/%s args are:\n TBS_FREQ (Hz, float64)",ME,dest,cmd);
            exit(EXIT_FAILURE);
            }
-         f4.f  = f41;  c.data[0]= f4.b[3]; c.data[1]= f4.b[2]; c.data[2]= f4.b[1]; c.data[3]= f4.b[0];
-         c.data[4] = 8;
-         c.datalen = 5;
+         f8.f = f81;
+         c.data[0]= f8.b[7]; c.data[1]= f8.b[6]; c.data[2]= f8.b[5]; c.data[3]= f8.b[4];
+         c.data[4]= f8.b[3]; c.data[5]= f8.b[2]; c.data[6]= f8.b[1]; c.data[7]= f8.b[0];
+         c.data[8] = 8;
+         c.datalen = 9;
          break;
          
        case LWA_CMD_COR:

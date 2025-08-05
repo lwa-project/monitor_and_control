@@ -40,6 +40,7 @@ int LWA_mibupdate_NDP(
   long int mjd, mpm;
 
   float f4;
+  double f8;
   
   char cor_navg[13];
   char cor_tuning_mask[21];
@@ -56,7 +57,7 @@ int LWA_mibupdate_NDP(
 
   unsigned char beam;
   unsigned char tuning;
-  float freq=1.0;
+  double freq=1.0;
   unsigned char ebw;
   unsigned short int gain;
   unsigned char high_dr;
@@ -115,6 +116,28 @@ int LWA_mibupdate_NDP(
 
       break;
 
+    case LWA_CMD_TBS:
+      /* When we get an "A" in response to the TBS command, use LWA_mibupdate_RPT() */
+      /* to update the corresponding non-ICD (i.e., added by me) MIB entries FREQ and */
+      /* BW. */
+
+      /* recovering parameters from packed binary argument */
+      memset(&freq,0,8);
+      memcpy(&freq,cmdata,8);
+      freq = LWA_f8_swap(freq); /* swapping endianness */
+      
+      memcpy(&ebw,  cmdata+8, 1);
+
+      sprintf(sMIBlabel,"MCS_TBS_FREQ",beam,tuning);
+      sprintf(sData,"%12.3f",freq);
+      eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
+
+      sprintf(sMIBlabel,"MCS_TBS_BW",beam,tuning);
+      sprintf(sData,"%1hhu",ebw);
+      eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, sData, -1 );
+
+      break;
+      
     case LWA_CMD_COR:
       /* When we get an "A" in response to the COR command, use LWA_mibupdate_RPT() */
       /* to update the corresponding non-ICD (i.e., added by me) MIB entries COR_NAVG, */
@@ -177,12 +200,12 @@ int LWA_mibupdate_NDP(
       memcpy( &beam,     cmdata+0, 1 );
       memcpy( &tuning,   cmdata+1, 1 );
       
-      memset(&freq,0,4);
-      memcpy(&freq,cmdata+2,4);
-      freq = LWA_f4_swap(freq); /* swapping endianness */
+      memset(&freq,0,8);
+      memcpy(&freq,cmdata+2,8);
+      freq = LWA_f8_swap(freq); /* swapping endianness */
       
-      memcpy(&ebw,  cmdata+6, 1);
-      memcpy(&gain, cmdata+7, 2);
+      memcpy(&ebw,  cmdata+10, 1);
+      memcpy(&gain, cmdata+11, 2);
       gain = LWA_i2u_swap(gain); /* swapping endianness */
       /* ignoring cmdata[9] = high_dr */
       /* ignoring cmdata[10] = subslot */
@@ -243,19 +266,25 @@ int LWA_mibupdate_NDP(
       sscanf(cmdata,"%s", output);
       
       /* Which is it? */
-      if( !strncmp("TBF", output, 3) ) {
-          /* TBF */
-          sprintf(sMIBlabel,"MCS_TBF_BITS");
+      if( !strncmp("TBT", output, 3) ) {
+          /* TBT */
+          sprintf(sMIBlabel,"MCS_TBT_TRIG_TIME");
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
           
-          sprintf(sMIBlabel,"MCS_TBF_TRIG_TIME");
+          sprintf(sMIBlabel,"MCS_TBT_SAMPLES");
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
           
-          sprintf(sMIBlabel,"MCS_TBF_SAMPLES");
+          sprintf(sMIBlabel,"MCS_TBT_TUNING_MASK");
+          eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
+      }
+      if( !strncmp("TBS", output, 3) ) {
+          /* TBS */
+          printf(sMIBlabel,"MCS_TBS_FREQ");
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
           
-          sprintf(sMIBlabel,"MCS_TBF_TUNING_MASK");
+          sprintf(sMIBlabel,"MCS_TBS_BW");
           eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, "0", -1 );
+          
       }
       if( !strncmp("COR", output, 3) ) {
           /* COR */

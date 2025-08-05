@@ -40,10 +40,11 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 //     (The string provided will be exactly the string used for the DATA field)
 // Concerning "data":
 //   For dest="NDP", this will be a list of parameters that will get translated into a raw binary DATA field
-//     For cmd="TBF": Args are TBF_BITS        (always 16)
-//                             TBF_TRIG_TIME   (samples from start of slot, uint32)
-//                             TBF_SAMPLES     (samples, uint32)
-//                             DRX_TUNING_MASK (drx tunings to pull data from, uint64)
+//     For cmd="TBT": Args are TBT_TRIG_TIME   (samples from start of slot, uint32)
+//                             TBT_SAMPLES     (samples, uint32)
+//                             DRX_TUNING_MASK (server tunings to pull data from, uint64)
+//     For cmd="TBS": Args are TBS_FREQ        (Hz, float64) 
+//                             TBS_BW          {1..11}
 //     For cmd="FST": Args are INDEX           ( -1, 0, or channel# (1-512) ) 
 //                             cname           This is the name of a file, presumed to be located in 
 //                                               MCS/Scheduler's "cfiles" 
@@ -58,7 +59,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 //                             drx_tuning      1..NUM_TUNINGS(32) (uint8 DRX_TUNING)
 //                             sub_slot        {0..99}
 //     For cmd="DRX": Args are tuning          1..NUM_TUNINGS(32)     (uint8 DRX_TUNING)
-//                             freq            [Hz]                   (float32 DRX_FREQ)
+//                             freq            [Hz]                   (float64 DRX_FREQ)
 //                             ebw             Bandwidth setting 0..8 (unit8 DRX_BW)
 //                             gain            0..15                  (uint16 DRX_GAIN)
 //                             high_dr         0 or 1                 (uint8 OBS_B)
@@ -67,62 +68,6 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 //                             COR_GAIN        {0..15}
 //                             sub_slot        {0..99}
 //
-//   For dest="ADP", this will be a list of parameters that will get translated into a raw binary DATA field
-//     For cmd="TBF": Args are TBF_BITS        (always 16)
-//                             TBF_TRIG_TIME   (samples from start of slot, uint32)
-//                             TBF_SAMPLES     (samples, uint32)
-//                             DRX_TUNING_MASK (drx tunings to pull data from, uint64)
-//     For cmd="TBN": Args are TBN_FREQ        (Hz, float32) 
-//                             TBN_BW          {1..11}
-//                             TBN_GAIN        {0..30}
-//     For cmd="FST": Args are INDEX           ( -1, 0, or channel# (1-512) ) 
-//                             cname           This is the name of a file, presumed to be located in 
-//                                               MCS/Scheduler's "cfiles" 
-//                                               directory, containing "sint16 COEFF_DATA[16][32]"
-//     For cmd="BAM": Args are beam            1..NUM_BEAMS(32) (uint16 BEAM_ID) 
-//                             dfile           This is the name of a file, presumed to be located in 
-//                                               MCS/Scheduler's "dfiles" 
-//                                               directory, containing "uint16 BEAM_DELAY[520]" 
-//                             gfile           This is the name of a file, presumed to be located in 
-//                                               MCS/Scheduler's "gfiles" 
-//                                               directory, containing "sint16 BEAM_GAIN[260][2][2]"   
-//                             drx_tuning      1..NUM_TUNINGS(32) (uint8 DRX_TUNING)
-//                             sub_slot        {0..99}
-//     For cmd="DRX": Args are tuning          1..NUM_TUNINGS(32)     (uint8 DRX_TUNING)
-//                             freq            [Hz]                   (float32 DRX_FREQ)
-//                             ebw             Bandwidth setting 0..8 (unit8 DRX_BW)
-//                             gain            0..15                  (uint16 DRX_GAIN)
-//     For cmd="COR": Args are COR_NAVG        integration time in sub-slots (sint32 COR_NAVG)
-//                             DRX_TUNING_MASK (drx tunings to pull data from, uint64)
-//                             COR_GAIN        {0..15}
-//                             sub_slot        {0..99}
-//
-//   For dest="DP_", this will be a list of parameters that will get translated into a raw binary DATA field
-//     For cmd="TBW": Args are TBW_BITS      {0|1}
-//                             TBW_TRIG_TIME (samples from start of slot, uint32)
-//                             TBW_SAMPLES   (samples, uint32)
-//     For cmd="TBN": Args are TBN_FREQ      (Hz, float32) 
-//                             TBN_BW        {1..7}
-//                             TBN_GAIN      {0..30}
-//                             sub_slot      {0..99}
-//     For cmd="FST": Args are INDEX         ( -1, 0, or channel# (1-520) ) 
-//                             cname         This is the name of a file, presumed to be located in 
-//                                             MCS/Scheduler's "cfiles" 
-//                                             directory, containing "sint16 COEFF_DATA[16][32]"
-//     For cmd="BAM": Args are beam          1..NUM_BEAMS(4) (uint16 BEAM_ID) 
-//                             dfile         This is the name of a file, presumed to be located in 
-//                                             MCS/Scheduler's "dfiles" 
-//                                             directory, containing "uint16 BEAM_DELAY[520]" 
-//                             gfile         This is the name of a file, presumed to be located in 
-//                                             MCS/Scheduler's "gfiles" 
-//                                             directory, containing "sint16 BEAM_GAIN[260][2][2]"      
-//                             sub_slot      {0..99}
-//     For cmd="DRX": Args are beam          1..NUM_BEAMS(4)        (uint8 DRX_BEAM)
-//                             tuning        1..NUM_TUNINGS(2)      (uint8 DRX_TUNING)
-//                             freq          [Hz]                   (float32 DRX_FREQ)
-//                             ebw  	     Bandwidth setting 1..7 (unit8 DRX_BW)
-//                             gain          0..15                  (uint16 DRX_GAIN)
-//                             subslot       0..99                  (uint8 sub_slot)
 //   Remember to use quotes, since "data" includes spaces
 // Note meaning of arguments is sensitive to position; so if you want <time> other than "asap", you have to
 //   explicitly include a <date> parameter.
@@ -152,6 +97,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
   signed int i4s1;
   unsigned long int i8u1;
   float f41;                  /* assuming this is 32 bits */
+  double f81;                 /* assuming this is 64 bits */
 
   union {
     unsigned short int i;
@@ -177,11 +123,14 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
     float f;
     unsigned char b[4];
     } f4;
+  union {
+    double f;
+    unsigned char b[8];
+    } f8;
 
   unsigned char beam;
   unsigned char tuning;
-  float freq;
-  double freq8;
+  double freq;
   unsigned char ebw;
   unsigned short int gain;
   unsigned char subslot;
@@ -313,7 +262,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          // uint8 sub_slot;
 
          // parse the input string into parameters
-         sscanf(data,"%hhu %hhu %lf %hhu %hu %hhu %hhu", &beam, &tuning, &freq8, &ebw, &gain, &high_dr, &subslot);
+         sscanf(data,"%hhu %hhu %lf %hhu %hu %hhu %hhu", &beam, &tuning, &freq, &ebw, &gain, &high_dr, &subslot);
          //printf("%f %1hhu %1hhu %1hhu %1hhu\n",freq,c.data[2],c.data[3],c.data[4],c.data[5]);
 
          // assemble into c.data:
@@ -321,8 +270,9 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          memcpy( &(c.data[1]), &tuning,   1 );
 
          /* flipping endian-ness of freq: */
-         freq = (float) freq8;
-         f4.f  = freq;  c.data[2]= f4.b[3]; c.data[3]= f4.b[2]; c.data[4]= f4.b[1]; c.data[5]= f4.b[0]; 
+         f8.f  = freq;
+         c.data[7]= f8.b[0]; c.data[6]= f8.b[1]; c.data[5]= f8.b[2]; c.data[4]= f4.b[3];
+         c.data[3]= f8.b[4]; c.data[2]= f8.b[5]; c.data[1]= f8.b[6]; c.data[0]= f4.b[7];
 
          /* flipping endian-ness of gain: */
          i2u.i  = gain;  c.data[7]= i2u.b[1]; c.data[8]= i2u.b[0];  
@@ -333,10 +283,12 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          memcpy( &(c.data[9]), &high_dr, 1 );
          memcpy( &(c.data[10]), &subslot,  1 );
 
-         f4.b[3] = c.data[2]; f4.b[2] = c.data[3]; f4.b[1] = c.data[4]; f4.b[0] = c.data[5]; freq = f4.f;  
+         f8.b[7] = c.data[0]; f8.b[6] = c.data[1]; f8.b[5] = c.data[2]; f8.b[4] = c.data[3];
+         f8.b[3] = c.data[4]; f8.b[2] = c.data[5]; f8.b[1] = c.data[6]; f8.b[0] = c.data[7]; 
+         freq = f8.f;  
          //printf("%f %1hhu %1hhu %1hhu %1hhu\n",freq,c.data[2],c.data[3],c.data[4],c.data[5]);
 
-         c.datalen=11;
+         c.datalen=15;
 
          break;
 
@@ -364,17 +316,20 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
        case LWA_CMD_TBS:
          // DATA field structure:
          // float32 TBS_FREQ;
-         sscanf(data,"%lf %hhu", &freq8, &ebw);
+         sscanf(data,"%lf %hhu", &freq, &ebw);
          /* flipping endian-ness of freq: */
-         freq = (float) freq8;
-         f4.f  = freq;  c.data[0]= f4.b[3]; c.data[1]= f4.b[2]; c.data[2]= f4.b[1]; c.data[3]= f4.b[0];
+         f8.f  = freq;
+         c.data[7]= f8.b[0]; c.data[6]= f8.b[1]; c.data[5]= f8.b[2]; c.data[4]= f4.b[3];
+         c.data[3]= f8.b[4]; c.data[2]= f8.b[5]; c.data[1]= f8.b[6]; c.data[0]= f4.b[7];
 
-         memcpy( &(c.data[4]), &ebw,      1 );
+         memcpy( &(c.data[8]), &ebw,      1 );
 
-         f4.b[3] = c.data[0]; f4.b[2] = c.data[1]; f4.b[1] = c.data[2]; f4.b[0] = c.data[3]; freq = f4.f;  
+         f8.b[7] = c.data[0]; f8.b[6] = c.data[1]; f8.b[5] = c.data[2]; f8.b[4] = c.data[3];
+         f8.b[3] = c.data[4]; f8.b[2] = c.data[5]; f8.b[1] = c.data[6]; f8.b[0] = c.data[7]; 
+         freq = f8.f;  
          //printf("%f %1hhu %1hhu %1hhu %1hhu\n",freq,c.data[0],c.data[1],c.data[2],c.data[3]);
 
-         c.datalen=5;
+         c.datalen=9;
 
          break;
 

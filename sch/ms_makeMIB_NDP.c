@@ -64,8 +64,9 @@ main ( int narg, char *argv[] ) {
 
   fprintf(fp,"B 0.5           MCS_TBS_CONFIG 		NUL 	NUL 	NUL\n");
   fprintf(fp,"V 0.5.1         MCS_TBS_FREQ                0.000\ta12     NUL\n");
-  fprintf(fp,"V 0.5.2         MCS_TBN_REFERENCE           0       a9      NUL\n");
-  fprintf(fp,"V 0.5.3         MCS_TBN_CMD_SENT_MPM        0       a9      NUL\n");
+  fprintf(fp,"V 0.5.2         MCS_TBS_BW 		          0 	  a1 	NUL\n",i+1,i+1); 
+  fprintf(fp,"V 0.5.3         MCS_TBN_REFERENCE           0       a9      NUL\n");
+  fprintf(fp,"V 0.5.4         MCS_TBN_CMD_SENT_MPM        0       a9      NUL\n");
   
   fprintf(fp,"B 0.6           MCS_COR_CONFIG		NUL 	NUL 	NUL\n");
   fprintf(fp,"V 0.6.1         MCS_COR_NAVG                0      a10      NUL\n");
@@ -152,11 +153,15 @@ main ( int narg, char *argv[] ) {
   
   fprintf(fp,"V 9 		CMD_STAT 		0 	r606 	r606\n"); 
   
+  fprintf(fp,"B 10           TBS_CONFIG 		NUL 	NUL 	NUL\n");
+  fprintf(fp,"V 10.1         TBS_CONFIG_FREQ		0	f8r	f8r\n");
+  fprintf(fp,"V 10.2         TBS_CONFIG_FILTER	0	i2ur	i2ur\n");
+  
   for ( i=0; i<4; i++ ) {
     fprintf(fp,"B 11.%d		DRX_CONFIG_%d		NUL	NUL	NUL\n",i+1,i+1);
     for ( j=0; j<2; j++ ) {
       fprintf(fp,"B 11.%d.%d		DRX_CONFIG_%d_%d		NUL	NUL	NUL\n",i+1,j+1,i+1,j+1);
-      fprintf(fp,"V 11.%d.%d.1	DRX_CONFIG_%d_%d_FREQ		0	f4r	f4r\n",i+1,j+1,i+1,j+1);
+      fprintf(fp,"V 11.%d.%d.1	DRX_CONFIG_%d_%d_FREQ		0	f8r	f8r\n",i+1,j+1,i+1,j+1);
       fprintf(fp,"V 11.%d.%d.2	DRX_CONFIG_%d_%d_FILTER		0	i2ur	i2ur\n",i+1,j+1,i+1,j+1);
       fprintf(fp,"V 11.%d.%d.3	DRX_CONFIG_%d_%d_GAIN		0	i2ur	i2ur\n",i+1,j+1,i+1,j+1);
       }
