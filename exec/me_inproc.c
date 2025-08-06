@@ -517,8 +517,8 @@ int main ( int narg, char *argv[] ) {
               /* =-1 means we saw an illegal (probably unimplemented) observation mode request */
               /* =1 means we saw a DIAG1 observation request */
 
-  long int dp_cmd_mjd;
-  long int dp_cmd_mpm;
+  long int ndp_cmd_mjd;
+  long int ndp_cmd_mpm;
   long int t0;
   int b4bits;
   unsigned long int tuning_mask;
@@ -968,7 +968,7 @@ int main ( int narg, char *argv[] ) {
               if (osf.SESSION_DRX_BEAM<ME_MAX_NDPOUT) {
                   dr_length_ms = ssf.SESSION_DUR; /* beam obs are recorded contiguously in one session */
                 } else {
-                  dr_length_ms = osf.OBS_DUR; /* each TBN/TBW observation is a separate recording */ 
+                  dr_length_ms = osf.OBS_DUR; /* each TBS/TBT observation is a separate recording */ 
                 }
               strcpy(dr_format,""); 
               switch (osf.OBS_MODE) {
@@ -1081,7 +1081,7 @@ int main ( int narg, char *argv[] ) {
             /* NDP commands neet to be sent in first 80% of slot N-2, given start time in slot N */
             me_timecalc( osf.OBS_START_MJD, osf.OBS_START_MPM, /* calc time to send command to DP */
                         -2000,
-                         &dp_cmd_mjd, &dp_cmd_mpm );  
+                         &ndp_cmd_mjd, &ndp_cmd_mpm );  
 
             switch (osf.OBS_MODE) {
               case LWA_OM_TBT:
@@ -1093,7 +1093,7 @@ int main ( int narg, char *argv[] ) {
                 tuning_mask = (unsigned long int) 255;
                 
                 /* Build up the TBT command */
-                LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+5000 );	// TBF needs a bit for the ADP buffers to flush
+                LWA_time2tv( &(cs[ncs].action.tv), ndp_cmd_mjd, ndp_cmd_mpm+5000 );	// TBT needs a bit for the NDP buffers to flush
                 cs[ncs].action.bASAP = 0;                   
                 cs[ncs].action.sid = LWA_SID_NDP;  
                 cs[ncs].action.cid = LWA_CMD_TBT;  
@@ -1104,23 +1104,10 @@ int main ( int narg, char *argv[] ) {
 
                 break; /* LWA_OM_TBT */
 
-//  /* if TBW, now tell DP to start.  It will take a couple seconds before it gets going, so */
-//  /* make sure DP record time is long enough to account for this! */
-//  if (!strncmp(mode,"TBW",3)) {
-//    sprintf(data,"%d 0 %ld",b4bits,nsamp);
-//    err = mesi( NULL, "DP_", "TBW", data, "today", "asap", &reference );
-//    if (err!=MESI_ERR_OK) {
-//      printf("[%d/%d] FATAL: mesi(NULL,'DP_','REC',...) returned code %d\n",ME_MEOS,getpid(),err);  
-//      eResult += MEOS_ERR_DP_TBX;
-//      return eResult;  
-//      } 
-//    printf("[%d/%d] DP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
-//    }
-
               case LWA_OM_TBS:
 
                 /* construct the command */ 
-                LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
+                LWA_time2tv( &(cs[ncs].action.tv), ndp_cmd_mjd, ndp_cmd_mpm );
                 cs[ncs].action.bASAP = 0; 
                 cs[ncs].action.sid = LWA_SID_NDP;
                 cs[ncs].action.cid = LWA_CMD_TBS;  
@@ -1138,7 +1125,7 @@ int main ( int narg, char *argv[] ) {
               case LWA_OM_TRK_LUN:
 
                 /* DRX trigger time is in units of "subslots" (1/100ths of a second) */
-                t0 = dp_cmd_mpm % 1000; /* number of ms beyond a second boundary */
+                t0 = ndp_cmd_mpm % 1000; /* number of ms beyond a second boundary */
                 t0 /= 10; if (t0>99) t0=99; /* now in subslots */
                 
                 //printf("debug: s.settings.drx_gain=%hd\n",s.settings.drx_gain);
@@ -1176,7 +1163,7 @@ int main ( int narg, char *argv[] ) {
                      (osf.OBS_BW != last_drx_bw1) || \
                      (gain1 != last_drx_gain1) || \
                      (osf.OBS_B != last_drx_high_dr1) ) {
-                  LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm );
+                  LWA_time2tv( &(cs[ncs].action.tv), ndp_cmd_mjd, ndp_cmd_mpm );
                   cs[ncs].action.bASAP = 0;
                   cs[ncs].action.tv.tv_sec -= 2; /* Must be sent in slot N-4 instead of N-2 */
                   cs[ncs].action.sid = LWA_SID_NDP;
@@ -1204,7 +1191,7 @@ int main ( int narg, char *argv[] ) {
                        (osf.OBS_BW != last_drx_bw2) || \
                        (gain2 != last_drx_gain2) || \
                        (osf.OBS_B != last_drx_high_dr2) ) ) {
-                  LWA_time2tv( &(cs[ncs].action.tv), dp_cmd_mjd, dp_cmd_mpm+10 ); /* staggering send times for DP commands by 10 ms */
+                  LWA_time2tv( &(cs[ncs].action.tv), ndp_cmd_mjd, ndp_cmd_mpm+10 ); /* staggering send times for DP commands by 10 ms */
                   cs[ncs].action.bASAP = 0;                   
                   cs[ncs].action.tv.tv_sec -= 2; /* Must be sent in slot N-4 instead of N-2 */
                   cs[ncs].action.sid = LWA_SID_NDP;
@@ -1385,9 +1372,7 @@ int main ( int narg, char *argv[] ) {
 //  signed short int   OBS_ASP_AT1[LWA_MAX_NSTD];
 //  signed short int   OBS_ASP_AT2[LWA_MAX_NSTD];
 //  signed short int   OBS_ASP_ATS[LWA_MAX_NSTD];
-//  unsigned short int OBS_TBW_BITS;
-//  unsigned int       OBS_TBW_SAMPLES;
-//  signed short int   OBS_TBN_GAIN;
+//  unsigned int       OBS_TBT_SAMPLES;
 //  signed short int   OBS_DRX_GAIN;
 
           /*******************************************************/

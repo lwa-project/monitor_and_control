@@ -14,13 +14,13 @@
 
 /* error codes returned by meos() */
 #define MEOS_ERR_OK                             0 /* OK */
-#define MEOS_ERR_INVALID_MODE                   1 /* invalid mode (i.e., not TBW, TBN, or DRX) specified */
+#define MEOS_ERR_INVALID_MODE                   1 /* invalid mode (i.e., not TBT, TBS, or DRX) specified */
 #define MEOS_ERR_MESI_MCSS                      2 /* MCS/Scheduler not responding as expected */
 #define MEOS_ERR_BSA_DP                         4 /* me_bSubsystemAlive("DP_") failed */
 #define MEOS_ERR_BSA_DR                         8 /* me_bSubsystemAlive("DR#") failed */
 #define MEOS_ERR_DR_INI			       16 /* DR# INI failed */
 #define MEOS_ERR_DR_REC                        32 /* attempt to send DR# REC command failed */
-#define MEOS_ERR_DP_TBX                        64 /* attempt to send DP_ TBW, TBN, or DRX command failed */
+#define MEOS_ERR_DP_TBX                        64 /* attempt to send DP_ TBT, TBS, or DRX command failed */
 #define MEOS_ERR_DR_OPTYPE_FAIL               128 /* memdre() returned an error when asked for OP-TYPE */
 #define MEOS_ERR_DR_DIR_FAIL                  256 /* problem getting DIRECTORY-COUNT or DIRECTORY-ENTRY-# */
 #define MEOS_ERR_DR_CPY_FAIL                  512 /* problem doing DR# CPY */
@@ -29,8 +29,8 @@
 /* other parameters which affect operation */
 #define MEOS_DR_START_DELAY_MS         5000 /* [ms] how far in the future [ms] to start DR recording */
                                             /* Chris Wolfe says this must be > 2.5 s */
-#define MEOS_DR_LENGTH_MS_TBW         75000 /* [ms] how long to record, for TBW (takes a long time to read out) */
-                                            /* This is 60s for TBW readout, plus a comfortable margin to account */
+#define MEOS_DR_LENGTH_MS_TBT         75000 /* [ms] how long to record, for TBT (takes a long time to read out) */
+                                            /* This is 60s for TBT readout, plus a comfortable margin to account */
                                             /* for the simplistic sync scheme employed here */
 #define MEOS_DR_MIB_UPDATE_DELAY_US 3000000 /* [us] how long to wait for a MIB entry to update after RPT issued */
 
@@ -116,7 +116,7 @@ int meos (
     //printf("[%d/%d] args='%s'\n",ME_MEOS,getpid(),args);
     sscanf(args,"%f %d %ld",&tbs_f,&tbs_r,&tbs_d);
     printf("[%d/%d] mode='%s', f=%f, r=%d, d=%ld [ms]\n",ME_MEOS,getpid(),mode,tbs_f,tbs_r,tbs_d);
-    sprintf(dr_format,"TBN");
+    sprintf(dr_format,"TBS");
     bDone=1;
     }
   if (!strncmp(mode,"DRX",3)) {
@@ -182,7 +182,7 @@ int meos (
     dr_start_mjd += 1;
     dr_start_mpm -= (24*3600*1000); 
     }
-  dr_length_ms = MEOS_DR_LENGTH_MS_TBW;
+  dr_length_ms = MEOS_DR_LENGTH_MS_TBT;
   if (!strncmp(mode,"TBS",3)) {
     dr_length_ms = tbs_d; 
     }
@@ -190,7 +190,7 @@ int meos (
     dr_length_ms = drx_d; 
     }
 
-  /* if TBN, then we want to start DP first (since this mode runs continuously), and then DR */
+  /* if TBS, then we want to start NDP first (since this mode runs continuously), and then DR */
   if (!strncmp(mode,"TBS",3)) {
     sprintf(data,"%8.0f %d",tbs_f,tbs_r);
     err = mesi( NULL, "NDP", "TBS", data, "today", "asap", &reference );
@@ -203,7 +203,7 @@ int meos (
     printf("[%d/%d] NDP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
     }
 
-  /* if DRX, we assume DP is already running; so above procedure (for TBN) is not necessary */
+  /* if DRX, we assume NDP is already running; so above procedure (for TBS) is not necessary */
 
   /* Send DR# REC command */
   sprintf(data,"%06ld %09ld %09ld %s",dr_start_mjd,dr_start_mpm,dr_length_ms,dr_format);

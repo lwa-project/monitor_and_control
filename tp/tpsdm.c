@@ -265,7 +265,7 @@ int main ( int narg, char *argv[] ) {
                     printf("MCS: MRP=%hd MUP=%hd",  s.settings.mrp_mcs,  s.settings.mup_mcs);
       if (!bStatic) printf(  " | MRP=%hd MUP=%hd",sdm.settings.mrp_mcs,sdm.settings.mup_mcs);
       printf("\n");   
-      printf("key: (for TBN_GAIN, DRX_GAIN, and MRP/MUP lines)\n"); 
+      printf("key: (for DRX_GAIN and MRP/MUP lines)\n"); 
       printf("  static values"); if (!bStatic) printf(" | dynamic values");
       printf("\n");
       break;

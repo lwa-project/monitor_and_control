@@ -3,7 +3,7 @@
 // COMPILE: gcc -o tpms tpms.c -I../common
 // ---
 // COMMAND LINE: ./tpms <mode> <dt> <arg3> <arg4>
-//   <mode> is one of "DIAG1", "TBN", "TBW", "TRK_RADEC", etc. from MCS0030
+//   <mode> is one of "DIAG1", "TBS", "TBT", "TRK_RADEC", etc. from MCS0030
 //   <dt> is integer number of seconds from current time at which to initiate session;
 //     will round up to the nearest whole second
 //   <arg3>, <arg4>, etc. depend on <mode>.  Here they are:
@@ -38,7 +38,6 @@
 //                (OBS_BW is assumed to be 8 (200 kSPS) 
 //     TBT:       arg3> OBS_DUR [ms], integer.  DEFAULT is 10000.
 //                (TBT_TUNING_MASK is assumed to be 255 (maximum bandwidth) 
-//     TBW:       <arg3> OBS_DUR [ms], integer.  DEFAULT is 10000.
 //     DIAG1:     (none)
 // ---
 // REQUIRES: 
@@ -250,7 +249,7 @@ int main ( int narg, char *argv[] ) {
   switch (eMode) {
     case LWA_OM_DIAG1:
       break;
-    case LWA_OM_TBN:
+    case LWA_OM_TBS:
       fprintf(fp,"OBS_FREQ1      %ld\n",iFreq);
       //fprintf(fp,"OBS_FREQ1+     19.999999955 MHz\n");
       fprintf(fp,"OBS_BW         8\n");
