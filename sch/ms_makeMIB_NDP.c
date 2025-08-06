@@ -65,8 +65,8 @@ main ( int narg, char *argv[] ) {
   fprintf(fp,"B 0.5           MCS_TBS_CONFIG 		NUL 	NUL 	NUL\n");
   fprintf(fp,"V 0.5.1         MCS_TBS_FREQ                0.000\ta12     NUL\n");
   fprintf(fp,"V 0.5.2         MCS_TBS_BW 		          0 	  a1 	NUL\n",i+1,i+1); 
-  fprintf(fp,"V 0.5.3         MCS_TBN_REFERENCE           0       a9      NUL\n");
-  fprintf(fp,"V 0.5.4         MCS_TBN_CMD_SENT_MPM        0       a9      NUL\n");
+  fprintf(fp,"V 0.5.3         MCS_TBS_REFERENCE           0       a9      NUL\n");
+  fprintf(fp,"V 0.5.4         MCS_TBS_CMD_SENT_MPM        0       a9      NUL\n");
   
   fprintf(fp,"B 0.6           MCS_COR_CONFIG		NUL 	NUL 	NUL\n");
   fprintf(fp,"V 0.6.1         MCS_COR_NAVG                0      a10      NUL\n");
