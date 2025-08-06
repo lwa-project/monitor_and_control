@@ -27,14 +27,13 @@ int LWA_mibupdate_NDP(
 
   unsigned char uc;
   unsigned short int usi;
-  char tbf_bits[3];
   unsigned int ui; 
   signed int si;
   unsigned long int uli;
-  char tbf_trig_time[10];
-  char tbf_samples[10];
+  char tbt_trig_time[10];
+  char tbt_samples[10];
   unsigned long int ul;
-  char tbf_tuning_mask[21];
+  char tbt_tuning_mask[21];
 
   char sData[13];
   long int mjd, mpm;
@@ -68,7 +67,7 @@ int LWA_mibupdate_NDP(
 
     case LWA_CMD_TBT:
       /* When we get an "A" in response to the TBT command, use LWA_mibupdate_RPT() */
-      /* to update the corresponding non-ICD (i.e., added by me) MIB entries TBF_TRIG_TIME,
+      /* to update the corresponding non-ICD (i.e., added by me) MIB entries TBT_TRIG_TIME,
       /* TBT_SAMPLES, TBT_TUNING_MASK, TBT_REFERENCE, and TBT_CMD_SENT_MPM */
 
       //Looking at cmdata:
@@ -82,28 +81,28 @@ int LWA_mibupdate_NDP(
       memset(&si,0,4);
         memcpy(&si,cmdata+0,4);
         //sprintf(tbw_trig_time,"%9u",ui);
-        sprintf(tbf_trig_time,"%9d",LWA_i4s_swap(si));
+        sprintf(tbt_trig_time,"%9d",LWA_i4s_swap(si));
         //printf("ABC: <%u> <%u> <%s>\n",ui,LWA_i4u_swap(ui),tbw_trig_time);
       memset(&si,0,4);
         memcpy(&si,cmdata+4,4);
         //sprintf(tbw_samples,"%8u",ui);
-        sprintf(tbf_samples,"%9d",LWA_i4s_swap(si));
+        sprintf(tbt_samples,"%9d",LWA_i4s_swap(si));
         //printf("ABC: <%u> <%u> <%s>\n",ui,LWA_i4u_swap(ui),tbw_samples);
       memset(&uli,0,8);
         memcpy(&uli,cmdata+8,8);
         //sprintf(tbw_tuning_mask,"%20u",uli);
-        sprintf(tbf_tuning_mask,"%20d",LWA_i8u_swap(uli));
+        sprintf(tbt_tuning_mask,"%20d",LWA_i8u_swap(uli));
 
       /* updating the MIB using the LWA_mibupdate_RPT() function */
 
       sprintf(sMIBlabel,"MCS_TBT_TRIG_TIME");
-      eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbf_trig_time, -1 );
+      eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbt_trig_time, -1 );
 
       sprintf(sMIBlabel,"MCS_TBT_SAMPLES");
-      eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbf_samples, -1 );
+      eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbt_samples, -1 );
 
       sprintf(sMIBlabel,"MCS_TBT_TUNING_MASK");
-      eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbf_tuning_mask, -1 );
+      eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, tbt_tuning_mask, -1 );
       
       sprintf(sMIBlabel,"MCS_TBT_REFERENCE");
       sprintf(sData,"%9ld",ref);

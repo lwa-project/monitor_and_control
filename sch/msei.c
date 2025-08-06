@@ -249,12 +249,12 @@ int main ( int narg, char *argv[] ) {
          bError=0;
          if (narg>3) {
             bError=1;
-            bError &= strncmp(argv[3], "TBF",  3);
+            bError &= strncmp(argv[3], "TBS",  3);
             bError &= strncmp(argv[3], "BEAM", 4);
             bError &= strncmp(argv[3], "COR",  3);
          } else {bError=1;}
          if (bError) {
-           printf("[%s] FATAL: %s/%s arg is one of TBT|TBS|BEAM#|COR (string)\n",ME,dest,cmd);
+           printf("[%s] FATAL: %s/%s arg is one of TBS|BEAM#|COR (string)\n",ME,dest,cmd);
            return;
            }
          c.datalen=-1;

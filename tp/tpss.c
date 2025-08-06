@@ -175,7 +175,7 @@ int main ( int narg, char *argv[] ) {
   char msg[1024];
   int err_max, i_max;
 
-  long int t_tbw;
+  long int t_tbt;
 
   FILE *fp;
   char ssfname[256];
@@ -332,7 +332,7 @@ int main ( int narg, char *argv[] ) {
   for (n=1;n<=nobs;n++) {
     if ( (obs[n].OBS_DUR==0) && ( ! ( (obs[n].OBS_MODE==LWA_OM_TBT)     || 
                                       (obs[n].OBS_MODE==LWA_OM_DIAG1)     ) ) )  {
-      printf("[%d/%d] FATAL: obs[%d].OBS_DUR==0 for a mode other than TBF or DIAG\n",MT_TPSS,getpid(),n);
+      printf("[%d/%d] FATAL: obs[%d].OBS_DUR==0 for a mode other than TBT or DIAG\n",MT_TPSS,getpid(),n);
       exit(EXIT_FAILURE);
       }
     if ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) && (obs[n].OBS_RA<0) ) {
@@ -347,7 +347,7 @@ int main ( int narg, char *argv[] ) {
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_LUN  )   ) && (obs[n].OBS_FREQ1<222417950) ) {
-      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, TRK_LUN, or TBN\n",MT_TPSS,getpid(),n);
+      printf("[%d/%d] FATAL: obs[%d].OBS_FREQ1 invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, or TRK_LUN\n",MT_TPSS,getpid(),n);
       exit(EXIT_FAILURE);
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
@@ -361,9 +361,8 @@ int main ( int narg, char *argv[] ) {
            (obs[n].OBS_MODE==LWA_OM_TRK_SOL  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_JOV  ) ||
            (obs[n].OBS_MODE==LWA_OM_TRK_LUN  ) ||
-           (obs[n].OBS_MODE==LWA_OM_TBT      ) ||
            (obs[n].OBS_MODE==LWA_OM_TBS      )    ) && (obs[n].OBS_BW<=0) ) {
-      printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, TRK_LUN, or TBN\n",MT_TPSS,getpid(),n);
+      printf("[%d/%d] FATAL: obs[%d].OBS_BW invalid while mode is TRK_RADEC, TRK_SOL, TRK_JOV, TRK_LUN, or TBS\n",MT_TPSS,getpid(),n);
       exit(EXIT_FAILURE);
       }
     if ( ( (obs[n].OBS_MODE==LWA_OM_TRK_RADEC) ||
@@ -393,7 +392,7 @@ int main ( int narg, char *argv[] ) {
          (obs[n].OBS_MODE==LWA_OM_STEPPED  )   ) b_DRX_requested = 1;
     }
   if ( b_TB_requested && b_DRX_requested ) {
-    printf("[%d/%d] FATAL: Sessions cannot mix TBW/TBN with other observing modes\n",MT_TPSS,getpid());
+    printf("[%d/%d] FATAL: Sessions cannot mix TBT/TBS with other observing modes\n",MT_TPSS,getpid());
     exit(EXIT_FAILURE);
     }
     
@@ -402,14 +401,11 @@ int main ( int narg, char *argv[] ) {
    /* if mode = TBT, OBS_DUR needs to be computed */
   for (n=1;n<=nobs;n++) {
     if (obs[n].OBS_MODE==LWA_OM_TBT) {
-      t_tbw = ( obs[n].OBS_TBT_SAMPLES / 196000 ) +1; /* convert samples to ms */
-      t_tbw *= TBT_INVERSE_DUTY_CYCLE;                /* account for read-out time after triggering (~100:1) */
-      if( obs[n].OBS_FREQ2 != 0 ) {
-        t_tbw *= 2;                                   /* account for the second tuning, if used */
-        }
-      t_tbw += 5000;                                  /* account for the buffer fill lag */
-      obs[n].OBS_DUR = t_tbw;
-      printf("[%d/%d] Computed obs[%d].OBS_DUR = %ld [ms] for this TBF observation\n",MT_TPSS,getpid(),n,obs[n].OBS_DUR);
+      t_tbt = ( obs[n].OBS_TBT_SAMPLES / 196000 ) +1; /* convert samples to ms */
+      t_tbt *= TBT_INVERSE_DUTY_CYCLE;                /* account for read-out time after triggering (~100:1) */
+      t_tbt += 5000;                                  /* account for the buffer fill lag */
+      obs[n].OBS_DUR = t_tbt;
+      printf("[%d/%d] Computed obs[%d].OBS_DUR = %ld [ms] for this TBT observation\n",MT_TPSS,getpid(),n,obs[n].OBS_DUR);
       }
     }
 
