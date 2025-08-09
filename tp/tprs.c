@@ -141,8 +141,8 @@ int main ( int narg, char *argv[] ) {
   int iRPD;
   int iSEP;
   int iARB;
-  int iDP1;
-  int iDP2;
+  int iSNP;
+  int iSVR;
   int iDR;
   int iRack;
   int iPort;
