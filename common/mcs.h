@@ -647,7 +647,7 @@ double LWA_f8_swap( double x ) {
 #define ME_MAX_NSNAP 16
 #define ME_MAX_NSERVER 5
 #define ME_MAX_FEEID_LENGTH 10
-#define ME_MAX_RACK 6
+#define ME_MAX_RACK 8
 #define ME_MAX_PORT 50
 #define ME_MAX_RPDID_LENGTH 25
 #define ME_MAX_SEPID_LENGTH 25
