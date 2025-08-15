@@ -13,6 +13,8 @@
 // See end of this file for history.
 
 #include <stdlib.h>
+#include <unistd.h>
+#include <limits.h>
 
 #include "me.h"
 
@@ -106,9 +108,26 @@ int main ( int narg, char *argv[] ) {
   me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 ); 
   bFlg_NoSch = ( flagset & ME_FLAG_NO_SCH ) != 0;
 
-  /*================================*/
+  /*=========================*/
+  /*=== Set the host file ===*/
+  /*=========================*/
+  char hostname[HOST_NAME_MAX+1];
+  FILE* fp;
+  printf("[%d/%d] Recording MCS hostname...\n",ME_INIT,getpid());
+  if (gethostname(hostname, HOST_NAME_MAX) == 0) {
+      fp = fopen("state/mcs.host", "w");
+      if (fp != NULL) {
+          fprintf(fp, "%s", hostname);
+      }
+      fclose(fp);
+  } else {
+      printf("[%d/%d] me_init: WARNING: failed to record MCS hostname\n",ME_INIT,getpid());
+      me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: WARNING: failed to record MCS hostname", sq_ptr, 0 );
+  }
+
+  /*=================================*/
   /*=== Copying ssmif.dat from TP ===*/
-  /*================================*/
+  /*=================================*/
   printf("[%d/%d] Copying ssmif.dat from TP...\n",ME_INIT,getpid());
   me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: Copying ssmif.dat from TP...", sq_ptr, 0 );
   sprintf(cmd, "scp %s:%s/ssmif.dat state/.",LWA_TP_SCP_ADDR,LWA_TP_SCP_DIR);

@@ -11,8 +11,6 @@
 // See end of this file for history.
 
 #include <stdlib.h>
-#include <unistd.h>
-#include <limits.h>
 
 #include "me.h"
 #include <dirent.h> /* this is listing files in a directory */
@@ -201,21 +199,12 @@ int main ( int narg, char *argv[] ) {
         /* moving files into temp directory */
         sprintf(cmd,"mv sinbox/%s_%04d* tpcom/temp/.",om.ssf.PROJECT_ID,om.ssf.SESSION_ID);
         system(cmd);
+        system("cp state/mcs.host tpcom/temp/.");
         system("cp state/mindelay.txt tpcom/temp/.");
         if (om.ssf.SESSION_INC_SMIB==1) system("cp state/ssmif.dat tpcom/temp/.");
         system("cp state/sdm.dat tpcom/temp/dynamic/.");
         if (om.ssf.SESSION_LOG_EXE==1)  system("cp state/meelog.txt tpcom/temp/dynamic/.");
         
-        /* save the hostname to help figure out where this came from */
-        char hostname[HOST_NAME_MAX+1];
-        if (gethostname(hostname, HOST_NAME_MAX) == 0) {
-            fp = fopen("tpcom/temp/mcs.host", "w");
-            if (fp != NULL) {
-                fprintf(fp, "%s", hostname);
-            }
-            fclose(fp);
-        }
-
         /* making zip file & moving it into soutbox */
         //sprintf(cmd,"cd %s/temp; tar -zcvf temp.tgz .; mv temp.tgz ../%s_%04d.tgz; cd ../.. 2> /dev/null", 
         sprintf(cmd,"cd tpcom/temp; tar -zcf ../../soutbox/%s_%04d.tgz *; cd ../..",
