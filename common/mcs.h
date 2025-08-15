@@ -70,7 +70,7 @@ extern "C" {
 /* =============================================== */
 
 #define LWA_ASP_OP_TIME_MS 1000            /* assumed time [ms] for ASP to do one operation safely */
-#define LWA_SESS_DRDP_INIT_TIME_MS 5000    /* time [ms] to allow for DP+DR initialization at start of session */
+#define LWA_SESS_DRNDP_INIT_TIME_MS 5000    /* time [ms] to allow for NDP+DR initialization at start of session */
 #define LWA_SESS_GUARD_TIME_MS 5000        /* time [ms] to allow at end of session to avoid stomping on next session */
 
 #define MIB_REC_TYPE_BRANCH 0 
@@ -209,13 +209,13 @@ char *LWA_saysum( int sidsum ) {
 #define LWA_SID_MCS 10 /* MCS */
 #define LWA_SID_SHL 11 /* SHL (shelter) */
 #define LWA_SID_ASP 12 /* ASP */
-#define LWA_SID_DP_ 13 /* DP */
+#define LWA_SID_DP_ 13 /* DP - Obsolete */
 #define LWA_SID_DR1 14 /* MCS-DR #1 */
 #define LWA_SID_DR2 15 /* MCS-DR #2 */
 #define LWA_SID_DR3 16 /* MCS-DR #3 */
 #define LWA_SID_DR4 17 /* MCS-DR #4 */
 #define LWA_SID_DR5 18 /* MCS-DR #5 */
-#define LWA_SID_ADP 19 /* ADP */
+#define LWA_SID_ADP 19 /* ADP - Obsolete */
 #define LWA_SID_NDP 20 /* NDP */
 /* When adding subsystems, remember to change LWA_MAX_SID ! */
 
@@ -279,7 +279,7 @@ char *LWA_sid2str( int sid ) {
 #define LWA_CMD_PNG      1 /* PNG */
 #define LWA_CMD_RPT      2 /* RPT */
 #define LWA_CMD_SHT      3 /* SHT */
-#define LWA_CMD_INI      4 /* INI (SHL,ASP,DP_,DR#,ADP,NDP) */
+#define LWA_CMD_INI      4 /* INI (SHL,ASP,NDP,DR#) */
 #define LWA_CMD_TMP      5 /* TMP (SHL) */
 #define LWA_CMD_DIF      6 /* DIF (SHL) */
 #define LWA_CMD_PWR      7 /* PWR (SHL) */
@@ -290,15 +290,15 @@ char *LWA_sid2str( int sid ) {
 #define LWA_CMD_FPW     12 /* FPW (ASP) */
 #define LWA_CMD_RXP     13 /* RXP (ASP) */
 #define LWA_CMD_FEP     14 /* FEP (ASP) */
-#define LWA_CMD_TBW     15 /* TBW (DP_) */
-#define LWA_CMD_TBN     16 /* TBN (DP_,ADP) */
-#define LWA_CMD_DRX     17 /* DRX (DP_,ADP,NDP) */
-#define LWA_CMD_BAM     18 /* BAM (DP_,ADP,NDP) */
-#define LWA_CMD_FST     19 /* FST (DP_) */
-#define LWA_CMD_CLK     20 /* CLK (DP_) */
+#define LWA_CMD_TBW     15 /* TBW (Obsolete) */
+#define LWA_CMD_TBN     16 /* TBN (Obsolete) */
+#define LWA_CMD_DRX     17 /* DRX (NDP) */
+#define LWA_CMD_BAM     18 /* BAM (NDP) */
+#define LWA_CMD_FST     19 /* FST (Obsolete) */
+#define LWA_CMD_CLK     20 /* CLK (Obsolete) */
 #define LWA_CMD_REC     21 /* REC (DR#) */
 #define LWA_CMD_DEL     22 /* DEL (DR#) */
-#define LWA_CMD_STP     23 /* STP (DR#,DP_,ADP,NDP) */
+#define LWA_CMD_STP     23 /* STP (DR#,NDP) */
 #define LWA_CMD_GET     24 /* GET (DR#) */
 #define LWA_CMD_CPY     25 /* CPY (DR#) */
 #define LWA_CMD_DMP     26 /* DMP (DR#) */
@@ -315,8 +315,8 @@ char *LWA_sid2str( int sid ) {
 #define LWA_CMD_OBS     37 /* (MCS) observation start  */
 #define LWA_CMD_OBE     38 /* (MCS) observation end */
 #define LWA_CMD_SPC     39 /* SPC (DR#) */
-#define LWA_CMD_TBF     40 /* TBF (ADP) */
-#define LWA_CMD_COR     41 /* COR (ADP,NDP) */
+#define LWA_CMD_TBF     40 /* TBF (Obsolete) */
+#define LWA_CMD_COR     41 /* COR (NDP) */
 #define LWA_CMD_TBT     42 /* TBT (NDP) */
 #define LWA_CMD_TBS     43 /* TBS (NDP) */
 

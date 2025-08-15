@@ -210,7 +210,7 @@ int me_beamspec( char *cs_filename,
 
         } /* if (data[3]!="c") */
 
-      } /* if ((action.sid==LWA_SID_DP_) && (action.cid==LWA_CMD_BAM)) */
+      } /* if ((action.sid==LWA_SID_NDP) && (action.cid==LWA_CMD_BAM)) */
 
     } /* while ( fread( */
 
@@ -887,7 +887,7 @@ int main ( int narg, char *argv[] ) {
             // SESSION_START_MJD;
             // SESSION_START_MPM;
             // SESSION_MRP_ASP;
-            // SESSION_MRP_DP_;
+            // SESSION_MRP_NDP;
             // SESSION_MRP_DR1;
             // SESSION_MRP_DR2;
             // SESSION_MRP_DR3;
@@ -896,7 +896,7 @@ int main ( int narg, char *argv[] ) {
             // SESSION_MRP_SHL;
             // SESSION_MRP_MCS;
             // SESSION_MUP_ASP;
-            // SESSION_MUP_DP_;
+            // SESSION_MUP_NDP;
             // SESSION_MUP_DR1;
             // SESSION_MUP_DR2;
             // SESSION_MUP_DR3;
@@ -1018,7 +1018,7 @@ int main ( int narg, char *argv[] ) {
 
               /* Figure out when to send command to DR */
               me_timecalc( osf.OBS_START_MJD, osf.OBS_START_MPM, /* calc time to send command to DR */
-                          -LWA_SESS_DRDP_INIT_TIME_MS,
+                          -LWA_SESS_DRNDP_INIT_TIME_MS,
                            &mjd, &mpm );  
               LWA_time2tv( &tv, mjd, mpm );
 
@@ -1298,11 +1298,7 @@ int main ( int narg, char *argv[] ) {
                     cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2;
                     cs[ncs].action.tv.tv_usec = 20000; /* staggering send times for DP commands by 10 ms */
                     cs[ncs].action.bASAP = 0;
-                    #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
                     cs[ncs].action.sid = LWA_SID_NDP;
-                    #else
-                    cs[ncs].action.sid = LWA_SID_DP_; 
-                    #endif 
                     cs[ncs].action.cid = LWA_CMD_BAM; 
                     sprintf( cs[ncs].data, "%hd %s %s %ld",
                                     osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
@@ -1577,11 +1573,7 @@ int main ( int narg, char *argv[] ) {
               cs[ncs].action.tv.tv_sec  = tv.tv_sec - 2; /* Must be sent in first 80% of slot N-2 */
               cs[ncs].action.tv.tv_usec = 20000;         /* staggering send times for DP commands by 10 ms */
               cs[ncs].action.bASAP = 0;
-              #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
               cs[ncs].action.sid = LWA_SID_NDP;
-              #else
-              cs[ncs].action.sid = LWA_SID_DP_;  
-              #endif
               cs[ncs].action.cid = LWA_CMD_BAM; 
               sprintf( cs[ncs].data, "%hd %s %s %ld",
                                       osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)

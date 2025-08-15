@@ -862,7 +862,7 @@ int me_write_mess( struct ssmif_struct s,
 //Format of schedule file: (mess.dat)
 //line 0 is MCS_CRA
 //line 1 is n n n n n (state of functioning beams 1-5, based on SSMIF)
-//Each line is a session, sorted by Start MJD, Start MPM, then DP_output
+//Each line is a session, sorted by Start MJD, Start MPM, then NDP_output
 //StartMJD/MPM, NDP-output# (1-5), DURATION, CRA, PROJECTID/SESSION_ID
 
 /*******************************************************************/

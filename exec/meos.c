@@ -16,11 +16,11 @@
 #define MEOS_ERR_OK                             0 /* OK */
 #define MEOS_ERR_INVALID_MODE                   1 /* invalid mode (i.e., not TBT, TBS, or DRX) specified */
 #define MEOS_ERR_MESI_MCSS                      2 /* MCS/Scheduler not responding as expected */
-#define MEOS_ERR_BSA_DP                         4 /* me_bSubsystemAlive("DP_") failed */
+#define MEOS_ERR_BSA_NDP                        4 /* me_bSubsystemAlive("NDP") failed */
 #define MEOS_ERR_BSA_DR                         8 /* me_bSubsystemAlive("DR#") failed */
-#define MEOS_ERR_DR_INI			       16 /* DR# INI failed */
+#define MEOS_ERR_DR_INI                        16 /* DR# INI failed */
 #define MEOS_ERR_DR_REC                        32 /* attempt to send DR# REC command failed */
-#define MEOS_ERR_DP_TBX                        64 /* attempt to send DP_ TBT, TBS, or DRX command failed */
+#define MEOS_ERR_NDP_TBX                       64 /* attempt to send NDP TBT, TBS, or DRX command failed */
 #define MEOS_ERR_DR_OPTYPE_FAIL               128 /* memdre() returned an error when asked for OP-TYPE */
 #define MEOS_ERR_DR_DIR_FAIL                  256 /* problem getting DIRECTORY-COUNT or DIRECTORY-ENTRY-# */
 #define MEOS_ERR_DR_CPY_FAIL                  512 /* problem doing DR# CPY */
@@ -47,7 +47,7 @@ int meos (
                   /*                  e.g., "38000000 7 28 0 60000" */
                   /*         For DRX: "d" where d is duration [ms].  No other arguments are expected. */
                   /*                  It is assumed that appropriate FST, BAM, and DRX */
-                  /*                  commands have already been sent & that DP is ready to go */
+                  /*                  commands have already been sent & that NDP is ready to go */
   ) {
   /* Returns error code (one of MEOS_ERR_*) */
   /* Recording is written to file named <OP-TAG>_<nDR>.dat; e.g., 055468_000000008_1.dat */
@@ -144,14 +144,14 @@ int meos (
     return eResult;
     }
 
-  /* confirm that DP_ is responding */
-  //err = me_bSubsystemAlive("DP_");
+  /* confirm that NDP is responding */
+  //err = me_bSubsystemAlive("NDP");
   //if (err!=0) {
-  //  printf("[%d/%d] FATAL: ms_bSubsystemAlive('DP_') returned code %d\n",ME_MEOS,getpid(),err);
-  //  eResult += MEOS_ERR_BSA_DP;
+  //  printf("[%d/%d] FATAL: ms_bSubsystemAlive('NDP') returned code %d\n",ME_MEOS,getpid(),err);
+  //  eResult += MEOS_ERR_BSA_NDP;
   //  return eResult;
   //  }
-  //printf("[%d/%d] DP is responding NORMAL\n",ME_MEOS,getpid(),err);
+  //printf("[%d/%d] NDP is responding NORMAL\n",ME_MEOS,getpid(),err);
 
   /* confirm that DRn is responding */
   //err = me_bSubsystemAlive(sDR);
@@ -175,7 +175,7 @@ int meos (
   LWA_time( &mjd0, &mpm0 );  /* gets current time; returns MJD and MPM */
   printf("[%d/%d] LWA time is now %ld %ld\n",ME_MEOS,getpid(),mjd0,mpm0); 
   
-  /* figure out when to start DR and DP, and when acquisition should be done */
+  /* figure out when to start DR and NDP, and when acquisition should be done */
   dr_start_mjd = mjd0;
   dr_start_mpm = mpm0 + MEOS_DR_START_DELAY_MS;
   if ( dr_start_mpm > (24*3600*1000) ) { /* need to roll over into next day */
@@ -196,7 +196,7 @@ int meos (
     err = mesi( NULL, "NDP", "TBS", data, "today", "asap", &reference );
     if (err!=MESI_ERR_OK) {
       printf("[%d/%d] FATAL: mesi(NULL,'NDP','TBS',...) returned code %d\n",ME_MEOS,getpid(),err);  
-      eResult += MEOS_ERR_DP_TBX;
+      eResult += MEOS_ERR_NDP_TBX;
       return eResult;  
       } 
 
@@ -227,7 +227,7 @@ int meos (
     err = mesi( NULL, "NDP", "TBT", data, "today", "asap", &reference );
     if (err!=MESI_ERR_OK) {
       printf("[%d/%d] FATAL: mesi(NULL,'NDP','TBT',...) returned code %d\n",ME_MEOS,getpid(),err);  
-      eResult += MEOS_ERR_DP_TBX;
+      eResult += MEOS_ERR_NDP_TBX;
       return eResult;  
       } 
     printf("[%d/%d] NDP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );

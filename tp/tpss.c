@@ -441,8 +441,8 @@ int main ( int narg, char *argv[] ) {
 
   /* t0 = (start time of first observation) - (obs#1 ASP setup time) - (NDP+DR setup time) */
   LWA_time2tv( &t0, obs[1].OBS_START_MJD, obs[1].OBS_START_MPM ); /* t0 is now start time as a timeval */
-  LWA_timeadd( &t0,-obs[1].ASP_setup_time-LWA_SESS_DRDP_INIT_TIME_MS );
-  printf("[%d/%d] Time allocated for session DR+NDP setup is %d [ms]\n",MT_TPSS,getpid(),LWA_SESS_DRDP_INIT_TIME_MS);
+  LWA_timeadd( &t0,-obs[1].ASP_setup_time-LWA_SESS_DRNDP_INIT_TIME_MS );
+  printf("[%d/%d] Time allocated for session DR+NDP setup is %d [ms]\n",MT_TPSS,getpid(),LWA_SESS_DRNDP_INIT_TIME_MS);
   printf("[%d/%d] Time allocated for session ASP   setup is %ld [ms]\n",MT_TPSS,getpid(),obs[1].ASP_setup_time);
   LWA_timeval( &t0, &SESSION_START_MJD, &SESSION_START_MPM ); /* remember this (session start time */
   printf("[%d/%d] Session start will be MJD=%ld MPM=%ld\n",MT_TPSS,getpid(),SESSION_START_MJD,SESSION_START_MPM);
