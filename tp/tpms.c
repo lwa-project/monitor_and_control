@@ -144,12 +144,12 @@ int main ( int narg, char *argv[] ) {
     case LWA_OM_TBS:
       iDur=10000;      if (narg>=4) sscanf(argv[3],"%ld",&iDur);   
       iFreq=832697741; if (narg>=5) sscanf(argv[4],"%ld",&iFreq); 
-      printf("[%d/%d] INPUT: iDur=%ld\n",MT_TPMS,getpid(),iDur);
+      printf("[%d/%d] INPUT: iDur=%ld [ms]\n",MT_TPMS,getpid(),iDur);
       printf("[%d/%d] INPUT: iFreq=%ld\n",MT_TPMS,getpid(),iFreq);
       break;
     case LWA_OM_TBT:
       iDur=10000;      if (narg>=4) sscanf(argv[3],"%ld",&iDur);
-      printf("[%d/%d] INPUT: iDur=%ld\n",MT_TPMS,getpid(),iDur);
+      printf("[%d/%d] INPUT: iDur=%ld [ms]\n",MT_TPMS,getpid(),iDur);
       break;
     case LWA_OM_DIAG1:
       break;
