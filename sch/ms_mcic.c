@@ -665,10 +665,10 @@ int main ( int narg, char *argv[] ) {
        //printf("[%s/%d] Sending mq_msg.datalen = %d\n",ME,getpid(),mq_msg.datalen);
        //printf("[%s/%d] Sending mq_msg.cid = %d\n",ME,getpid(),mq_msg.cid); 
  
-       /* DP sends back raw binary in R-COMMENT when an RPT command for DP-specific info is accepted ("A"). */
+       /* NDP sends back raw binary in R-COMMENT when an RPT command for NDP-specific info is accepted ("A"). */
        /* (If RPT but not accepted, we get printable text; if not RPT, we get nothing) */
        /* To accomodate this, we convert the data field to a printable representation: */
-       if ( (mq_msg.sid==LWA_SID_DP_) && 
+       if ( (mq_msg.sid==LWA_SID_NDP) && 
             (mq_msg.cid==LWA_CMD_RPT) && 
             (!LWA_isMCSRSVD(cmdata)) &&
             (mq_msg.bAccept!=LWA_MSELOG_TP_FAIL_REJD) ) {
