@@ -136,6 +136,25 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
 
   } /* for n */
 
+    sprintf(keyword,"OBS_TBT_SAMPLES");  
+    obs[nobs].OBS_TBT_SAMPLES=19600000;  /* default values */
+    while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
+    switch (i) {
+      case TPSS_PL_KEYWORD_MATCH:    
+        printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
+        sscanf(data,"%ld",&(obs[nobs].OBS_TBT_SAMPLES));
+        printf("...converts to %ld\n",obs[nobs].OBS_TBT_SAMPLES);
+        if ( (obs[nobs].OBS_TBT_SAMPLES>392000000) ) {   
+          printf("[%d/%d] FATAL: OBS_TBT_SAMPLES out of range\n",MT_TPSS,getpid());  
+          exit(EXIT_FAILURE);
+          }
+        strcpy(data,"");   
+        break;
+      case TPSS_PL_EOF:                                                                                                        break;
+      case TPSS_PL_KEYWORD_MISMATCH:                                                                                           break;
+      case TPSS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: TPSS_PL_OVERLONG_LINE\n",MT_TPSS,getpid());    exit(EXIT_FAILURE); break;
+      }
+      
     sprintf(keyword,"OBS_DRX_GAIN");  obs[nobs].OBS_DRX_GAIN=-1; 
     while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
     switch (i) {

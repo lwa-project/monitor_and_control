@@ -16,8 +16,8 @@
 //                <arg7> OBS_STP_FREQ2[2] [tuning word].  DEFAULT is 1621569285 (73.999999990 MHz)
 //                <arg8> BW [filter code].  DEFAULT is 7.
 //     TRK_RADEC: <arg3> OBS_DUR [ms], integer.  DEFAULT is 10000.
-//                <arg4> RA [deg].  DEFAULT is 5.6
-//                <arg5> DEC [h].  DEFAULT is +22.0
+//                <arg4> RA [h].  DEFAULT is 5.6
+//                <arg5> DEC [deg].  DEFAULT is +22.0
 //                <arg6> FREQ1 [tuning word].  DEFAULT is  832697741 (37.999999997 MHz)
 //                <arg7> FREQ2 [tuning word].  DEFAULT is 1621569285 (73.999999990 MHz)
 //                <arg8> BW [filter code].  DEFAULT is 7.
@@ -205,18 +205,18 @@ int main ( int narg, char *argv[] ) {
   fp = fopen("tpms.out","w");
 
   /* write project/session sections */
-  fprintf(fp,"PI_ID          0\n");
-  fprintf(fp,"PI_NAME        Not_Specified\n");
+  fprintf(fp,"PI_ID           0\n");
+  fprintf(fp,"PI_NAME         Not_Specified\n");
   fprintf(fp,"\n");
-  fprintf(fp,"PROJECT_ID     TPMS0001\n");
-  fprintf(fp,"PROJECT_TITLE  tpms-generated SDF\n");
-  fprintf(fp,"PROJECT_REMPI  mode='%s', dt=%ld\n",sMode,dt);
-  fprintf(fp,"PROJECT_REMPO  (none)\n");
+  fprintf(fp,"PROJECT_ID      TPMS0001\n");
+  fprintf(fp,"PROJECT_TITLE   tpms-generated SDF\n");
+  fprintf(fp,"PROJECT_REMPI   mode='%s', dt=%ld\n",sMode,dt);
+  fprintf(fp,"PROJECT_REMPO   (none)\n");
   fprintf(fp,"\n");
-  fprintf(fp,"SESSION_ID     1\n");
-  fprintf(fp,"SESSION_TITLE  tpms-generated SDF\n");
-  fprintf(fp,"SESSION_REMPI  (none)\n");
-  fprintf(fp,"SESSION_REMPO  (none)\n");
+  fprintf(fp,"SESSION_ID      1\n");
+  fprintf(fp,"SESSION_TITLE   tpms-generated SDF\n");
+  fprintf(fp,"SESSION_REMPI   (none)\n");
+  fprintf(fp,"SESSION_REMPO   (none)\n");
 
   /* Specifying beam 1 for modes other than TBS or TBT */
   switch (eMode) {
@@ -224,71 +224,72 @@ int main ( int narg, char *argv[] ) {
     case LWA_OM_TBT:
       break;
     default:
-      fprintf(fp,"SESSION_DRX_BEAM  1\n");
+      fprintf(fp,"SESSION_DRX_BEAM   1\n");
       break;
     }
 
   /* write preface of observation section */
   fprintf(fp,"\n");
-  fprintf(fp,"OBS_ID         1\n");
-  fprintf(fp,"OBS_TITLE      tpms-generated %s observation\n",sMode);
-  //fprintf(fp,"OBS_TARGET     Observation 1 Target\n");
-  //fprintf(fp,"OBS_REMPI      Observation 1 REMPI\n");
-  //fprintf(fp,"OBS_REMPO      Observation 1 REMPO\n");
-  fprintf(fp,"OBS_START_MJD  %ld\n",mjd_start);
-  fprintf(fp,"OBS_START_MPM  %ld\n",mpm_start);
-  fprintf(fp,"OBS_START      %s\n",sPrettyTime);
+  fprintf(fp,"OBS_ID          1\n");
+  fprintf(fp,"OBS_TITLE       tpms-generated %s observation\n",sMode);
+  //fprintf(fp,"OBS_TARGET      Observation 1 Target\n");
+  //fprintf(fp,"OBS_REMPI       Observation 1 REMPI\n");
+  //fprintf(fp,"OBS_REMPO       Observation 1 REMPO\n");
+  fprintf(fp,"OBS_START_MJD   %ld\n",mjd_start);
+  fprintf(fp,"OBS_START_MPM   %ld\n",mpm_start);
+  fprintf(fp,"OBS_START       %s\n",sPrettyTime);
 
   /* OBS_DUR */
-  if (eMode!=LWA_OM_STEPPED) { fprintf(fp,"OBS_DUR        %ld\n",iDur); }
+  if (eMode!=LWA_OM_STEPPED && eMode!=LWA_OM_TBT) { fprintf(fp,"OBS_DUR         %ld\n",iDur); }
   //fprintf(fp,"OBS_DUR+       00:00:10.000\n"); 
 
   /* OBS_MODE */
-  fprintf(fp,"OBS_MODE       %s\n",sMode);  
+  fprintf(fp,"OBS_MODE        %s\n",sMode);  
 
   switch (eMode) {
     case LWA_OM_DIAG1:
       break;
     case LWA_OM_TBS:
-      fprintf(fp,"OBS_FREQ1      %ld\n",iFreq);
+      fprintf(fp,"OBS_FREQ1       %ld\n",iFreq);
       //fprintf(fp,"OBS_FREQ1+     19.999999955 MHz\n");
-      fprintf(fp,"OBS_BW         8\n");
-      fprintf(fp,"OBS_BW+        200 kSPS\n"); 
+      fprintf(fp,"OBS_BW          8\n");
+      fprintf(fp,"OBS_BW+         200 kSPS\n"); 
       break;
     case LWA_OM_TBT:
+      fprintf(fp,"OBS_TBT_SAMPLES %ld\n",iDur*196000);
       break;
     case LWA_OM_TRK_RADEC:
-      fprintf(fp,"OBS_RA         %6.3f\n",fRA);
-      fprintf(fp,"OBS_DEC        %+6.3f\n",fDEC);
-      fprintf(fp,"OBS_B          SIMPLE\n");
-      fprintf(fp,"OBS_FREQ1      %ld\n",iFreq);
-      //fprintf(fp,"OBS_FREQ1+     19.999999955 MHz\n");
-      fprintf(fp,"OBS_FREQ2      %ld\n",iFreq2);
-      //fprintf(fp,"OBS_FREQ2+     19.999999955 MHz\n");     
-      fprintf(fp,"OBS_BW         %d\n",iBW);
-      //fprintf(fp,"OBS_BW+        19.6 MSPS\n");
+      fprintf(fp,"OBS_RA          %6.3f\n",fRA);
+      fprintf(fp,"OBS_DEC         %+6.3f\n",fDEC);
+      fprintf(fp,"OBS_B           SIMPLE\n");
+      fprintf(fp,"OBS_FREQ1       %ld\n",iFreq);
+      //fprintf(fp,"OBS_FREQ1+      19.999999955 MHz\n");
+      fprintf(fp,"OBS_FREQ2       %ld\n",iFreq2);
+      //fprintf(fp,"OBS_FREQ2+      19.999999955 MHz\n");     
+      fprintf(fp,"OBS_BW          %d\n",iBW);
+      //fprintf(fp,"OBS_BW+         19.6 MSPS\n");
       break; 
     case LWA_OM_TRK_SOL:
     case LWA_OM_TRK_JOV:
     case LWA_OM_TRK_LUN:
-      fprintf(fp,"OBS_B          SIMPLE\n");
-      fprintf(fp,"OBS_FREQ1      %ld\n",iFreq);
-      //fprintf(fp,"OBS_FREQ1+     19.999999955 MHz\n");
-      fprintf(fp,"OBS_FREQ2      %ld\n",iFreq2);
-      //fprintf(fp,"OBS_FREQ2+     19.999999955 MHz\n");     
-      fprintf(fp,"OBS_BW         %d\n",iBW);
-      //fprintf(fp,"OBS_BW+        19.6 MSPS\n");
+      fprintf(fp,"OBS_B           SIMPLE\n");
+      fprintf(fp,"OBS_FREQ1       %ld\n",iFreq);
+      //fprintf(fp,"OBS_FREQ1+      19.999999955 MHz\n");
+      fprintf(fp,"OBS_FREQ2       %ld\n",iFreq2);
+      //fprintf(fp,"OBS_FREQ2+      19.999999955 MHz\n");     
+      fprintf(fp,"OBS_BW          %d\n",iBW);
+      //fprintf(fp,"OBS_BW+         19.6 MSPS\n");
       break; 
     case LWA_OM_STEPPED:
-      fprintf(fp,"OBS_BW           %d\n",iBW);
-      fprintf(fp,"OBS_STP_N        1\n");
-      fprintf(fp,"OBS_STP_RADEC    0\n");
-      fprintf(fp,"OBS_STP_C1[1]    %6.3f\n",fAz);
-      fprintf(fp,"OBS_STP_C2[1]    %6.3f\n",fEl);
-      fprintf(fp,"OBS_STP_T[1]     %ld\n",iDur);
-      fprintf(fp,"OBS_STP_FREQ1[1] %ld\n",iFreq);
-      fprintf(fp,"OBS_STP_FREQ2[1] %ld\n",iFreq2);   
-      fprintf(fp,"OBS_STP_B[1]     SIMPLE\n"); 
+      fprintf(fp,"OBS_BW            %d\n",iBW);
+      fprintf(fp,"OBS_STP_N         1\n");
+      fprintf(fp,"OBS_STP_RADEC     0\n");
+      fprintf(fp,"OBS_STP_C1[1]     %6.3f\n",fAz);
+      fprintf(fp,"OBS_STP_C2[1]     %6.3f\n",fEl);
+      fprintf(fp,"OBS_STP_T[1]      %ld\n",iDur);
+      fprintf(fp,"OBS_STP_FREQ1[1]  %ld\n",iFreq);
+      fprintf(fp,"OBS_STP_FREQ2[1]  %ld\n",iFreq2);   
+      fprintf(fp,"OBS_STP_B[1]      SIMPLE\n"); 
       break; 
     default:
       printf("[%d/%d] FATAL: Mode supported but not implemented(?)\n",MT_TPSS,getpid()); 
