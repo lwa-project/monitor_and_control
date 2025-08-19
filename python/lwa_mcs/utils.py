@@ -6,12 +6,11 @@ import os
 import re
 import sys
 import math
-import pytz
 import shlex
 import tempfile
 import subprocess
 from typing import Dict, Tuple, Union
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from lwa_mcs._mcs import get_current_time
 from lwa_mcs.config import STATION_TZ
@@ -19,9 +18,6 @@ from lwa_mcs.config import STATION_TZ
 __version__ = "0.3"
 __all__ = ['get_uptime', 'get_current_mjdmpm', 'mjdmpm_to_datetime', 'datetime_to_mjdmpm',
            'get_at_queue', 'get_at_command', 'schedule_at_command']
-
-
-_UTC = pytz.utc
 
 
 def get_uptime() -> int:
@@ -70,7 +66,7 @@ def mjdmpm_to_datetime(mjd, mpm):
     """
     
     unix = mjd*86400.0 + mpm/1000.0 - 3506716800.0
-    return datetime.utcfromtimestamp(unix)
+    return datetime.fromtimestamp(unix, tz=timezone.utc)
 
 
 def datetime_to_mjdmpm(dt: datetime) -> Tuple[int, int]:
@@ -91,7 +87,10 @@ def datetime_to_mjdmpm(dt: datetime) -> Tuple[int, int]:
     minute      = dt.minute
     second      = dt.second     
     millisecond = dt.microsecond / 1000
-
+    
+    if dt.tzinfo is not None:
+        dt = dt.astimezone(timezone.utc)
+        
     # compute MJD         
     # adapted from http://paste.lisp.org/display/73536
     # can check result using http://www.csgnetwork.com/julianmodifdateconv.html
@@ -134,8 +133,8 @@ def get_at_queue() -> Dict[int, datetime]:
         
         ## The 'at' queue uses the system time zone which is currently set 
         ## to 'US/Mountain'
-        dt = STATION_TZ.localize(dt)
-        dt = dt.astimezone(_UTC)
+        dt = dt.replace(tzinfo=STATION_TZ)
+        dt = dt.astimezone(timezone.utc)
         
         ## Append
         queue[id] = dt
@@ -190,7 +189,7 @@ def schedule_at_command(execution_time: Union[int, float, datetime], command: st
         execution_time = datetime.utcfromtimestamp(execution_time)
     ## Has the execution time already had a time zone assigned to it?
     if execution_time.tzinfo is None:
-        execution_time = _UTC.localize(execution_time)
+        execution_time = execution_time.replace(tzinfo=timezone.utc)
     ## Convert to the systems's timezone	
     execution_time = execution_time.astimezone(STATION_TZ)
 
