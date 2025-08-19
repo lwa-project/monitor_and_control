@@ -3,7 +3,10 @@ Module for defining common MCS values.
 """
 
 import os
-import pytz
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
 
 from lwa_mcs._mcs import MAX_NDR, SCH_PATH, MCS_TIMEOUT
 
@@ -32,5 +35,5 @@ elif os.path.exists('/etc/sysconfig/clock'):
                 _, tzname = line.rstrip().split('=', 1)
                 tzname = tzname.replace('"', '').replace("'", '')
                 break
-STATION_TZ = pytz.timezone(tzname)
+STATION_TZ = zoneinfo.ZoneInfo(tzname)
 
