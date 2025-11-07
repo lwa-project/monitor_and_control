@@ -316,7 +316,8 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 
        case LWA_CMD_TBS:
          // DATA field structure:
-         // float32 TBS_FREQ;
+         // float64 TBS_FREQ;
+         // uint8 TBS_BW
          sscanf(data,"%lf %hhu", &freq, &ebw);
          /* flipping endian-ness of freq: */
          f8.f  = freq;
