@@ -19,8 +19,8 @@ int LWA_mibupdate_NDP(
                       long int       ref,        /* REFERENCE field, uniquely identifying command/response pair */ 
                       struct timeval sent_tv     /* time of command message */
                      ) {
-  /* This is the handler for the ADP subsystem. */
-  
+  /* This is the handler for the NDP subsystem. */
+
   int eMIBerror = LWA_MIBERR_OK;
 
   char sMIBlabel[MIB_LABEL_FIELD_LENGTH];

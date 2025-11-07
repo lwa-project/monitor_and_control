@@ -261,7 +261,7 @@ int main ( int narg, char *argv[] ) {
          break;
  
        default:
-         printf("[%s] FATAL: cmd <%s> not recognized as valid for ADP\n",ME,cmd);
+         printf("[%s] FATAL: cmd <%s> not recognized as valid for NDP\n",ME,cmd);
          return;
          break;
 
