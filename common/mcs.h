@@ -1,9 +1,4 @@
 
-// issues
-// LWA_MCS.h deprecated; check all scheduler source code
-// LWA_MCS_subsytems.h deprecated
-// update readmes for sch, exec, tp
-
 #ifndef MCS_COMMON_H  /* this keeps this header from getting rolled in more than once */
 #define MCS_COMMON_H
 
@@ -46,8 +41,8 @@ extern "C" {
 #define LWA_MS_CMD_ADV_NOTICE_MS 5 /* [ms] required advance notice for time-scheduled commands */ 
 
 /* these are for ms_mcic's (pending) task queue */
-#define LWA_PTQ_SIZE 500  /* because DP limits us to 120 commands/slot (times 3 seconds for timeout) */
-#define LWA_PTQ_TIMEOUT 15 /*FIXME*/ /* timeout in seconds (increased from 4 to 5 to accomodate DP emulator's INI) */
+#define LWA_PTQ_SIZE 500  /* because NDP limits us to 120 commands/slot (times 3 seconds for timeout) */
+#define LWA_PTQ_TIMEOUT 15 /*FIXME*/ /* timeout in seconds (increased from 4 to 5 to accommodate NDP emulator's INI) */
 
 /* these are for ms_exec's task queue */
 #define LWA_MS_TASK_QUEUE_LENGTH 740
@@ -1391,7 +1386,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 // Jul 01, 2010: Changed MIB_VAL_FIELD_LENGTH from 256 to 8192
 // May 31, 2010: Added utility function LWA_f4_swap()
 // May 30, 2010: Added utility functions LWA_i2u_swap() and LWA_i4u_swap()
-// May 25, 2010: Increased LWA_PTQ_TIMEOUT from 4 to 5 to accomodated DP emulator
+// May 25, 2010: Increased LWA_PTQ_TIMEOUT from 4 to 5 to accommodate NDP emulator
 // Aug 25, 2009: Got rid of "subslot" field
 // Aug 17, 2009: Added LWA_isMCSRSVD()
 // Aug 16, 2009: Added LWA_raw2hex(); added datalen to LWA_cmd_struct

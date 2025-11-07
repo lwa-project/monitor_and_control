@@ -23,9 +23,6 @@ Notable Changes in This Version
 
 me_getaltaz(x)
 mefsdfg
-FIXME mers -- deprecated
-FIXME meis -- deprecated
-FIXME me
 FIXME meei(x)
 FIXME me_init
 FIXME me_tpcom
