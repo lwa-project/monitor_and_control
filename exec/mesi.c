@@ -272,8 +272,8 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 
          /* flipping endian-ness of freq: */
          f8.f  = freq;
-         c.data[9]= f8.b[0]; c.data[8]= f8.b[1]; c.data[7]= f8.b[2]; c.data[6]= f4.b[3];
-         c.data[5]= f8.b[4]; c.data[4]= f8.b[5]; c.data[3]= f8.b[6]; c.data[2]= f4.b[7];
+         c.data[9]= f8.b[0]; c.data[8]= f8.b[1]; c.data[7]= f8.b[2]; c.data[6]= f8.b[3];
+         c.data[5]= f8.b[4]; c.data[4]= f8.b[5]; c.data[3]= f8.b[6]; c.data[2]= f8.b[7];
 
          /* flipping endian-ness of gain: */
          i2u.i  = gain;  c.data[11]= i2u.b[1]; c.data[12]= i2u.b[0];

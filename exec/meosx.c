@@ -13,9 +13,9 @@
 //                                         r = rate "1"|"2"|...|"7" 
 //                                         d = duration [ms] 
 //                e.g., "38000000 8 60000" 
-//              For DRX: "d" where d is duration [ms] 
-//                No other arguments are expected.  It is assumed that appropriate FST, BAM, and DRX
-//                commands have already been sent & that DP is ready to go 
+//              For DRX: "d" where d is duration [ms]
+//                No other arguments are expected.  It is assumed that appropriate BAM and DRX
+//                commands have already been sent & that NDP is ready to go 
 // EXAMPLE:
 // $ ./mseox                                  # uses all defaults
 // $ ./mseox 1 /dev/sdg1 . TBT "196000 255"   # same thing with default values shown explicitly
