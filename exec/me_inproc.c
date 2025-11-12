@@ -1111,7 +1111,7 @@ int main ( int narg, char *argv[] ) {
                 cs[ncs].action.bASAP = 0; 
                 cs[ncs].action.sid = LWA_SID_NDP;
                 cs[ncs].action.cid = LWA_CMD_TBS;
-                sprintf( cs[ncs].data, "%8.0f %hhu",
+                sprintf( cs[ncs].data, "%12.3f %hhu",
                                 (4.563480616e-02)*(osf.OBS_FREQ1), /* center freq in Hz */
                                       osf.OBS_BW);                 /* 1-9 */                /* subslot */ 
                 cs[ncs].action.len = strlen(cs[ncs].data)+1;
