@@ -6,25 +6,19 @@
 //   <DR#>:     DR to use (e.g., "1" (DEFAULT))
 //   <ExtDev>:  Location of file on DR#'s external storage (e.g., "/dev/sdg1" (DEFAULT)) 
 //   <DestDir>: Desination directory (in user space) for file.  No trailing slash.  DEFAULT is "." ("here")
-//   <mode>:    "TBF (DEFAULT for ADP), "TBW" (12-bit; DEFAULT for DP), "TBN", "DRX"   
-//   <args>:    For TBW: "b n" where b = "12" means 12-bit [DEFAULT], "4" means 4-bit */
-//                                   n = number of samples (up to 12000000 [DEFAULT] for 12-bit;
-//                                                          up to 36000000 [DEFAULT] for  4-bit)
-//                e.g., "12 12000000"
-//              For TBF: "n m" where n = number of samples
+//   <mode>:    "TBT", "TBS", "DRX"   
+//   <args>:    For TBT: "n m" where n = number of samples
 //                                   m = 64-bit DRX tuning mask
-//              For TBN: "f r g s d" where f = center freq [Hz], 
+//              For TBS: "f r d" where f = center freq [Hz], 
 //                                         r = rate "1"|"2"|...|"7" 
-//                                         g = gain "0"|"1"|... 
-//                                         s = subslot "0"|"1"|... 
 //                                         d = duration [ms] 
-//                e.g., "38000000 7 28 0 60000" 
-//              For DRX: "d" where d is duration [ms] 
-//                No other arguments are expected.  It is assumed that appropriate FST, BAM, and DRX
-//                commands have already been sent & that DP is ready to go 
+//                e.g., "38000000 8 60000" 
+//              For DRX: "d" where d is duration [ms]
+//                No other arguments are expected.  It is assumed that appropriate BAM and DRX
+//                commands have already been sent & that NDP is ready to go 
 // EXAMPLE:
 // $ ./mseox                                  # uses all defaults
-// $ ./mseox 1 /dev/sdg1 . TBW "12 12000000"  # same thing with default values shown explicitly
+// $ ./mseox 1 /dev/sdg1 . TBT "196000 255"   # same thing with default values shown explicitly
 // ---
 // REQUIRES: 
 //   me.h
@@ -58,25 +52,14 @@ int main ( int narg, char *argv[] ) {
   if (narg>3) { 
     sscanf(argv[3],"%s",sDestDir);
     }
-#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
-  sprintf(mode,"TBF");
+  sprintf(mode,"TBT");
   if (narg>4) { 
     sscanf(argv[4],"%s",mode);
     } 
-  sprintf(args,"12000000 9223372036854775808");
+  sprintf(args,"196000 255");
   if (narg>5) { 
     memcpy(args,argv[5],strlen(argv[5])+1);
     }
-#else
-  sprintf(mode,"TBW");
-  if (narg>4) { 
-    sscanf(argv[4],"%s",mode);
-    } 
-  sprintf(args,"12 12000000");
-  if (narg>5) { 
-    memcpy(args,argv[5],strlen(argv[5])+1);
-    }
-#endif
 
   eResult = meos(nDR,sExtDev,sDestDir,mode,args);
   printf("[%d/%d] meos() returned code %d\n",ME_MEOSX,getpid(),eResult);

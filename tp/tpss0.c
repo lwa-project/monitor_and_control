@@ -17,7 +17,7 @@
   char SESSION_SPC[32];
 
   int  SESSION_MRP_ASP=-1;
-  int  SESSION_MRP_DP_=-1;
+  int  SESSION_MRP_NDP=-1;
   int  SESSION_MRP_DR1=-1;
   int  SESSION_MRP_DR2=-1;
   int  SESSION_MRP_DR3=-1;
@@ -27,7 +27,7 @@
   int  SESSION_MRP_MCS=-1;
 
   int  SESSION_MUP_ASP=-1;
-  int  SESSION_MUP_DP_=-1;
+  int  SESSION_MUP_NDP=-1;
   int  SESSION_MUP_DR1=-1;
   int  SESSION_MUP_DR2=-1;
   int  SESSION_MUP_DR3=-1;
@@ -81,16 +81,7 @@
     int OBS_ASP_AT1[LWA_MAX_NSTD+1];
     int OBS_ASP_AT2[LWA_MAX_NSTD+1];
     int OBS_ASP_ATS[LWA_MAX_NSTD+1];
-#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
-    long int OBS_TBF_SAMPLES;
-    int OBS_TBF_GAIN;
-#else
-    int OBS_TBW_BITS;
-    long int OBS_TBW_SAMPLES;
-#endif
-#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
-    int OBS_TBN_GAIN;
-#endif
+    int OBS_TBT_SAMPLES;
     int OBS_DRX_GAIN;
     long int ASP_setup_time; // not part of SDF 
     };

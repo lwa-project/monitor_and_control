@@ -13,6 +13,8 @@
 // See end of this file for history.
 
 #include <stdlib.h>
+#include <unistd.h>
+#include <limits.h>
 
 #include "me.h"
 
@@ -106,9 +108,26 @@ int main ( int narg, char *argv[] ) {
   me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, msg, sq_ptr, 0 ); 
   bFlg_NoSch = ( flagset & ME_FLAG_NO_SCH ) != 0;
 
-  /*================================*/
+  /*=========================*/
+  /*=== Set the host file ===*/
+  /*=========================*/
+  char hostname[HOST_NAME_MAX+1];
+  FILE* fp;
+  printf("[%d/%d] Recording MCS hostname...\n",ME_INIT,getpid());
+  if (gethostname(hostname, HOST_NAME_MAX) == 0) {
+      fp = fopen("state/mcs.host", "w");
+      if (fp != NULL) {
+          fprintf(fp, "%s", hostname);
+      }
+      fclose(fp);
+  } else {
+      printf("[%d/%d] me_init: WARNING: failed to record MCS hostname\n",ME_INIT,getpid());
+      me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: WARNING: failed to record MCS hostname", sq_ptr, 0 );
+  }
+
+  /*=================================*/
   /*=== Copying ssmif.dat from TP ===*/
-  /*================================*/
+  /*=================================*/
   printf("[%d/%d] Copying ssmif.dat from TP...\n",ME_INIT,getpid());
   me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: Copying ssmif.dat from TP...", sq_ptr, 0 );
   sprintf(cmd, "scp %s:%s/ssmif.dat state/.",LWA_TP_SCP_ADDR,LWA_TP_SCP_DIR);
@@ -230,7 +249,7 @@ int main ( int narg, char *argv[] ) {
   sdm.station.summary = LWA_SIDSUM_BOOTING; strcpy(sdm.station.info,""); sdm.station.tv = tv; /* station */
   sdm.shl.summary     = LWA_SIDSUM_UNK;     strcpy(sdm.shl.info,    ""); sdm.shl.tv     = tv; /* SHL */
   sdm.asp.summary     = LWA_SIDSUM_UNK;     strcpy(sdm.asp.info,    ""); sdm.asp.tv     = tv; /* ASP */
-  sdm.dp.summary      = LWA_SIDSUM_UNK;     strcpy(sdm.dp.info,     ""); sdm.dp.tv      = tv; /* DP */
+  sdm.ndp.summary     = LWA_SIDSUM_UNK;     strcpy(sdm.ndp.info,    ""); sdm.ndp.tv     = tv; /* NDP */
   for (i=0;i<ME_MAX_NDR;i++) {
     sdm.dr[i].summary = LWA_SIDSUM_UNK; strcpy(sdm.dr[i].info,""); sdm.dr[i].tv   = tv; /* DR# */
     }
@@ -242,20 +261,9 @@ int main ( int narg, char *argv[] ) {
   for (i=0;i<ME_MAX_NARB;i++) { 
     for (j=0;j<ME_MAX_NARBCH;j++) { 
       sdm.ssss.eARBStat[i][j] = 0; } }                   /* ARB_STAT[][] */
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
   for (i=0;i<ME_MAX_NSNAP;i++) { 
     for (j=0;j<ME_MAX_NSNAPCH;j++) { 
       sdm.ssss.eSnapStat[i][j] = 0; } }                   /* SNAP_STAT[][] */
-#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-  for (i=0;i<ME_MAX_NROACH;i++) { 
-    for (j=0;j<ME_MAX_NROACHCH;j++) { 
-      sdm.ssss.eRoachStat[i][j] = 0; } }                   /* ROACH_STAT[][] */
-#else
-  for (i=0;i<ME_MAX_NDP1;i++) { 
-    for (j=0;j<ME_MAX_NDP1CH;j++) { 
-      sdm.ssss.eDP1Stat[i][j] = 0; } }                   /* DP1_STAT[][] */
-  for (i=0;i<ME_MAX_NDP2;i++) { sdm.ssss.eDP2Stat[i] = 0; } /* DP2_STAT[] */
-#endif
   for (i=0;i<ME_MAX_NDR;i++)  { sdm.ssss.eDRStat[i]  = 0;  } /* DR_STAT[] */
 
   /* setting all status to "not installed" */
@@ -263,10 +271,10 @@ int main ( int narg, char *argv[] ) {
     for (j=0;j<2;j++) {    
       sdm.ant_stat[i][j] = 0; } }
   for (i=0;i<ME_MAX_NDR;i++)  { 
-      sdm.dpo_stat[i]    = 0;  } 
+      sdm.ndpo_stat[i]    = 0;  } 
 
   sdm.settings.mrp_asp = 0;
-  sdm.settings.mrp_dp  = 0;
+  sdm.settings.mrp_ndp = 0;
   sdm.settings.mrp_dr1 = 0;
   sdm.settings.mrp_dr2 = 0;
   sdm.settings.mrp_dr3 = 0;
@@ -276,7 +284,7 @@ int main ( int narg, char *argv[] ) {
   sdm.settings.mrp_mcs = 0;
 
   sdm.settings.mup_asp = 0;
-  sdm.settings.mup_dp  = 0;
+  sdm.settings.mup_ndp = 0;
   sdm.settings.mup_dr1 = 0;
   sdm.settings.mup_dr2 = 0;
   sdm.settings.mup_dr3 = 0;
@@ -292,12 +300,6 @@ int main ( int narg, char *argv[] ) {
     sdm.settings.asp_at2[i] = -1;
     sdm.settings.asp_ats[i] = -1;
     }
-#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
-    sdm.settings.tbf_gain = -1;
-#endif
-#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
-    sdm.settings.tbn_gain = -1;
-#endif
   sdm.settings.drx_gain = -1;
 
   /* write it */

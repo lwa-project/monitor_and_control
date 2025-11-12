@@ -6,11 +6,6 @@
 extern "C" {
 #endif
 
-// Digital processor selection
-#define LWA_BACKEND_IS_DP @HAVE_DP@
-#define LWA_BACKEND_IS_ADP @HAVE_ADP@
-#define LWA_BACKEND_IS_NDP @HAVE_NDP@
-
 // LAN configuration
 #define LWA_IP_MSE       "@MSE_IP@"                     /* IP address of MCS Scheduler "ms_exec" process */
 #define LWA_IP_MEE       "@MEE_IP@"                     /* IP address of MCS Executive "me" process */

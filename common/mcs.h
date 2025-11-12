@@ -1,9 +1,4 @@
 
-// issues
-// LWA_MCS.h deprecated; check all scheduler source code
-// LWA_MCS_subsytems.h deprecated
-// update readmes for sch, exec, tp
-
 #ifndef MCS_COMMON_H  /* this keeps this header from getting rolled in more than once */
 #define MCS_COMMON_H
 
@@ -46,8 +41,8 @@ extern "C" {
 #define LWA_MS_CMD_ADV_NOTICE_MS 5 /* [ms] required advance notice for time-scheduled commands */ 
 
 /* these are for ms_mcic's (pending) task queue */
-#define LWA_PTQ_SIZE 500  /* because DP limits us to 120 commands/slot (times 3 seconds for timeout) */
-#define LWA_PTQ_TIMEOUT 15 /*FIXME*/ /* timeout in seconds (increased from 4 to 5 to accomodate DP emulator's INI) */
+#define LWA_PTQ_SIZE 500  /* because NDP limits us to 120 commands/slot (times 3 seconds for timeout) */
+#define LWA_PTQ_TIMEOUT 15 /*FIXME*/ /* timeout in seconds (increased from 4 to 5 to accommodate NDP emulator's INI) */
 
 /* these are for ms_exec's task queue */
 #define LWA_MS_TASK_QUEUE_LENGTH 740
@@ -70,7 +65,7 @@ extern "C" {
 /* =============================================== */
 
 #define LWA_ASP_OP_TIME_MS 1000            /* assumed time [ms] for ASP to do one operation safely */
-#define LWA_SESS_DRDP_INIT_TIME_MS 5000    /* time [ms] to allow for DP+DR initialization at start of session */
+#define LWA_SESS_DRNDP_INIT_TIME_MS 5000    /* time [ms] to allow for NDP+DR initialization at start of session */
 #define LWA_SESS_GUARD_TIME_MS 5000        /* time [ms] to allow at end of session to avoid stomping on next session */
 
 #define MIB_REC_TYPE_BRANCH 0 
@@ -209,13 +204,13 @@ char *LWA_saysum( int sidsum ) {
 #define LWA_SID_MCS 10 /* MCS */
 #define LWA_SID_SHL 11 /* SHL (shelter) */
 #define LWA_SID_ASP 12 /* ASP */
-#define LWA_SID_DP_ 13 /* DP */
+#define LWA_SID_DP_ 13 /* DP - Obsolete */
 #define LWA_SID_DR1 14 /* MCS-DR #1 */
 #define LWA_SID_DR2 15 /* MCS-DR #2 */
 #define LWA_SID_DR3 16 /* MCS-DR #3 */
 #define LWA_SID_DR4 17 /* MCS-DR #4 */
 #define LWA_SID_DR5 18 /* MCS-DR #5 */
-#define LWA_SID_ADP 19 /* ADP */
+#define LWA_SID_ADP 19 /* ADP - Obsolete */
 #define LWA_SID_NDP 20 /* NDP */
 /* When adding subsystems, remember to change LWA_MAX_SID ! */
 
@@ -279,7 +274,7 @@ char *LWA_sid2str( int sid ) {
 #define LWA_CMD_PNG      1 /* PNG */
 #define LWA_CMD_RPT      2 /* RPT */
 #define LWA_CMD_SHT      3 /* SHT */
-#define LWA_CMD_INI      4 /* INI (SHL,ASP,DP_,DR#,ADP,NDP) */
+#define LWA_CMD_INI      4 /* INI (SHL,ASP,NDP,DR#) */
 #define LWA_CMD_TMP      5 /* TMP (SHL) */
 #define LWA_CMD_DIF      6 /* DIF (SHL) */
 #define LWA_CMD_PWR      7 /* PWR (SHL) */
@@ -290,15 +285,15 @@ char *LWA_sid2str( int sid ) {
 #define LWA_CMD_FPW     12 /* FPW (ASP) */
 #define LWA_CMD_RXP     13 /* RXP (ASP) */
 #define LWA_CMD_FEP     14 /* FEP (ASP) */
-#define LWA_CMD_TBW     15 /* TBW (DP_) */
-#define LWA_CMD_TBN     16 /* TBN (DP_,ADP) */
-#define LWA_CMD_DRX     17 /* DRX (DP_,ADP,NDP) */
-#define LWA_CMD_BAM     18 /* BAM (DP_,ADP,NDP) */
-#define LWA_CMD_FST     19 /* FST (DP_) */
-#define LWA_CMD_CLK     20 /* CLK (DP_) */
+#define LWA_CMD_TBW     15 /* TBW (Obsolete) */
+#define LWA_CMD_TBN     16 /* TBN (Obsolete) */
+#define LWA_CMD_DRX     17 /* DRX (NDP) */
+#define LWA_CMD_BAM     18 /* BAM (NDP) */
+#define LWA_CMD_FST     19 /* FST (Obsolete) */
+#define LWA_CMD_CLK     20 /* CLK (Obsolete) */
 #define LWA_CMD_REC     21 /* REC (DR#) */
 #define LWA_CMD_DEL     22 /* DEL (DR#) */
-#define LWA_CMD_STP     23 /* STP (DR#,DP_,ADP,NDP) */
+#define LWA_CMD_STP     23 /* STP (DR#,NDP) */
 #define LWA_CMD_GET     24 /* GET (DR#) */
 #define LWA_CMD_CPY     25 /* CPY (DR#) */
 #define LWA_CMD_DMP     26 /* DMP (DR#) */
@@ -315,8 +310,10 @@ char *LWA_sid2str( int sid ) {
 #define LWA_CMD_OBS     37 /* (MCS) observation start  */
 #define LWA_CMD_OBE     38 /* (MCS) observation end */
 #define LWA_CMD_SPC     39 /* SPC (DR#) */
-#define LWA_CMD_TBF     40 /* TBF (ADP,NDP) */
-#define LWA_CMD_COR     41 /* COR (ADP,NDP) */
+#define LWA_CMD_TBF     40 /* TBF (Obsolete) */
+#define LWA_CMD_COR     41 /* COR (NDP) */
+#define LWA_CMD_TBT     42 /* TBT (NDP) */
+#define LWA_CMD_TBS     43 /* TBS (NDP) */
 
 /* When adding commands, remember to change LWA_MAX_CMD ! */
 
@@ -365,6 +362,8 @@ int LWA_getcmd( char *ssc ) {
   if (!strcmp(ssc,"SPC")) cmd = LWA_CMD_SPC;
   if (!strcmp(ssc,"TBF")) cmd = LWA_CMD_TBF;
   if (!strcmp(ssc,"COR")) cmd = LWA_CMD_COR;
+  if (!strcmp(ssc,"TBT")) cmd = LWA_CMD_TBT;
+  if (!strcmp(ssc,"TBS")) cmd = LWA_CMD_TBS;
   return cmd;
   } /* LWA_getcmd() */
 
@@ -413,6 +412,8 @@ char *LWA_cmd2str( int cmd ) {
   if (cmd == LWA_CMD_SPC)     return "SPC";
   if (cmd == LWA_CMD_TBF)     return "TBF";
   if (cmd == LWA_CMD_COR)     return "COR";
+  if (cmd == LWA_CMD_TBT)     return "TBT";
+  if (cmd == LWA_CMD_TBS)     return "TBS";
   return "   ";
   } /* LWA_getsid() */
 
@@ -632,17 +633,16 @@ double LWA_f8_swap( double x ) {
 /*** moved here from me.h *************/
 /**************************************/
 
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
 #define ME_SSMIF_FORMAT_VERSION 10
-#  define ME_MAX_NSTD 256
-#  define ME_MAX_NFEE 256
-#  define ME_MAX_NRPD 512
-#  define ME_MAX_NSEP 512
-#  define ME_MAX_NARB 32
-#  define ME_MAX_NSNAP 8
-#  define ME_MAX_NSERVER 9
+#define ME_MAX_NSTD 256
+#define ME_MAX_NFEE 256
+#define ME_MAX_NRPD 512
+#define ME_MAX_NSEP 512
+#define ME_MAX_NARB 32
+#define ME_MAX_NSNAP 16
+#define ME_MAX_NSERVER 5
 #define ME_MAX_FEEID_LENGTH 10
-#define ME_MAX_RACK 6
+#define ME_MAX_RACK 8
 #define ME_MAX_PORT 50
 #define ME_MAX_RPDID_LENGTH 25
 #define ME_MAX_SEPID_LENGTH 25
@@ -652,62 +652,11 @@ double LWA_f8_swap( double x ) {
 #define ME_MAX_NSNAPCH 64
 #define ME_MAX_SNAPID_LENGTH 10
 #define ME_MAX_SERVERID_LENGTH 10
-#define ME_MAX_NDR 4
-#define ME_MAX_DRID_LENGTH 10
-#define ME_MAX_NPWRPORT 50
-#define ME_MAX_SSNAME_LENGTH 3 /* for codes used for PWR_NAME */
-#define ME_MAX_NDPOUT 4 /* ADP outputs; 1,2,3,4 */
-#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-#define ME_SSMIF_FORMAT_VERSION 9
-#define ME_MAX_NSTD 256
-#define ME_MAX_NFEE 256
-#define ME_MAX_FEEID_LENGTH 10
-#define ME_MAX_RACK 6
-#define ME_MAX_PORT 50
-#define ME_MAX_NRPD 512
-#define ME_MAX_RPDID_LENGTH 25
-#define ME_MAX_NSEP 512
-#define ME_MAX_SEPID_LENGTH 25
-#define ME_MAX_SEPCABL_LENGTH 25
-#define ME_MAX_NARB 32
-#define ME_MAX_NARBCH 16
-#define ME_MAX_ARBID_LENGTH 10
-#define ME_MAX_NROACH 16
-#define ME_MAX_NROACHCH 32
-#define ME_MAX_ROACHID_LENGTH 10
-#define ME_MAX_NSERVER 7
-#define ME_MAX_SERVERID_LENGTH 10
-#define ME_MAX_NDR 4
-#define ME_MAX_DRID_LENGTH 10
-#define ME_MAX_NPWRPORT 50
-#define ME_MAX_SSNAME_LENGTH 3 /* for codes used for PWR_NAME */
-#define ME_MAX_NDPOUT 4 /* ADP outputs; 1,2,3 for beams, 4 for TBN */
-#else
-#define ME_SSMIF_FORMAT_VERSION 7
-#define ME_MAX_NSTD 260
-#define ME_MAX_NFEE 260
-#define ME_MAX_FEEID_LENGTH 10
-#define ME_MAX_RACK 6
-#define ME_MAX_PORT 50
-#define ME_MAX_NRPD 520
-#define ME_MAX_RPDID_LENGTH 25
-#define ME_MAX_NSEP 520
-#define ME_MAX_SEPID_LENGTH 25
-#define ME_MAX_SEPCABL_LENGTH 25
-#define ME_MAX_NARB 33
-#define ME_MAX_NARBCH 16
-#define ME_MAX_ARBID_LENGTH 10
-#define ME_MAX_NDP1 26
-#define ME_MAX_NDP1CH 20
-#define ME_MAX_DP1ID_LENGTH 10
-#define ME_MAX_NDP2 2
-#define ME_MAX_DP2ID_LENGTH 10
 #define ME_MAX_NDR 5
 #define ME_MAX_DRID_LENGTH 10
 #define ME_MAX_NPWRPORT 50
 #define ME_MAX_SSNAME_LENGTH 3 /* for codes used for PWR_NAME */
-#define ME_MAX_NDPOUT 5 /* DP outputs; = #beams + 1 for TBW/TBN */
-#endif
+#define ME_MAX_NDPOUT 5 /* NDP outputs; 1,2,3,4,5 */
 
 /* defined observing modes (MCS0030) */
 #define LWA_OM_TRK_RADEC 1
@@ -719,6 +668,8 @@ double LWA_f8_swap( double x ) {
 #define LWA_OM_DIAG1     7
 #define LWA_OM_TBF       8
 #define LWA_OM_TRK_LUN   9
+#define LWA_OM_TBT      10
+#define LWA_OM_TBS      11
 
 int LWA_getmode( char *ssc ) {
   /* ssc is a string from which to determine mode */
@@ -727,11 +678,11 @@ int LWA_getmode( char *ssc ) {
   if (!strncmp(ssc,"TRK_RADEC",9)) mode = LWA_OM_TRK_RADEC;
   if (!strncmp(ssc,"TRK_SOL"  ,7)) mode = LWA_OM_TRK_SOL;
   if (!strncmp(ssc,"TRK_JOV"  ,7)) mode = LWA_OM_TRK_JOV;
+  if (!strncmp(ssc,"TRK_LUN"  ,7)) mode = LWA_OM_TRK_LUN;
   if (!strncmp(ssc,"STEPPED"  ,7)) mode = LWA_OM_STEPPED;
-  if (!strncmp(ssc,"TBW"      ,3)) mode = LWA_OM_TBW;
-  if (!strncmp(ssc,"TBN"      ,3)) mode = LWA_OM_TBN;
   if (!strncmp(ssc,"DIAG1"    ,5)) mode = LWA_OM_DIAG1;
-  if (!strncmp(ssc,"TBF"      ,3)) mode = LWA_OM_TBF;
+  if (!strncmp(ssc,"TBT"      ,3)) mode = LWA_OM_TBT;
+  if (!strncmp(ssc,"TBS"      ,3)) mode = LWA_OM_TBS;
   return mode;
   } /* LWA_getmode() */
 
@@ -742,11 +693,11 @@ void LWA_saymode( unsigned short int mode, char *ssc ) {
   if (mode==LWA_OM_TRK_RADEC) strcpy(ssc,"TRK_RADEC");
   if (mode==LWA_OM_TRK_SOL  ) strcpy(ssc,"TRK_SOL");
   if (mode==LWA_OM_TRK_JOV  ) strcpy(ssc,"TRK_JOV");
+  if (mode==LWA_OM_TRK_LUN  ) strcpy(ssc,"TRK_LUN");
   if (mode==LWA_OM_STEPPED  ) strcpy(ssc,"STEPPED");
-  if (mode==LWA_OM_TBW      ) strcpy(ssc,"TBW");
-  if (mode==LWA_OM_TBN      ) strcpy(ssc,"TBN");
   if (mode==LWA_OM_DIAG1    ) strcpy(ssc,"DIAG1");
-  if (mode==LWA_OM_TBF      ) strcpy(ssc,"TBF");
+  if (mode==LWA_OM_TBT      ) strcpy(ssc,"TBT");
+  if (mode==LWA_OM_TBS      ) strcpy(ssc,"TBS");
   return;
   } /* LWA_saymode() */
 
@@ -775,13 +726,13 @@ void LWA_saybeamtype( int mode, char *ssc ) {
   return;
   } /* LWA_saybeamtype() */
 
-int LWA_dpoavail( 
-  signed short int dpo,            /* DP/ADP output: numbered 1 through 5 (5 is TBW/TBN) for DP; 1 or 2 for ADP */
+int LWA_ndpoavail( 
+  signed short int ndpo,            /* NDP output: numbered 1 through 5 (5 is TBT/TBS) */
   struct timeval t0,  /* start time */
   long int d,         /* duration (ms) */
   char *path,         /* path to mess.dat, no trailing slash */
   char *msg )         /* text message summarizing result */
-  /* reads mess.dat, determines if requested DP output is available */
+  /* reads mess.dat, determines if requested NDP output is available */
   /* returns <0 if error, >=0 corresponds to Status of that DP output */ 
   /* -1: invalid dpo (not in range 1..5) */ 
   /* -2: mess.dat not found */
@@ -790,18 +741,18 @@ int LWA_dpoavail(
   FILE *fp;
   char *filename;
   char line[256];
-  int dpos[ME_MAX_NDPOUT];
+  int ndpos[ME_MAX_NDPOUT];
   int i;
   long int mjd,mpm;
-  int dpox;
+  int ndpox;
   long int durx;
   int cra;
   char project_id[256];
   char session_id[256];
   struct timeval t1,t2,t3;
 
-   if ((dpo<1) || (dpo>ME_MAX_NDPOUT)) {
-    sprintf(msg,"dpo=%d is out of range (1-%i)",dpo,ME_MAX_NDPOUT);
+   if ((ndpo<1) || (ndpo>ME_MAX_NDPOUT)) {
+    sprintf(msg,"ndpo=%d is out of range (1-%i)",ndpo,ME_MAX_NDPOUT);
     return -1;
     }
     
@@ -818,12 +769,12 @@ int LWA_dpoavail(
     return -2;
     }
     
-  for (i=0;i<ME_MAX_NDPOUT;i++) dpos[i]=-1; /* initialize these */
+  for (i=0;i<ME_MAX_NDPOUT;i++) ndpos[i]=-1; /* initialize these */
   
   fgets(line,256,fp); /* this should be MCS_CRA */
   fgets(line,256,fp); /* this should five numbers representing status of each beam output */
   //printf("LWA_dpoavail: <%s>\n",line);
-  sscanf(line,"%d %d %d %d %d",&(dpos[0]),&(dpos[1]),&(dpos[2]),&(dpos[3]),&(dpos[4])); 
+  sscanf(line,"%d %d %d %d %d",&(ndpos[0]),&(ndpos[1]),&(ndpos[2]),&(ndpos[3]),&(ndpos[4])); 
 
   t1.tv_sec  = t0.tv_sec;
   t1.tv_usec = t0.tv_usec;
@@ -832,10 +783,10 @@ int LWA_dpoavail(
   fgets(line,256,fp);
   while (!feof(fp)) {
 
-    sscanf(line,"%ld %ld %d %ld %d %255s %255s",&mjd,&mpm,&dpox,&durx,&cra,project_id,session_id);
-    //printf("LWA_dpoavail: %ld %ld %d %ld %d <%s> <%s>\n",mjd,mpm,dpox,durx,cra,project_id,session_id);
+    sscanf(line,"%ld %ld %d %ld %d %255s %255s",&mjd,&mpm,&ndpox,&durx,&cra,project_id,session_id);
+    //printf("LWA_ndpoavail: %ld %ld %d %ld %d <%s> <%s>\n",mjd,mpm,dpox,durx,cra,project_id,session_id);
 
-    if (dpox==dpo) {
+    if (ndpox==ndpo) {
       LWA_time2tv( &t2, mjd, mpm ); /* get start time as a timeval */
       t3.tv_sec  = t2.tv_sec;       /* construct end time as a timeval */
       t3.tv_usec = t2.tv_usec;
@@ -856,13 +807,13 @@ int LWA_dpoavail(
   fclose(fp); 
   free(filename);
 
-  if (dpos[dpo-1]<1) {
-    sprintf(msg,"UNAVAILABLE (status = %d)",dpos[dpo-1]);
+  if (ndpos[ndpo-1]<1) {
+    sprintf(msg,"UNAVAILABLE (status = %d)",ndpos[ndpo-1]);
     return 0; /* not available because this output has status <1 */
     }
 
-  sprintf(msg,"available with status = %d",dpos[dpo-1]);
-  return dpos[dpo-1];
+  sprintf(msg,"available with status = %d",ndpos[ndpo-1]);
+  return ndpos[ndpo-1];
   }
 
 /* defines a session */
@@ -878,7 +829,7 @@ struct ssf_struct {
   unsigned long int  SESSION_DUR;
   unsigned int       SESSION_NOBS;
   signed short int SESSION_MRP_ASP;
-  signed short int SESSION_MRP_DP_;
+  signed short int SESSION_MRP_NDP;
   signed short int SESSION_MRP_DR1;
   signed short int SESSION_MRP_DR2;
   signed short int SESSION_MRP_DR3;
@@ -887,7 +838,7 @@ struct ssf_struct {
   signed short int SESSION_MRP_SHL;
   signed short int SESSION_MRP_MCS;
   signed short int SESSION_MUP_ASP;
-  signed short int SESSION_MUP_DP_;
+  signed short int SESSION_MUP_NDP;
   signed short int SESSION_MUP_DR1;
   signed short int SESSION_MUP_DR2;
   signed short int SESSION_MUP_DR3;
@@ -932,13 +883,7 @@ struct osfs_struct { /* one step within an observation */
   unsigned short int OBS_STP_B;
   };
 
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
 #define LWA_MAX_NSTD 256 /* FIXME should be reconciled with ME_MAX_NSTD */
-#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-#define LWA_MAX_NSTD 256 /* FIXME should be reconciled with ME_MAX_NSTD */
-#else
-#define LWA_MAX_NSTD 260 /* FIXME should be reconciled with ME_MAX_NSTD */
-#endif
 struct beam_struct {
   unsigned short int OBS_BEAM_DELAY[2*LWA_MAX_NSTD];
   signed short int   OBS_BEAM_GAIN[LWA_MAX_NSTD][2][2];
@@ -950,16 +895,7 @@ struct osf2_struct { /* really just a continuation of osf_struct */
   signed short int   OBS_ASP_AT1[LWA_MAX_NSTD];
   signed short int   OBS_ASP_AT2[LWA_MAX_NSTD];
   signed short int   OBS_ASP_ATS[LWA_MAX_NSTD];
-#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
-  unsigned int       OBS_TBF_SAMPLES;
-  signed short int   OBS_TBF_GAIN;
-#else
-  unsigned short int OBS_TBW_BITS;
-  unsigned int       OBS_TBW_SAMPLES;
-#endif
-#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
-  signed short int   OBS_TBN_GAIN;
-#endif
+  unsigned int       OBS_TBT_SAMPLES;
   signed short int   OBS_DRX_GAIN;
   };
 
@@ -974,7 +910,7 @@ struct me_action_struct {  /* atomic unit of action as me_exec executes session 
 /* this sub-structure is used in both the ssmif and sdm */
 struct station_settings_struct {
   signed short int mrp_asp; // SESSION_MRP_ASP // MRP_ASP
-  signed short int mrp_dp;  // SESSION_MRP_DP_ // MRP_DP_
+  signed short int mrp_ndp; // SESSION_MRP_NDP // MRP_NDP
   signed short int mrp_dr1; // SESSION_MRP_DR1 // MRP_DR1
   signed short int mrp_dr2; // SESSION_MRP_DR2 // MRP_DR2
   signed short int mrp_dr3; // SESSION_MRP_DR3 // MRP_DR3
@@ -983,7 +919,7 @@ struct station_settings_struct {
   signed short int mrp_shl; // SESSION_MRP_SHL // MRP_SHL
   signed short int mrp_mcs; // SESSION_MRP_MCS // MRP_MCS
   signed short int mup_asp; // SESSION_MUP_ASP // MUP_ASP
-  signed short int mup_dp;  // SESSION_MUP_DP_ // MUP_DP_
+  signed short int mup_ndp; // SESSION_MUP_NDP // MUP_NDP
   signed short int mup_dr1; // SESSION_MUP_DR1 // MUP_DR1
   signed short int mup_dr2; // SESSION_MUP_DR2 // MUP_DR2
   signed short int mup_dr3; // SESSION_MUP_DR3 // MUP_DR3
@@ -996,12 +932,6 @@ struct station_settings_struct {
   signed short int asp_at1[LWA_MAX_NSTD]; // OBS_ASP_AT1[LWA_MAX_NSTD] // ASP_AT1[LWA_MAX_NSTD]
   signed short int asp_at2[LWA_MAX_NSTD]; // OBS_ASP_AT2[LWA_MAX_NSTD] // ASP_AT2[LWA_MAX_NSTD]
   signed short int asp_ats[LWA_MAX_NSTD]; // OBS_ASP_ATS[LWA_MAX_NSTD] // ASP_ATS[LWA_MAX_NSTD]
-#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
-  signed short int tbf_gain; // OBS_TBF_GAIN // TBF_GAIN
-#endif
-#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
-  signed short int tbn_gain; // OBS_TBN_GAIN // TBN_GAIN
-#endif
   signed short int drx_gain; // OBS_DRX_GAIN // DRX_GAIN
   };
 
@@ -1064,7 +994,6 @@ struct ssmif_struct {
   int    iARBAnt[ME_MAX_NARB][ME_MAX_NARBCH];        /* ARB_ANT[][] */
   char   sARBIN[ME_MAX_NARB][ME_MAX_NARBCH][ME_MAX_ARBID_LENGTH+1]; /* ARB_IN[][] */
   char   sARBOUT[ME_MAX_NARB][ME_MAX_NARBCH][ME_MAX_ARBID_LENGTH+1]; /* ARB_OUT[][] */
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
   int    nSnap;                     /* N_SNAP */
   int    nSnapCh;                   /* N_SNAPCH */
   char   sSnapID[ME_MAX_NSNAP][ME_MAX_SNAPID_LENGTH+1]; /* SNAP_ID[] */
@@ -1079,42 +1008,11 @@ struct ssmif_struct {
   char   sServerSlot[ME_MAX_NSERVER][ME_MAX_SERVERID_LENGTH+1]; /* SERVER_SLOT[] */
   int    eServerStat[ME_MAX_NSERVER];       /* SERVER_STAT[] */
   int    eServerDesi[ME_MAX_NSERVER];       /* SERVER_DESI[] */
-#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-  int    nRoach;                     /* N_ROACH */
-  int    nRoachCh;                   /* N_ROACHCH */
-  char   sRoachID[ME_MAX_NROACH][ME_MAX_ROACHID_LENGTH+1]; /* ROACH_ID[] */
-  char   sRoachSlot[ME_MAX_NROACH][ME_MAX_ROACHID_LENGTH+1]; /* ROACH_SLOT[] */
-  int    eRoachDesi[ME_MAX_NROACH]; /* ROACH_DESI[] */
-  int    eRoachStat[ME_MAX_NROACH][ME_MAX_NROACHCH];       /* ROACH_STAT[][] */
-  char   sRoachINR[ME_MAX_NROACH][ME_MAX_NROACHCH][ME_MAX_ROACHID_LENGTH+1]; /* ROACH_INR[][] */
-  char   sRoachINC[ME_MAX_NROACH][ME_MAX_NROACHCH][ME_MAX_ROACHID_LENGTH+1]; /* ROACH_INC[][] */
-  int    iRoachAnt[ME_MAX_NROACH][ME_MAX_NROACHCH];        /* ROACH_ANT[][] */
-  int    nServer;                     /* N_SERVER */
-  char   sServerID[ME_MAX_NSERVER][ME_MAX_SERVERID_LENGTH+1]; /* SERVER_ID[] */
-  char   sServerSlot[ME_MAX_NSERVER][ME_MAX_SERVERID_LENGTH+1]; /* SERVER_SLOT[] */
-  int    eServerStat[ME_MAX_NSERVER];       /* SERVER_STAT[] */
-  int    eServerDesi[ME_MAX_NSERVER];       /* SERVER_DESI[] */
-#else
-  int    nDP1;                     /* N_DP1 */
-  int    nDP1Ch;                     /* N_DP1CH */
-  char   sDP1ID[ME_MAX_NDP1][ME_MAX_DP1ID_LENGTH+1]; /* DP1_ID[] */
-  char   sDP1Slot[ME_MAX_NDP1][ME_MAX_DP1ID_LENGTH+1]; /* DP1_SLOT[] */
-  int    eDP1Desi[ME_MAX_NDP1]; /* DP1_DESI[] */
-  int    eDP1Stat[ME_MAX_NDP1][ME_MAX_NDP1CH];       /* DP1_STAT[][] */
-  char   sDP1INR[ME_MAX_NDP1][ME_MAX_NDP1CH][ME_MAX_DP1ID_LENGTH+1]; /* DP1_INR[][] */
-  char   sDP1INC[ME_MAX_NDP1][ME_MAX_NDP1CH][ME_MAX_DP1ID_LENGTH+1]; /* DP1_INC[][] */
-  int    iDP1Ant[ME_MAX_NDP1][ME_MAX_NDP1CH];        /* DP1_ANT[][] */
-  int    nDP2;                     /* N_DP2 */
-  char   sDP2ID[ME_MAX_NDP2][ME_MAX_DP2ID_LENGTH+1]; /* DP2_ID[] */
-  char   sDP2Slot[ME_MAX_NDP2][ME_MAX_DP2ID_LENGTH+1]; /* DP1_SLOT[] */
-  int    eDP2Stat[ME_MAX_NDP2];       /* DP2_STAT[] */
-  int    eDP2Desi[ME_MAX_NDP2];       /* DP2_DESI[] */
-#endif
   int    nDR;                     /* N_DR */
   int    eDRStat[ME_MAX_NDR];       /* DR_STAT[] */
   char   sDRID[ME_MAX_NDR][ME_MAX_DRID_LENGTH+1]; /* DR_ID[] */
   char   sDRPC[ME_MAX_NDR][ME_MAX_DRID_LENGTH+1]; /* DR_PC[] */
-  int    iDRDP[ME_MAX_NDR];       /* DR_DP[] */
+  int    iDRNDP[ME_MAX_NDR];       /* DR_NDP[] */
   int    nPwrRack;                /* N_PWR_RACK */
   int    nPwrPort[ME_MAX_RACK];   /* N_PWR_PORT[] */
   int    ePwrSS[ME_MAX_RACK][ME_MAX_NPWRPORT]; /* PWR_SS[][], converted to a LWA_SID_ value */
@@ -1144,16 +1042,8 @@ struct subsubsystem_status_struct {
   int    eRPDStat[ME_MAX_NRPD];                /* RPD_STAT[] */
   int    eSEPStat[ME_MAX_NSEP];                /* SEP_STAT[] */
   int    eARBStat[ME_MAX_NARB][ME_MAX_NARBCH]; /* ARB_STAT[][] */
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
   int    eSnapStat[ME_MAX_NSNAP][ME_MAX_NSNAPCH]; /* SNAP_STAT[][] */
   int    eServerStat[ME_MAX_NSERVER];             /* SERVER_STAT[] */
-#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-  int    eRoachStat[ME_MAX_NROACH][ME_MAX_NROACHCH]; /* ROACH_STAT[][] */
-  int    eServerStat[ME_MAX_NSERVER];                /* SERVER_STAT[] */
-#else
-  int    eDP1Stat[ME_MAX_NDP1][ME_MAX_NDP1CH]; /* DP1_STAT[][] */
-  int    eDP2Stat[ME_MAX_NDP2];                /* DP2_STAT[] */
-#endif
   int    eDRStat[ME_MAX_NDR];                  /* DR_STAT[] */
   };
 
@@ -1162,11 +1052,11 @@ struct sdm_struct  {
   struct    subsystem_status_struct station;        /* Station overall status */
   struct    subsystem_status_struct shl;            /* SHL status */
   struct    subsystem_status_struct asp;            /* ASP status */
-  struct    subsystem_status_struct dp;             /* DP_ status */
+  struct    subsystem_status_struct ndp;            /* NDP status */
   struct    subsystem_status_struct dr[ME_MAX_NDR]; /* DR# status (0=DR1,1=DR2,...) */
   struct subsubsystem_status_struct ssss;  /* correspond to ssmif "stat" items */
   int ant_stat[ME_MAX_NSTD][2]; /* corresponds to sc.Stand[i].Ant[k].iSS, but dynamically updated */
-  int dpo_stat[ME_MAX_NDR];     /* corresponds to sc.DPO[i].iStat, but dynamically updated */ 
+  int ndpo_stat[ME_MAX_NDR];    /* corresponds to sc.NDPO[i].iStat, but dynamically updated */ 
   struct station_settings_struct settings; /* these are the current, dynamically-varying versions of these things */
   };
 
@@ -1215,11 +1105,11 @@ struct arx_ch_struct {
   int iStat; /* ARB_STAT[][] */
   };
 
-/* DP/ADP/NDP channel configuration */
-struct dp_ch_struct {
+/* NDP channel configuration */
+struct ndp_ch_struct {
   int i;     /* index of DP1 (in 1..N_DP1) */
   int c;     /* index of DP1 input channel (in 1..N_DP1CH) */
-  int iStat; /* DP1_STAT[][] */
+  int iStat; /* NDP_STAT[][] */
   };
 
 /* Antenna analog configuration. Describes antenna and connections to it. */
@@ -1234,7 +1124,7 @@ struct ant_struct {
   struct rpd_struct RPD;
   struct sep_struct SEP;
   struct arx_ch_struct ARX;
-  struct dp_ch_struct DP;
+  struct ndp_ch_struct NDP;
   };
 
 /* Stand analog configuration. Describes 1 stand (both antennas). */
@@ -1246,17 +1136,16 @@ struct stand_struct {
                             /* '1' is antenna orientation '1' (E-W)              */
   };
 
-/* Describes 1 DP output (i.e., 4 x DRX + TBW/TBN) output, through DR */
-struct dpo_struct {
+/* Describes 1 DP output (i.e., 4 x DRX + TBT/TBS) output, through DR */
+struct ndpo_struct {
   int iStat;   /* summary status for this output */
-  /* NOTE: For DP it is assumed that DP2[1] is used for beams 1-2, and DP2[2] for beams 3-4 */
-  int iDR;     /* the DR index (1-5) attached to this DP output */
+  int iDR;     /* the DR index (1-5) attached to this NDP output */
   };
 
 /* Station configuration */
 struct sc_struct {
   struct stand_struct Stand[ME_MAX_NSTD];
-  struct dpo_struct DPO[ME_MAX_NDPOUT]; /* DP output; 1..4 are beams; 5 is TBW/TBN */
+  struct ndpo_struct NDPO[ME_MAX_NDPOUT]; /* NDP output; 1..4 are beams; 5 is TBT/TBS */
   };
 
 /**************************************/
@@ -1364,40 +1253,16 @@ int me_sc_MakeASM( struct ssmif_struct s, struct sc_struct *sc ) {
       } /* for c */ 
     } /* for i */
 
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
   /* load SNAP channel information into station config data structure */
   for ( i=0; i<s.nSnap; i++ ) {
     for ( c=0; c<s.nSnapCh; c++ ) {
       m = s.iSnapAnt[i][c]-1; /* this is the ANT that this SNAP channel is associated with */
       k = s.iAntStd[m]-1;    /* this is the STD that this SNAP channel is associated with */
-      sc->Stand[k].Ant[s.iAntOrie[m]].DP.i = i;
-      sc->Stand[k].Ant[s.iAntOrie[m]].DP.c = c;
-      sc->Stand[k].Ant[s.iAntOrie[m]].DP.iStat = s.eSnapStat[i][c];
+      sc->Stand[k].Ant[s.iAntOrie[m]].NDP.i = i;
+      sc->Stand[k].Ant[s.iAntOrie[m]].NDP.c = c;
+      sc->Stand[k].Ant[s.iAntOrie[m]].NDP.iStat = s.eSnapStat[i][c];
       } /* for c */
     } /* for i */
-#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-  /* load ROACH channel information into station config data structure */
-  for ( i=0; i<s.nRoach; i++ ) {
-    for ( c=0; c<s.nRoachCh; c++ ) {
-      m = s.iRoachAnt[i][c]-1; /* this is the ANT that this ROACH channel is associated with */ 
-      k = s.iAntStd[m]-1;    /* this is the STD that this ROACH channel is associated with */
-      sc->Stand[k].Ant[s.iAntOrie[m]].DP.i = i;  
-      sc->Stand[k].Ant[s.iAntOrie[m]].DP.c = c;     
-      sc->Stand[k].Ant[s.iAntOrie[m]].DP.iStat = s.eRoachStat[i][c];
-      } /* for c */ 
-    } /* for i */
-#else
-  /* load DP1 channel information into station config data structure */
-  for ( i=0; i<s.nDP1; i++ ) {
-    for ( c=0; c<s.nDP1Ch; c++ ) {
-      m = s.iDP1Ant[i][c]-1; /* this is the ANT that this DP1 channel is associated with */ 
-      k = s.iAntStd[m]-1;    /* this is the STD that this DP1 channel is associated with */
-      sc->Stand[k].Ant[s.iAntOrie[m]].DP.i = i;  
-      sc->Stand[k].Ant[s.iAntOrie[m]].DP.c = c;     
-      sc->Stand[k].Ant[s.iAntOrie[m]].DP.iStat = s.eDP1Stat[i][c];
-      } /* for c */ 
-    } /* for i */
-#endif
 
   /* compute the stand's iStat */
   for ( i=0; i<s.nStd; i++ ) {
@@ -1408,7 +1273,7 @@ int me_sc_MakeASM( struct ssmif_struct s, struct sc_struct *sc ) {
       if ( sc->Stand[i].Ant[k].RPD.iStat < sc->Stand[i].Ant[k].iSS ) { sc->Stand[i].Ant[k].iSS = sc->Stand[i].Ant[k].RPD.iStat; }
       if ( sc->Stand[i].Ant[k].SEP.iStat < sc->Stand[i].Ant[k].iSS ) { sc->Stand[i].Ant[k].iSS = sc->Stand[i].Ant[k].SEP.iStat; }
       if ( sc->Stand[i].Ant[k].ARX.iStat < sc->Stand[i].Ant[k].iSS ) { sc->Stand[i].Ant[k].iSS = sc->Stand[i].Ant[k].ARX.iStat; }
-      if ( sc->Stand[i].Ant[k].DP.iStat  < sc->Stand[i].Ant[k].iSS ) { sc->Stand[i].Ant[k].iSS = sc->Stand[i].Ant[k].DP.iStat;  }
+      if ( sc->Stand[i].Ant[k].NDP.iStat < sc->Stand[i].Ant[k].iSS ) { sc->Stand[i].Ant[k].iSS = sc->Stand[i].Ant[k].NDP.iStat;  }
       }
     }
 
@@ -1425,57 +1290,31 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
   int iErr = 0;
 
   /* figure out which DR is assigned to each DP output */
-  for ( i=0; i<s.nDR; i++ ) { sc->DPO[ s.iDRDP[i]-1 ].iDR = i+1; }
+  for ( i=0; i<s.nDR; i++ ) { sc->NDPO[ s.iDRNDP[i]-1 ].iDR = i+1; }
 
   /* figure out status of each DP/ADP output */
   /* Note that only the status of the associated DP board and DR are considered. */ 
   for ( i=0; i<ME_MAX_NDPOUT; i++ ) {
 
     /* assume this until we find otherwise */
-    sc->DPO[i].iStat = 3;
+    sc->NDPO[i].iStat = 3;
 
     /* consider status of attached data recorder */
-    if ( s.eDRStat[ sc->DPO[i].iDR -1 ] < sc->DPO[i].iStat ) { 
-      sc->DPO[i].iStat = s.eDRStat[ sc->DPO[i].iDR -1 ]; 
+    if ( s.eDRStat[ sc->NDPO[i].iDR -1 ] < sc->NDPO[i].iStat ) { 
+      sc->NDPO[i].iStat = s.eDRStat[ sc->NDPO[i].iDR -1 ]; 
       }
 
-#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
     /* consider the status of the ROACH/SNAP boards */
     if (i<ME_MAX_NDPOUT) { /* i=0 to 1: These are standard beams */
        /* no basis for marking this anything other than "3" at the moment*/
-      sc->DPO[i].iStat = 3;
+      sc->NDPO[i].iStat = 3;
     }
     
     /* consider the status of the servers */
     if (i<ME_MAX_NDPOUT) { /* i=0 to 1: These are standard beams */
        /* no basis for marking this anything other than "3" at the moment*/
-      sc->DPO[i].iStat = 3;
+      sc->NDPO[i].iStat = 3;
     }
-#else
-    /* NOTE: it is assumed that DP2[1] is used for beams 1-2, and DP2[2] for beams 3-4 */
-    
-    /* consider status of associated DP2 board */
-    if (i<2) { /* i=0 or 1: These go through the first DP2 board */
-      if ( s.nDP2<1 ) { 
-          /* no DP2 board for these outputs */
-          sc->DPO[i].iStat = 0;
-        } else {
-          if ( s.eDP2Stat[0] < sc->DPO[i].iStat ) { sc->DPO[i].iStat = s.eDP2Stat[0]; }
-        }
-      }
-    if ( (i>1) && (i<4) ) { /* i=2 or 3: These go through the second DP2 board */
-      if ( s.nDP2<2 ) { 
-          /* no DP2 board for these outputs */
-          sc->DPO[i].iStat = 0;
-        } else {
-          if ( s.eDP2Stat[1] < sc->DPO[i].iStat ) { sc->DPO[i].iStat = s.eDP2Stat[1]; }
-        }
-      }
-    if (i==4) { /* this is the TBW/TBN output */
-      /* no basis for marking this anything other than "3" at the moment*/
-      sc->DPO[i].iStat = 3;
-      }
-#endif
 
     }
 
@@ -1547,7 +1386,7 @@ int me_sc_MakeDSM( struct ssmif_struct s, struct sc_struct *sc ) {
 // Jul 01, 2010: Changed MIB_VAL_FIELD_LENGTH from 256 to 8192
 // May 31, 2010: Added utility function LWA_f4_swap()
 // May 30, 2010: Added utility functions LWA_i2u_swap() and LWA_i4u_swap()
-// May 25, 2010: Increased LWA_PTQ_TIMEOUT from 4 to 5 to accomodated DP emulator
+// May 25, 2010: Increased LWA_PTQ_TIMEOUT from 4 to 5 to accommodate NDP emulator
 // Aug 25, 2009: Got rid of "subslot" field
 // Aug 17, 2009: Added LWA_isMCSRSVD()
 // Aug 16, 2009: Added LWA_raw2hex(); added datalen to LWA_cmd_struct

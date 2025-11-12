@@ -4,10 +4,9 @@ Module for controlling MCS executive via UDP packets.
 
 import os
 import time
-import pytz
 import subprocess
 from typing import Dict, List, Optional, Tuple
-from datetime import datetime, timedelta, tzinfo
+from datetime import datetime, timedelta, tzinfo, timezone
 
 from lwa_mcs.config import TP_PATH
 from lwa_mcs.utils import mjdmpm_to_datetime
@@ -17,8 +16,6 @@ from lwa_mcs._mcs import send_exec_command
 __version__ = "0.4"
 __all__ = ['get_pids', 'is_running', 'send_command', 'get_queue', 'cancel_observation']
 
-
-_UTC = pytz.utc
 
 
 def get_pids() -> List[int]:
@@ -109,10 +106,6 @@ def get_queue(tz: Optional[tzinfo]=None) -> Dict[Tuple[str,int], Tuple[int,datet
             
             ## Deal with the timezone, if needed
             if tz is not None:
-                ### UTC
-                dStart = _UTC.localize(dStart)
-                dStop  = _UTC.localize(dStop)
-                
                 ### Requested timezone
                 dStart = dStart.astimezone(tz)
                 dStop  = dStop.astimezone(tz)

@@ -44,16 +44,8 @@ int main(int argc, char *argv[]) {
   printf("echo \\\n'");
   printf("mibinit ASP %s.40 1740 1741\n", ipaddr);
   printf("mcic    ASP\n\n");
-  #if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
-    printf("mibinit NDP %s.10 1742 1743\n", ipaddr);
-    printf("mcic    NDP\n\n");
-  #elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-    printf("mibinit ADP %s.10 1742 1743\n", ipaddr);
-    printf("mcic    ADP\n\n");
-  #else
-    printf("mibinit DP_ %s.10 1742 1743\n", ipaddr);
-    printf("mcic    DP_\n\n");
-  #endif
+  printf("mibinit NDP %s.10 1742 1743\n", ipaddr);
+  printf("mcic    NDP\n\n");
   int i=0;
   for(i=0; i<ME_MAX_NDR; ++i) {
     printf("mibinit DR%i %s.%i %i %i\n", i+1, ipaddr, 21+i, 5000+2*i, 5001+2*i);

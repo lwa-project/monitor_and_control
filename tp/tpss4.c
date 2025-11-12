@@ -120,17 +120,10 @@
         printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
         sscanf(data,"%ld",&(obs[nobs].OBS_STP_FREQ1[k]));
         printf("...converts to %ld\n",obs[nobs].OBS_STP_FREQ1[k]);
-#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
         if ( ( obs[nobs].OBS_STP_FREQ1[k]<222417950 ) || ( obs[nobs].OBS_STP_FREQ1[k]>1928352663 ) ) {   
           printf("[%d/%d] FATAL: OBS_STP_FREQ1[%d] out of range\n",MT_TPSS,getpid(),k);  
           exit(EXIT_FAILURE);
           }
-#else
-        if ( ( obs[nobs].OBS_STP_FREQ1[k]<219130984 ) || ( obs[nobs].OBS_STP_FREQ1[k]>1928352663 ) ) {   
-          printf("[%d/%d] FATAL: OBS_STP_FREQ1[%d] out of range\n",MT_TPSS,getpid(),k);  
-          exit(EXIT_FAILURE);
-          }
-#endif
         strcpy(data,"");   
         break;
       case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;
@@ -158,21 +151,12 @@
         printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
         sscanf(data,"%ld",&(obs[nobs].OBS_STP_FREQ2[k]));
         printf("...converts to %ld\n",obs[nobs].OBS_STP_FREQ2[k]);
-#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
         if ( obs[nobs].OBS_STP_FREQ2[k] == 0 ) {
           printf("[%d/%d] WARNING: OBS_STP_FREQ2[%d] is zero, this will be a half beam step",MT_TPSS,getpid(),k);
 	   } else if ( ( obs[nobs].OBS_STP_FREQ2[k]<222417950 ) || ( obs[nobs].OBS_STP_FREQ2[k]>1928352663 ) ) {   
           printf("[%d/%d] FATAL: OBS_STP_FREQ2[%d] out of range\n",MT_TPSS,getpid(),k);  
           exit(EXIT_FAILURE);
           }
-#else
-        if ( obs[nobs].OBS_STP_FREQ2[k] == 0 ) {
-          printf("[%d/%d] WARNING: OBS_STP_FREQ2[%d] is zero, this will be a half beam step",MT_TPSS,getpid(),k);
-	   } else if ( ( obs[nobs].OBS_STP_FREQ2[k]<219130984 ) || ( obs[nobs].OBS_STP_FREQ2[k]>1928352663 ) ) {   
-          printf("[%d/%d] FATAL: OBS_STP_FREQ2[%d] out of range\n",MT_TPSS,getpid(),k);  
-          exit(EXIT_FAILURE);
-          }
-#endif
         strcpy(data,"");   
         break;
       case TPSS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected TPSS_PL_EOF\n",MT_TPSS,getpid());   exit(EXIT_FAILURE); break;

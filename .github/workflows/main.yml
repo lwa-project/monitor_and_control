@@ -55,37 +55,17 @@ jobs:
       - name: "Software Install - Python, Part 2" 
         run: |
           python -m pip install lsl
-      - name: "Build and Install - LWA1"
+      - name: "Build and Install"
         run: |
           ./configure --with-sch-ip=127.0.0.1
           make all
           mkdir -p exec/state
-      - name: Test - LWA1
+      - name: Test - Scheduler
         run: |
           cd sch/tests
           python -m unittest discover
-          cd $GITHUB_WORKSPACE
-          cd exec/tests
-          python -m unittest discover
-      - name: "Build and Install - LWA-SV"
+      - name: Test - Executive
         run: |
           cd $GITHUB_WORKSPACE
-          make clean
-          ./configure --enable-adp
-          make all
-          mkdir -p exec/state
-      - name: Test - LWA-SV
-        run: |
-          cd exec/tests
-          python -m unittest discover
-      - name: "Build and Install - LWA-NA"
-        run: |
-          cd $GITHUB_WORKSPACE
-          make clean
-          ./configure --enable-ndp
-          make all
-          mkdir -p exec/state
-      - name: Test - LWA-NA
-        run: |
           cd exec/tests
           python -m unittest discover
