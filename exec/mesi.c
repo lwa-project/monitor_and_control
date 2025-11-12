@@ -43,26 +43,26 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 //     For cmd="TBT": Args are TBT_TRIG_TIME   (samples from start of slot, uint32)
 //                             TBT_SAMPLES     (samples, uint32)
 //                             DRX_TUNING_MASK (server tunings to pull data from, uint64)
-//     For cmd="TBS": Args are TBS_FREQ        (Hz, float64) 
-//                             TBS_BW          {1..11}
-//     For cmd="FST": Args are INDEX           ( -1, 0, or channel# (1-512) ) 
-//                             cname           This is the name of a file, presumed to be located in 
-//                                               MCS/Scheduler's "cfiles" 
+//     For cmd="TBS": Args are TBS_FREQ        (Hz, float64)
+//                             TBS_BW          {0..8}
+//     For cmd="FST": Args are INDEX           ( -1, 0, or channel# (1-512) )
+//                             cname           This is the name of a file, presumed to be located in
+//                                               MCS/Scheduler's "cfiles"
 //                                               directory, containing "sint16 COEFF_DATA[16][32]"
-//     For cmd="BAM": Args are beam            1..NUM_BEAMS(32) (uint16 BEAM_ID) 
-//                             dfile           This is the name of a file, presumed to be located in 
-//                                               MCS/Scheduler's "dfiles" 
-//                                               directory, containing "uint16 BEAM_DELAY[520]" 
-//                             gfile           This is the name of a file, presumed to be located in 
-//                                               MCS/Scheduler's "gfiles" 
-//                                               directory, containing "sint16 BEAM_GAIN[260][2][2]"   
-//                             drx_tuning      1..NUM_TUNINGS(32) (uint8 DRX_TUNING)
-//                             sub_slot        {0..99}
-//     For cmd="DRX": Args are tuning          1..NUM_TUNINGS(32)     (uint8 DRX_TUNING)
+//     For cmd="BAM": Args are beam            1..NUM_BEAMS(32) (uint16 BEAM_ID)
+//                             dfile           This is the name of a file, presumed to be located in
+//                                               MCS/Scheduler's "dfiles"
+//                                               directory, containing "uint16 BEAM_DELAY[512]"
+//                             gfile           This is the name of a file, presumed to be located in
+//                                               MCS/Scheduler's "gfiles"
+//                                               directory, containing "sint16 BEAM_GAIN[256][2][2]"
+//     For cmd="DRX": Args are beam            1..NUM_BEAMS(32)       (uint8 DRX_BEAM)
+//                             tuning          1..NUM_TUNINGS(32)     (uint8 DRX_TUNING)
 //                             freq            [Hz]                   (float64 DRX_FREQ)
 //                             ebw             Bandwidth setting 0..8 (unit8 DRX_BW)
 //                             gain            0..15                  (uint16 DRX_GAIN)
 //                             high_dr         0 or 1                 (uint8 OBS_B)
+//                             subslot         {0..99}                (uint8 sub_slot)
 //     For cmd="COR": Args are COR_NAVG        integration time in sub-slots (sint32 COR_NAVG)
 //                             DRX_TUNING_MASK (drx tunings to pull data from, uint64)
 //                             COR_GAIN        {0..15}
@@ -255,6 +255,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          break;
 
        case LWA_CMD_DRX:
+         // uint8 DRX_BEAM;
          // uint8 DRX_TUNING;
          // float64 DRX_FREQ;
          // unit8 DRX_BW;
