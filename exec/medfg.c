@@ -1,15 +1,15 @@
 // medfg.c: J. Dowell, UNM, 2015 Aug 28
 // ---
-// Delay file generator: Converts .dft files to .df, 
-// suitable for DP "uint16 BEAM_DELAY[520]" arguments
+// Delay file generator: Converts .dft files to .df,
+// suitable for DP "uint16 BEAM_DELAY[512]" arguments
 // See end of this file for history.
 // ---
 // COMMAND LINE:
 // $ ./medfg <dft_file> <df_file>
-//  <dft_file>: name of a ".dft" file.  The format of this file is expected to be text, 
-//    with 1 line per delay, with each line consisting of 2 numbers: 
+//  <dft_file>: name of a ".dft" file.  The format of this file is expected to be text,
+//    with 1 line per delay, with each line consisting of 2 numbers:
 //    the coarse (integer sample) delay (0..MAX_COARSE_DELAY), and fine (subsample delay filter index) delay 0..16.
-//  <df_file>: name of a ".df" file.  The format of this file is "uint16 BEAM_DELAY[520]", 
+//  <df_file>: name of a ".df" file.  The format of this file is "uint16 BEAM_DELAY[512]",
 //    with big-endian elements, where for each element the high 12 bits are the coarse delay and the low
 //    4 bits are the fine delay (index to a filter).  
 // ---

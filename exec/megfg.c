@@ -1,15 +1,15 @@
 // megfg.c: J. Dowell, UNM, 2015 Aug 28
 // ---
-// Gains file generator: Converts .gft files to .gf, 
-// suitable for DP "sint16 BEAM_GAIN[260][2][2]" argument
+// Gains file generator: Converts .gft files to .gf,
+// suitable for DP "sint16 BEAM_GAIN[256][2][2]" argument
 // See end of this file for history.
 // ---
 // COMMAND LINE:
 // $ ./megfg <gft_file> <gf_file>
-//  <gft_file>: name of a ".gft" file.  The format of this file is expected to be text, 
-//    with 1 line per stand, with each line consisting of 4 numbers: xx, xy, yx, yy; 
+//  <gft_file>: name of a ".gft" file.  The format of this file is expected to be text,
+//    with 1 line per stand, with each line consisting of 4 numbers: xx, xy, yx, yy;
 //    each being a float between 0 and 1.
-//  <gf_file>: name of a ".gf" file.  The format of this file is "sint16 BEAM_GAIN[260][2][2]", 
+//  <gf_file>: name of a ".gf" file.  The format of this file is "sint16 BEAM_GAIN[256][2][2]",
 //    with big-endian elements, where for each element the representation fixed point "16.1".  
 // ---
 // REQUIRES: 
