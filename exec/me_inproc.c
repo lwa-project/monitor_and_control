@@ -1097,7 +1097,7 @@ int main ( int narg, char *argv[] ) {
                 cs[ncs].action.bASAP = 0;
                 cs[ncs].action.sid = LWA_SID_NDP;
                 cs[ncs].action.cid = LWA_CMD_TBT;
-                sprintf( cs[ncs].data, "%u %u %lu", t0, osf2.OBS_TBT_SAMPLES, tuning_mask );
+                sprintf( cs[ncs].data, "%lu %u %lu", t0, osf2.OBS_TBT_SAMPLES, tuning_mask );
                 cs[ncs].action.len = strlen(cs[ncs].data)+1; 
                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                 ncs++;
