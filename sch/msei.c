@@ -62,7 +62,8 @@ int main ( int narg, char *argv[] ) {
   int i4u1, i4u2, i4s1, i4s2;
   float f41; /* assuming this is 32 bits */
   double f81; /* assuming this is 64 bits */
-  long int i8u1;
+  long int i8u1, i8u2;
+  unsigned char i1u1;
 
   union {
     unsigned short int i;
@@ -170,38 +171,41 @@ int main ( int narg, char *argv[] ) {
         
        case LWA_CMD_TBT:
          // DATA field structure:
-         // sint32 TBT_TRIG_TIME; 
-         // sint32 TBT_SAMPLES;
+         // uint64 TBT_TRIG_TIME;
+         // uint32 TBT_SAMPLES;
          // uint64 TBT_TUNING_MASK
          bError=0;
-         if (narg>3) { sscanf(argv[3],"%i", &i4s1); } else {bError=1;}
-         if (narg>4) { sscanf(argv[4],"%i", &i4s2); } else {bError=1;}
-         if (narg>5) { sscanf(argv[5],"%lu",&i8u1); } else {bError=1;}
+         if (narg>3) { sscanf(argv[3],"%lu",&i8u1); } else {bError=1;}
+         if (narg>4) { sscanf(argv[4],"%u", &i4u1); } else {bError=1;}
+         if (narg>5) { sscanf(argv[5],"%lu",&i8u2); } else {bError=1;}
          if (bError) {
-           printf("[%s] FATAL: %s/%s args are:\n TBT_TRIG_TIME (samples, int32)\n TBT_SAMPLES (samples, int32)\n TBT_TUNING_MASK (mask, uint64)\n",ME,dest,cmd);
+           printf("[%s] FATAL: %s/%s args are:\n TBT_TRIG_TIME (samples, uint64)\n TBT_SAMPLES (samples, uint32)\n TBT_TUNING_MASK (mask, uint64)\n",ME,dest,cmd);
            return;
            }
-         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;
-         i4s.i = i4s1; c.data[ 0]=i4s.b[3]; c.data[ 1]=i4s.b[2]; c.data[ 2]=i4s.b[1]; c.data[ 3]=i4s.b[0];
-         i4s.i = i4s2; c.data[ 4]=i4s.b[3]; c.data[ 5]=i4s.b[2]; c.data[ 6]=i4s.b[1]; c.data[ 7]=i4s.b[0];
-         i8u.i = i8u1; c.data[ 8]=i8u.b[7]; c.data[ 9]=i8u.b[6]; c.data[10]=i8u.b[5]; c.data[11]=i8u.b[4];
-                       c.data[12]=i8u.b[3]; c.data[13]=i8u.b[2]; c.data[14]=i8u.b[1]; c.data[15]=i8u.b[0];
-         c.datalen=16;
+         //printf("[%s] %lu %u %lu\n",ME,i8u1,i4u1,i8u2); return;
+         i8u.i = i8u1; c.data[ 0]=i8u.b[7]; c.data[ 1]=i8u.b[6]; c.data[ 2]=i8u.b[5]; c.data[ 3]=i8u.b[4];
+                       c.data[ 4]=i8u.b[3]; c.data[ 5]=i8u.b[2]; c.data[ 6]=i8u.b[1]; c.data[ 7]=i8u.b[0];
+         i4u.i = i4u1; c.data[ 8]=i4u.b[3]; c.data[ 9]=i4u.b[2]; c.data[10]=i4u.b[1]; c.data[11]=i4u.b[0];
+         i8u.i = i8u2; c.data[12]=i8u.b[7]; c.data[13]=i8u.b[6]; c.data[14]=i8u.b[5]; c.data[15]=i8u.b[4];
+                       c.data[16]=i8u.b[3]; c.data[17]=i8u.b[2]; c.data[18]=i8u.b[1]; c.data[19]=i8u.b[0];
+         c.datalen=20;
          break;
 
        case LWA_CMD_TBS:
          // DATA field structure:
-         // float32 TBS_FREQ;
+         // float64 TBS_FREQ;
+         // uint8 TBS_BW;
          bError=0;
          if (narg>3) { sscanf(argv[3],"%lf", &f81 ); } else {bError=1;}
+         if (narg>4) { sscanf(argv[4],"%hhu",&i1u1); } else {bError=1;}
          if (bError) {
-           printf("[%s] FATAL: %s/%s args are:\n TBS_FREQ (Hz, float64)",ME,dest,cmd);
+           printf("[%s] FATAL: %s/%s args are:\n TBS_FREQ (Hz, float64)\n TBS_BW {0..8}\n",ME,dest,cmd);
            exit(EXIT_FAILURE);
            }
          f8.f = f81;
          c.data[0]= f8.b[7]; c.data[1]= f8.b[6]; c.data[2]= f8.b[5]; c.data[3]= f8.b[4];
          c.data[4]= f8.b[3]; c.data[5]= f8.b[2]; c.data[6]= f8.b[1]; c.data[7]= f8.b[0];
-         c.data[8] = 8;
+         c.data[8] = i1u1;
          c.datalen = 9;
          break;
          
