@@ -95,8 +95,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
   signed short int i2s1, i2s2;
   unsigned int i4u1, i4u2;
   signed int i4s1;
-  unsigned long int i4ul1;
-  unsigned long int i8u1;
+  unsigned long int i8u1, i8u2;
   float f41;                  /* assuming this is 32 bits */
   double f81;                 /* assuming this is 64 bits */
 
@@ -301,16 +300,16 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          // uint32 TBT_SAMPLES;
          // uint64 TBT_TUNING_MASK;
 
-         i4ul1 = 0;
-         i4u2 = 0;
          i8u1 = 0;
-         sscanf(data,"%lu %u %lu",&i4ul1,&i4u2,&i8u1);
-         //printf("[%d/%d] TBF args: TBF_BITS=%hu, TBF_TRIG_TIME=%lu, TBF_SAMPLES=%u, DRX_TUNING_MASK=%lu\n",ME_MESI,getpid(),i2u1,i4ul1,i4u2,i8u1);
+         i4u1 = 0;
+         i8u2 = 0;
+         sscanf(data,"%lu %u %lu",&i8u1,&i4u1,&i8u2);
+         //printf("[%d/%d] TBF args: TBF_BITS=%hu, TBF_TRIG_TIME=%lu, TBF_SAMPLES=%u, DRX_TUNING_MASK=%lu\n",ME_MESI,getpid(),i2u1,i8u1,i4u1,i8u2);
 
-         i8u.i = i4ul1; c.data[ 0]=i8u.b[7]; c.data[ 1]=i8u.b[6]; c.data[ 2]=i8u.b[5]; c.data[ 3]=i8u.b[4];
-                        c.data[ 4]=i8u.b[3]; c.data[ 5]=i8u.b[2]; c.data[ 6]=i8u.b[1]; c.data[ 7]=i8u.b[0];
-         i4u.i = i4u2; c.data[ 8]=i4u.b[3]; c.data[ 9]=i4u.b[2]; c.data[10]=i4u.b[1]; c.data[11]=i4u.b[0];
-         i8u.i = i8u1; c.data[12]=i8u.b[7]; c.data[13]=i8u.b[6]; c.data[14]=i8u.b[5]; c.data[15]=i8u.b[4];
+         i8u.i = i8u1; c.data[ 0]=i8u.b[7]; c.data[ 1]=i8u.b[6]; c.data[ 2]=i8u.b[5]; c.data[ 3]=i8u.b[4];
+                       c.data[ 4]=i8u.b[3]; c.data[ 5]=i8u.b[2]; c.data[ 6]=i8u.b[1]; c.data[ 7]=i8u.b[0];
+         i4u.i = i4u1; c.data[ 8]=i4u.b[3]; c.data[ 9]=i4u.b[2]; c.data[10]=i4u.b[1]; c.data[11]=i4u.b[0];
+         i8u.i = i8u2; c.data[12]=i8u.b[7]; c.data[13]=i8u.b[6]; c.data[14]=i8u.b[5]; c.data[15]=i8u.b[4];
                        c.data[16]=i8u.b[3]; c.data[17]=i8u.b[2]; c.data[18]=i8u.b[1]; c.data[19]=i8u.b[0];
 
          c.datalen=20;
