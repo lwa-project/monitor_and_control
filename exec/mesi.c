@@ -40,7 +40,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 //     (The string provided will be exactly the string used for the DATA field)
 // Concerning "data":
 //   For dest="NDP", this will be a list of parameters that will get translated into a raw binary DATA field
-//     For cmd="TBT": Args are TBT_TRIG_TIME   (samples from start of slot, uint32)
+//     For cmd="TBT": Args are TBT_TRIG_TIME   (samples from start of slot, uint64)
 //                             TBT_SAMPLES     (samples, uint32)
 //                             DRX_TUNING_MASK (server tunings to pull data from, uint64)
 //     For cmd="TBS": Args are TBS_FREQ        (Hz, float64)
@@ -297,7 +297,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 
        case LWA_CMD_TBT:
          // DATA field structure:
-         // uint32 TBT_TRIG_TIME;
+         // uint64 TBT_TRIG_TIME;
          // uint32 TBT_SAMPLES;
          // uint64 TBT_TUNING_MASK;
 
@@ -307,12 +307,13 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          sscanf(data,"%lu %u %lu",&i4ul1,&i4u2,&i8u1);
          //printf("[%d/%d] TBF args: TBF_BITS=%hu, TBF_TRIG_TIME=%lu, TBF_SAMPLES=%u, DRX_TUNING_MASK=%lu\n",ME_MESI,getpid(),i2u1,i4ul1,i4u2,i8u1);
 
-         i4u.i = (unsigned int)i4ul1; c.data[ 0]=i4u.b[3]; c.data[ 1]=i4u.b[2]; c.data[ 2]=i4u.b[1]; c.data[ 3]=i4u.b[0];
-         i4u.i = i4u2; c.data[ 4]=i4u.b[3]; c.data[ 5]=i4u.b[2]; c.data[ 6]=i4u.b[1]; c.data[ 7]=i4u.b[0];
-         i8u.i = i8u1; c.data[ 8]=i8u.b[7]; c.data[ 9]=i8u.b[6]; c.data[10]=i8u.b[5]; c.data[11]=i8u.b[4];
-                       c.data[12]=i8u.b[3]; c.data[13]=i8u.b[2]; c.data[14]=i8u.b[1]; c.data[15]=i8u.b[0];
+         i8u.i = i4ul1; c.data[ 0]=i8u.b[7]; c.data[ 1]=i8u.b[6]; c.data[ 2]=i8u.b[5]; c.data[ 3]=i8u.b[4];
+                        c.data[ 4]=i8u.b[3]; c.data[ 5]=i8u.b[2]; c.data[ 6]=i8u.b[1]; c.data[ 7]=i8u.b[0];
+         i4u.i = i4u2; c.data[ 8]=i4u.b[3]; c.data[ 9]=i4u.b[2]; c.data[10]=i4u.b[1]; c.data[11]=i4u.b[0];
+         i8u.i = i8u1; c.data[12]=i8u.b[7]; c.data[13]=i8u.b[6]; c.data[14]=i8u.b[5]; c.data[15]=i8u.b[4];
+                       c.data[16]=i8u.b[3]; c.data[17]=i8u.b[2]; c.data[18]=i8u.b[1]; c.data[19]=i8u.b[0];
 
-         c.datalen=16;
+         c.datalen=20;
 
          break;
 
