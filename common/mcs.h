@@ -365,6 +365,7 @@ int LWA_getcmd( char *ssc ) {
   if (!strcmp(ssc,"COR")) cmd = LWA_CMD_COR;
   if (!strcmp(ssc,"TBT")) cmd = LWA_CMD_TBT;
   if (!strcmp(ssc,"TBS")) cmd = LWA_CMD_TBS;
+  if (!strcmp(ssc,"AT3")) cmd = LWA_CMD_AT3;
   return cmd;
   } /* LWA_getcmd() */
 
@@ -415,6 +416,7 @@ char *LWA_cmd2str( int cmd ) {
   if (cmd == LWA_CMD_COR)     return "COR";
   if (cmd == LWA_CMD_TBT)     return "TBT";
   if (cmd == LWA_CMD_TBS)     return "TBS";
+  if (cmd == LWA_CMD_AT3)     return "AT3";
   return "   ";
   } /* LWA_getsid() */
 
@@ -895,7 +897,7 @@ struct osf2_struct { /* really just a continuation of osf_struct */
   signed short int   OBS_ASP_FLT[LWA_MAX_NSTD];
   signed short int   OBS_ASP_AT1[LWA_MAX_NSTD];
   signed short int   OBS_ASP_AT2[LWA_MAX_NSTD];
-  signed short int   OBS_ASP_ATS[LWA_MAX_NSTD];
+  signed short int   OBS_ASP_AT3[LWA_MAX_NSTD];
   unsigned int       OBS_TBT_SAMPLES;
   signed short int   OBS_DRX_GAIN;
   };
@@ -932,7 +934,7 @@ struct station_settings_struct {
   signed short int asp_flt[LWA_MAX_NSTD]; // OBS_ASP_FLT[LWA_MAX_NSTD] // ASP_FLT[LWA_MAX_NSTD]
   signed short int asp_at1[LWA_MAX_NSTD]; // OBS_ASP_AT1[LWA_MAX_NSTD] // ASP_AT1[LWA_MAX_NSTD]
   signed short int asp_at2[LWA_MAX_NSTD]; // OBS_ASP_AT2[LWA_MAX_NSTD] // ASP_AT2[LWA_MAX_NSTD]
-  signed short int asp_ats[LWA_MAX_NSTD]; // OBS_ASP_ATS[LWA_MAX_NSTD] // ASP_ATS[LWA_MAX_NSTD]
+  signed short int asp_at3[LWA_MAX_NSTD]; // OBS_ASP_AT3[LWA_MAX_NSTD] // ASP_AT3[LWA_MAX_NSTD]
   signed short int drx_gain; // OBS_DRX_GAIN // DRX_GAIN
   };
 
