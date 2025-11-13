@@ -115,7 +115,7 @@ int main ( int narg, char *argv[] ) {
     }
   fprintf(fp,"B 4.3 		ATTEN-SPLIT 		NUL 	NUL 	NUL\n");  
   for ( i=0; i<260; i++ ) {
-    fprintf(fp,"V 4.3.%d 	ATSPLIT_%d		00 	a2 	a2\n",i+1,i+1);
+    fprintf(fp,"V 4.3.%d 	AT3_%d		00 	a2 	a2\n",i+1,i+1);
     }
 
   /* FEE-PWR */

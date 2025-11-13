@@ -1367,7 +1367,7 @@ int main ( int narg, char *argv[] ) {
 //  signed short int   OBS_ASP_FLT[LWA_MAX_NSTD];
 //  signed short int   OBS_ASP_AT1[LWA_MAX_NSTD];
 //  signed short int   OBS_ASP_AT2[LWA_MAX_NSTD];
-//  signed short int   OBS_ASP_ATS[LWA_MAX_NSTD];
+//  signed short int   OBS_ASP_AT3[LWA_MAX_NSTD];
 //  unsigned int       OBS_TBT_SAMPLES;
 //  signed short int   OBS_DRX_GAIN;
 
@@ -1647,7 +1647,7 @@ int main ( int narg, char *argv[] ) {
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_FLT[%d]=%hd\n",m,osf2.OBS_ASP_FLT[m]); }
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_AT1[%d]=%hd\n",m,osf2.OBS_ASP_AT1[m]); }
           for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_AT2[%d]=%hd\n",m,osf2.OBS_ASP_AT2[m]); }
-          for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_ATS[%d]=%hd\n",m,osf2.OBS_ASP_ATS[m]); }
+          for (m=0;m<LWA_MAX_NSTD;m++) { fprintf(fpl,"osf2.OBS_ASP_AT3[%d]=%hd\n",m,osf2.OBS_ASP_AT3[m]); }
           fprintf(fpl,"osf2.OBS_TBT_SAMPLES=%u\n",osf2.OBS_TBT_SAMPLES);
           fprintf(fpl,"osf2.OBS_DRX_GAIN=%hd\n",osf2.OBS_DRX_GAIN);
           } /* for ( i=1, i<=ssf.SESSION_NOBS; i++ ) */

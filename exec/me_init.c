@@ -298,7 +298,7 @@ int main ( int narg, char *argv[] ) {
     sdm.settings.asp_flt[i] = -1;
     sdm.settings.asp_at1[i] = -1;
     sdm.settings.asp_at2[i] = -1;
-    sdm.settings.asp_ats[i] = -1;
+    sdm.settings.asp_at3[i] = -1;
     }
   sdm.settings.drx_gain = -1;
 

@@ -499,14 +499,14 @@ int main ( int narg, char *argv[] ) {
                                s.settings.asp_flt[i], 
                                     s.settings.asp_at1[i], 
                                          s.settings.asp_at2[i], 
-                                              s.settings.asp_ats[i]); 
+                                              s.settings.asp_at3[i]); 
         if (!bStatic) 
         printf(" |F %2hd |A %2hd %2hd %2hd %2hd", 
                     sdm.settings.fee[i],
                             sdm.settings.asp_flt[i], 
                                  sdm.settings.asp_at1[i], 
                                       sdm.settings.asp_at2[i], 
-                                           sdm.settings.asp_ats[i]); 
+                                           sdm.settings.asp_at3[i]); 
         printf("\n");
         } /* for i */ 
       printf("key:\n");
@@ -515,13 +515,13 @@ int main ( int narg, char *argv[] ) {
       printf("|A ASP_FLT (0=split,1=full,2=reduced,3=off) (static)\n");
       printf("   ASP_AT1 (0-15) (static)\n");
       printf("   ASP_AT2 (0-15) (static)\n");
-      printf("   ASP_ATS (0-15) (static)\n");
+      printf("   ASP_AT3 (0-31) (static)\n");
       if (!bStatic) {
         printf("|F FEE (1=power on, 0=power off) (dynamic)\n");  
         printf("|A ASP_FLT (0=split,1=full,2=reduced,3=off) (dynamic)\n");
         printf("   ASP_AT1 (0-15) (dynamic)\n");
         printf("   ASP_AT2 (0-15) (dynamic)\n");
-        printf("   ASP_ATS (0-15) (dynamic)\n");
+        printf("   ASP_AT3 (0-31) (dynamic)\n");
         }
       break;
 

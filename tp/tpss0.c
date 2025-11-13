@@ -80,7 +80,7 @@
     int OBS_ASP_FLT[LWA_MAX_NSTD+1];
     int OBS_ASP_AT1[LWA_MAX_NSTD+1];
     int OBS_ASP_AT2[LWA_MAX_NSTD+1];
-    int OBS_ASP_ATS[LWA_MAX_NSTD+1];
+    int OBS_ASP_AT3[LWA_MAX_NSTD+1];
     int OBS_TBT_SAMPLES;
     int OBS_DRX_GAIN;
     long int ASP_setup_time; // not part of SDF 

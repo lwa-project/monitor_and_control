@@ -167,7 +167,7 @@ int main ( int narg, char *argv[] ) {
   signed short int asp_flt_default;
   signed short int asp_at1_default;
   signed short int asp_at2_default;
-  signed short int asp_ats_default;
+  signed short int asp_at3_default;
 
   int c[2*ME_MAX_NSTD];
 

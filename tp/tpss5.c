@@ -110,22 +110,22 @@ for (n=0;n<=LWA_MAX_NSTD;n++) {
 
   } /* for n */
 
-for (n=0;n<=LWA_MAX_NSTD;n++) { obs[nobs].OBS_ASP_ATS[n]=-1; }
+for (n=0;n<=LWA_MAX_NSTD;n++) { obs[nobs].OBS_ASP_AT3[n]=-1; }
 for (n=0;n<=LWA_MAX_NSTD;n++) {
 
-    sprintf(keyword,"OBS_ASP_ATS[%d]",n);  
+    sprintf(keyword,"OBS_ASP_AT3[%d]",n);  
     while( (i=tpss_parse_line( fpsdf, keyword, data)) == TPSS_PL_BLANK_LINE ) { }
     switch (i) {
       case TPSS_PL_KEYWORD_MATCH:    
         printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
-        sscanf(data,"%d",&(obs[nobs].OBS_ASP_ATS[n]));
-        printf("...converts to %d\n",obs[nobs].OBS_ASP_ATS[n]);
-        if ( ( obs[nobs].OBS_ASP_ATS[n]<-1 ) || ( obs[nobs].OBS_ASP_ATS[n]>15 ) ) {   
-          printf("[%d/%d] FATAL: OBS_ASP_ATS[%d] out of range\n",MT_TPSS,getpid(),n);  
+        sscanf(data,"%d",&(obs[nobs].OBS_ASP_AT3[n]));
+        printf("...converts to %d\n",obs[nobs].OBS_ASP_AT3[n]);
+        if ( ( obs[nobs].OBS_ASP_AT3[n]<-1 ) || ( obs[nobs].OBS_ASP_AT3[n]>31 ) ) {   
+          printf("[%d/%d] FATAL: OBS_ASP_AT3[%d] out of range\n",MT_TPSS,getpid(),n);  
           exit(EXIT_FAILURE);
           }
         if (n==0) { /* this is intended to apply to all n */
-          for (k=1;k<=LWA_MAX_NSTD;k++) obs[nobs].OBS_ASP_ATS[k] = obs[nobs].OBS_ASP_ATS[n];
+          for (k=1;k<=LWA_MAX_NSTD;k++) obs[nobs].OBS_ASP_AT3[k] = obs[nobs].OBS_ASP_AT3[n];
           }
         strcpy(data,"");   
         break;

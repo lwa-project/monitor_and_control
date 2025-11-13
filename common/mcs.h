@@ -281,7 +281,7 @@ char *LWA_sid2str( int sid ) {
 #define LWA_CMD_FIL      8 /* FIL (ASP) */
 #define LWA_CMD_AT1      9 /* AT1 (ASP) */
 #define LWA_CMD_AT2     10 /* AT2 (ASP) */
-#define LWA_CMD_ATS     11 /* ATS (ASP) */
+#define LWA_CMD_ATS     11 /* ATS (Obsolete) */
 #define LWA_CMD_FPW     12 /* FPW (ASP) */
 #define LWA_CMD_RXP     13 /* RXP (ASP) */
 #define LWA_CMD_FEP     14 /* FEP (ASP) */
@@ -314,6 +314,7 @@ char *LWA_sid2str( int sid ) {
 #define LWA_CMD_COR     41 /* COR (NDP) */
 #define LWA_CMD_TBT     42 /* TBT (NDP) */
 #define LWA_CMD_TBS     43 /* TBS (NDP) */
+#define LWA_CMD_AT3     44 /* AT3 (ASP) */
 
 /* When adding commands, remember to change LWA_MAX_CMD ! */
 

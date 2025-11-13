@@ -435,7 +435,7 @@ int main ( int narg, char *argv[] ) {
     for (n=1;n<=LWA_MAX_NSTD;n++) { if (obs[i].OBS_ASP_FLT[n]!=-1) obs[i].ASP_setup_time += LWA_ASP_OP_TIME_MS; }
     for (n=1;n<=LWA_MAX_NSTD;n++) { if (obs[i].OBS_ASP_AT1[n]!=-1) obs[i].ASP_setup_time += LWA_ASP_OP_TIME_MS; }
     for (n=1;n<=LWA_MAX_NSTD;n++) { if (obs[i].OBS_ASP_AT2[n]!=-1) obs[i].ASP_setup_time += LWA_ASP_OP_TIME_MS; }
-    for (n=1;n<=LWA_MAX_NSTD;n++) { if (obs[i].OBS_ASP_ATS[n]!=-1) obs[i].ASP_setup_time += LWA_ASP_OP_TIME_MS; }
+    for (n=1;n<=LWA_MAX_NSTD;n++) { if (obs[i].OBS_ASP_AT3[n]!=-1) obs[i].ASP_setup_time += LWA_ASP_OP_TIME_MS; }
     printf("[%d/%d] Obs#%d ASP setup time is %ld [ms]\n",MT_TPSS,getpid(),i,obs[i].ASP_setup_time);
     } /* for i */
 
@@ -649,7 +649,7 @@ int main ( int narg, char *argv[] ) {
 
     fprintf(fp,"\n");
     for (m=1;m<=LWA_MAX_NSTD;m++) {
-      fprintf(fp,"OBS_ASP_ATS[%d] %d\n",m,obs[n].OBS_ASP_ATS[m]);
+      fprintf(fp,"OBS_ASP_AT3[%d] %d\n",m,obs[n].OBS_ASP_AT3[m]);
       }
 
     fprintf(fp,"\n");
@@ -779,7 +779,7 @@ int main ( int narg, char *argv[] ) {
     for (m=1;m<=LWA_MAX_NSTD;m++) { osf2.OBS_ASP_FLT[m-1] = obs[n].OBS_ASP_FLT[m]; }
     for (m=1;m<=LWA_MAX_NSTD;m++) { osf2.OBS_ASP_AT1[m-1] = obs[n].OBS_ASP_AT1[m]; }
     for (m=1;m<=LWA_MAX_NSTD;m++) { osf2.OBS_ASP_AT2[m-1] = obs[n].OBS_ASP_AT2[m]; }
-    for (m=1;m<=LWA_MAX_NSTD;m++) { osf2.OBS_ASP_ATS[m-1] = obs[n].OBS_ASP_ATS[m]; }
+    for (m=1;m<=LWA_MAX_NSTD;m++) { osf2.OBS_ASP_AT3[m-1] = obs[n].OBS_ASP_AT3[m]; }
     osf2.OBS_DRX_GAIN        = obs[n].OBS_DRX_GAIN;
 
     fwrite(&osf2,sizeof(struct osf2_struct),1,fp);

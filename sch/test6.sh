@@ -95,7 +95,7 @@ sleep 1
 ./msei ASP FIL '02702'
 ./msei ASP AT1 '02708'
 ./msei ASP AT2 '02708'
-./msei ASP ATS '02708'
+./msei ASP AT3 '02708'
 ./msei ASP FPW '027211'
 ./msei ASP RXP '00'
 ./msei ASP FEP '00'

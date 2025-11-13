@@ -2582,43 +2582,43 @@
 
     } /* for ( iStd */
 
-  /* reading ASP_ATS (no brackets) */
-  sprintf(keyword,"ASP_ATS"); 
+  /* reading ASP_AT3 (no brackets) */
+  sprintf(keyword,"ASP_AT3"); 
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
   switch (i) {
     case MERS_PL_KEYWORD_MATCH: 
-      sscanf(data,"%hd",&(asp_ats_default));  
+      sscanf(data,"%hd",&(asp_at3_default));  
       strcpy(data,"");  
       break;
     case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
     case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
     case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
     }        
-  if ((asp_ats_default<0) || (asp_ats_default>15) ) {
-    printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,asp_ats_default);
+  if ((asp_at3_default<0) || (asp_at3_default>31) ) {
+    printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,asp_at3_default);
     exit(EXIT_FAILURE);
     }   
-  printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,asp_ats_default); 
+  printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,asp_at3_default); 
 
-  /* reading ASP_ATS[] */
+  /* reading ASP_AT3[] */
   for ( iStd=0; iStd<s.nStd; iStd++ ) {
 
-    sprintf(keyword,"ASP_ATS[%d]",iStd+1); s.settings.asp_ats[iStd] = asp_ats_default;
+    sprintf(keyword,"ASP_AT3[%d]",iStd+1); s.settings.asp_at3[iStd] = asp_at3_default;
     while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
     switch (i) {
       case MERS_PL_KEYWORD_MATCH: 
-        sscanf(data,"%hd",&(s.settings.asp_ats[iStd]));     
+        sscanf(data,"%hd",&(s.settings.asp_at3[iStd]));     
         strcpy(data,"");  
         break;
       case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
       case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
       case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
       }       
-  if ( (s.settings.asp_ats[iStd]<0) || (s.settings.asp_ats[iStd]>15) ) {
-      printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.settings.asp_ats[iStd]);
+  if ( (s.settings.asp_at3[iStd]<0) || (s.settings.asp_at3[iStd]>31) ) {
+      printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.settings.asp_at3[iStd]);
       exit(EXIT_FAILURE);
       } 
-    printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.settings.asp_ats[iStd]);    
+    printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.settings.asp_at3[iStd]);    
 
     } /* for ( iStd */
 

@@ -83,16 +83,16 @@ int LWA_mibupdate_ASP(
         }
       break;
 
-    case LWA_CMD_ATS:
+    case LWA_CMD_AT3:
       sscanf(cmdata,"%3d%2d",&iStand,&eSet);
       sprintf(s2,"%02d",eSet);
       if (iStand==0) { /* means "apply to all" */
           for ( i=0; i<260; i++) {
-            sprintf(sMIBlabel,"ATSPLIT_%d",i+1);
+            sprintf(sMIBlabel,"AT3_%d",i+1);
             eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, s2, strlen(s2) );
             }    
         } else { /* apply to indicated stand */
-            sprintf(sMIBlabel,"ATSPLIT_%d",iStand);
+            sprintf(sMIBlabel,"AT3_%d",iStand);
             eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, s2, strlen(s2) );
         }
       break;
