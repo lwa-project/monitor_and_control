@@ -315,6 +315,7 @@ char *LWA_sid2str( int sid ) {
 #define LWA_CMD_TBT     42 /* TBT (NDP) */
 #define LWA_CMD_TBS     43 /* TBS (NDP) */
 #define LWA_CMD_AT3     44 /* AT3 (ASP) */
+#define LWA_CMD_LOC     45 /* LOC (ASP) */
 
 /* When adding commands, remember to change LWA_MAX_CMD ! */
 
@@ -366,6 +367,7 @@ int LWA_getcmd( char *ssc ) {
   if (!strcmp(ssc,"TBT")) cmd = LWA_CMD_TBT;
   if (!strcmp(ssc,"TBS")) cmd = LWA_CMD_TBS;
   if (!strcmp(ssc,"AT3")) cmd = LWA_CMD_AT3;
+  if (!strcmp(ssc,"LOC")) cmd = LWA_CMD_LOC;
   return cmd;
   } /* LWA_getcmd() */
 
@@ -417,6 +419,7 @@ char *LWA_cmd2str( int cmd ) {
   if (cmd == LWA_CMD_TBT)     return "TBT";
   if (cmd == LWA_CMD_TBS)     return "TBS";
   if (cmd == LWA_CMD_AT3)     return "AT3";
+  if (cmd == LWA_CMD_LOC)     return "LOC";
   return "   ";
   } /* LWA_getsid() */
 
