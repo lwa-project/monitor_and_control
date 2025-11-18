@@ -1090,7 +1090,7 @@ int main ( int narg, char *argv[] ) {
                 t0 = 196000 * t0; /* [samples/ms] * [ms] */
 
                 /* Define the tuning mask to use */
-                tuning_mask = (unsigned long int) 255;
+                tuning_mask = (unsigned long int) 65535;  // 0xFFFF - all 16 tunings
 
                 /* Build up the TBT command */
                 /* TBT timing: t0=0 means "right now", send immediately after start time.
