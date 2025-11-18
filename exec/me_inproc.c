@@ -1088,17 +1088,24 @@ int main ( int narg, char *argv[] ) {
                 /* TBT trigger time is in units of samples from beginning of slot */
                 t0 = osf.OBS_START_MPM % 1000; /* number of ms beyond a second boundary */
                 t0 = 196000 * t0; /* [samples/ms] * [ms] */
-                
+
                 /* Define the tuning mask to use */
                 tuning_mask = (unsigned long int) 255;
-                
+
                 /* Build up the TBT command */
-                LWA_time2tv( &(cs[ncs].action.tv), ndp_cmd_mjd, ndp_cmd_mpm+5000 );	// TBT needs a bit for the NDP buffers to flush
+                /* TBT timing: t0=0 means "right now", send immediately after start time.
+                   t0!=0 references a specific past time (TBT controls a buffer),
+                   so send command 1-2 seconds after that time has occurred. */
+                if (t0 == 0) {
+                  LWA_time2tv( &(cs[ncs].action.tv), ndp_cmd_mjd, ndp_cmd_mpm+2000 );  // Send at start time
+                } else {
+                  LWA_time2tv( &(cs[ncs].action.tv), ndp_cmd_mjd, ndp_cmd_mpm+3000 );  // Send 1 sec after trigger time
+                }
                 cs[ncs].action.bASAP = 0;
                 cs[ncs].action.sid = LWA_SID_NDP;
                 cs[ncs].action.cid = LWA_CMD_TBT;
                 sprintf( cs[ncs].data, "%lu %u %lu", t0, osf2.OBS_TBT_SAMPLES, tuning_mask );
-                cs[ncs].action.len = strlen(cs[ncs].data)+1; 
+                cs[ncs].action.len = strlen(cs[ncs].data)+1;
                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                 ncs++;
 
