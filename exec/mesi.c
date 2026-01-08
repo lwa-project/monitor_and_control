@@ -309,8 +309,8 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          // NDP knows what to do with zero.
          i8u1 = 0;
          if( i4s1 != 0 ) {
-           i8u1 = c.tv->tv_sec * 196000000;
-           i8u1 += c.tv->tv_usec * 196;
+           i8u1 = c.tv.tv_sec * 196000000;
+           i8u1 += c.tv.tv_usec * 196;
            
            i8u1 += i4s1;
          }
