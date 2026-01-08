@@ -1170,7 +1170,7 @@ int main ( int narg, char *argv[] ) {
                   cs[ncs].action.tv.tv_sec -= 2; /* Must be sent in slot N-4 instead of N-2 */
                   cs[ncs].action.sid = LWA_SID_NDP;
                   cs[ncs].action.cid = LWA_CMD_DRX; 
-                  sprintf( cs[ncs].data, "%hd 1 %12.3f %hu %hd %ld %ld %ld",
+                  sprintf( cs[ncs].data, "%hd 1 %12.3f %hu %hd %ld %ld",
                                   osf.SESSION_DRX_BEAM, //beam 1..NUM_BEAMS(4) (uint8 DRX_BEAM)
                                       //tuning 1..NUM_TUNINGS(2) (uint8 DRX_TUNING)
                                         (4.563480616e-02)*(osf.OBS_FREQ1),                /* center freq in Hz */
