@@ -1090,7 +1090,7 @@ int main ( int narg, char *argv[] ) {
                 t0 = 196000 * t0; /* [samples/ms] * [ms] */
                 
                 /* Define the tuning mask to use */
-                tuning_mask = (unsigned long int) 255;
+                tuning_mask = (unsigned long int) 65535;
                 
                 /* Build up the TBT command */
                 LWA_time2tv( &(cs[ncs].action.tv), ndp_cmd_mjd, ndp_cmd_mpm+5000 );	// TBT needs a bit for the NDP buffers to flush

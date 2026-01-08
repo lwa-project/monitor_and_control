@@ -18,7 +18,7 @@
 //                commands have already been sent & that NDP is ready to go 
 // EXAMPLE:
 // $ ./mseox                                  # uses all defaults
-// $ ./mseox 1 /dev/sdg1 . TBT "196000 255"   # same thing with default values shown explicitly
+// $ ./mseox 1 /dev/sdg1 . TBT "196000 65535"   # same thing with default values shown explicitly
 // ---
 // REQUIRES: 
 //   me.h
@@ -56,7 +56,7 @@ int main ( int narg, char *argv[] ) {
   if (narg>4) { 
     sscanf(argv[4],"%s",mode);
     } 
-  sprintf(args,"196000 255");
+  sprintf(args,"196000 65535");
   if (narg>5) { 
     memcpy(args,argv[5],strlen(argv[5])+1);
     }

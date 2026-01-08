@@ -78,18 +78,18 @@ int LWA_mibupdate_NDP(
       //printf("ABC: <%x>\n",(unsigned int)cmdata[4]);
 
       /* parse the contents of cmdata (the DATA field form the command message) into the included 4 parameters */
+      memset(&si,0,8);
+        memcpy(&si,cmdata+0,8);
+        //sprintf(tbt_trig_time,"%9u",ui);
+        sprintf(tbt_trig_time,"%20d",LWA_i8u_swap(si));
+        //printf("ABC: <%u> <%u> <%s>\n",ui,LWA_i8u_swap(ui),tbt_trig_time);
       memset(&si,0,4);
-        memcpy(&si,cmdata+0,4);
-        //sprintf(tbw_trig_time,"%9u",ui);
-        sprintf(tbt_trig_time,"%9d",LWA_i4s_swap(si));
-        //printf("ABC: <%u> <%u> <%s>\n",ui,LWA_i4u_swap(ui),tbw_trig_time);
-      memset(&si,0,4);
-        memcpy(&si,cmdata+4,4);
+        memcpy(&si,cmdata+8,4);
         //sprintf(tbw_samples,"%8u",ui);
         sprintf(tbt_samples,"%9d",LWA_i4s_swap(si));
         //printf("ABC: <%u> <%u> <%s>\n",ui,LWA_i4u_swap(ui),tbw_samples);
       memset(&uli,0,8);
-        memcpy(&uli,cmdata+8,8);
+        memcpy(&uli,cmdata+12,8);
         //sprintf(tbw_tuning_mask,"%20u",uli);
         sprintf(tbt_tuning_mask,"%20d",LWA_i8u_swap(uli));
 
