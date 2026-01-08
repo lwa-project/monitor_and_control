@@ -492,6 +492,7 @@ int main ( int narg, char *argv[] ) {
 
   struct timeval tv;
   struct timeval tv2; /* used to remember observation end time while computing BAM updates */
+  struct timeval tbt_trigger;
 
   struct cs_command cs[ME_INPROC_MAX_CMDS];  /* the command script */
   long int ncs = 0; /* number of commands in command script */
@@ -1087,7 +1088,6 @@ int main ( int narg, char *argv[] ) {
             switch (osf.OBS_MODE) {
               case LWA_OM_TBT:
                 /* TBT trigger time is an NDP time tag */
-                struct timeval tbt_trigger;
                 LWA_time2tv(&tbt_trigger, ndp_cmd_mjd, ndp_cmd_mpm);
                 u8 = tbt_trigger.tv_sec * 196000000 + tbt_trigger.tv_usec * 196;
                 
