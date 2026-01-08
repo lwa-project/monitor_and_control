@@ -510,6 +510,7 @@ int main ( int narg, char *argv[] ) {
   struct beam_struct beam;
   struct osf2_struct osf2;
   unsigned int u4;
+  unsigned long int u8;
 
   char ssc[256];
 
@@ -1085,19 +1086,20 @@ int main ( int narg, char *argv[] ) {
 
             switch (osf.OBS_MODE) {
               case LWA_OM_TBT:
-                /* TBT trigger time is in units of samples from beginning of slot */
-                t0 = osf.OBS_START_MPM % 1000; /* number of ms beyond a second boundary */
-                t0 = 196000 * t0; /* [samples/ms] * [ms] */
+                /* TBT trigger time is an NDP time tag */
+                struct timeval tbt_trigger;
+                LWA_time2tv(&tbt_trigger, ndp_cmd_mjd, ndp_cmd_mpm);
+                u8 = tbt_trigger.tv_sec * 196000000 + tbt_trigger.tv_usec * 196;
                 
                 /* Define the tuning mask to use */
                 tuning_mask = (unsigned long int) 65535;
                 
                 /* Build up the TBT command */
-                LWA_time2tv( &(cs[ncs].action.tv), ndp_cmd_mjd, ndp_cmd_mpm+5000 );	// TBT needs a bit for the NDP buffers to flush
+                LWA_time2tv( &(cs[ncs].action.tv), ndp_cmd_mjd, ndp_cmd_mpm+2000 );	// TBT needs a bit for the NDP buffers to flush
                 cs[ncs].action.bASAP = 0;                   
                 cs[ncs].action.sid = LWA_SID_NDP;  
                 cs[ncs].action.cid = LWA_CMD_TBT;  
-                sprintf( cs[ncs].data, "%ld %u %lu", t0, osf2.OBS_TBT_SAMPLES, tuning_mask );
+                sprintf( cs[ncs].data, "%lu %u %lu", u8, osf2.OBS_TBT_SAMPLES, tuning_mask );
                 cs[ncs].action.len = strlen(cs[ncs].data)+1; 
                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                 ncs++;
