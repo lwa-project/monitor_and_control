@@ -78,8 +78,8 @@ int LWA_mibupdate_NDP(
       //printf("ABC: <%x>\n",(unsigned int)cmdata[4]);
 
       /* parse the contents of cmdata (the DATA field form the command message) into the included 4 parameters */
-      memset(&si,0,8);
-        memcpy(&si,cmdata+0,8);
+      memset(&uli,0,8);
+        memcpy(&uli,cmdata+0,8);
         //sprintf(tbt_trig_time,"%9u",ui);
         sprintf(tbt_trig_time,"%20d",LWA_i8u_swap(si));
         //printf("ABC: <%u> <%u> <%s>\n",ui,LWA_i8u_swap(ui),tbt_trig_time);
