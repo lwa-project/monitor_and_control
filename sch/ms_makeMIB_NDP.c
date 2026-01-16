@@ -56,9 +56,9 @@ main ( int narg, char *argv[] ) {
   /* lay in ADP-specific entries used by MCS (not part of ADP ICD) */
 
   fprintf(fp,"B 0.4           MCS_TBT_TRIGGER 		NUL 	NUL 	NUL\n");
-  fprintf(fp,"V 0.4.1         MCS_TBT_TRIG_TIME           0       a9      NUL\n");
+  fprintf(fp,"V 0.4.1         MCS_TBT_TRIG_TIME           0       a20     NUL\n");
   fprintf(fp,"V 0.4.2         MCS_TBT_SAMPLES             0       a8      NUL\n");
-  fprintf(fp,"V 0.4.3         MCS_TBT_TUNING_MASK         0       i8ur    NUL\n");
+  fprintf(fp,"V 0.4.3         MCS_TBT_TUNING_MASK         0       a20     NUL\n");
   fprintf(fp,"V 0.4.4         MCS_TBT_REFERENCE           0       a9      NUL\n");
   fprintf(fp,"V 0.4.5         MCS_TBT_CMD_SENT_MPM        0       a9      NUL\n");  
 
