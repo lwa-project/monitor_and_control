@@ -30,7 +30,7 @@ int LWA_mibupdate_NDP(
   unsigned int ui; 
   signed int si;
   unsigned long int uli;
-  char tbt_trig_time[10];
+  char tbt_trig_time[21];
   char tbt_samples[10];
   unsigned long int ul;
   char tbt_tuning_mask[21];
