@@ -30,6 +30,7 @@ int LWA_mibupdate_NDP(
   unsigned int ui; 
   signed int si;
   unsigned long int uli;
+  signed long int sli;
   char tbt_trig_time[21];
   char tbt_samples[10];
   unsigned long int ul;
@@ -85,13 +86,13 @@ int LWA_mibupdate_NDP(
         //printf("ABC: <%u> <%u> <%s>\n",ui,LWA_i8u_swap(ui),tbt_trig_time);
       memset(&si,0,4);
         memcpy(&si,cmdata+8,4);
-        //sprintf(tbw_samples,"%8u",ui);
+        //sprintf(tbt_samples,"%8u",ui);
         sprintf(tbt_samples,"%9d",LWA_i4s_swap(si));
-        //printf("ABC: <%u> <%u> <%s>\n",ui,LWA_i4u_swap(ui),tbw_samples);
-      memset(&uli,0,8);
-        memcpy(&uli,cmdata+12,8);
-        //sprintf(tbw_tuning_mask,"%20u",uli);
-        sprintf(tbt_tuning_mask,"%20d",LWA_i8u_swap(uli));
+        //printf("ABC: <%u> <%u> <%s>\n",ui,LWA_i4u_swap(ui),tbt_samples);
+      memset(&sli,0,8);
+        memcpy(&sli,cmdata+12,8);
+        //sprintf(tbt_tuning_mask,"%20u",sli);
+        sprintf(tbt_tuning_mask,"%20d",LWA_i8s_swap(sli));
 
       /* updating the MIB using the LWA_mibupdate_RPT() function */
 

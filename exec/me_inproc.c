@@ -524,6 +524,7 @@ int main ( int narg, char *argv[] ) {
   long int t0;
   int b4bits;
   unsigned long int tuning_mask;
+  long int signed_tuning_mask;
   int gain1, gain2;
 
   int dr_sid;
@@ -1092,14 +1093,14 @@ int main ( int narg, char *argv[] ) {
                 u8 = tbt_trigger.tv_sec * 196000000 + tbt_trigger.tv_usec * 196;
                 
                 /* Define the tuning mask to use */
-                tuning_mask = (unsigned long int) 65535;
+                signed_tuning_mask = (long int) 65535;
                 
                 /* Build up the TBT command */
                 LWA_time2tv( &(cs[ncs].action.tv), ndp_cmd_mjd, ndp_cmd_mpm+2000 );	// TBT needs a bit for the NDP buffers to flush
                 cs[ncs].action.bASAP = 0;                   
                 cs[ncs].action.sid = LWA_SID_NDP;  
                 cs[ncs].action.cid = LWA_CMD_TBT;  
-                sprintf( cs[ncs].data, "%lu %u %lu", u8, osf2.OBS_TBT_SAMPLES, tuning_mask );
+                sprintf( cs[ncs].data, "%lu %u %ld", u8, osf2.OBS_TBT_SAMPLES, signed_tuning_mask );
                 cs[ncs].action.len = strlen(cs[ncs].data)+1; 
                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                 ncs++;

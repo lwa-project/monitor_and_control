@@ -62,7 +62,7 @@ int main ( int narg, char *argv[] ) {
   int i4u1, i4u2, i4s1, i4s2;
   float f41; /* assuming this is 32 bits */
   double f81; /* assuming this is 64 bits */
-  long int i8u1, i8u2;
+  long int i8u1, i8u2, i8s1;
 
   union {
     unsigned short int i;
@@ -80,6 +80,10 @@ int main ( int narg, char *argv[] ) {
     unsigned long int i;
     char b[8];
     } i8u;
+  union {
+    long int i;
+    char b[8];
+    } i8s;
   union {
     float f;
     unsigned char b[4];
@@ -172,21 +176,21 @@ int main ( int narg, char *argv[] ) {
          // DATA field structure:
          // uint64 TBT_TRIG_TIME; 
          // sint32 TBT_SAMPLES;
-         // uint64 TBT_TUNING_MASK
+         // sint64 TBT_TUNING_MASK
          bError=0;
          if (narg>3) { sscanf(argv[3],"%lu",&i8u1); } else {bError=1;}
          if (narg>4) { sscanf(argv[4],"%i", &i4s2); } else {bError=1;}
-         if (narg>5) { sscanf(argv[5],"%lu",&i8u2); } else {bError=1;}
+         if (narg>5) { sscanf(argv[5],"%ld",&i8s1); } else {bError=1;}
          if (bError) {
-           printf("[%s] FATAL: %s/%s args are:\n TBT_TRIG_TIME (samples, uint64)\n TBT_SAMPLES (samples, int32)\n TBT_TUNING_MASK (mask, uint64)\n",ME,dest,cmd);
+           printf("[%s] FATAL: %s/%s args are:\n TBT_TRIG_TIME (samples, uint64)\n TBT_SAMPLES (samples, int32)\n TBT_TUNING_MASK (mask, int64)\n",ME,dest,cmd);
            return;
            }
-         //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;
+         //printf("[%s] %lu %i %ld\n",ME,lu,i4s2,i8s1); return;
          i8u.i = i8u1; c.data[ 0]=i8u.b[7]; c.data[ 1]=i8u.b[6]; c.data[ 2]=i8u.b[5]; c.data[ 3]=i8u.b[4];
                        c.data[ 4]=i8u.b[3]; c.data[ 5]=i8u.b[2]; c.data[ 6]=i8u.b[1]; c.data[ 7]=i8u.b[0];
          i4s.i = i4s2; c.data[ 8]=i4s.b[3]; c.data[ 9]=i4s.b[2]; c.data[10]=i4s.b[1]; c.data[11]=i4s.b[0];
-         i8u.i = i8u2; c.data[12]=i8u.b[7]; c.data[13]=i8u.b[6]; c.data[14]=i8u.b[5]; c.data[15]=i8u.b[4];
-                       c.data[16]=i8u.b[3]; c.data[17]=i8u.b[2]; c.data[18]=i8u.b[1]; c.data[19]=i8u.b[0];
+         i8s.i = i8s1; c.data[12]=i8s.b[7]; c.data[13]=i8s.b[6]; c.data[14]=i8s.b[5]; c.data[15]=i8s.b[4];
+                       c.data[16]=i8s.b[3]; c.data[17]=i8s.b[2]; c.data[18]=i8s.b[1]; c.data[19]=i8s.b[0];
          c.datalen=20;
          break;
 

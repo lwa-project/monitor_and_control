@@ -63,6 +63,7 @@ int meos (
   int temp = 0;
   long int nsamp = 12000000;
   unsigned long int tuning_mask;
+  long int signed_tuning_mask;
   float tbs_f = 0;
   int tbs_r = 0;
   long int tbs_d = 0;
@@ -107,8 +108,8 @@ int meos (
   /* parse mode/args */
   bDone=0;
   if (!strncmp(mode,"TBT",3)) {\
-    sscanf(args,"%ld %lu",&nsamp,&tuning_mask);
-    printf("[%d/%d] mode='%s', nsamp=%ld, tuning_mask=%lu\n",ME_MEOS,getpid(),mode,nsamp,tuning_mask);
+    sscanf(args,"%ld %ld",&nsamp,&signed_tuning_mask);
+    printf("[%d/%d] mode='%s', nsamp=%ld, tuning_mask=%ld\n",ME_MEOS,getpid(),mode,nsamp,signed_tuning_mask);
     sprintf(dr_format,"DEFAULT_TBT");
     bDone=1;
   }
@@ -223,7 +224,7 @@ int meos (
 
   /* if TBT, now tell NDP to start. */
   if (!strncmp(mode,"TBT",3)) {
-    sprintf(data,"0 %ld %lu",nsamp,tuning_mask);
+    sprintf(data,"0 %ld %ld",nsamp,signed_tuning_mask);
     err = mesi( NULL, "NDP", "TBT", data, "today", "asap", &reference );
     if (err!=MESI_ERR_OK) {
       printf("[%d/%d] FATAL: mesi(NULL,'NDP','TBT',...) returned code %d\n",ME_MEOS,getpid(),err);  
