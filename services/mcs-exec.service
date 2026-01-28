@@ -9,6 +9,7 @@ User=op1
 
 # Startup method
 Type=oneshot
+RemainAfterExit=yes
 
 # Shutdown method
 KillSignal=SIGTERM
