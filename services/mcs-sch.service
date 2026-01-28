@@ -1,0 +1,34 @@
+[Unit]
+Description=LWA Monitor and Control Software - Scheduler
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# Run as the specified user
+User=op1
+
+# Startup method
+Type=oneshot
+
+# Shutdown method
+KillSignal=SIGTERM
+TimeoutStopSec=120
+
+# Logging
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=mcs-sch
+
+# Setup the environment
+Environment=PYTHONUNBUFFERED=1
+
+WorkingDirectory=/home/op1/MCS/sch
+
+ExecStart=/bin/bash -ec '\
+    ./start_station.sh'
+
+ExecStop=/bin/bash -ec '\
+    ./ms_shutdown.sh'
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,34 @@
+[Unit]
+Description=LWA Monitor and Control Software - Executive
+After=network-online.target mcs-sch.service
+Wants=network-online.target mcs-sch.service
+
+[Service]
+# Run as the specified user
+User=op1
+
+# Startup method
+Type=oneshot
+
+# Shutdown method
+KillSignal=SIGTERM
+TimeoutStopSec=120
+
+# Logging
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=mcs-exec
+
+# Setup the environment
+Environment=PYTHONUNBUFFERED=1
+
+WorkingDirectory=/home/op1/MCS/exec
+
+ExecStart=/bin/bash -ec '\
+    ./me_init 0'
+
+ExecStop=/bin/bash -ec '\
+    ./meeix SHT'
+    
+[Install]
+WantedBy=multi-user.target
