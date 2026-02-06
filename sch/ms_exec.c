@@ -546,7 +546,7 @@ int main ( int narg, char *argv[] ) {
           c.datalen = -1;
 
           /* log it as a failed task */
-	  LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, c.ref, 
+          LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, c.ref, 
                        LWA_MSELOG_TP_FAIL_EXEC, c.sid, c.cid, c.data, c.datalen, &mselog_line_ctr );
                             
           } 
@@ -628,7 +628,7 @@ int main ( int narg, char *argv[] ) {
           c.datalen = -1;
 
           /* log task progress */
-	  LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, c.ref, 
+          LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, c.ref, 
                        LWA_MSELOG_TP_FAIL_EXEC, 
                        c.sid, c.cid, c.data, c.datalen, &mselog_line_ctr ); 
    
@@ -690,10 +690,11 @@ int main ( int narg, char *argv[] ) {
 
       if ( msgsnd( mqtid[task[tqp].sid], (void *)&mq_msg, LWA_msz(), 0) == -1 ) {
 
-          sprintf(logmsg,"FATAL: Could not msgsnd()");
-	  LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, task[tqp].ref, 
+          LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, task[tqp].ref, 
                        LWA_MSELOG_TP_FAIL_EXEC, 
                        task[tqp].sid, task[tqp].cid, task[tqp].data, task[tqp].datalen, &mselog_line_ctr ); 
+          sprintf(logmsg,"FATAL: Could not msgsnd()");
+          LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
 
           tq[tqp] = 0; /* reallocate this slot in the message queue */
 
