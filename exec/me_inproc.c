@@ -1116,7 +1116,7 @@ int main ( int narg, char *argv[] ) {
                 cs[ncs].action.cid = LWA_CMD_TBS;  
                 sprintf( cs[ncs].data, "%8.0f %hu",
                                 (4.563480616e-02)*(osf.OBS_FREQ1), /* center freq in Hz */
-                                      osf.OBS_BW);                 /* 1-9 */                /* subslot */ 
+                                      osf.OBS_BW);                 /* 7-9 */                /* subslot */ 
                 cs[ncs].action.len = strlen(cs[ncs].data)+1;
                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
                 ncs++;

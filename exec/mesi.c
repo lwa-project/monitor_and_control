@@ -44,7 +44,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 //                             TBT_SAMPLES     (samples, uint32)
 //                             DRX_TUNING_MASK (server tunings to pull data from, uint64)
 //     For cmd="TBS": Args are TBS_FREQ        (Hz, float64) 
-//                             TBS_BW          {1..11}
+//                             TBS_BW          {7..9}
 //     For cmd="FST": Args are INDEX           ( -1, 0, or channel# (1-512) ) 
 //                             cname           This is the name of a file, presumed to be located in 
 //                                               MCS/Scheduler's "cfiles" 
