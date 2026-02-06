@@ -314,7 +314,7 @@
       sscanf(data,"%d",&(obs[nobs].OBS_BW));
       printf("...converts to %d\n",obs[nobs].OBS_BW);
       if ( obs[nobs].OBS_MODE == LWA_OM_TBS ) {
-         if ( ( obs[nobs].OBS_BW<8 ) || ( obs[nobs].OBS_BW>8 ) ) { 		// TODO: Update this when possible
+         if ( ( obs[nobs].OBS_BW<7 ) || ( obs[nobs].OBS_BW>9 ) ) { 		// TODO: Update this when possible
             printf("[%d/%d] FATAL: Invalid OBS_BW\n",MT_TPSS,getpid());
             exit(EXIT_FAILURE);
             }
