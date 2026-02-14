@@ -99,28 +99,28 @@ int main ( int narg, char *argv[] ) {
 
   /* ARX-FILTERS */
   fprintf(fp,"B 3 		ARX-FILTERS 		NUL 	NUL 	NUL\n");
-  for ( i=0; i<260; i++ ) {
+  for ( i=0; i<256; i++ ) {
     fprintf(fp,"V 3.%d		FILTER_%d 		3 	a1 	a1\n",i+1,i+1);
     }
 
   /* ARX-ATTEN */
   fprintf(fp,"B 4 		ARX-ATTEN 		NUL 	NUL 	NUL\n");  
   fprintf(fp,"B 4.1 		ATTEN-1 		NUL 	NUL 	NUL\n");  
-  for ( i=0; i<260; i++ ) {
+  for ( i=0; i<256; i++ ) {
     fprintf(fp,"V 4.1.%d 	AT1_%d\t\t\t00 	a2 	a2\n",i+1,i+1);
     }
   fprintf(fp,"B 4.2 		ATTEN-2 		NUL 	NUL 	NUL\n");  
-  for ( i=0; i<260; i++ ) {
+  for ( i=0; i<256; i++ ) {
     fprintf(fp,"V 4.2.%d 	AT2_%d\t\t\t00 	a2 	a2\n",i+1,i+1);
     }
-  fprintf(fp,"B 4.3 		ATTEN-SPLIT 		NUL 	NUL 	NUL\n");  
-  for ( i=0; i<260; i++ ) {
+  fprintf(fp,"B 4.3 		ATTEN-3 		NUL 	NUL 	NUL\n");  
+  for ( i=0; i<256; i++ ) {
     fprintf(fp,"V 4.3.%d 	AT3_%d		00 	a2 	a2\n",i+1,i+1);
     }
 
   /* FEE-PWR */
   fprintf(fp,"B 5 		FEE-PWR 		NUL 	NUL 	NUL\n");
-  for ( i=0; i<260; i++ ) {
+  for ( i=0; i<256; i++ ) {
     fprintf(fp,"B 5.%d    \tFEEPWR_%d		NUL 	NUL 	NUL\n",i+1,i+1);
     fprintf(fp,"V 5.%d.1  \tFEEPOL1PWR_%d		UNK 	a3 	a3\n",i+1,i+1);
     fprintf(fp,"V 5.%d.2  \tFEEPOL2PWR_%d		UNK 	a3 	a3\n",i+1,i+1);
