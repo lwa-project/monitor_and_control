@@ -1,0 +1,67 @@
+% 06-examples.tex - Section 6: Command/Response Examples
+
+\section{Command/Response Examples}
+\label{sec:examples}
+
+For clarity in the following examples, single quotes (\texttt{'}) are used in lieu of spaces and ``\texttt{@}'' is used to represent a byte of raw binary data.
+
+\subsection{PNG Command/Response}
+
+The following is an example of a \cmd{PNG} command sent from MCS to NDP.  MCS sends a message packet containing the payload
+\begin{verbatim}
+NDPMCSPNG'''''1391'''0'54828'12345678'
+\end{verbatim}
+which is interpreted as follows:
+\begin{itemize}
+    \item \texttt{DESTINATION} is the NDP subsystem.
+    \item \texttt{SENDER} is MCS.
+    \item \texttt{TYPE} = ``\texttt{PNG}''
+    \item \texttt{REFERENCE} = 1391
+    \item \texttt{DATALEN} = 0, so the \texttt{DATA} field is empty.
+    \item \texttt{MJD} = 54828, so Dec~28, 2008~UT.
+    \item \texttt{MPM} = 12345678.  Dividing by $3600 \times 1000$ gives the number of hours past UT midnight; in this case, about 3.4.
+    \item Mandatory space following the \texttt{MPM} field.
+    \item The \texttt{DATA} field is empty.
+\end{itemize}
+
+In response, NDP sends the message
+\begin{verbatim}
+MCSNDPPNG'''''1391'''8'54828'12345698'A'NORMAL
+\end{verbatim}
+which is interpreted as follows:
+\begin{itemize}
+    \item \texttt{DESTINATION} is the MCS subsystem.
+    \item \texttt{SENDER} is NDP.
+    \item \texttt{TYPE} = ``\texttt{PNG}''
+    \item \texttt{REFERENCE} = 1391 (same as the command message, so MCS can identify it)
+    \item \texttt{DATALEN} = 8, so the \texttt{DATA} field is 8~bytes long.
+    \item \texttt{MJD} = 54828 (same as the command message since the response occurs the same UT day)
+    \item \texttt{MPM} = 12345698; this is NDP's estimate of when this response was sent.
+    \item Mandatory space following the \texttt{MPM} field.
+    \item The \texttt{DATA} field contains the 8-byte string ``\texttt{A'NORMAL}'', indicating that the associated command message was accepted, and that the value of MIB entry~1.1 (\mib{SUMMARY}) is ``\texttt{NORMAL}''.
+\end{itemize}
+
+\subsection{RPT Command/Response}
+
+The following is an example of an \cmd{RPT} command sent from MCS to NDP.  This example assumes the MIB fragment shown in Table~\ref{tab:mib-fragment}.  MCS sends the message
+\begin{verbatim}
+NDPMCSRPT'''''1391'''3'54828'12345678'B21
+\end{verbatim}
+which is interpreted as a request for the data value associated with MIB index~2.1.
+
+In response, NDP sends the message
+\begin{verbatim}
+MCSNDPRPT'''''1391'''5'54828'12345698'A'NORMAL''3.4
+\end{verbatim}
+in which NDP is indicating that B21~= 3.4.  Note that all 5~bytes of data value (per the specification of Table~\ref{tab:mib-fragment}) are sent.
+
+The following example is different only in that multiple values are requested simultaneously using a single branch index.  MCS sends the message
+\begin{verbatim}
+NDPMCSRPT'''''1391''3'54828'12345678'C22
+\end{verbatim}
+
+In response, NDP sends the message
+\begin{verbatim}
+MCSNDPRPT'''''1391''5'54828'12345698'A'NORMALPRR'7
+\end{verbatim}
+in which NDP is indicating that D221~= ``PRR'' and E222~= 7.  Again, note that all bytes of the data value (per the specification of Table~\ref{tab:mib-fragment}) are sent.  This is particularly important as MCS will simply count bytes to parse the \texttt{DATA} field into MIB entry data.

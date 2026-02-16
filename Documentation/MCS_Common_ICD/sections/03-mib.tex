@@ -1,0 +1,58 @@
+% 03-mib.tex - Section 3: MIB
+
+\section{MIB}
+\label{sec:mib}
+
+``MIB'' stands for ``management information base.''\footnote{The use of this term is a nod to the MIB concept used in the SNMP protocol, but the two MIBs are not the same, and in fact are different in many respects.}  The MIB provides a means for organizing subsystem status information that is jointly understood by communicating subsystems.
+
+The MIB has an index/outline structure, as demonstrated by the MIB fragment in Table~\ref{tab:mib-fragment}.  (Note this fragment is an example only, shown only for the purposes of explaining the MIB concept.)  In this fragment, each line is an ``entry'', consisting of an ``index'' (e.g., 2) and a ``label'' (e.g., A2).  Each MIB index/label possibly also has an associated data value.  A ``branch'' is a set of entries with a common index/label; for example, branch~2 (also known as ``A2'') contains the data values B21~= 3.4, D221~= ``PRR'', and E222~= 7.  Other examples: Branch~2.1 contains the data value B21~= 3.4 only, and branch~2.2 (also known as ``C22'') contains data values D221~= ``PRR'' and E222~= 7.  Note that entries with ``sub-entries'' are for organizational purposes only (making it possible to refer to multiple entries using a single index/label), and do not contain data.  For example, entries 2 and 2.2 have labels only and contain no data.
+
+\begin{table}[htbp]
+    \centering
+    \caption{A MIB fragment, provided as an example only.}
+    \label{tab:mib-fragment}
+    \begin{tabular}{llll}
+        \toprule
+        \textbf{Index} & \textbf{Label} & \textbf{Data} & \textbf{Remarks} \\
+        \midrule
+        2       & \mib{A2}   &       &  \\
+        2.1     & \mib{B21}  & 3.4   & 5 bytes, ASCII, base-10, decimal point allowed \\
+        2.2     & \mib{C22}  &       &  \\
+        2.2.1   & \mib{D221} & PRR   & 3 bytes, ASCII, alphanumeric \\
+        2.2.2   & \mib{E222} & 7     & 2 bytes, ASCII, base-10 integer \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+MIB labels must consist only of letters (case is significant), integer numbers, and the underscore character.  Spaces are not allowed.  The length must be less than or equal to 32 characters.
+
+Data referenced by MIB entries need not be ASCII, and can be raw binary.  If raw binary, then the subsystem ICD must specify whether this is big- or little-endian.  An example of the use of raw binary would be to represent the coefficients for a digital filter.  The filter can be represented as a MIB branch where each entry is the raw bit values for one coefficient, or the entire filter can be represented as a single entry consisting of all coefficients concatenated into a contiguous sequence of bits.
+
+Each subsystem communicating with MCS using this ICD must specify a MIB as part of a subsystem-specific ICD.  This MIB consists of MCS-required MIB entries, plus additional MIB entries which are subsystem-specific.  The MCS-required MIB entries are specified below.
+
+\begin{enumerate}
+\item \mib{MCS-RESERVED}
+    \begin{enumerate}[label=1.\arabic*.]
+    \item \mib{SUMMARY} [7~bytes, ASCII/Alphanumeric].  Summary state of subsystem.  Valid values are as follows:
+        \begin{itemize}
+        \item \texttt{NORMAL}
+        \item \texttt{WARNING} (issue(s) found, but still fully operational)
+        \item \texttt{ERROR} (problems found which limit or prevent proper operation)
+        \item \texttt{BOOTING} (initializing system; not yet fully operational)
+        \item \texttt{SHUTDWN} (shutting down system; not ready for operation)
+        \end{itemize}
+
+    \item \mib{INFO} [maximum 256~bytes, ASCII].  When MIB entry~1.1 is \texttt{WARNING} or \texttt{ERROR}, this entry should begin with a list of MIB labels, separated by single spaces, and terminated by the character ``!'' (exclamation mark).  The MIB labels should be those containing values indicating the problem condition.  A human-readable text string which further explains \texttt{WARNING} and \texttt{ERROR} values may be included following the character ``!''.  Any unused bytes at the end of the \mib{INFO} string should be spaces.  Use of this MIB entry when 1.1 is not \texttt{WARNING} or \texttt{ERROR} is subsystem-specific.
+
+    \item \mib{LASTLOG} [maximum 256~bytes, ASCII].  Last internal log message.  Human-readable text string, with format specified in the subsystem-specific ICD.  A timestamp of some form should be included near the beginning of the string.  Any unused bytes at the end of the string should be spaces.
+
+    \item \mib{SUBSYSTEM} [3~bytes, ASCII/Alphanumeric].  3~character string identifying the subsystem; e.g., ``\texttt{NDP}'', ``\texttt{ASP}''.  All strings beginning with the characters ``MC'' are reserved.  Other strings are assigned by the LWA Systems Engineer.\footnote{One possible use of this entry is to facilitate subsystem discovery; e.g., MCS can send a \cmd{RPT} command message to ``ALL'' requesting MIB entry~1.4, and see who responds.}
+
+    \item \mib{SERIALNO} [maximum 5~bytes, ASCII].  A string identifying the specific subsystem hardware ``serial number''.  This string is assigned by the subsystem manufacturer in coordination with the LWA Systems Engineer.
+
+    \item \mib{VERSION} [maximum 256~bytes, ASCII].  Version number of locally-installed software.  May include additional information or elaboration; if so, the ``principal'' version number must appear first and be followed by a single space.  Any unused bytes at the end of this string should be spaces.
+
+    \item[$1.$\{n\}$.$] \textit{Additional MIB entries beginning ``1.'' TBD}
+    \end{enumerate}
+\item[\{n\}.] \textit{MIB entries numbered 2 or higher are subsystem-specific, and are defined in the associated ICDs}
+\end{enumerate}

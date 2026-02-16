@@ -1,0 +1,10 @@
+% 01-introduction.tex - Section 1: Introduction and Scope
+
+\section{Introduction and Scope}
+\label{sec:introduction}
+
+MCS stands for ``monitoring and control system.''  As described in the LWA station architecture document~[1], MCS monitors and controls ASP (``analog signal processing''), NDP (``Next Generation Digital Processor''), and other subsystems.  The purpose of this interface control document (ICD) is to define a common interface between MCS and connected subsystems.
+
+Compliance with this ICD is necessary, but not sufficient for integration with MCS.  As explained below, this ICD provides a framework for the interface between MCS and subsystems which are directly connected to it, including electromechanical interfaces and protocol information.  It is expected that subsystems connecting to MCS will cite this ICD in their subsystem-specific ICDs, and then specify subsystem-specific information as extensions within this framework.
+
+This ICD does not apply to the interface between NDP and the data recording capability being provided by MCS, described in Section~3 of~[2].  It also does not apply to the Heuristic Automation for LWA (HAL) or the SmartCopy systems.
