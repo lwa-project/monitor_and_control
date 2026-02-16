@@ -50,7 +50,6 @@ jobs:
             setuptools \
             numpy \
             astropy \
-            ephem \
             requests
       - name: "Software Install - Python, Part 2" 
         run: |
