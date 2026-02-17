@@ -1,0 +1,188 @@
+% 06-obs-spec.tex - Format of an Observation Specification File
+
+\section{Format of an Observation Specification File}
+
+The observation specification file (\texttt{.obs}) is a packed binary file.  The following format specifiers are used:  \texttt{f4} denotes a 4-byte floating-point number in little-endian (IEEE~754) format;  \texttt{s$n$} denotes a string of $n$ bytes;  \texttt{i2} denotes a signed 2-byte integer in little-endian byte order;  \texttt{u2}, \texttt{u4}, and \texttt{u8} denote unsigned integers of 2, 4, and 8 bytes, respectively, in little-endian byte order.
+
+Table~\ref{tab:obs-format} shows the format of the observation specification file.
+
+\begin{longtable}{|l|l|p{8cm}|}
+\caption{Format of an observation specification file.}
+\label{tab:obs-format} \\
+\hline
+\textbf{Format} & \textbf{Field} & \textbf{Description} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Format} & \textbf{Field} & \textbf{Description} \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\texttt{u2} & \texttt{FORMAT\_VERSION}      & Format version of this file. \\
+\hline
+\texttt{s9} & \texttt{PROJECT\_ID}          & Project identifier (null-terminated string). \\
+\hline
+\texttt{u4} & \texttt{SESSION\_ID}          & Session identifier. \\
+\hline
+\texttt{i2} & \texttt{SESSION\_DRX\_BEAM}   & DRX beam assignment. \\
+\hline
+\texttt{s32} & \texttt{SESSION\_SPC}        & DR spectrometer configuration (see~[2]). \\
+\hline
+\texttt{u4} & \texttt{OBS\_ID}              & Observation identifier. \\
+\hline
+\texttt{u8} & \texttt{OBS\_START\_MJD}      & Observation start time, MJD (integer part). \\
+\hline
+\texttt{u8} & \texttt{OBS\_START\_MPM}      & Observation start time, milliseconds past midnight. \\
+\hline
+\texttt{u8} & \texttt{OBS\_DUR}             & Observation duration in milliseconds. \\
+\hline
+\texttt{u2} & \texttt{OBS\_MODE}            & Observing mode (1=\texttt{TRK\_RADEC}, 2=\texttt{TRK\_SOL}, 3=\texttt{TRK\_JOV}, 4=\texttt{STEPPED}, 7=\texttt{DIAG1}, 9=\texttt{TRK\_LUN}, 10=\texttt{TBT}, 11=\texttt{TBS}). \\
+\hline
+\texttt{s32} & \texttt{OBS\_BDM}            & Beam-dipole mode configuration. \\
+\hline
+\texttt{f4} & \texttt{OBS\_RA}              & Right ascension (decimal hours, J2000). \\
+\hline
+\texttt{f4} & \texttt{OBS\_DEC}             & Declination (decimal degrees, J2000). \\
+\hline
+\texttt{u2} & \texttt{OBS\_B}               & Beam type (1=\texttt{SIMPLE}, 2=\texttt{HIGH\_DR}; 0 for non-tracking modes). \\
+\hline
+\texttt{u4} & \texttt{OBS\_FREQ1}           & Tuning word for first tuning. \\
+\hline
+\texttt{u4} & \texttt{OBS\_FREQ2}           & Tuning word for second tuning. \\
+\hline
+\texttt{u2} & \texttt{OBS\_BW}              & Bandwidth code. \\
+\hline
+\texttt{u4} & \texttt{OBS\_STP\_N}          & Number of steps (0 if not \texttt{STEPPED}). \\
+\hline
+\texttt{u2} & \texttt{OBS\_STP\_RADEC}      & Step coordinate system (1=RA/DEC, 0=AZ/ALT). \\
+\hline
+     var     & Step Def.\ Blocks             & \texttt{OBS\_STP\_N} step definition blocks (see below). \\
+\hline
+\texttt{i2} & \texttt{OBS\_FEE[1][1]}       & FEE setting, stand 1, pol 1. \\
+\hline
+             & $\vdots$                      & \\
+\hline
+\texttt{i2} & \texttt{OBS\_FEE[256][2]}     & FEE setting, stand 256, pol 2. \\
+\hline
+\texttt{i2} & \texttt{OBS\_ASP\_FLT[1]}     & ASP filter setting, stand 1. \\
+\hline
+             & $\vdots$                      & \\
+\hline
+\texttt{i2} & \texttt{OBS\_ASP\_FLT[256]}   & ASP filter setting, stand 256. \\
+\hline
+\texttt{i2} & \texttt{OBS\_ASP\_AT1[1]}     & ASP first attenuator, stand 1. \\
+\hline
+             & $\vdots$                      & \\
+\hline
+\texttt{i2} & \texttt{OBS\_ASP\_AT1[256]}   & ASP first attenuator, stand 256. \\
+\hline
+\texttt{i2} & \texttt{OBS\_ASP\_AT2[1]}     & ASP second attenuator, stand 1. \\
+\hline
+             & $\vdots$                      & \\
+\hline
+\texttt{i2} & \texttt{OBS\_ASP\_AT2[256]}   & ASP second attenuator, stand 256. \\
+\hline
+\texttt{i2} & \texttt{OBS\_ASP\_AT3[1]}     & ASP third attenuator, stand 1. \\
+\hline
+             & $\vdots$                      & \\
+\hline
+\texttt{i2} & \texttt{OBS\_ASP\_AT3[256]}   & ASP third attenuator, stand 256. \\
+\hline
+\texttt{u4} & \texttt{OBS\_TBT\_SAMPLES}    & Number of samples (\texttt{TBT} mode). \\
+\hline
+\texttt{i2} & \texttt{OBS\_DRX\_GAIN}       & Gain (DRX/tracking/TBS modes). \\
+\hline
+\texttt{u4} & 4294967295                     & Alignment check ($= 2^{32}-1$). \\
+\hline
+
+\end{longtable}
+
+\subsection{Step Definition Block}
+
+Each step definition block (for step $n$) has the following format:
+
+\begin{longtable}{|l|l|p{8cm}|}
+\caption{Format of a step definition block.}
+\label{tab:step-format} \\
+\hline
+\textbf{Format} & \textbf{Field} & \textbf{Description} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Format} & \textbf{Field} & \textbf{Description} \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\texttt{f4} & \texttt{OBS\_STP\_C1[$n$]}     & First coordinate (RA or azimuth). \\
+\hline
+\texttt{f4} & \texttt{OBS\_STP\_C2[$n$]}     & Second coordinate (DEC or altitude). \\
+\hline
+\texttt{u4} & \texttt{OBS\_STP\_T[$n$]}      & Step start time (ms from \texttt{OBS\_START\_MPM}). \\
+\hline
+\texttt{u4} & \texttt{OBS\_STP\_FREQ1[$n$]}  & Tuning word for first tuning at step $n$. \\
+\hline
+\texttt{u4} & \texttt{OBS\_STP\_FREQ2[$n$]}  & Tuning word for second tuning at step $n$. \\
+\hline
+\texttt{u2} & \texttt{OBS\_STP\_B[$n$]}      & Beam type at step $n$ (1=\texttt{SIMPLE}, 2=\texttt{HIGH\_DR}, 3=\texttt{SPEC\_DELAYS\_GAINS}). \\
+\hline
+     var     & Beam Def.\ Block               & Present only if \texttt{OBS\_STP\_B[$n$]} = \texttt{SPEC\_DELAYS\_GAINS}. \\
+\hline
+\texttt{u4} & 4294967294                      & Alignment check ($= 2^{32}-2$). \\
+\hline
+
+\end{longtable}
+
+\subsection{Beam Definition Block}
+
+A beam definition block is present within a step definition block only when \texttt{OBS\_STP\_B[$n$]} = \texttt{SPEC\_DELAYS\_GAINS}.  Its format is:
+
+\begin{longtable}{|l|l|p{8cm}|}
+\caption{Format of a beam definition block.}
+\label{tab:beam-format} \\
+\hline
+\textbf{Format} & \textbf{Field} & \textbf{Description} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Format} & \textbf{Field} & \textbf{Description} \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\texttt{u2} & \texttt{OBS\_BEAM\_DELAY[$n$][1]}       & Beam delay, antenna 1. \\
+\hline
+             & $\vdots$                                & \\
+\hline
+\texttt{u2} & \texttt{OBS\_BEAM\_DELAY[$n$][512]}     & Beam delay, antenna 512. \\
+\hline
+\texttt{i2} & \texttt{BEAM\_GAIN[$n$][1][1][1]}       & Beam gain, stand 1, pol 1$\times$1. \\
+\hline
+             & $\vdots$                                & \\
+\hline
+\texttt{i2} & \texttt{BEAM\_GAIN[$n$][256][2][2]}     & Beam gain, stand 256, pol 2$\times$2. \\
+\hline
+
+\end{longtable}
+
+\begin{noteBox}
+Note 1: The beam delay array has $2 \times 256 = 512$ entries (one per antenna, i.e., two per stand), while the beam gain array has $256 \times 2 \times 2 = 1024$ entries (a $2\times 2$ Jones matrix per stand).
+\end{noteBox}
+
+\begin{noteBox}
+Note 2: Fields that are not applicable to a given observing mode are set to 0.  For example, \texttt{OBS\_RA} and \texttt{OBS\_DEC} are 0 for modes other than \texttt{TRK\_RADEC}, and \texttt{OBS\_STP\_N} is 0 for modes other than \texttt{STEPPED}.
+\end{noteBox}
+
+\begin{calloutBox}{Implementation Note}{blue}
+The per-stand arrays in the observation specification file and beam definition blocks are always dimensioned for 256 stands, regardless of the actual number of stands at the station.  For stations with fewer stands, the unused entries are set to their default values ($-1$ for optional parameters, 0 otherwise).  This ensures that the binary file format is the same for all stations.
+\end{calloutBox}

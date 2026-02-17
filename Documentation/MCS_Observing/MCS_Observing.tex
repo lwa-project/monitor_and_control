@@ -1,0 +1,40 @@
+% MCS_Observing.tex - LWA Station-Level Observing Procedure
+% Version 5 - April 2011
+%
+% Long Wavelength Array Project
+% LWA Station-Level Observing Procedure and Associated Metadata
+
+\documentclass{lwa-icd-memo}
+
+% Project-specific configuration
+\input{config/packages}
+\input{config/macros}
+\input{config/metadata}
+
+\begin{document}
+
+% Title page
+\makeICDtitlepage
+
+% Change record
+\input{frontmatter/revisions}
+\clearpage
+
+% Table of contents
+\makeICDtoc
+
+% Main content
+\input{sections/01-introduction}
+\input{sections/02-definitions}
+\input{sections/03-process}
+\input{sections/04-sdf-format}
+\input{sections/05-session-spec}
+\input{sections/06-obs-spec}
+\input{sections/07-session-metadata}
+
+% Appendices
+\appendix
+\input{appendices/appendix-a}
+\input{appendices/appendix-b}
+
+\end{document}
