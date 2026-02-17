@@ -1,3 +1,4 @@
+#define PY_SSIZE_T_CLEAN
 #include "Python.h"
 #include "mcs.h"
 #include "me.h"
