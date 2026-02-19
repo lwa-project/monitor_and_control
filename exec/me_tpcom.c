@@ -204,6 +204,14 @@ int main ( int narg, char *argv[] ) {
         if (om.ssf.SESSION_INC_SMIB==1) system("cp state/ssmif.dat tpcom/temp/.");
         system("cp state/sdm.dat tpcom/temp/dynamic/.");
         if (om.ssf.SESSION_LOG_EXE==1)  system("cp state/meelog.txt tpcom/temp/dynamic/.");
+        if (om.ssf.SESSION_LOG_SCH==1) {
+          #ifdef ME_SCP2CP  /*see me.h */
+            sprintf(cmd, "cp %s/mselog.txt tpcom/temp/dynamic/.",LWA_SCH_SCP_DIR);
+          #else
+            sprintf(cmd, "scp %s:%s/mselog.txt tpcom/temp/dynamic/.",LWA_SCH_SCP_ADDR,LWA_SCH_SCP_DIR);
+          #endif
+          system(cmd);
+          }
         
         /* making zip file & moving it into soutbox */
         //sprintf(cmd,"cd %s/temp; tar -zcvf temp.tgz .; mv temp.tgz ../%s_%04d.tgz; cd ../.. 2> /dev/null", 
