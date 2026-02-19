@@ -1,0 +1,78 @@
+% revisions.tex - Change record table for MCS Observing Procedure
+
+\changerecordheader
+
+\begin{longtable}{|p{1.5cm}|p{2.5cm}|p{3cm}|p{7cm}|}
+    \hline
+    \textbf{Version} & \textbf{Date} & \textbf{Author(s)} & \textbf{Changes} \\
+    \hline
+    \endfirsthead
+
+    \hline
+    \textbf{Version} & \textbf{Date} & \textbf{Author(s)} & \textbf{Changes} \\
+    \hline
+    \endhead
+
+    \hline
+    \endfoot
+
+    1 & 2010-06-16 & S.~Ellingson &
+    \begin{minipage}[t]{\linewidth}
+        \begin{itemize}[leftmargin=*,nosep,after=\strut]
+            \item First version.
+        \end{itemize}
+    \end{minipage} \\
+    \hline
+    2 & 2011-02-27 & S.~Ellingson &
+    \begin{minipage}[t]{\linewidth}
+        \begin{itemize}[leftmargin=*,nosep,after=\strut]
+            \item Renamed \texttt{tp\_session\_sch} to \texttt{tpss}; UT changed to UTC; mean Julian date changed to modified Julian date; \texttt{OBS\_START\_MPM} range clarified; \texttt{OBS\_RA}/\texttt{OBS\_DEC} epoch J2000; SDF lines required order; \texttt{OBS\_BW}=5 now 4.9~MSPS; \texttt{PROJECT\_ID} 8 chars; session-specific optional params reordered; Added \texttt{SESSION\_CRA}; TBN freq set by \texttt{OBS\_FREQ1}; Session Spec File format significantly different.
+        \end{itemize}
+    \end{minipage} \\
+    \hline
+    3 & 2011-03-01 & S.~Ellingson &
+    \begin{minipage}[t]{\linewidth}
+        \begin{itemize}[leftmargin=*,nosep,after=\strut]
+            \item Replaced SDF example in Appendix~1.
+        \end{itemize}
+    \end{minipage} \\
+    \hline
+    4 & 2011-03-29 & S.~Ellingson &
+    \begin{minipage}[t]{\linewidth}
+        \begin{itemize}[leftmargin=*,nosep,after=\strut]
+            \item Added \texttt{DIAG1} mode; \texttt{OBS\_STP\_T[$n$]} valid values updated; Deleted \texttt{OBS\_COMMENT} codes; \texttt{SESSION\_DRX\_BEAM} now 2-byte signed; \texttt{SESSION\_LOG\_}/\texttt{SESSION\_INC\_} now 1-byte signed; In obs spec, \texttt{OBS\_START\_MJD}/\texttt{MPM}/\texttt{DUR} now 8-byte unsigned; Changed session metadata file; Additional files in tarball; Clarified dynamic subdirectory; Fixed minor typos.
+        \end{itemize}
+    \end{minipage} \\
+    \hline
+    5 & 2011-04-12 & S.~Ellingson &
+    \begin{minipage}[t]{\linewidth}
+        \begin{itemize}[leftmargin=*,nosep,after=\strut]
+            \item Added tag field to session metadata; Explained both \texttt{OBS\_FEE} must be off; Fixed minor typos.
+        \end{itemize}
+    \end{minipage} \\
+    \hline
+    10 & 2026-02 & J.~Dowell &
+    \begin{minipage}[t]{\linewidth}
+        \begin{itemize}[leftmargin=*,nosep,after=\strut]
+            \item All DP\_ references changed to NDP throughout.
+            \item Removed \texttt{TBW} and \texttt{TBN} observing modes; added \texttt{TRK\_LUN}, \texttt{TBT}, \texttt{TBS}.
+            \item Added \texttt{SESSION\_SPC}, \texttt{OBS\_BDM} keywords.
+            \item \texttt{OBS\_ASP\_ATS} replaced by \texttt{OBS\_ASP\_AT3} (range 0--31).
+            \item Removed \texttt{OBS\_TBW\_BITS}, \texttt{OBS\_TBW\_SAMPLES}, \texttt{OBS\_TBN\_GAIN}.
+            \item Added \texttt{OBS\_TBT\_SAMPLES}.
+            \item Stand counts updated from 260 to 256; beam delays from 520 to 512.
+            \item \texttt{OBS\_DRX\_GAIN} range updated to 0--255 (packed per-tuning gains).
+            \item \texttt{OBS\_ASP\_FLT} range updated to 0--7.
+            \item Binary formats updated: \texttt{SESSION\_SPC}, \texttt{OBS\_BDM} fields added; \texttt{SESSION\_MRP\_NDP}/\texttt{MUP\_NDP} replace \texttt{DP\_}.
+            \item Updated session output tarball contents to match current implementation.
+            \item Updated session metadata file format (added \texttt{BARCODE} field, documented outcome codes).
+            \item Added implementation notes for 256-stand array sizing and stepped observation setting carry-over.
+            \item Removed \texttt{OBS\_BW} sample rate table; refer to NDP ICD.
+            \item Updated organization address to University of New Mexico.
+            \item Updated \texttt{OBS\_B} options and explinations.
+            \item Added a not that setting \texttt{OBS\_FREQ2} to 0 disables the beam's second tuning.
+        \end{itemize}
+    \end{minipage} \\
+    \hline
+
+\end{longtable}

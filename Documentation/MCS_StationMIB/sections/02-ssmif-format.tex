@@ -1,0 +1,559 @@
+\section{Format of a Station Static MIB Initialization File}
+
+Initialization files are human-readable text files.
+Each line of a file has one of the following formats:
+\begin{itemize}
+\item \texttt{keyword data \# comment}
+\item \texttt{\# comment}
+\item empty line
+\end{itemize}
+where \texttt{keyword} identifies a parameter and contains no internal whitespace,
+\texttt{data} consists of printable non-whitespace characters (not including ``\#''),
+and \texttt{comment} is preceded by ``\#'' and may contain any printable characters including spaces.
+
+Lines may be up to 4096 characters in length.
+Empty lines are allowed and their use is encouraged for readability.
+
+Parameters must appear in the order listed below.
+For each parameter, the keyword, definition, and valid values are given.
+
+%% -------------------------------------------------------------------
+\subsection{Station-Level Parameters}
+%% -------------------------------------------------------------------
+
+\begin{description}[style=nextline]
+
+\item[\texttt{FORMAT\_VERSION}]
+Integer equal to the version number of this document (i.e., the format version).  Included to account for the possibility of format modifications over time.  This document describes version 10 of the Station Static MIB Initialization File (SSMIF).
+
+\item[\texttt{STATION\_ID}]
+Two-letter station identification code, intended to enable concise, unambiguous identification of the station.
+
+\item[\texttt{GEO\_N}]
+WGS84 latitude of the origin of the station's local coordinate system.  Decimal degrees, with North and South being indicated as ``$+$'' and ``$-$'', respectively.  This position is an arbitrarily-selected reference point and may not necessarily correspond to the location of the phase center of the station during an observation.
+
+\item[\texttt{GEO\_E}]
+WGS84 longitude of the origin of the station's local coordinate system.  Decimal degrees, with East and West being indicated as ``$+$'' and ``$-$'', respectively.  This position is an arbitrarily-selected reference point and may not necessarily correspond to the location of the phase center of the station during an observation.
+
+\item[\texttt{GEO\_EL}]
+Elevation (above mean sea level) of the origin of the station's local coordinate system, in meters.  This position is an arbitrarily-selected reference point and may not necessarily correspond to the location of the phase center of the station during an observation.
+
+\item[\texttt{N\_STD}]
+Maximum number of stands; expected to be $\le 256$.
+
+\end{description}
+
+%% -------------------------------------------------------------------
+\subsection{Stand Locations}
+%% -------------------------------------------------------------------
+
+Stand locations are specified by stand ID $n$, where $1 \le n \le \texttt{N\_STD}$.
+Stands must appear in order.
+
+\begin{description}[style=nextline]
+
+\item[\texttt{STD\_LX[$n$]}]
+$x$ coordinate in meters of the feedpoints of stand $n$ ($1 \le n \le \texttt{N\_STD}$) in the local coordinate system.  The $+x$ direction points East.
+
+\item[\texttt{STD\_LY[$n$]}]
+$y$ coordinate in meters of the feedpoints of stand $n$ ($1 \le n \le \texttt{N\_STD}$) in the local coordinate system.  The $+y$ direction points North.
+
+\item[\texttt{STD\_LZ[$n$]}]
+$z$ coordinate in meters of the feedpoints of stand $n$ ($1 \le n \le \texttt{N\_STD}$) in the local coordinate system.  The $+z$ direction points to the Zenith.
+
+\end{description}
+
+%% -------------------------------------------------------------------
+\subsection{Antenna Parameters}
+%% -------------------------------------------------------------------
+
+Antenna parameters are indexed by antenna number $n$, where $1 \le n \le 2 \times \texttt{N\_STD}$.
+
+\begin{description}[style=nextline]
+
+\item[\texttt{ANT\_STD[$n$]}]
+The stand on which antenna $n$ ($1 \le n \le 2 \times \texttt{N\_STD}$) is mounted.
+This will be set to $\lfloor(n-1)/2\rfloor + 1$ if not otherwise specified.
+
+\item[\texttt{ANT\_ORIE[$n$]}]
+The intended orientation (polarization) of antenna $n$ ($1 \le n \le 2 \times \texttt{N\_STD}$).
+0 = ``intended to be North--South''; 1 = ``intended to be East--West''.
+This will be set to $(n-1) \bmod 2$ if not otherwise specified.
+
+\item[\texttt{ANT\_STAT[$n$]}]
+The status of antenna $n$ ($1 \le n \le 2 \times \texttt{N\_STD}$).  See Note~1.
+This will be set to 3 (``OK'') if not otherwise specified.
+
+\item[\texttt{ANT\_THETA[$n$]}]
+The undesired rotation [deg] of the North or East arm of antenna $n$ ($1 \le n \le 2 \times \texttt{N\_STD}$) in the elevation plane, relative to nominal ($0^{\circ}$).  Positive sign means increasing angle with respect to the $+z$-axis of the local coordinate system, in the direction of the $+x$ axis.
+Will be set to 0.0 (no error) if not otherwise specified.
+
+\item[\texttt{ANT\_PHI[$n$]}]
+The undesired rotation [deg] of the North or East arm of antenna $n$ ($1 \le n \le 2 \times \texttt{N\_STD}$) in the azimuth plane, relative to nominal ($0^{\circ}$).  Positive sign means increasing angle with respect to the $+x$-axis of the local coordinate system in the direction of the $+y$ axis.
+Will be set to 0.0 (no error) if not otherwise specified.
+
+\item[\texttt{ANT\_DESI[$n$]}]
+An integer code which identifies the design of antenna $n$ ($1 \le n \le 2 \times \texttt{N\_STD}$).  See Note~2.  Design information expected to be indexed by this code includes the mechanical specification (specific design/manufacture/model), complex vector effective length vs.\ frequency and pattern direction, and self-impedance vs.\ frequency.  This will be set to ``1'' unless otherwise specified.  Use ``0'' to indicate a different but unknown/undocumented design.
+\texttt{ANT\_DESI} (without \texttt{[$n$]}) will result in \texttt{ANT\_DESI[$n$]} being set to \texttt{ANT\_DESI} for all $n$; although subsequent uses of \texttt{ANT\_DESI[$n$]} can override this for selected $n$.
+
+\end{description}
+
+%% -------------------------------------------------------------------
+\subsection{FEE Parameters}
+%% -------------------------------------------------------------------
+
+\begin{description}[style=nextline]
+
+\item[\texttt{N\_FEE}]
+Number of FEEs to be described in this file; expected to be $\le 256$.
+
+\item[\texttt{FEE\_ID[$m$]}]
+Label or serial number which unambiguously identifies FEE $m$ ($1 \le m \le \texttt{N\_FEE}$).  Limited to 10 characters.
+Default: \texttt{"UNK"}.
+
+\item[\texttt{FEE\_STAT[$m$]}]
+The status of FEE $m$ ($1 \le m \le \texttt{N\_FEE}$).  See Note~1.
+This will be set to 3 (``OK'') unless otherwise specified.
+
+\item[\texttt{FEE\_DESI[$m$]}]
+An integer code which identifies the design of FEE $m$ ($1 \le m \le \texttt{N\_FEE}$).  See Note~2.  Design information expected to be indexed by this code includes electrical and mechanical descriptions and frequency-domain transfer function described as (a) coefficients in a polynomial fit (representative of all FEEs with this design code) and (b) measurements of a representative FEE.  This will be set to ``1'' unless otherwise specified.  Use ``0'' to indicate a different but unknown/undocumented design.
+\texttt{FEE\_DESI} (without \texttt{[$m$]}) will result in \texttt{FEE\_DESI[$n$]} being set to \texttt{FEE\_DESI} for all $n$; although subsequent uses of \texttt{FEE\_DESI[$n$]} can override this for selected $n$.
+
+\item[\texttt{FEE\_GAI1[$m$]}]
+Gain [dB] of FEE $m$ ($1 \le m \le \texttt{N\_FEE}$) port~1, assuming nominal input and output terminations, at the reference frequency of 38~MHz.
+This will be set to 35.7 unless otherwise specified.
+\texttt{FEE\_GAI1} (without \texttt{[$m$]}) will result in \texttt{FEE\_GAI1[$n$]} being set to \texttt{FEE\_GAI1} for all $n$; although subsequent uses of \texttt{FEE\_GAI1[$n$]} can override this for selected $n$.
+
+\item[\texttt{FEE\_GAI2[$m$]}]
+Gain [dB] of FEE $m$ ($1 \le m \le \texttt{N\_FEE}$) port~2, assuming nominal input and output terminations, at the reference frequency of 38~MHz.  If this FEE has only one port, then this should be $-200$.
+This will be set to 35.7 unless otherwise specified.
+\texttt{FEE\_GAI2} (without \texttt{[$m$]}) will result in \texttt{FEE\_GAI2[$n$]} being set to \texttt{FEE\_GAI2} for all $n$; although subsequent uses of \texttt{FEE\_GAI2[$n$]} can override this for selected $n$.
+
+\item[\texttt{FEE\_ANT1[$m$]}]
+Antenna to which port~1 of FEE $m$ ($1 \le m \le \texttt{N\_FEE}$) is connected.  Normally in the range 1 to $2 \times \texttt{N\_STD}$.  A value of 0 means the FEE input is open-circuited.
+If not specified, then \texttt{FEE\_ANT1[1]} will be 1, \texttt{FEE\_ANT2[1]} will be 2, \texttt{FEE\_ANT1[2]} will be 3, \texttt{FEE\_ANT2[2]} will be 4, and so on.
+
+\item[\texttt{FEE\_ANT2[$m$]}]
+Antenna to which port~2 of FEE $m$ ($1 \le m \le \texttt{N\_FEE}$) is connected.  Normally in the range 1 to $2 \times \texttt{N\_STD}$.  A value of 0 means the FEE input is open-circuited or has only one port.  See \texttt{FEE\_ANT1[$m$]} (above) for default ordering.
+
+\end{description}
+
+\subsubsection{FEE Power Sources}
+
+FEE power sources must be identified in order of FEE index $m$, with each FEE's source being specified using \texttt{FEE\_RACK[$m$]} and \texttt{FEE\_PORT[$m$]} keywords, in that order.
+
+\begin{description}[style=nextline]
+
+\item[\texttt{FEE\_RACK[$m$]}]
+From the perspective of SHL, this is the rack (1 to \texttt{N\_PWR\_RACK}) in which the power supply powering this FEE is located.  A value of 0 means this parameter is unknown.  This parameter is used in conjunction with \texttt{FEE\_PORT[$m$]} to identify the power source for this FEE.
+
+\item[\texttt{FEE\_PORT[$m$]}]
+From the perspective of SHL, this is the power port corresponding to the power supply powering this FEE.  A value of 0 means this parameter is unknown.  This parameter is used in conjunction with \texttt{FEE\_RACK[$m$]} to identify the power source for this FEE.
+
+\end{description}
+
+%% -------------------------------------------------------------------
+\subsection{Cable (RPD) Parameters}
+%% -------------------------------------------------------------------
+
+\begin{description}[style=nextline]
+
+\item[\texttt{N\_RPD}]
+Maximum number of cables connecting FEEs to SEP; expected to be $\le 512$.
+
+\item[\texttt{RPD\_ID[$m$]}]
+Label or tag which unambiguously identifies cable $m$ ($1 \le m \le \texttt{N\_RPD}$).  Maximum 25 characters.
+Default: \texttt{"UNK"}.
+
+\item[\texttt{RPD\_STAT[$m$]}]
+The status of cable $m$ ($1 \le m \le \texttt{N\_RPD}$).  See Note~1.
+Set to 3 (``OK'') unless otherwise specified.
+
+\item[\texttt{RPD\_DESI[$m$]}]
+An integer code which identifies the design of cable $m$ ($1 \le m \le \texttt{N\_RPD}$).  See Note~2.  Design information expected to be indexed by this code includes cable type, electrical and mechanical descriptions, frequency-domain transfer function described as coefficients in a polynomial fit (representative of all cables with this design code).  Set to ``1'' unless otherwise specified.  Use ``0'' to indicate that design is unknown or undocumented.
+\emph{The value ``2'' has been used for the (primarily) LMR-400 cables to Stand~258.}
+\texttt{RPD\_DESI} (without \texttt{[$m$]}) will result in \texttt{RPD\_DESI[$n$]} being set to \texttt{RPD\_DESI} for all $n$; although subsequent uses of \texttt{RPD\_DESI[$n$]} can override this for selected $n$.
+
+\item[\texttt{RPD\_LENG[$m$]}]
+Length [m] of cable $m$ ($1 \le m \le \texttt{N\_RPD}$).
+Set to 0.0 unless otherwise specified.
+
+\end{description}
+
+The following cable parameters appear in the order shown.
+First the default-setting keyword (without index) is given, then the per-cable values:
+\texttt{RPD\_VF}, \texttt{RPD\_DD}, \texttt{RPD\_A0}, \texttt{RPD\_A1}, \texttt{RPD\_FREF}, \texttt{RPD\_STR},
+followed by
+\texttt{RPD\_VF[$m$]}, \texttt{RPD\_DD[$m$]}, \texttt{RPD\_A0[$m$]}, \texttt{RPD\_A1[$m$]}, \texttt{RPD\_FREF[$m$]}, \texttt{RPD\_STR[$m$]}.
+
+\begin{description}[style=nextline]
+
+\item[\texttt{RPD\_VF[$m$]}]
+Velocity factor [\%] of cable $m$ ($1 \le m \le \texttt{N\_RPD}$) at the reference frequency of 10~MHz.
+Set to 83 unless specified otherwise.
+\texttt{RPD\_VF} (without \texttt{[$m$]}) will result in \texttt{RPD\_VF[$n$]} being set to \texttt{RPD\_VF} for all $n$; although subsequent uses of \texttt{RPD\_VF[$n$]} can override this for selected $n$.
+
+\item[\texttt{RPD\_DD[$m$]}]
+Dispersive delay [ns] of cable $m$ ($1 \le m \le \texttt{N\_RPD}$) at the reference frequency of 10~MHz and reference length of 100~m.  This is the additional propagation time beyond that expected by dividing length by (velocity factor $\times$ the speed of light in free space) due to cable dispersion.
+Set to 2.4 unless specified otherwise.
+\texttt{RPD\_DD} (without \texttt{[$m$]}) will result in \texttt{RPD\_DD[$n$]} being set to \texttt{RPD\_DD} for all $n$; although subsequent uses of \texttt{RPD\_DD[$n$]} can override this for selected $n$.
+
+\item[\texttt{RPD\_A0[$m$]}]
+$\alpha_0$ [m$^{-1}$] of cable $m$ ($1 \le m \le \texttt{N\_RPD}$) at the reference frequency \texttt{RPD\_FREF[$m$]}.  This is used to calculate cable gain given length and frequency via the Memo~170 model.
+Set to 0.00428 unless otherwise specified.
+\texttt{RPD\_A0} (without \texttt{[$m$]}) will result in \texttt{RPD\_A0[$n$]} being set to \texttt{RPD\_A0} for all $n$; although subsequent uses of \texttt{RPD\_A0[$n$]} can override this for selected $n$.
+
+\item[\texttt{RPD\_A1[$m$]}]
+$\alpha_1$ [m$^{-1}$] of cable $m$ ($1 \le m \le \texttt{N\_RPD}$) at the reference frequency \texttt{RPD\_FREF[$m$]}.  This is an additional parameter included to improve accuracy, but is not implemented in the Memo~170 model as of Version~3.
+Set to 0.0 unless otherwise specified.
+\texttt{RPD\_A1} (without \texttt{[$m$]}) will result in \texttt{RPD\_A1[$n$]} being set to \texttt{RPD\_A1} for all $n$; although subsequent uses of \texttt{RPD\_A1[$n$]} can override this for selected $n$.
+
+\item[\texttt{RPD\_FREF[$m$]}]
+Frequency [Hz] at which the parameters \texttt{RPD\_A0[$m$]} and \texttt{RPD\_A1[$m$]} are specified.
+Set to \texttt{10.0e+6} (10~MHz) unless otherwise specified.
+\texttt{RPD\_FREF} (without \texttt{[$m$]}) will result in \texttt{RPD\_FREF[$n$]} being set to \texttt{RPD\_FREF} for all $n$; although subsequent uses of \texttt{RPD\_FREF[$n$]} can override this for selected $n$.
+
+\item[\texttt{RPD\_STR[$m$]}]
+Coefficient of stretching [unitless] for cable $m$ ($1 \le m \le \texttt{N\_RPD}$).  \texttt{RPD\_LENG[$m$]} is multiplied by this prior to computation of cable gain or delay.
+Set to 1.0 unless otherwise specified.
+\texttt{RPD\_STR} (without \texttt{[$m$]}) will result in \texttt{RPD\_STR[$n$]} being set to \texttt{RPD\_STR} for all $n$; although subsequent uses of \texttt{RPD\_STR[$n$]} can override this for selected $n$.
+
+\item[\texttt{RPD\_ANT[$m$]}]
+Antenna to which cable $m$ ($1 \le m \le \texttt{N\_RPD}$) is ultimately connected.  Normally in the range 1 to $2 \times \texttt{N\_STD}$.  A negative value means the cable is connected at its input, but not at its output.  A value of 0 means this cable is disconnected at both ends, or that its connections are unknown.
+Will be set to $m$ unless otherwise specified.
+
+\end{description}
+
+%% -------------------------------------------------------------------
+\subsection{SEP Parameters}
+%% -------------------------------------------------------------------
+
+Note that a ``SEP port'' is defined as the path from the jack on the outside of the shelter, to the end of the cable that connects to the ASP input.
+
+\begin{description}[style=nextline]
+
+\item[\texttt{N\_SEP}]
+Maximum number of ports through SEP; expected to be $\le 512$.
+
+\item[\texttt{SEP\_ID[$m$]}]
+Label which unambiguously identifies SEP port $m$ ($1 \le m \le \texttt{N\_SEP}$) on the SEP panel.
+Set to \texttt{"UNK"} unless otherwise specified.
+
+\item[\texttt{SEP\_STAT[$m$]}]
+The status of SEP port $m$ ($1 \le m \le \texttt{N\_SEP}$).  See Note~1.
+Will be set to 3 (``OK'') unless otherwise specified.
+
+\item[\texttt{SEP\_CABL[$m$]}]
+Label or tag which unambiguously identifies the cable that connects the SEP panel to the ASP input.
+Set to \texttt{"UNK"} unless otherwise specified.
+
+\item[\texttt{SEP\_LENG[$m$]}]
+Length [m] of the cable that connects the SEP panel to the ASP input.
+Will be set to 0 unless otherwise specified.
+\texttt{SEP\_LENG} (without \texttt{[$m$]}) will result in \texttt{SEP\_LENG[$n$]} being set to \texttt{SEP\_LENG} for all $n$; although subsequent uses of \texttt{SEP\_LENG[$n$]} can override this for selected $n$.
+
+\item[\texttt{SEP\_DESI[$m$]}]
+An integer code which identifies the design of SEP port $m$ ($1 \le m \le \texttt{N\_SEP}$), including the cable to ASP.  See Note~2.  Design information expected to be indexed by this code includes cable type, electrical and mechanical descriptions, frequency-domain transfer function described as coefficients in a polynomial fit (representative of all cables with this design code).  Will be set to ``1'' unless otherwise specified.  Use ``0'' to indicate that design is unknown or undocumented.
+\texttt{SEP\_DESI} (without \texttt{[$m$]}) will result in \texttt{SEP\_DESI[$n$]} being set to \texttt{SEP\_DESI} for all $n$; although subsequent uses of \texttt{SEP\_DESI[$n$]} can override this for selected $n$.
+
+\item[\texttt{SEP\_GAIN[$m$]}]
+Gain [dB] of SEP port $m$ ($1 \le m \le \texttt{N\_SEP}$) including the cable to ASP, at the reference frequency of 38~MHz.
+Will be set to 0 unless otherwise specified.
+\texttt{SEP\_GAIN} (without \texttt{[$m$]}) will result in \texttt{SEP\_GAIN[$n$]} being set to \texttt{SEP\_GAIN} for all $n$; although subsequent uses of \texttt{SEP\_GAIN[$n$]} can override this for selected $n$.
+
+\item[\texttt{SEP\_ANT[$m$]}]
+Antenna to which SEP port $m$ ($1 \le m \le \texttt{N\_SEP}$) is ultimately connected.  Normally in the range 1 to $2 \times \texttt{N\_STD}$.  A negative value means the SEP port is connected at its input, but not at its output.  A value of 0 means this SEP port is disconnected at both ends, or that its connections are unknown.
+Will be set to $m$ unless otherwise specified.
+
+\end{description}
+
+%% -------------------------------------------------------------------
+\subsection{ARX Board Parameters}
+%% -------------------------------------------------------------------
+
+\begin{description}[style=nextline]
+
+\item[\texttt{N\_ARB}]
+Maximum number of ARX boards; expected to be $\le 32$.
+
+\item[\texttt{N\_ARBCH}]
+Maximum number of channels per ARX board; expected to be $\le 16$.
+
+\item[\texttt{ARB\_ID[$m$]}]
+Label or serial number which unambiguously identifies ARX board $m$ ($1 \le m \le \texttt{N\_ARB}$).  Maximum 10 characters.
+Will be set to \texttt{"UNK"} unless otherwise specified.
+
+\item[\texttt{ARB\_SLOT[$m$]}]
+Unambiguous identification of the slot of the ASP chassis in which ARX board $m$ ($1 \le m \le \texttt{N\_ARB}$) is installed.
+Will be set to 0 unless otherwise specified.
+
+\item[\texttt{ARB\_DESI[$m$]}]
+An integer code which identifies the design of ARX board $m$ ($1 \le m \le \texttt{N\_ARB}$).  See Note~2.  Design information expected to be indexed by this code includes board revision number, electrical and/or mechanical descriptions, frequency-domain transfer function described as coefficients in a polynomial fit (representative of all ARX board channels with this design code).  Will be set to ``1'' unless otherwise specified.  Use ``0'' to indicate that design is unknown or undocumented.
+\texttt{ARB\_DESI} (without \texttt{[$m$]}) will result in \texttt{ARB\_DESI[$n$]} being set to \texttt{ARB\_DESI} for all $n$; although subsequent uses of \texttt{ARB\_DESI[$n$]} can override this for selected $n$.
+
+\end{description}
+
+\subsubsection{ARX Board Power Sources}
+
+ASP power sources must be identified in order of ARB index $m$, with each ARB's source being specified using \texttt{ARB\_RACK[$m$]} and \texttt{ARB\_PORT[$m$]} keywords, in that order.
+
+\begin{description}[style=nextline]
+
+\item[\texttt{ARB\_RACK[$m$]}]
+From the perspective of SHL, this is the rack (1 to \texttt{N\_PWR\_RACK}) in which the power supply powering this ARX board is located.  A value of 0 means this parameter is unknown.  This parameter is used in conjunction with \texttt{ARB\_PORT[$m$]} to identify the power source for this ARX board.
+Will be set to 0 unless otherwise specified.
+
+\item[\texttt{ARB\_PORT[$m$]}]
+From the perspective of SHL, this is the power port corresponding to the power supply powering this ARX board.  A value of 0 means this parameter is unknown.  This parameter is used in conjunction with \texttt{ARB\_RACK[$m$]} to identify the power source for this ARX board.
+Will be set to 0 unless otherwise specified.
+
+\end{description}
+
+\subsubsection{ARX Board Channel Parameters}
+
+Indexed by board $m$ and channel $p$, where $1 \le p \le \texttt{N\_ARBCH}$.
+
+\begin{description}[style=nextline]
+
+\item[\texttt{ARB\_STAT[$m$][$p$]}]
+The status of channel $p$ ($1 \le p \le \texttt{N\_ARBCH}$) of ARX board $m$ ($1 \le m \le \texttt{N\_ARB}$).  See Note~1.
+This will be set to 3 (``OK'') unless otherwise specified.
+
+\item[\texttt{ARB\_GAIN[$m$][$p$]}]
+Maximum gain [dB] of channel $p$ ($1 \le p \le \texttt{N\_ARBCH}$) of ARX board $m$ ($1 \le m \le \texttt{N\_ARB}$), at the reference frequency of 38~MHz in full-bandwidth mode.  ``Maximum gain'' means gain when programmable attenuation is minimum.
+Will be set to 67.0 unless otherwise specified.
+\texttt{ARB\_GAIN} (without \texttt{[$m$][$p$]}) will result in \texttt{ARB\_GAIN[$m$][$p$]} being set to \texttt{ARB\_GAIN} for all $m$ and $p$; although subsequent uses of \texttt{ARB\_GAIN[$m$][$p$]} can override this for the selected $m$ and $p$.
+
+\item[\texttt{ARB\_ANT[$m$][$p$]}]
+Antenna that channel $p$ ($1 \le p \le \texttt{N\_ARBCH}$) of ARX board $m$ ($1 \le m \le \texttt{N\_ARB}$) is ultimately connected to.  A negative value means the channel is connected at its input, but not at its output.  A value of 0 means this channel is disconnected at both ends, or that its connections are unknown; this is the default if not specified.
+
+\item[\texttt{ARB\_IN[$m$][$p$]}]
+Label unambiguously identifying the input connector to channel $p$ ($1 \le p \le \texttt{N\_ARBCH}$) of ARX board $m$ ($1 \le m \le \texttt{N\_ARB}$) on the ASP rack.  Maximum 10 characters.
+Will be set to \texttt{"UNK"} unless otherwise specified.
+
+\item[\texttt{ARB\_OUT[$m$][$p$]}]
+Label unambiguously identifying the output connector from channel $p$ ($1 \le p \le \texttt{N\_ARBCH}$) of ARX board $m$ ($1 \le m \le \texttt{N\_ARB}$) on the ASP rack.  Maximum 10 characters.
+Will be set to \texttt{"UNK"} unless otherwise specified.
+
+\end{description}
+
+%% -------------------------------------------------------------------
+\subsection{SNAP Board Parameters}
+%% -------------------------------------------------------------------
+
+Although these parameters use the ``SNAP'' naming convention, they apply to any digitizer board used by NDP, including ZCU102-based systems.
+The key difference is the number of channels per board: set \texttt{N\_SNAPCH} to match the hardware in use (e.g., 64 for SNAP boards, or 32 for ZCU102 boards).
+
+\begin{description}[style=nextline]
+
+\item[\texttt{N\_SNAP}]
+Number of digitizer boards; expected to be $\le 16$.
+
+\item[\texttt{N\_SNAPCH}]
+Number of channels per board; expected to be $\le 64$.
+Set to match the hardware in use.
+
+\item[\texttt{SNAP\_ID[$m$]}]
+Label or serial number which unambiguously identifies digitizer board $m$ ($1 \le m \le \texttt{N\_SNAP}$).  Maximum 10 characters.
+Will be set to \texttt{"UNK"} unless otherwise specified.
+
+\item[\texttt{SNAP\_SLOT[$m$]}]
+Unambiguous identification of the slot in which digitizer board $m$ ($1 \le m \le \texttt{N\_SNAP}$) is installed.  Maximum 10 characters.
+Will be set to \texttt{"UNK"} unless otherwise specified.
+
+\item[\texttt{SNAP\_DESI[$m$]}]
+An integer code which identifies the design of digitizer board $m$ ($1 \le m \le \texttt{N\_SNAP}$).  See Note~2.  Design information expected to be indexed by this code includes board revision number, firmware version, and bandpass described as coefficients in a polynomial fit.
+Will be set to ``1'' unless otherwise specified.  Use ``0'' to indicate unknown/undocumented design.
+
+\end{description}
+
+\subsubsection{SNAP Board Channel Parameters}
+
+Indexed by board $m$ and channel $p$, where $1 \le p \le \texttt{N\_SNAPCH}$.
+
+\begin{description}[style=nextline]
+
+\item[\texttt{SNAP\_STAT[$m$][$p$]}]
+The status of channel $p$ ($1 \le p \le \texttt{N\_SNAPCH}$) of digitizer board $m$ ($1 \le m \le \texttt{N\_SNAP}$).  See Note~1.
+This will be set to 3 (``OK'') unless otherwise specified.
+
+\item[\texttt{SNAP\_INR[$m$][$p$]}]
+Label unambiguously identifying the \emph{rack} input connector for channel $p$ ($1 \le p \le \texttt{N\_SNAPCH}$) of digitizer board $m$ ($1 \le m \le \texttt{N\_SNAP}$) on the NDP rack.  Maximum 10 characters.
+Will be set to \texttt{"UNK"} unless otherwise specified.
+
+\item[\texttt{SNAP\_INC[$m$][$p$]}]
+Label unambiguously identifying the \emph{chassis} (i.e., inside the rack) input connector for channel $p$ ($1 \le p \le \texttt{N\_SNAPCH}$) of digitizer board $m$ ($1 \le m \le \texttt{N\_SNAP}$) on the NDP rack.  Maximum 10 characters.
+Will be set to \texttt{"UNK"} unless otherwise specified.
+
+\item[\texttt{SNAP\_ANT[$m$][$p$]}]
+Antenna that channel $p$ ($1 \le p \le \texttt{N\_SNAPCH}$) of digitizer board $m$ ($1 \le m \le \texttt{N\_SNAP}$) is ultimately connected to.  A value of 0 means this channel is not connected, or that its connection is unknown.
+If not specified otherwise, will be set to 0.
+
+\end{description}
+
+%% -------------------------------------------------------------------
+\subsection{GPU Server Parameters}
+%% -------------------------------------------------------------------
+
+\begin{description}[style=nextline]
+
+\item[\texttt{N\_SERVER}]
+Number of GPU servers; expected to be $\le 5$.
+
+\item[\texttt{SERVER\_ID[$m$]}]
+Label or serial number (max 10 characters), $1 \le m \le \texttt{N\_SERVER}$.
+
+\item[\texttt{SERVER\_SLOT[$m$]}]
+Slot designation (max 10 characters).
+
+\item[\texttt{SERVER\_STAT[$m$]}]
+Status.  See Note~1.
+
+\item[\texttt{SERVER\_DESI[$m$]}]
+Design code.  See Note~2.
+
+\end{description}
+
+%% -------------------------------------------------------------------
+\subsection{MCS-DR Parameters}
+%% -------------------------------------------------------------------
+
+\begin{description}[style=nextline]
+
+\item[\texttt{N\_DR}]
+Number of data recorders; expected to be $\le 5$.
+
+\item[\texttt{DR\_STAT[$m$]}]
+The status of MCS-DR $m$ ($1 \le m \le \texttt{N\_DR}$).  See Note~1.
+Will be set to 3 (``OK'') unless otherwise specified.
+
+\item[\texttt{DR\_ID[$m$]}]
+Serial number which unambiguously identifies MCS-DR $m$ ($1 \le m \le \texttt{N\_DR}$).  Maximum 10 characters.
+Will be set to \texttt{"UNK"} unless otherwise specified.
+
+\item[\texttt{DR\_PC[$m$]}]
+The model of this MCS-DR PC.
+Will be set to \texttt{"UNK"} unless otherwise specified.
+\emph{Values currently in use are ``XPS435'' and ``T1500''.}
+
+\item[\texttt{DR\_NDP[$m$]}]
+Which NDP output this MCS-DR is connected to.  Values are 1--4 for beam outputs, and 5 for TBT/TBS.
+Will be set to 0 (not connected) unless otherwise specified.
+
+\end{description}
+
+%% -------------------------------------------------------------------
+\subsection{Power Parameters}
+%% -------------------------------------------------------------------
+
+\begin{description}[style=nextline]
+
+\item[\texttt{N\_PWR\_RACK}]
+Maximum number of racks, from the perspective of SHL; expected to be $\le 8$.
+
+\item[\texttt{N\_PWR\_PORT[$m$]}]
+Maximum number of power ports in rack $m$ ($1 \le m \le \texttt{N\_PWR\_RACK}$), from the perspective of SHL; expected to be $\le 50$.
+Will be set to 0 (no ports) unless otherwise specified.
+
+\item[\texttt{PWR\_SS[$m$][$p$]}]
+Subsystem that receives power from port $p$ ($1 \le p \le \texttt{N\_PWR\_PORT}$) of rack $m$ ($1 \le m \le \texttt{N\_PWR\_RACK}$).
+Valid values: \texttt{SHL}, \texttt{ASP}, \texttt{NDP}, \texttt{MCS}, \texttt{DR1}--\texttt{DR5}.
+A value of \texttt{"UNK"} means this port is not connected, or that its connection is unknown.
+
+\item[\texttt{PWR\_NAME[$m$][$p$]}]
+Specific item that receives power from port $p$ ($1 \le p \le \texttt{N\_PWR\_PORT}$) of rack $m$ ($1 \le m \le \texttt{N\_PWR\_RACK}$).
+A value of \texttt{"UNK"} means this port is not connected, or that its connection is unknown.
+Valid values depend on \texttt{PWR\_SS}:
+\begin{itemize}
+\item For \texttt{PWR\_SS[$m$][$p$]} = \texttt{SHL}, valid values are \texttt{MCS}, others TBD.
+\item For \texttt{PWR\_SS[$m$][$p$]} = \texttt{ASP}, valid values are \texttt{MCS}, \texttt{FEE}, \texttt{ARX}, \texttt{FAN}.
+\item For \texttt{PWR\_SS[$m$][$p$]} = \texttt{NDP}, valid values are \texttt{MCS}, \texttt{FPG} (FPGA boards), \texttt{SVR} (servers), \texttt{FAN}, \texttt{SYN} (synthesizer module), and \texttt{SWI} (10GbE switch).
+\item For \texttt{PWR\_SS[$m$][$p$]} = \texttt{MCS}, valid values are \texttt{SCH} (Scheduler), \texttt{EXE} (Executive), \texttt{TP} (Task Processor), \texttt{CH} (Command Hub), and \texttt{GW} (Gateway).
+\item For \texttt{PWR\_SS[$m$][$p$]} = \texttt{DR1}--\texttt{DR5}, valid values are \texttt{PC}, \texttt{DS1} (DRSU~1), and \texttt{DS2} (DRSU~2).
+\end{itemize}
+
+It should be noted that while this information is largely (but not exactly) redundant with respect to the \texttt{\_RACK} and \texttt{\_PORT} parameters for subsystems, the former is intended primarily as an aid to operators and maintainers.  MCS may use either for actionable control decisions, so it is important that they be consistent.
+
+\end{description}
+
+%% -------------------------------------------------------------------
+\subsection{Array Pointing Correction Parameters}
+%% -------------------------------------------------------------------
+
+\begin{description}[style=nextline]
+
+\item[\texttt{PC\_AXIS\_TH}]
+Array pointing correction axis rotation in the elevation (theta) plane, in degrees.
+
+\item[\texttt{PC\_AXIS\_PH}]
+Array pointing correction axis rotation in the azimuth (phi) plane, in degrees.
+
+\item[\texttt{PC\_ROT}]
+Array pointing correction rotation, in degrees.
+
+\end{description}
+
+%% -------------------------------------------------------------------
+\subsection{Station-Wide Configuration Parameters}
+%% -------------------------------------------------------------------
+
+\begin{description}[style=nextline]
+
+\item[\texttt{MCS\_CRA}]
+``Configuration request authority'' policy to be used by MCS when processing requests to set FEE and ASP parameters (which obviously apply station-wide) in session definition files.  \texttt{"0"} means that MCS sets FEE and ASP parameters according to the information in the SSMIF, and any requests for changes are ignored.  \texttt{"1"} means that the FEE and ASP parameters set by the SSMIF are treated as defaults, and that a session may be able to change them.  See the discussion of the \texttt{SESSION\_CRA} keyword in the MCS Observing document for additional details.
+
+\item[\texttt{MRP\_\emph{sss}}]
+This sets the station default recording period for the MIB associated with the level-1 subsystem \texttt{\emph{sss}}, where \texttt{\emph{sss}} is the usual three-letter acronym (e.g., ``ASP'', ``NDP'', etc.).  Integer minutes.  For example: \texttt{MRP\_ASP} = 5 will cause MCS to archive (record) a copy of the ASP MIB every 5 minutes for the duration of the observation.  The recorded MIB files are then available as metadata following the observation.  ``0'' = ``never record'' (default).  Note that the setting of this parameter does not imply anything about how often the MIB is \emph{updated}; see \texttt{MUP\_\emph{sss}}.  Typically, \texttt{MRP\_\emph{sss}} $\ge$ \texttt{SESSION\_MUP\_\emph{sss}}.
+
+When invoked, the order of invocation of subsystems must be: ASP, NDP, DR1, DR2, DR3, DR4, DR5, SHL, MCS.  Note also that it is possible for observation sessions to temporarily override these settings depending on \texttt{MCS\_CRA} and the session definition.
+
+\item[\texttt{MUP\_\emph{sss}}]
+This sets the station default update period for the MIB associated with the level-1 subsystem \texttt{\emph{sss}}, where \texttt{\emph{sss}} is the usual three-letter acronym (e.g., ``ASP'', ``NDP'', etc.).  Integer minutes.  For example: \texttt{MUP\_ASP} = 5 will request MCS to force a 100\% update of the ASP MIB every 5 minutes for the duration of the observation.  ``0'' = ``request no updates (but don't prevent them either)'' (default).  It should be noted that there is only one set of MIBs for the station, and that they are common to all sessions.
+
+When invoked, the order of invocation of subsystems must be: ASP, NDP, DR1, DR2, DR3, DR4, DR5, SHL, MCS.  Note also that it is possible for observation sessions to temporarily override these settings depending on \texttt{MCS\_CRA} and the session definition.
+
+\item[\texttt{FEE[$n$]}]
+Controls power for the FEE on stand $n$.  \texttt{"1"} = ``on'', \texttt{"0"} = ``off''.
+$1 \le n \le 256$.
+\texttt{FEE} (without \texttt{[$n$]}) will result in \texttt{FEE[$n$]} being set to \texttt{FEE} for all $n$; although subsequent uses of \texttt{FEE[$n$]} can override this for the selected $n$.  Otherwise, must be listed in order of increasing $n$.  Note also that it is possible for observation sessions to temporarily override these settings depending on \texttt{MCS\_CRA} and the session definition.
+
+\item[\texttt{ASP\_FLT[$n$]}]
+Selects the ``filter setting'' for the ARX corresponding to stand $n$.  This corresponds to the ASP MIB parameter ``FIL''.  \texttt{"0"} = ``split'', \texttt{"1"} = ``full'' (default), \texttt{"2"} = ``reduced'', and \texttt{"3"} = ``off''.
+$1 \le n \le 256$.
+\texttt{ASP\_FLT} (without \texttt{[$n$]}) will result in \texttt{ASP\_FLT[$n$]} being set to \texttt{ASP\_FLT} for all $n$; although subsequent uses of \texttt{ASP\_FLT[$n$]} can override this for the selected $n$.  Otherwise, must be listed in order of increasing $n$.  Note also that it is possible for observation sessions to temporarily override these settings depending on \texttt{MCS\_CRA} and the session definition.
+
+\item[\texttt{ASP\_AT1[$n$]}]
+Selects the first attenuator setting for the ARX corresponding to stand $n$.  This corresponds to the ASP MIB parameter ``AT1''.  This is an integer value between 0 (default) and 15.
+$1 \le n \le 256$.
+\texttt{ASP\_AT1} (without \texttt{[$n$]}) will result in \texttt{ASP\_AT1[$n$]} being set to \texttt{ASP\_AT1} for all $n$; although subsequent uses of \texttt{ASP\_AT1[$n$]} can override this for the selected $n$.  Otherwise, must be listed in order of increasing $n$.  Note also that it is possible for observation sessions to temporarily override these settings depending on \texttt{MCS\_CRA} and the session definition.
+
+\item[\texttt{ASP\_AT2[$n$]}]
+Selects the second attenuator setting for the ARX corresponding to stand $n$.  This corresponds to the ASP MIB parameter ``AT2''.  This is an integer value between 0 (default) and 15.
+$1 \le n \le 256$.
+\texttt{ASP\_AT2} (without \texttt{[$n$]}) will result in \texttt{ASP\_AT2[$n$]} being set to \texttt{ASP\_AT2} for all $n$; although subsequent uses of \texttt{ASP\_AT2[$n$]} can override this for the selected $n$.  Otherwise, must be listed in order of increasing $n$.  Note also that it is possible for observation sessions to temporarily override these settings depending on \texttt{MCS\_CRA} and the session definition.
+
+\item[\texttt{ASP\_AT3[$n$]}]
+Selects the third attenuator setting for the ARX corresponding to stand $n$.  This corresponds to the ASP MIB parameter ``AT3''.  This is an integer value between 0 (default) and 31.
+$1 \le n \le 256$.
+\texttt{ASP\_AT3} (without \texttt{[$n$]}) will result in \texttt{ASP\_AT3[$n$]} being set to \texttt{ASP\_AT3} for all $n$; although subsequent uses of \texttt{ASP\_AT3[$n$]} can override this for the selected $n$.  Otherwise, must be listed in order of increasing $n$.  Note also that it is possible for observation sessions to temporarily override these settings depending on \texttt{MCS\_CRA} and the session definition.
+
+\item[\texttt{DRX\_GAIN}]
+This corresponds to the NDP DRX command parameter ``DRX\_GAIN''.  This is an integer value between 0 (default) and 15.  Note it is possible for observation sessions to temporarily override these settings depending on \texttt{MCS\_CRA} and the session definition.
+
+\end{description}
+
+%% -------------------------------------------------------------------
+\subsection{Notes}
+%% -------------------------------------------------------------------
+
+\textbf{Note 1:}
+For status (\texttt{\_STAT}) entries, the valid codes are:
+\begin{itemize}
+\item 3 = ``OK''
+\item 2 = ``Suspect; possibly bad (If used, provide warning)''
+\item 1 = ``Bad (Don't use)''
+\item 0 = ``Not Installed''
+\end{itemize}
+
+\textbf{Note 2:}
+The details of the use of \texttt{\_DESI} parameters has not yet been worked out.

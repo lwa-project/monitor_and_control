@@ -1,0 +1,14 @@
+% 02-summary.tex - Section 2: Summary
+
+\section{Summary}
+\label{sec:summary}
+
+\begin{enumerate}
+
+\item The sole physical interface with MCS will be a single 1000BASE-T (full-duplex gigabit ethernet) connection over Category~6 (``Cat-6'') cable terminated in RJ45 connectors.
+
+\item The sole protocol interface with MCS will be UDP, with direct passing of messages using sockets.\footnote{For the uninitiated, see \texttt{http://en.wikipedia.org/wiki/User\_Datagram\_Protocol} and/or \texttt{http://docs.python.org/library/socket.html}.}  IP addresses are static and defined in a separate document.  Port assignments are defined in a separate document.  The term ``message'' is defined henceforth to mean a single command or response, contained entirely within the data field of one or more UDP packets.  A message will normally correspond to a single use of a ``send()'' or ``recv()'' function (with syntax dependent on the programming language, of course).  Message structure is defined in Section~\ref{sec:message-structure}.
+
+\item The interface will operate according to a ``polling'' paradigm.  Connected subsystems will never \textit{initiate} communications, and will only respond to an MCS message to the extent required by the applicable ICD(s).  Subsystems shall not communicate with subsystems other than MCS over this interface.  The exception to this rule is that subsystems may send unsolicited \cmd{RPT} response messages to MCS; see Section~\ref{sec:message-types}.
+
+\end{enumerate}

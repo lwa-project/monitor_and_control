@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
+#include <errno.h>
 
 #include <sys/types.h>
 #include <sys/ipc.h>
@@ -546,7 +547,7 @@ int main ( int narg, char *argv[] ) {
           c.datalen = -1;
 
           /* log it as a failed task */
-	  LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, c.ref, 
+          LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, c.ref, 
                        LWA_MSELOG_TP_FAIL_EXEC, c.sid, c.cid, c.data, c.datalen, &mselog_line_ctr );
                             
           } 
@@ -628,7 +629,7 @@ int main ( int narg, char *argv[] ) {
           c.datalen = -1;
 
           /* log task progress */
-	  LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, c.ref, 
+          LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, c.ref, 
                        LWA_MSELOG_TP_FAIL_EXEC, 
                        c.sid, c.cid, c.data, c.datalen, &mselog_line_ctr ); 
    
@@ -690,10 +691,32 @@ int main ( int narg, char *argv[] ) {
 
       if ( msgsnd( mqtid[task[tqp].sid], (void *)&mq_msg, LWA_msz(), 0) == -1 ) {
 
-          sprintf(logmsg,"FATAL: Could not msgsnd()");
-	  LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, task[tqp].ref, 
+          LWA_mse_log( fpl, LWA_MSELOG_MTYPE_TASK, task[tqp].ref, 
                        LWA_MSELOG_TP_FAIL_EXEC, 
                        task[tqp].sid, task[tqp].cid, task[tqp].data, task[tqp].datalen, &mselog_line_ctr ); 
+          switch (errno) {
+            case EAGAIN:
+                sprintf(logmsg,"FATAL: Could not msgsnd() - queue is full and IPC_NOWAIT was set");
+                break;
+            case EACCES:
+                sprintf(logmsg,"FATAL: Could not msgsnd() - no write permission");
+                break;
+            case EIDRM:
+                sprintf(logmsg,"FATAL: Could not msgsnd() - message queue was removed");
+                break;
+            case EINTR:
+                sprintf(logmsg,"FATAL: Could not msgsnd() - interrupted by a signal while waiting (not applicable with IPC_NOWAIT)");
+                break;
+            case EINVAL:
+                sprintf(logmsg,"FATAL: Could not msgsnd() - invalid msqid, mtype < 1, or msgsz invalid");
+                break;
+            case ENOMEM:
+                sprintf(logmsg,"FATAL: Could not msgsnd() - unsufficient memory to copy message buffer");
+                break;
+            default:
+                sprintf(logmsg,"FATAL: Could not msgsnd() - %s",strerror(errno));
+          }
+          LWA_mse_log( fpl, LWA_MSELOG_MTYPE_INFO,0,0,0,0, logmsg, -1, &mselog_line_ctr );
 
           tq[tqp] = 0; /* reallocate this slot in the message queue */
 

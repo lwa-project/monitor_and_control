@@ -1,0 +1,78 @@
+% revisions.tex - Change record table for MCS Common ICD
+
+\changerecordheader
+
+\begin{longtable}{|p{1.5cm}|p{2.5cm}|p{3cm}|p{7cm}|}
+    \hline
+    \textbf{Version} & \textbf{Date} & \textbf{Author(s)} & \textbf{Changes} \\
+    \hline
+    \endfirsthead
+
+    \hline
+    \textbf{Version} & \textbf{Date} & \textbf{Author(s)} & \textbf{Changes} \\
+    \hline
+    \endhead
+
+    \hline
+    \endfoot
+
+    0.2 & 2009-02-23 & S.~Ellingson &
+    \begin{minipage}[t]{\linewidth}
+        \begin{itemize}[leftmargin=*,nosep,after=\strut]
+            \item Julian day (JDAY) changed to modified Julian day (MJD)
+            \item Fixed error in left- vs.\ right-justification
+            \item Pointed out that a UT day can have a leap second
+            \item More specific guidance for MIB labels
+        \end{itemize}
+    \end{minipage} \\
+    \hline
+    0.3 & 2009-03-20 & S.~Ellingson &
+    \begin{minipage}[t]{\linewidth}
+        \begin{itemize}[leftmargin=*,nosep,after=\strut]
+            \item Fixed error in representation of MJD
+            \item Fixed error where SUBSYSTEM and SERIALNO were both index 1.4
+            \item Settled on UDP over TCP
+            \item Maximum payload set to 4050 bytes
+            \item Added DATALEN field
+            \item MJD/MPM interpreted as send time
+            \item Added CKSUM field
+            \item Standardized response DATA field
+            \item Clarified multi-packet messages
+            \item Changed space notation in examples
+        \end{itemize}
+    \end{minipage} \\
+    \hline
+    0.4 & 2009-03-29 & S.~Ellingson &
+    \begin{minipage}[t]{\linewidth}
+        \begin{itemize}[leftmargin=*,nosep,after=\strut]
+            \item INFO uses MIB labels not indices
+            \item Editing of message/packet/payload terms
+            \item Multipacket messages removed
+            \item Fixed RPT response examples
+            \item Guidance on MJD/MPM meanings
+            \item Standardized 3-second response time
+            \item Clarified invalid checksum handling
+            \item Edited SERIALNO field
+        \end{itemize}
+    \end{minipage} \\
+    \hline
+    1.0 & 2009-04-04 & S.~Ellingson &
+    \begin{minipage}[t]{\linewidth}
+        \begin{itemize}[leftmargin=*,nosep,after=\strut]
+            \item Maximum message length increased to 8192 bytes
+            \item Removed CKSUM field
+        \end{itemize}
+    \end{minipage} \\
+    \hline
+    1.1 & 2026-02 & J.~Dowell &
+    \begin{minipage}[t]{\linewidth}
+        \begin{itemize}[leftmargin=*,nosep,after=\strut]
+            \item Replaced DP with NDP throughout
+            \item Added unsolicited RPT response support
+            \item Updated organization address
+            \item Fixed MIB label length limit (40 $\to$ 32) to match implementation
+        \end{itemize}
+    \end{minipage} \\
+    \hline
+
+\end{longtable}

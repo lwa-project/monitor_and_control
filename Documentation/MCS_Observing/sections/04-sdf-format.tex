@@ -1,0 +1,198 @@
+% 04-sdf-format.tex - Format of a Session Definition File
+
+\section{Format of a Session Definition File}
+\label{ch:sdf-format}
+
+Session definition files (SDFs) are human-readable text files.  See the example provided in Appendix~A.
+
+Session definition files consist of lines, with each line having the following structure:
+\begin{itemize}
+\item A keyword identifying a parameter
+\item At least one whitespace character
+\item Data intended to be assigned to the parameter
+\item Newline (line terminator)
+\end{itemize}
+
+A line may be up to 4096 characters long.  Lines which are empty (i.e., containing only the newline character) are allowed, ignored, and encouraged as a way to improve the readability.  The ``data'' field contains only alphanumeric characters (including space) plus standard punctuation and common symbols, but not special/invisible characters.  Note that any whitespace between the end of the intended data and the newline is significant.
+
+Generally, session definition files have three or more parts.  The first part is a set of lines identifying the PI and project.  The second part is a set of lines identifying the session, including parameters that apply session-wide.  The third part is a set of lines identifying the first observation, including parameters that apply to that observation.  Each additional observation is defined by repeating the third part with the desired modifications.  Only parameters which are different from the previous observation need to be defined for subsequent observations.
+
+The following is a list of defined parameters, in the order in which it is required that they appear in the session definition file.  In each case, we give the identifying keyword, followed by information on valid values.
+
+\subsection{PI/Project Identification}
+
+The following keywords define the PI and project:
+
+\begin{description}
+\item[\texttt{PI\_ID}] -- PI Identification.  This is intended to enable concise, unambiguous identification of the PI.  PI identification codes should be assigned and maintained by the Project Office.  It is recommended that this be a sequentially-assigned integer.
+
+\item[\texttt{PI\_NAME}] -- PI Name.  This is redundant information given \texttt{PI\_ID}, but is included primarily for user convenience.  The recommended format is \textit{Last\_Name, First\_Name Middle\_Initial(s)}.
+
+\item[\texttt{PROJECT\_ID}] -- Project Identification.  This is a string of no more than 8 characters.  This is intended to enable concise, unambiguous identification of the project.  Project identification codes should be assigned and maintained by the Project Office.  Since this is used as part of the filename of some files, it is strongly recommended that these be minimum length, free of whitespace, and constructed to be easy to sort; for example ``E00037'' where ``E'' identifies a class of projects and ``00037'' means the 37th project in this class.
+
+\item[\texttt{PROJECT\_TITLE}] -- This is redundant information given \texttt{PROJECT\_ID}, but is included primarily for user convenience.
+
+\item[\texttt{PROJECT\_REMPI}] -- Remarks from the PI on the project.  This is intended to convey information that might not be present or obvious through other session definition file parameters.
+
+\item[\texttt{PROJECT\_REMPO}] -- Remarks from the Project Office on the project.  This is intended to convey information that might not be present or obvious through other session definition file parameters.
+\end{description}
+
+\subsection{Session Identification}
+
+The following keywords identify the session and provide session-wide parameters:
+
+\begin{description}
+\item[\texttt{SESSION\_ID}] -- Session Identification.  This is intended to enable concise, unambiguous (in combination with \texttt{PROJECT\_ID}) identification of the session.  Session identification codes are sequentially-assigned integers, beginning with 1.
+
+\item[\texttt{SESSION\_TITLE}] -- This is redundant information given \texttt{SESSION\_ID}, but is included primarily for user convenience.
+
+\item[\texttt{SESSION\_REMPI}] -- Remarks from the PI on the session.  This is intended to convey information that might not be present or obvious through other session definition file parameters.
+
+\item[\texttt{SESSION\_REMPO}] -- Remarks from the Project Office on the session.  This is intended to convey information that might not be present or obvious through other session definition file parameters.
+\end{description}
+
+\subsubsection{Optional Session Parameters}
+
+The following session-level parameters are optional.  If not specified, MCS assigns default values.
+
+\begin{description}
+\item[\texttt{SESSION\_CRA}] -- Configuration Request Authority.  An unsigned integer in the range 0--65535 which indicates the priority of this session (with respect to other concurrent sessions) in determining authority to set FEE and ASP settings, which affect all concurrent sessions.  ``0'' (the default if not specified) means no authority; the keywords \texttt{OBS\_FEE} and \texttt{OBS\_ASP\_*} will simply be ignored.  When multiple sessions are running concurrently on the station and at least one of them has \texttt{SESSION\_CRA}$> 0$, the session with the largest \texttt{SESSION\_CRA} sets FEE and ASP settings within the constraints of the station CRA policy set in the SSMIF.  In the event of a tie, MCS will proceed as if all concurrent sessions have \texttt{SESSION\_CRA}$= 0$.
+
+\item[\texttt{SESSION\_DRX\_BEAM}] -- DRX beam to use for this session.  An integer in the range 1--4.  A value of $-1$ means MCS decides (value used if not specified).  This is not meaningful if \texttt{OBS\_MODE} = \texttt{TBT} or \texttt{TBS}, and is ignored for those observing modes.
+
+\item[\texttt{SESSION\_SPC}] -- Spectrometer configuration for the MCS data recorder (MCS-DR).  A free-form string of up to 31 characters.  This string is passed directly to the DR as the argument of the \texttt{SPC} command; see~[2] for details on the format and valid values.  If not specified, the spectrometer is not used.
+
+\item[\texttt{SESSION\_MRP\_\textit{sss}}] -- MIB recording period for subsystem \textit{sss}, where \textit{sss} is one of \texttt{ASP}, \texttt{NDP}, \texttt{DR1}, \texttt{DR2}, \texttt{DR3}, \texttt{DR4}, \texttt{DR5}, \texttt{SHL}, or \texttt{MCS}.  Integer minutes.  For example, \texttt{SESSION\_MRP\_ASP} = 5 will cause MCS to archive a copy of the ASP MIB every 5~minutes for the duration of the observation.  ``0'' = ``never record'', and ``$-1$'' = ``MCS decides'' (value used if not specified).  Note that the setting of this parameter does not imply anything about how often the MIB is \textit{updated}; see \texttt{SESSION\_MUP\_\textit{sss}}.  Typically, users will want \texttt{SESSION\_MRP\_\textit{sss}} $\ge$ \texttt{SESSION\_MUP\_\textit{sss}}.  When invoked, the order of invocation of subsystems must be: ASP, NDP, DR1, DR2, DR3, DR4, DR5, SHL, MCS.
+
+\item[\texttt{SESSION\_MUP\_\textit{sss}}] -- MIB update period for subsystem \textit{sss}, where \textit{sss} is as defined above.  Integer minutes.  For example, \texttt{SESSION\_MUP\_ASP} = 5 will request MCS to force a 100\% update of the ASP MIB every 5~minutes for the duration of the observation.  ``0'' = ``request no updates (but don't prevent them either)'', and ``$-1$'' = ``MCS decides'' (value used if not specified).  It should be noted that there is only one set of MIBs for the station, and that they are common to all sessions.  Therefore, if MCS or some other concurrently-running session successfully requests a shorter update period, then this parameter will have no effect.  When invoked, the order of invocation of subsystems must be: ASP, NDP, DR1, DR2, DR3, DR4, DR5, SHL, MCS.
+
+\item[\texttt{SESSION\_LOG\_SCH}] -- If this is ``1'', the portion of the MCS/Scheduler log file (\texttt{mselog.txt}) corresponding to the time period of the session is saved as metadata.  ``0'' = ``don't save'', which is assumed if the parameter is not specified.
+
+\item[\texttt{SESSION\_LOG\_EXE}] -- If this is ``1'', the portion of the MCS/Executive log file (\texttt{meelog.txt}) corresponding to the time period of the session is saved as metadata.  ``0'' = ``don't save'', which is assumed if the parameter is not specified.
+
+\item[\texttt{SESSION\_INC\_SMIB}] -- If this is ``1'', then the station static MIB is saved as metadata, as described in Section~3.  ``0'' = ``don't save'', which is assumed if the parameter is not specified.
+
+\item[\texttt{SESSION\_INC\_DES}] -- If this is ``1'', then available and relevant design and calibration information is saved as metadata, as described in Section~3.  ``0'' = ``don't save'', which is assumed if the parameter is not specified.
+\end{description}
+
+\subsection{Observation Definitions}
+
+Each observation within a session is defined by the following keywords.  Multiple observations are defined sequentially in the SDF.
+
+\subsubsection{Required Observation Keywords}
+
+\begin{description}
+\item[\texttt{OBS\_ID}] -- Observation Identification.  This is intended to enable concise, unambiguous (in combination with \texttt{PROJECT\_ID} and \texttt{SESSION\_ID}) identification of the observation.  Observation identification codes are sequentially-assigned integers, beginning with 1.
+
+\item[\texttt{OBS\_TITLE}] -- This is redundant information given \texttt{OBS\_ID}, but is included primarily for user convenience.  Optional.
+
+\item[\texttt{OBS\_TARGET}] -- This is intended to provide a convenient, standard place to indicate the intended ``target'' of the observation.  This might be a specific source (e.g., ``Cas~A''), or might be used to indicate that this is an ``All-Sky'' (TBT/TBS) observation.  This field is provided for the convenience of the observer only, and no specific format is required.  In particular, it should be noted that this field is NOT used in any way by MCS to determine observing mode or pointing direction.  Optional.
+
+\item[\texttt{OBS\_REMPI}] -- Remarks from the PI on the observation.  This is intended to convey information that might not be present or obvious through other session definition file parameters.  Optional.
+
+\item[\texttt{OBS\_REMPO}] -- Remarks from the Project Office on the observation.  This is intended to convey information that might not be present or obvious through other session definition file parameters.  Optional.
+
+\item[\texttt{OBS\_START\_MJD}] -- Modified Julian day (MJD) on which the observation is to start.  Coordinated Universal Time (UTC) is assumed.
+
+\item[\texttt{OBS\_START\_MPM}] -- Time of day at which the observation is to start, written as integer milliseconds past UTC midnight (MPM).  The range of values is 0 through 86399999; or, for days containing a leap second, 0 through 86400999.
+
+\item[\texttt{OBS\_START}] -- Start time of the observation written in a format of the PI's choice.  This is redundant information given \texttt{OBS\_START\_MJD} and \texttt{OBS\_START\_MPM}, but is included for user convenience.  The suggested format is ``UTC yyyy mm dd hh:mm:ss.sss''.  This parameter is not used by MCS.
+
+\item[\texttt{OBS\_DUR}] -- Duration of the observation in milliseconds.  This field is ignored for \texttt{STEPPED} mode (computed by \texttt{tpss} from step times), \texttt{TBT} mode (computed automatically from \texttt{OBS\_TBT\_SAMPLES}), and \texttt{DIAG1} mode.
+
+\item[\texttt{OBS\_DUR+}] -- The duration of the observation written in a format of the PI's choice.  This is redundant information given \texttt{OBS\_DUR} (or \texttt{OBS\_TBT\_SAMPLES}) and is ignored by MCS, but is included for user convenience.  The suggested format is ``hh:mm:ss.sss''.  Optional; this parameter is not used by MCS.
+
+\item[\texttt{OBS\_MODE}] -- Observing mode.  One of: \texttt{TRK\_RADEC}, \texttt{TRK\_SOL}, \texttt{TRK\_JOV}, \texttt{TRK\_LUN}, \texttt{STEPPED}, \texttt{TBT}, \texttt{TBS}, or \texttt{DIAG1}.
+
+\item[\texttt{OBS\_BDM}] -- Beam-dipole mode.  When specified, MCS constructs a custom gain file that forms a beam using all stands in one polarization output while routing a single specified stand (the ``dipole'') to the other polarization output.  The format of this string is ``\texttt{std gb gd pol}'', where \texttt{std} is the stand number for the dipole ($1 \le \texttt{std} \le 256$), \texttt{gb} is the gain applied to all other stands (the beam component), \texttt{gd} is the gain applied to the dipole stand, and \texttt{pol} is the polarization (\texttt{X} or \texttt{Y}).  If not specified, the observation runs in normal beam-beam mode.  A free-form string of up to 31 characters.  Optional.
+
+\item[\texttt{OBS\_RA}] -- Right ascension in decimal hours, epoch J2000.  Required only for \texttt{TRK\_RADEC} mode.
+
+\item[\texttt{OBS\_DEC}] -- Declination in decimal degrees, epoch J2000.  Required only for \texttt{TRK\_RADEC} mode.
+\end{description}
+
+\subsubsection{Beam, Tuning, and Bandwidth Keywords}
+
+\begin{description}
+\item[\texttt{OBS\_B}] -- Beam type.  Meaningful only if \texttt{OBS\_MODE} = \texttt{TRK\_RADEC}, \texttt{TRK\_SOL}, \texttt{TRK\_JOV}, \texttt{TRK\_LUN}, or \texttt{STEPPED}; should not appear otherwise.  Options are:
+\begin{itemize}
+\item \texttt{SIMPLE}.  Beamforming is by equalizing geometrical delays implied by the pointing direction and array geometry.  MCS attempts to account for instrumental delays, gains, and phases through the system.
+\item \texttt{HIGH\_DR}.  Beamforming uses the same delay computation as \texttt{SIMPLE}, but the output data uses a higher bit depth to provide greater dynamic range.
+\end{itemize}
+If not specified, \texttt{OBS\_B} will be set to \texttt{SIMPLE}.  Note: \texttt{SPEC\_DELAYS\_GAINS} is valid only in step definitions (see \texttt{OBS\_STP\_B} below), not as an observation-level beam type.
+
+\item[\texttt{OBS\_FREQ1}] -- Center frequency of the first DRX tuning for beamforming modes or the center frequency for transient buffer -- streaming (\texttt{TBS}) mode, expressed as an integer ``tuning word''.  The center frequency in MHz is $\texttt{OBS\_FREQ1} \times 196 / 2^{32}$.  For example, \texttt{OBS\_FREQ1} = 1073741824 corresponds to 49.000000~MHz.  For beamforming modes, the valid range is 222417950--1928352663 (approximately 10.15--88.00~MHz).  For \texttt{TBS} mode, the valid range is 65739295--2037918156 (approximately 3.00--93.00~MHz).  This parameter is ignored if \texttt{OBS\_MODE} = \texttt{STEPPED} (tuning frequencies are set per-step) or \texttt{TBT}.
+
+\item[\texttt{OBS\_FREQ1+}] -- Center frequency for the first DRX tuning or \texttt{TBS} center frequency, expressed in a format of the PI's choice.  This is redundant information given \texttt{OBS\_FREQ1} and is ignored by MCS, but is included primarily for user convenience.  The suggested format is ``xx.xxxxxx~MHz''.  Optional.
+
+\item[\texttt{OBS\_FREQ2}] -- Center frequency for the second DRX tuning, expressed as an integer ``tuning word''.  See \texttt{OBS\_FREQ1} for additional details.  A value of 0 disables the second tuning, resulting in a half-beam observation.
+
+\item[\texttt{OBS\_FREQ2+}] -- Center frequency for the second DRX tuning, expressed in a format of the PI's choice.  See \texttt{OBS\_FREQ1+} for additional details.  Optional.
+
+\item[\texttt{OBS\_BW}] -- Bandwidth, expressed as an integer.  For beamforming modes, an integer between 1 and 7.  For \texttt{TBS} mode, an integer in the range 7--9.  Refer to~[1] for the mapping between bandwidth codes and sample rates.
+
+\item[\texttt{OBS\_BW+}] -- Bandwidth, expressed in a format of the PI's choice.  This is redundant information given \texttt{OBS\_BW} and is ignored by MCS, but is included primarily for user convenience.
+\end{description}
+
+\subsubsection{STEPPED Mode Keywords}
+
+The following keywords are required only for \texttt{STEPPED} mode observations:
+
+\begin{description}
+\item[\texttt{OBS\_STP\_N}] -- Number of steps in the observation.
+
+\item[\texttt{OBS\_STP\_RADEC}] -- Coordinate system for step pointing.  1 = RA/DEC (equatorial, J2000), 0 = azimuth/altitude (horizontal).
+
+\item[\texttt{OBS\_STP\_C1[$n$]}] -- For beam pointing direction at step $n$, this is either RA or AZ depending on \texttt{OBS\_STP\_RADEC}.  Decimal hours or decimal degrees.  $1 \le n \le \texttt{OBS\_STP\_N}$.
+
+\item[\texttt{OBS\_STP\_C2[$n$]}] -- For beam pointing direction at step $n$, this is either DEC or ALT depending on \texttt{OBS\_STP\_RADEC}.  Decimal degrees.  $1 \le n \le \texttt{OBS\_STP\_N}$.
+
+\item[\texttt{OBS\_STP\_T[$n$]}] -- Start time for this step in integer milliseconds from \texttt{OBS\_START\_MPM}.  $1 \le n \le \texttt{OBS\_STP\_N}$.
+
+\item[\texttt{OBS\_STP\_FREQ1[$n$]}] -- Center frequency for the first DRX tuning during step $n$, expressed as an integer ``tuning word''.  The format is the same as used for \texttt{OBS\_FREQ1}.  $1 \le n \le \texttt{OBS\_STP\_N}$.
+
+\item[\texttt{OBS\_STP\_FREQ1+[$n$]}] -- Center frequency for the first DRX tuning during step $n$, expressed in a format of the PI's choice.  See \texttt{OBS\_FREQ1+} for additional details.  $1 \le n \le \texttt{OBS\_STP\_N}$.
+
+\item[\texttt{OBS\_STP\_FREQ2[$n$]}] -- Center frequency for the second DRX tuning during step $n$, expressed as an integer ``tuning word''.  The format is the same as used for \texttt{OBS\_FREQ1}.  $1 \le n \le \texttt{OBS\_STP\_N}$.
+
+\item[\texttt{OBS\_STP\_FREQ2+[$n$]}] -- Center frequency for the second DRX tuning during step $n$, expressed in a format of the PI's choice.  See \texttt{OBS\_FREQ1+} for additional details.  $1 \le n \le \texttt{OBS\_STP\_N}$.
+
+\item[\texttt{OBS\_STP\_B[$n$]}] -- Beam type.  $1 \le n \le \texttt{OBS\_STP\_N}$.  Options are:
+\begin{itemize}
+\item \texttt{SIMPLE}.  (See \texttt{OBS\_B} for additional details.)
+\item \texttt{HIGH\_DR}.  (See \texttt{OBS\_B} for additional details.)
+\item \texttt{SPEC\_DELAYS\_GAINS}.  Beamforming is by applying user-specified delays and gains.  The delays and gains are specified by the parameters \texttt{OBS\_BEAM\_DELAY[][]} and \texttt{BEAM\_GAIN[][][][]}.  MCS makes no attempt to account for instrumental delays and gains through the system.
+\end{itemize}
+
+\item[\texttt{OBS\_BEAM\_DELAY[$n$][$p$]}] -- Corresponds to \texttt{BEAM\_DELAY[$p$]} in~[1]; this is the value during step $n$.  Meaningful only when \texttt{OBS\_STP\_B[$n$]} = \texttt{SPEC\_DELAYS\_GAINS}, and must be specified in this case; otherwise optional.  $1 \le n \le \texttt{OBS\_STP\_N}$, $1 \le p \le 512$ (one per antenna, i.e., two per stand).  Keywords must appear in sequential order by $p$.
+
+\item[\texttt{BEAM\_GAIN[$n$][$p$][$q$][$r$]}] -- Corresponds to \texttt{BEAM\_GAIN[$p$][$q$][$r$]} in~[1]; this is the value during step $n$.  Meaningful only when \texttt{OBS\_STP\_B[$n$]} = \texttt{SPEC\_DELAYS\_GAINS}, and must be specified in this case; otherwise optional.  $1 \le n \le \texttt{OBS\_STP\_N}$, $1 \le p \le 256$, $1 \le q, r \le 2$.  Keywords must appear in sequential order by $p$, then $q$, then $r$.
+\end{description}
+
+\begin{calloutBox}{Implementation Note}{blue}
+In a \texttt{STEPPED} observation, DRX settings (tuning frequencies, bandwidth, gain, and beam type) carry over from one step to the next.  MCS only issues new commands to NDP when a setting changes relative to the previous step.  This means that if consecutive steps share the same tuning or gain parameters, those parameters need not be re-specified in the SDF --- the values from the preceding step remain in effect.
+\end{calloutBox}
+
+\subsubsection{Optional Observation Parameters}
+
+The following observation parameters are optional, but allow additional control over the observation which may be useful in certain cases.  If not specified, MCS will attempt to assign reasonable values.
+
+\begin{description}
+\item[\texttt{OBS\_FEE[$n$][$p$]}] -- Controls power for the FEE on stand $n$, polarization $p$.  ``1'' = ``on'', ``0'' = ``off'', ``$-1$'' = ``MCS decides'' (value used if not specified).  $1 \le n \le 256$ and $p = 1$ or 2.  $n$ can also be 0, which is interpreted as meaning that this setting should apply for \textit{all} $n$.  Must be listed in order of increasing $n$.  \textit{NOTE: Because each FEE has only a single power input, both} \texttt{OBS\_FEE} \textit{settings for a stand must be set to ``off'' in order to have any effect.}
+
+\item[\texttt{OBS\_ASP\_FLT[$n$]}] -- Selects the ``filter setting'' for the ARX corresponding to stand $n$.  This corresponds to the ASP MIB parameter ``FIL''.  An integer in the range 0--7, or ``$-1$'' = ``MCS decides'' (value used if not specified).  $1 \le n \le 256$.  $n$ can also be 0, which is interpreted as meaning that this setting should apply for \textit{all} $n$.  Must be listed in order of increasing $n$.
+
+\item[\texttt{OBS\_ASP\_AT1[$n$]}] -- Selects the first attenuator setting for the ARX corresponding to stand $n$.  This corresponds to the ASP MIB parameter ``AT1''.  This is an integer value between 0 and 15, or ``$-1$'' = ``MCS decides'' (value used if not specified).  $1 \le n \le 256$.  $n$ can also be 0, which is interpreted as meaning that this setting should apply for \textit{all} $n$.  Must be listed in order of increasing $n$.
+
+\item[\texttt{OBS\_ASP\_AT2[$n$]}] -- Selects the second attenuator setting for the ARX corresponding to stand $n$.  This corresponds to the ASP MIB parameter ``AT2''.  This is an integer value between 0 and 15, or ``$-1$'' = ``MCS decides'' (value used if not specified).  $1 \le n \le 256$.  $n$ can also be 0, which is interpreted as meaning that this setting should apply for \textit{all} $n$.  Must be listed in order of increasing $n$.
+
+\item[\texttt{OBS\_ASP\_AT3[$n$]}] -- Selects the third attenuator setting for the ARX corresponding to stand $n$.  This corresponds to the ASP MIB parameter ``AT3''.  This is an integer value between 0 and 31, or ``$-1$'' = ``MCS decides'' (value used if not specified).  $1 \le n \le 256$.  $n$ can also be 0, which is interpreted as meaning that this setting should apply for \textit{all} $n$.  Must be listed in order of increasing $n$.
+
+\item[\texttt{OBS\_TBT\_SAMPLES}] -- Number of samples to acquire in a TBT observation.  Default is 19600000.  Maximum is 392000000.  If not specified, the default value is used.  This is only meaningful for \texttt{OBS\_MODE} = \texttt{TBT}, and is ignored otherwise.
+
+\item[\texttt{OBS\_DRX\_GAIN}] -- This corresponds to the NDP DRX command parameter ``DRX\_GAIN''.  If both tunings should use the same gain, this is an integer value between 0 and 15.  To specify different gains for the two tunings, this value is packed as $(\text{gain}_1 \times 16) + \text{gain}_2$, where $\text{gain}_1$ and $\text{gain}_2$ are each in the range 0--15, giving a combined range of 16--255.  ``$-1$'' = ``MCS decides'' (value used if not specified).
+\end{description}
+
+\begin{calloutBox}{Implementation Note}{blue}
+MCS currently does not act on the \texttt{OBS\_FEE} and \texttt{OBS\_ASP\_*} parameters directly.  These settings are recorded in the observation specification file and may be handled upstream by HAL (Heuristic Automation for LWA; see~[5]).
+\end{calloutBox}

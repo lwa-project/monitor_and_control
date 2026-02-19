@@ -45,7 +45,7 @@ int LWA_mibupdate_ASP(
       sscanf(cmdata,"%3d%2d",&iStand,&eSet);
       sprintf(s2,"%02d",eSet);
       if (iStand==0) { /* means "apply to all" */
-          for ( i=0; i<260; i++) {
+          for ( i=0; i<256; i++) {
             sprintf(sMIBlabel,"FILTER_%d",i+1);
             eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, s2, strlen(s2) );
             }    
@@ -59,7 +59,7 @@ int LWA_mibupdate_ASP(
       sscanf(cmdata,"%3d%2d",&iStand,&eSet);
       sprintf(s2,"%02d",eSet);
       if (iStand==0) { /* means "apply to all" */
-          for ( i=0; i<260; i++) {
+          for ( i=0; i<256; i++) {
             sprintf(sMIBlabel,"AT1_%d",i+1);
             eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, s2, strlen(s2) );
             }    
@@ -73,7 +73,7 @@ int LWA_mibupdate_ASP(
       sscanf(cmdata,"%3d%2d",&iStand,&eSet);
       sprintf(s2,"%02d",eSet);
       if (iStand==0) { /* means "apply to all" */
-          for ( i=0; i<260; i++) {
+          for ( i=0; i<256; i++) {
             sprintf(sMIBlabel,"AT2_%d",i+1);
             eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, s2, strlen(s2) );
             }    
@@ -83,25 +83,25 @@ int LWA_mibupdate_ASP(
         }
       break;
 
-    case LWA_CMD_ATS:
+    case LWA_CMD_AT3:
       sscanf(cmdata,"%3d%2d",&iStand,&eSet);
       sprintf(s2,"%02d",eSet);
       if (iStand==0) { /* means "apply to all" */
-          for ( i=0; i<260; i++) {
-            sprintf(sMIBlabel,"ATSPLIT_%d",i+1);
+          for ( i=0; i<256; i++) {
+            sprintf(sMIBlabel,"AT3_%d",i+1);
             eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, s2, strlen(s2) );
             }    
         } else { /* apply to indicated stand */
-            sprintf(sMIBlabel,"ATSPLIT_%d",iStand);
+            sprintf(sMIBlabel,"AT3_%d",iStand);
             eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, s2, strlen(s2) );
         }
       break;
 
     case LWA_CMD_FPW:
-      sscanf(cmdata,"%3d%d%2d",&iStand,&iPol,&eSet);
+      sscanf(cmdata,"%3d%1d%2d",&iStand,&iPol,&eSet);
       if (eSet==0) { sprintf(s3,"OFF"); } else { sprintf(s3,"ON "); } 
       if (iStand==0) { /* means "apply to all" */
-          for ( i=0; i<260; i++) {
+          for ( i=0; i<256; i++) {
             sprintf(sMIBlabel,"FEEPOL%dPWR_%d",iPol,i+1);
             eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, sMIBlabel, s2, strlen(s2) );
             }    

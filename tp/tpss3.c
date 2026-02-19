@@ -233,8 +233,7 @@
       printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
       sscanf(data,"%ld",&(obs[nobs].OBS_FREQ1));
       printf("...converts to %ld\n",obs[nobs].OBS_FREQ1);
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-      if ( obs[nobs].OBS_MODE == LWA_OM_TBN ) {
+      if ( obs[nobs].OBS_MODE == LWA_OM_TBS ) {
          if ( ( obs[nobs].OBS_FREQ1<65739295 ) || ( obs[nobs].OBS_FREQ1>2037918156 ) ) {   
             printf("[%d/%d] FATAL: OBS_FREQ1 out of range\n",MT_TPSS,getpid());  
             exit(EXIT_FAILURE);
@@ -245,19 +244,6 @@
             exit(EXIT_FAILURE);
             }
          }
-#else
-      if ( obs[nobs].OBS_MODE == LWA_OM_TBN ) {
-         if ( ( obs[nobs].OBS_FREQ1<109565492 ) || ( obs[nobs].OBS_FREQ1>2037918156 ) ) {   
-            printf("[%d/%d] FATAL: OBS_FREQ1 out of range\n",MT_TPSS,getpid());  
-            exit(EXIT_FAILURE);
-            }
-      } else {
-          if ( ( obs[nobs].OBS_FREQ1<219130984 ) || ( obs[nobs].OBS_FREQ1>1928352663 ) ) {   
-            printf("[%d/%d] FATAL: OBS_FREQ1 out of range\n",MT_TPSS,getpid());  
-            exit(EXIT_FAILURE);
-            }
-         }
-#endif
       strcpy(data,"");   
       break;
     case TPSS_PL_EOF:                                                                                                        break;
@@ -327,9 +313,8 @@
       printf("[%d/%d] %s='%s'",MT_TPSS,getpid(),keyword,data); 
       sscanf(data,"%d",&(obs[nobs].OBS_BW));
       printf("...converts to %d\n",obs[nobs].OBS_BW);
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-      if ( obs[nobs].OBS_MODE == LWA_OM_TBN ) {
-         if ( ( obs[nobs].OBS_BW<1 ) || ( obs[nobs].OBS_BW>7 ) ) { 		// TODO: Update this when possible
+      if ( obs[nobs].OBS_MODE == LWA_OM_TBS ) {
+         if ( ( obs[nobs].OBS_BW<7 ) || ( obs[nobs].OBS_BW>9 ) ) { 		// TODO: Update this when possible
             printf("[%d/%d] FATAL: Invalid OBS_BW\n",MT_TPSS,getpid());
             exit(EXIT_FAILURE);
             }
@@ -339,12 +324,6 @@
             exit(EXIT_FAILURE);
             }
        }    
-#else
-      if ( ( obs[nobs].OBS_BW<1 ) || ( obs[nobs].OBS_BW>7 ) ) {   
-        printf("[%d/%d] FATAL: Invalid OBS_BW\n",MT_TPSS,getpid());  
-        exit(EXIT_FAILURE);
-        }
-#endif
       strcpy(data,"");   
       break;
     case TPSS_PL_EOF:                                                                                                        break;

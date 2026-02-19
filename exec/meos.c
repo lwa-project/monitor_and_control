@@ -14,13 +14,13 @@
 
 /* error codes returned by meos() */
 #define MEOS_ERR_OK                             0 /* OK */
-#define MEOS_ERR_INVALID_MODE                   1 /* invalid mode (i.e., not TBW, TBN, or DRX) specified */
+#define MEOS_ERR_INVALID_MODE                   1 /* invalid mode (i.e., not TBT, TBS, or DRX) specified */
 #define MEOS_ERR_MESI_MCSS                      2 /* MCS/Scheduler not responding as expected */
-#define MEOS_ERR_BSA_DP                         4 /* me_bSubsystemAlive("DP_") failed */
+#define MEOS_ERR_BSA_NDP                        4 /* me_bSubsystemAlive("NDP") failed */
 #define MEOS_ERR_BSA_DR                         8 /* me_bSubsystemAlive("DR#") failed */
-#define MEOS_ERR_DR_INI			       16 /* DR# INI failed */
+#define MEOS_ERR_DR_INI                        16 /* DR# INI failed */
 #define MEOS_ERR_DR_REC                        32 /* attempt to send DR# REC command failed */
-#define MEOS_ERR_DP_TBX                        64 /* attempt to send DP_ TBW, TBN, or DRX command failed */
+#define MEOS_ERR_NDP_TBX                       64 /* attempt to send NDP TBT, TBS, or DRX command failed */
 #define MEOS_ERR_DR_OPTYPE_FAIL               128 /* memdre() returned an error when asked for OP-TYPE */
 #define MEOS_ERR_DR_DIR_FAIL                  256 /* problem getting DIRECTORY-COUNT or DIRECTORY-ENTRY-# */
 #define MEOS_ERR_DR_CPY_FAIL                  512 /* problem doing DR# CPY */
@@ -29,8 +29,8 @@
 /* other parameters which affect operation */
 #define MEOS_DR_START_DELAY_MS         5000 /* [ms] how far in the future [ms] to start DR recording */
                                             /* Chris Wolfe says this must be > 2.5 s */
-#define MEOS_DR_LENGTH_MS_TBW         75000 /* [ms] how long to record, for TBW (takes a long time to read out) */
-                                            /* This is 60s for TBW readout, plus a comfortable margin to account */
+#define MEOS_DR_LENGTH_MS_TBT         75000 /* [ms] how long to record, for TBT (takes a long time to read out) */
+                                            /* This is 60s for TBT readout, plus a comfortable margin to account */
                                             /* for the simplistic sync scheme employed here */
 #define MEOS_DR_MIB_UPDATE_DELAY_US 3000000 /* [us] how long to wait for a MIB entry to update after RPT issued */
 
@@ -38,22 +38,16 @@ int meos (
   int nDR,        /* (input) ID# of DR (e.g., 1="DR1", 2="DR2", and so on) to use */
   char *sExtDev,  /* (input) name of DR's external device to copy acquisition to */
   char *sDestDir, /* (input) Desination directory (in user space) for file.  No trailing slash. */
-  char *mode,     /* (input) "TBW", "TBN", or "DRX" */
-  char *args      /* (input) For TBW: "b n" where b = "12" means 12-bit [DEFAULT], "4" means 4-bit */
-                  /*                              n = number of samples (up to 12000000 [DEFAULT] for 12-bit; */
-                  /*                                                     up to 36000000 [DEFAULT] for 36-bit) */
-                  /*                  e.g., "12 12000000" */
-                  /*         For TBF: "n m" where n = number of samples   */
+  char *mode,     /* (input) "TBT", "TBS", or "DRX" */
+  char *args      /* (input) For TBT: "n m" where n = number of samples   */
                   /*                              m = DRX tuning mask     */
-                  /*         For TBN: "f r g s d" where f = center freq [Hz], */
-                  /*                                    r = rate "1"|"2"|...|"7" */
-                  /*                                    g = gain "0"|"1"|... */
-                  /*                                    s = subslot "0"|"1"|... */
+                  /*         For TBS: "f r g s d" where f = center freq [Hz], */
+                  /*                                    r = rate "1"|"2"|...|"8" */
                   /*                                    d = duration [ms] */
                   /*                  e.g., "38000000 7 28 0 60000" */
                   /*         For DRX: "d" where d is duration [ms].  No other arguments are expected. */
                   /*                  It is assumed that appropriate FST, BAM, and DRX */
-                  /*                  commands have already been sent & that DP is ready to go */
+                  /*                  commands have already been sent & that NDP is ready to go */
   ) {
   /* Returns error code (one of MEOS_ERR_*) */
   /* Recording is written to file named <OP-TAG>_<nDR>.dat; e.g., 055468_000000008_1.dat */
@@ -69,11 +63,10 @@ int meos (
   int temp = 0;
   long int nsamp = 12000000;
   unsigned long int tuning_mask;
-  float tbn_f = 0;
-  int tbn_r = 0;
-  int tbn_g = 0;
-  int tbn_s = 0;
-  long int tbn_d = 0;
+  long int signed_tuning_mask;
+  float tbs_f = 0;
+  int tbs_r = 0;
+  long int tbs_d = 0;
   long int drx_d = 0;
   char dr_format[33];
 
@@ -114,31 +107,19 @@ int meos (
 
   /* parse mode/args */
   bDone=0;
-#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
-  if (!strncmp(mode,"TBF",3)) {\
-    sscanf(args,"%ld %lu",&nsamp,&tuning_mask);
-    printf("[%d/%d] mode='%s', nsamp=%ld, tuning_mask=%lu\n",ME_MEOS,getpid(),mode,nsamp,tuning_mask);
-    sprintf(dr_format,"DEFAULT_TBF");
+  if (!strncmp(mode,"TBT",3)) {\
+    sscanf(args,"%ld %ld",&nsamp,&signed_tuning_mask);
+    printf("[%d/%d] mode='%s', nsamp=%ld, tuning_mask=%ld\n",ME_MEOS,getpid(),mode,nsamp,signed_tuning_mask);
+    sprintf(dr_format,"DEFAULT_TBT");
     bDone=1;
   }
-#else
-  if (!strncmp(mode,"TBW",3)) {
-    b4bits = !strncmp(args,"4",1);
-    sscanf(args,"%d %ld",&temp,&nsamp);
-    printf("[%d/%d] mode='%s', b4bits=%d, nsamp=%ld\n",ME_MEOS,getpid(),mode,b4bits,nsamp);
-    sprintf(dr_format,"DEFAULT_TBW");
-    bDone=1;
-    }
-#endif
-#if !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
-  if (!strncmp(mode,"TBN",3)) {
+  if (!strncmp(mode,"TBS",3)) {
     //printf("[%d/%d] args='%s'\n",ME_MEOS,getpid(),args);
-    sscanf(args,"%f %d %d %d %ld",&tbn_f,&tbn_r,&tbn_g,&tbn_s,&tbn_d);
-    printf("[%d/%d] mode='%s', f=%f, r=%d, g=%d, s=%d, d=%ld [ms]\n",ME_MEOS,getpid(),mode,tbn_f,tbn_r,tbn_g,tbn_s,tbn_d);
-    sprintf(dr_format,"TBN");
+    sscanf(args,"%f %d %ld",&tbs_f,&tbs_r,&tbs_d);
+    printf("[%d/%d] mode='%s', f=%f, r=%d, d=%ld [ms]\n",ME_MEOS,getpid(),mode,tbs_f,tbs_r,tbs_d);
+    sprintf(dr_format,"TBS");
     bDone=1;
     }
-#endif
   if (!strncmp(mode,"DRX",3)) {
     //printf("[%d/%d] args='%s'\n",ME_MEOS,getpid(),args);
     sscanf(args,"%ld",&drx_d);
@@ -164,14 +145,14 @@ int meos (
     return eResult;
     }
 
-  /* confirm that DP_ is responding */
-  //err = me_bSubsystemAlive("DP_");
+  /* confirm that NDP is responding */
+  //err = me_bSubsystemAlive("NDP");
   //if (err!=0) {
-  //  printf("[%d/%d] FATAL: ms_bSubsystemAlive('DP_') returned code %d\n",ME_MEOS,getpid(),err);
-  //  eResult += MEOS_ERR_BSA_DP;
+  //  printf("[%d/%d] FATAL: ms_bSubsystemAlive('NDP') returned code %d\n",ME_MEOS,getpid(),err);
+  //  eResult += MEOS_ERR_BSA_NDP;
   //  return eResult;
   //  }
-  //printf("[%d/%d] DP is responding NORMAL\n",ME_MEOS,getpid(),err);
+  //printf("[%d/%d] NDP is responding NORMAL\n",ME_MEOS,getpid(),err);
 
   /* confirm that DRn is responding */
   //err = me_bSubsystemAlive(sDR);
@@ -195,46 +176,35 @@ int meos (
   LWA_time( &mjd0, &mpm0 );  /* gets current time; returns MJD and MPM */
   printf("[%d/%d] LWA time is now %ld %ld\n",ME_MEOS,getpid(),mjd0,mpm0); 
   
-  /* figure out when to start DR and DP, and when acquisition should be done */
+  /* figure out when to start DR and NDP, and when acquisition should be done */
   dr_start_mjd = mjd0;
   dr_start_mpm = mpm0 + MEOS_DR_START_DELAY_MS;
   if ( dr_start_mpm > (24*3600*1000) ) { /* need to roll over into next day */
     dr_start_mjd += 1;
     dr_start_mpm -= (24*3600*1000); 
     }
-  dr_length_ms = MEOS_DR_LENGTH_MS_TBW;
-  if (!strncmp(mode,"TBN",3)) {
-    dr_length_ms = tbn_d; 
+  dr_length_ms = MEOS_DR_LENGTH_MS_TBT;
+  if (!strncmp(mode,"TBS",3)) {
+    dr_length_ms = tbs_d; 
     }
   if (!strncmp(mode,"DRX",3)) {
     dr_length_ms = drx_d; 
     }
 
-  /* if TBN, then we want to start DP first (since this mode runs continuously), and then DR */
-  if (!strncmp(mode,"TBN",3)) {
-#if defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-    sprintf(data,"%8.0f %d %d",tbn_f,tbn_r,tbn_g);
-    err = mesi( NULL, "ADP", "TBN", data, "today", "asap", &reference );
-#elif !defined(LWA_BACKEND_IS_NDP) || !LWA_BACKEND_IS_NDP
-    sprintf(data,"%8.0f %d %d %d",tbn_f,tbn_r,tbn_g,tbn_s);
-    err = mesi( NULL, "DP_", "TBN", data, "today", "asap", &reference );
-#endif
+  /* if TBS, then we want to start NDP first (since this mode runs continuously), and then DR */
+  if (!strncmp(mode,"TBS",3)) {
+    sprintf(data,"%8.0f %d",tbs_f,tbs_r);
+    err = mesi( NULL, "NDP", "TBS", data, "today", "asap", &reference );
     if (err!=MESI_ERR_OK) {
-      printf("[%d/%d] FATAL: mesi(NULL,'DP_','TBN',...) returned code %d\n",ME_MEOS,getpid(),err);  
-      eResult += MEOS_ERR_DP_TBX;
+      printf("[%d/%d] FATAL: mesi(NULL,'NDP','TBS',...) returned code %d\n",ME_MEOS,getpid(),err);  
+      eResult += MEOS_ERR_NDP_TBX;
       return eResult;  
       } 
 
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
     printf("[%d/%d] NDP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
-#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-    printf("[%d/%d] ADP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
-#else
-    printf("[%d/%d] DP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
-#endif
     }
 
-  /* if DRX, we assume DP is already running; so above procedure (for TBN) is not necessary */
+  /* if DRX, we assume NDP is already running; so above procedure (for TBS) is not necessary */
 
   /* Send DR# REC command */
   sprintf(data,"%06ld %09ld %09ld %s",dr_start_mjd,dr_start_mpm,dr_length_ms,dr_format);
@@ -252,33 +222,17 @@ int meos (
   /* sleep until past estimated DR start time  */
   usleep((MEOS_DR_START_DELAY_MS+1000)*1000); /* 1 s after start-delay */
 
-#if (defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP) || (defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP)
-  /* if TBF, now tell ADP to start. */
-  if (!strncmp(mode,"TBF",3)) {
-    sprintf(data,"16 0 %ld %lu",nsamp,tuning_mask);
-    err = mesi( NULL, "ADP", "TBF", data, "today", "asap", &reference );
+  /* if TBT, now tell NDP to start. */
+  if (!strncmp(mode,"TBT",3)) {
+    sprintf(data,"0 %ld %ld",nsamp,signed_tuning_mask);
+    err = mesi( NULL, "NDP", "TBT", data, "today", "asap", &reference );
     if (err!=MESI_ERR_OK) {
-      printf("[%d/%d] FATAL: mesi(NULL,'ADP','TBF',...) returned code %d\n",ME_MEOS,getpid(),err);  
-      eResult += MEOS_ERR_DP_TBX;
+      printf("[%d/%d] FATAL: mesi(NULL,'NDP','TBT',...) returned code %d\n",ME_MEOS,getpid(),err);  
+      eResult += MEOS_ERR_NDP_TBX;
       return eResult;  
       } 
-    printf("[%d/%d] ADP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
+    printf("[%d/%d] NDP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
     }
-  
-#else
-  /* if TBW, now tell DP to start.  It will take a couple seconds before it gets going, so */
-  /* make sure DP record time is long enough to account for this! */
-  if (!strncmp(mode,"TBW",3)) {
-    sprintf(data,"%d 0 %ld",b4bits,nsamp);
-    err = mesi( NULL, "DP_", "TBW", data, "today", "asap", &reference );
-    if (err!=MESI_ERR_OK) {
-      printf("[%d/%d] FATAL: mesi(NULL,'DP_','REC',...) returned code %d\n",ME_MEOS,getpid(),err);  
-      eResult += MEOS_ERR_DP_TBX;
-      return eResult;  
-      } 
-    printf("[%d/%d] DP accepted '%s %s' (ref=%ld).  Here we go...\n",ME_MEOS,getpid(), mode, data, reference );
-    }
-#endif
    
   /* start looking for DR to be done */
   bDone = 0;

@@ -7,14 +7,6 @@ import shutil
 import subprocess
 from datetime import datetime, timedelta
 
-from lsl.astro import DJD_OFFSET, MJD_OFFSET
-
-try:
-    import ephem
-    use_ephem = True
-except ImportError:
-    use_ephem = False
-
 try:
     from astropy.coordinates import SkyCoord, EarthLocation, AltAz
     from astropy.time import Time, TimeDelta
@@ -106,59 +98,6 @@ class CelestialTests(unittest.TestCase):
     _ras = (0, 2, 4, 8, 16)
     _decs = (-60, -30, 0, 30, 60, 89)
     
-    def run_ephem_values(self, ra, dec, lat=35.0, lng=-108.0, hgt=2000.0):
-        observer = ephem.Observer()
-        observer.lat = str(lat)
-        observer.lon = str(lng)
-        observer.elevation = hgt
-        observer.pressure = 0
-        observer.temp = 0
-        tStart = ephem.Date(TEST_DATE_START)
-        tStop = ephem.Date(TEST_DATE_END)
-        tStep = TEST_DATE_STEP_DAY
-        
-        body = ephem.FixedBody()
-        body._ra = ra*15 * numpy.pi/180
-        body._dec = dec * numpy.pi/180
-        body._epoch = ephem.J2000
-        
-        t = tStart*1.0
-        values = []
-        while t < tStop:
-            observer.date = t
-            mjd = t+DJD_OFFSET-MJD_OFFSET
-            mpm = int((int(mjd)- mjd)*86400*1000)
-            mjd = int(mjd)
-            
-            body.compute(observer)
-            mcs_alt, mcs_az = _call_mcs(mjd, mpm, ra, dec, self._lat, self._lng, self._hgt)
-            
-            values.append({'mjd': t+DJD_OFFSET-MJD_OFFSET,
-                           'ra': ra,
-                           'dec': dec,
-                           'alt': body.alt*180/numpy.pi,
-                           'az':  body.az*180/numpy.pi,
-                           'mcs_alt': mcs_alt,
-                           'mcs_az':  mcs_az})
-            t += tStep
-            
-        return values
-        
-    @unittest.skipUnless(use_ephem, "requires the 'ephem' module")
-    def test_ephem(self):
-        """compare mcs to pyephem for celestial objects"""
-        
-        for ra in self._ras:
-            for dec in self._decs:
-                values = self.run_ephem_values(ra, dec,
-                                               self._lat, self._lng, self._hgt)
-                
-                for value in values:
-                    with self.subTest(mjd=value['mjd'], ra=ra, dec=dec):
-                        sep = _separation((value['az'], value['alt']),
-                                          (value['mcs_az'], value['mcs_alt']))
-                        self.assertLess(sep, TEST_TOLERANCE_ARCSEC)
-                        
     def run_astropy_values(self, ra, dec, lat=35.0, lng=-108.0, hgt=2000.0):
         observer = EarthLocation.from_geodetic(lng, lat, height=hgt)
         tStart = Time('%04i-%02i-%02i 00:00:00' % TEST_DATE_START, format='iso', scale='utc')
@@ -173,7 +112,7 @@ class CelestialTests(unittest.TestCase):
             frame = AltAz(location=observer, obstime=t,
                           pressure=0, temperature=0, relative_humidity=0, obswl=0)
             mjd = t.mjd
-            mpm = int((int(mjd)- mjd)*86400*1000)
+            mpm = int((mjd - int(mjd))*86400*1000)
             mjd = int(mjd)
             
             obj = body.transform_to(frame)

@@ -1,0 +1,543 @@
+# ----------------------------------------------
+# --- Station Static MIB Initialization File ---
+# ----------------------------------------------
+# Example SSMIF for documentation purposes.
+# Based on a subset (16 stands) of the LWA1 SSMIF.
+
+FORMAT_VERSION 10
+STATION_ID VL
+GEO_N   +34.068894 # N Lat [deg]
+GEO_E  -107.628350 # E Lon [deg]
+GEO_EL 2133.6      # [m] above MSL
+N_STD 16
+
+# ---------------------------------------
+# --- Stand Positions -------------------
+# ---------------------------------------
+STD_LX[1]    -1.006
+STD_LY[1]   -54.590
+STD_LZ[1]    +3.204
+STD_LX[2]    +0.232
+STD_LY[2]   -49.301
+STD_LZ[2]    +3.075
+STD_LX[3]    -2.621
+STD_LY[3]   -43.460
+STD_LZ[3]    +2.802
+STD_LX[4]    +1.350
+STD_LY[4]   -39.405
+STD_LZ[4]    +2.707
+STD_LX[5]    -3.380
+STD_LY[5]   -31.576
+STD_LZ[5]    +2.503
+STD_LX[6]    +1.717
+STD_LY[6]   -26.046
+STD_LZ[6]    +2.298
+STD_LX[7]    -0.060
+STD_LY[7]   -16.578
+STD_LZ[7]    +2.020
+STD_LX[8]    +0.316
+STD_LY[8]   -10.798
+STD_LZ[8]    +1.817
+STD_LX[9]    -0.787
+STD_LY[9]    -4.370
+STD_LZ[9]    +1.683
+STD_LX[10]    +1.893
+STD_LY[10]    +0.863
+STD_LZ[10]    +1.536
+STD_LX[11]    -0.641
+STD_LY[11]    +5.666
+STD_LZ[11]    +1.403
+STD_LX[12]    -1.245
+STD_LY[12]   +14.437
+STD_LZ[12]    +1.052
+STD_LX[13]    -0.813
+STD_LY[13]   +19.825
+STD_LZ[13]    +0.893
+STD_LX[14]    -0.055
+STD_LY[14]   +25.202
+STD_LZ[14]    +0.683
+STD_LX[15]    +1.960
+STD_LY[15]   +29.739
+STD_LZ[15]    +0.511
+STD_LX[16]    +2.872
+STD_LY[16]   +35.432
+STD_LZ[16]    +0.284
+
+# ------------------------------------
+# --- Antenna # -> Stand # mapping ---
+# ------------------------------------
+# Defaults are used: antennas 1 & 2 on stand 1, 3 & 4 on stand 2, etc.
+
+# ----------------------------
+# --- Antenna orientations ---
+# ----------------------------
+# Defaults are used: odd antennas = 0 (N-S), even antennas = 1 (E-W).
+
+# ----------------------
+# --- Antenna Status ---
+# ----------------------
+# Defaults are used (3 = OK) except:
+ANT_STAT[9] 1  # Bad
+
+# -------------------------------
+# --- Antenna mis-orientation ---
+# -------------------------------
+# Defaults are used (0.0) except:
+ANT_PHI[7]  +15.0
+ANT_PHI[8]  +15.0
+
+# ----------------------------------
+# --- Antenna design information ---
+# ----------------------------------
+# Default is used (ANT_DESI = 1).
+
+# ----------------------
+# --- FEEs -------------
+# ----------------------
+N_FEE 16
+
+# FEE_ID, FEE_STAT, FEE_DESI, FEE_GAI1, FEE_GAI2 all use defaults.
+# FEE_ANT1/FEE_ANT2 mapping uses defaults.
+
+# ----------------------------------------
+# --- FEE Power Source Identification ----
+# ----------------------------------------
+FEE_RACK[1] 1
+FEE_PORT[1] 1
+FEE_RACK[2] 1
+FEE_PORT[2] 1
+FEE_RACK[3] 1
+FEE_PORT[3] 1
+FEE_RACK[4] 1
+FEE_PORT[4] 1
+FEE_RACK[5] 1
+FEE_PORT[5] 1
+FEE_RACK[6] 1
+FEE_PORT[6] 1
+FEE_RACK[7] 1
+FEE_PORT[7] 1
+FEE_RACK[8] 1
+FEE_PORT[8] 1
+FEE_RACK[9] 1
+FEE_PORT[9] 1
+FEE_RACK[10] 1
+FEE_PORT[10] 1
+FEE_RACK[11] 1
+FEE_PORT[11] 1
+FEE_RACK[12] 1
+FEE_PORT[12] 1
+FEE_RACK[13] 1
+FEE_PORT[13] 1
+FEE_RACK[14] 1
+FEE_PORT[14] 1
+FEE_RACK[15] 1
+FEE_PORT[15] 1
+FEE_RACK[16] 1
+FEE_PORT[16] 1
+
+# ----------------------
+# --- RPD (Cables) -----
+# ----------------------
+N_RPD 32
+
+RPD_ID[1] EXK-001-138 (Gray)
+RPD_ID[2] EXK-001-138 (Black)
+RPD_ID[3] EXK-002-133 (Gray)
+RPD_ID[4] EXK-002-133 (Black)
+RPD_ID[5] EXK-003-134 (Gray)
+RPD_ID[6] EXK-003-134 (Black)
+RPD_ID[7] EXK-004-126 (Gray)
+RPD_ID[8] EXK-004-126 (Black)
+RPD_ID[9] EXK-005-117 (Gray)
+RPD_ID[10] EXK-005-117 (Black)
+RPD_ID[11] EXK-006-121 (Gray)
+RPD_ID[12] EXK-006-121 (Black)
+RPD_ID[13] EXK-007-105 (Gray)
+RPD_ID[14] EXK-007-105 (Black)
+RPD_ID[15] EXK-008-100 (Gray)
+RPD_ID[16] EXK-008-100 (Black)
+RPD_ID[17] EXK-009-091 (Gray)
+RPD_ID[18] EXK-009-091 (Black)
+RPD_ID[19] EXK-010-086 (Gray)
+RPD_ID[20] EXK-010-086 (Black)
+RPD_ID[21] EXK-011-096 (Gray)
+RPD_ID[22] EXK-011-096 (Black)
+RPD_ID[23] EXK-012-089 (Gray)
+RPD_ID[24] EXK-012-089 (Black)
+RPD_ID[25] EXK-013-083 (Gray)
+RPD_ID[26] EXK-013-083 (Black)
+RPD_ID[27] EXK-014-081 (Gray)
+RPD_ID[28] EXK-014-081 (Black)
+RPD_ID[29] EXK-015-082 (Gray)
+RPD_ID[30] EXK-015-082 (Black)
+RPD_ID[31] EXK-016-077 (Gray)
+RPD_ID[32] EXK-016-077 (Black)
+
+# RPD_STAT, RPD_DESI use defaults (3, 1).
+
+RPD_LENG[1] 138.00
+RPD_LENG[2] 138.00
+RPD_LENG[3] 133.00
+RPD_LENG[4] 133.00
+RPD_LENG[5] 134.00
+RPD_LENG[6] 134.00
+RPD_LENG[7] 126.00
+RPD_LENG[8] 126.00
+RPD_LENG[9] 117.00
+RPD_LENG[10] 117.00
+RPD_LENG[11] 121.00
+RPD_LENG[12] 121.00
+RPD_LENG[13] 105.00
+RPD_LENG[14] 105.00
+RPD_LENG[15] 100.00
+RPD_LENG[16] 100.00
+RPD_LENG[17]  91.00
+RPD_LENG[18]  91.00
+RPD_LENG[19]  86.00
+RPD_LENG[20]  86.00
+RPD_LENG[21]  96.00
+RPD_LENG[22]  96.00
+RPD_LENG[23]  89.00
+RPD_LENG[24]  89.00
+RPD_LENG[25]  83.00
+RPD_LENG[26]  83.00
+RPD_LENG[27]  81.00
+RPD_LENG[28]  81.00
+RPD_LENG[29]  82.00
+RPD_LENG[30]  82.00
+RPD_LENG[31]  77.00
+RPD_LENG[32]  77.00
+
+# RPD_VF, RPD_DD, RPD_A0, RPD_A1, RPD_FREF, RPD_STR defaults:
+# (per-cable RPD_VF/DD/A0/A1/FREF use defaults; only RPD_STR overridden)
+
+RPD_STR[1]  1.0085
+RPD_STR[2]  0.9955
+RPD_STR[3]  1.0070
+RPD_STR[4]  0.9900
+RPD_STR[5]  1.0040
+RPD_STR[6]  0.9925
+RPD_STR[7]  1.0200
+RPD_STR[8]  1.0040
+RPD_STR[9]  1.0470
+RPD_STR[10]  1.0100
+RPD_STR[11]  1.0240
+RPD_STR[12]  1.0145
+RPD_STR[13]  1.0180
+RPD_STR[14]  1.0150
+RPD_STR[15]  1.0510
+RPD_STR[16]  1.0170
+RPD_STR[17]  1.0030
+RPD_STR[18]  1.0095
+RPD_STR[19]  1.0210
+RPD_STR[20]  1.0195
+RPD_STR[21]  1.0060
+RPD_STR[22]  0.9810
+RPD_STR[23]  1.0635
+RPD_STR[24]  1.0595
+RPD_STR[25]  1.0085
+RPD_STR[26]  1.0475
+RPD_STR[27]  1.0360
+RPD_STR[28]  1.0160
+RPD_STR[29]  1.0255
+RPD_STR[30]  1.0120
+RPD_STR[31]  1.0240
+RPD_STR[32]  1.0175
+
+# RPD_ANT uses defaults (RPD_ANT[n] = n).
+
+# ----------------------
+# --- SEP --------------
+# ----------------------
+N_SEP 32
+
+# SEP_ID, SEP_STAT use defaults.
+
+SEP_CABL[1] 001-NS
+SEP_CABL[2] 001-EW
+SEP_CABL[3] 002-NS
+SEP_CABL[4] 002-EW
+SEP_CABL[5] 003-NS
+SEP_CABL[6] 003-EW
+SEP_CABL[7] 004-NS
+SEP_CABL[8] 004-EW
+SEP_CABL[9] 005-NS
+SEP_CABL[10] 005-EW
+SEP_CABL[11] 006-NS
+SEP_CABL[12] 006-EW
+SEP_CABL[13] 007-NS
+SEP_CABL[14] 007-EW
+SEP_CABL[15] 008-NS
+SEP_CABL[16] 008-EW
+SEP_CABL[17] 009-NS
+SEP_CABL[18] 009-EW
+SEP_CABL[19] 010-NS
+SEP_CABL[20] 010-EW
+SEP_CABL[21] 011-NS
+SEP_CABL[22] 011-EW
+SEP_CABL[23] 012-NS
+SEP_CABL[24] 012-EW
+SEP_CABL[25] 013-NS
+SEP_CABL[26] 013-EW
+SEP_CABL[27] 014-NS
+SEP_CABL[28] 014-EW
+SEP_CABL[29] 015-NS
+SEP_CABL[30] 015-EW
+SEP_CABL[31] 016-NS
+SEP_CABL[32] 016-EW
+
+# SEP_LENG, SEP_DESI, SEP_GAIN, SEP_ANT use defaults.
+
+# ----------------------
+# --- ASP (ARX) --------
+# ----------------------
+N_ARB 2
+N_ARBCH 16
+
+ARB_ID[1] 0343
+ARB_ID[2] 0335
+
+ARB_SLOT[1] 11
+ARB_SLOT[2] 12
+
+ARB_DESI[1] 5
+ARB_DESI[2] 5
+
+ARB_RACK[1] 1
+ARB_PORT[1] 2
+ARB_RACK[2] 1
+ARB_PORT[2] 2
+
+# ARB_STAT, ARB_GAIN use defaults (3, 67.0).
+# ARB_ANT uses defaults (sequential mapping).
+
+ARB_IN[1][1] 4_1
+ARB_IN[1][2] 4_2
+ARB_IN[1][3] 4_3
+ARB_IN[1][4] 4_4
+ARB_IN[1][5] 4_5
+ARB_IN[1][6] 4_6
+ARB_IN[1][7] 4_7
+ARB_IN[1][8] 4_8
+ARB_IN[1][9] 4_9
+ARB_IN[1][10] 4_10
+ARB_IN[1][11] 4_11
+ARB_IN[1][12] 4_12
+ARB_IN[1][13] 4_13
+ARB_IN[1][14] 4_14
+ARB_IN[1][15] 4_15
+ARB_IN[1][16] 4_16
+ARB_IN[2][1] 4_17
+ARB_IN[2][2] 4_18
+ARB_IN[2][3] 4_19
+ARB_IN[2][4] 4_20
+ARB_IN[2][5] 4_21
+ARB_IN[2][6] 4_22
+ARB_IN[2][7] 4_23
+ARB_IN[2][8] 4_24
+ARB_IN[2][9] 4_25
+ARB_IN[2][10] 4_26
+ARB_IN[2][11] 4_27
+ARB_IN[2][12] 4_28
+ARB_IN[2][13] 4_29
+ARB_IN[2][14] 4_30
+ARB_IN[2][15] 4_31
+ARB_IN[2][16] 4_32
+
+ARB_OUT[1][1] 1_1
+ARB_OUT[1][2] 1_2
+ARB_OUT[1][3] 1_3
+ARB_OUT[1][4] 1_4
+ARB_OUT[1][5] 1_5
+ARB_OUT[1][6] 1_6
+ARB_OUT[1][7] 1_7
+ARB_OUT[1][8] 1_8
+ARB_OUT[1][9] 1_9
+ARB_OUT[1][10] 1_10
+ARB_OUT[1][11] 1_11
+ARB_OUT[1][12] 1_12
+ARB_OUT[1][13] 1_13
+ARB_OUT[1][14] 1_14
+ARB_OUT[1][15] 1_15
+ARB_OUT[1][16] 1_16
+ARB_OUT[2][1] 1_17
+ARB_OUT[2][2] 1_18
+ARB_OUT[2][3] 1_19
+ARB_OUT[2][4] 1_20
+ARB_OUT[2][5] 1_21
+ARB_OUT[2][6] 1_22
+ARB_OUT[2][7] 1_23
+ARB_OUT[2][8] 1_24
+ARB_OUT[2][9] 1_25
+ARB_OUT[2][10] 1_26
+ARB_OUT[2][11] 1_27
+ARB_OUT[2][12] 1_28
+ARB_OUT[2][13] 1_29
+ARB_OUT[2][14] 1_30
+ARB_OUT[2][15] 1_31
+ARB_OUT[2][16] 1_32
+
+# ----------------------
+# --- NDP (SNAP/ZCU) ---
+# ----------------------
+N_SNAP 1
+N_SNAPCH 32
+
+SNAP_ID[1] 0A351D7908
+
+SNAP_SLOT[1] 1-1
+
+# SNAP_DESI: 2 = SNAP2, 3 = ZCU102
+SNAP_DESI[1] 3
+
+# SNAP_STAT uses defaults (3 = OK).
+
+SNAP_INR[1][1] 4_1
+SNAP_INR[1][2] 4_2
+SNAP_INR[1][3] 4_3
+SNAP_INR[1][4] 4_4
+SNAP_INR[1][5] 4_5
+SNAP_INR[1][6] 4_6
+SNAP_INR[1][7] 4_7
+SNAP_INR[1][8] 4_8
+SNAP_INR[1][9] 4_9
+SNAP_INR[1][10] 4_10
+SNAP_INR[1][11] 4_11
+SNAP_INR[1][12] 4_12
+SNAP_INR[1][13] 4_13
+SNAP_INR[1][14] 4_14
+SNAP_INR[1][15] 4_15
+SNAP_INR[1][16] 4_16
+SNAP_INR[1][17] 4_17
+SNAP_INR[1][18] 4_18
+SNAP_INR[1][19] 4_19
+SNAP_INR[1][20] 4_20
+SNAP_INR[1][21] 4_21
+SNAP_INR[1][22] 4_22
+SNAP_INR[1][23] 4_23
+SNAP_INR[1][24] 4_24
+SNAP_INR[1][25] 4_25
+SNAP_INR[1][26] 4_26
+SNAP_INR[1][27] 4_27
+SNAP_INR[1][28] 4_28
+SNAP_INR[1][29] 4_29
+SNAP_INR[1][30] 4_30
+SNAP_INR[1][31] 4_31
+SNAP_INR[1][32] 4_32
+
+# SNAP_INC uses defaults (UNK).
+# SNAP_ANT uses defaults (sequential mapping).
+
+# ----------------------
+# --- GPU Servers ------
+# ----------------------
+N_SERVER 5
+
+SERVER_ID[1] ndp
+SERVER_ID[2] ndp1
+SERVER_ID[3] ndp2
+SERVER_ID[4] ndp3
+SERVER_ID[5] ndp4
+
+SERVER_SLOT[1] 1
+SERVER_SLOT[2] 2
+SERVER_SLOT[3] 3
+SERVER_SLOT[4] 4
+SERVER_SLOT[5] 5
+
+# SERVER_STAT uses defaults (3 = OK).
+
+# SERVER_DESI: 1 = head node, 2 = compute node
+SERVER_DESI[1] 1
+SERVER_DESI[2] 2
+SERVER_DESI[3] 2
+SERVER_DESI[4] 2
+SERVER_DESI[5] 2
+
+# ----------------------
+# --- DR ---------------
+# ----------------------
+N_DR 5
+
+DR_STAT[1] 3
+DR_STAT[2] 3
+DR_STAT[3] 3
+DR_STAT[4] 3
+DR_STAT[5] 3
+
+DR_ID[1] DR1
+DR_ID[2] DR2
+DR_ID[3] DR3
+DR_ID[4] DR4
+DR_ID[5] DR5
+
+DR_PC[1] X11SSW-F
+DR_PC[2] X11SSW-F
+DR_PC[3] X11SSW-F
+DR_PC[4] X11SSW-F
+DR_PC[5] X11SSW-F
+
+# DR_NDP: 1-4 = beam outputs, 5 = TBT/TBS
+DR_NDP[1] 1
+DR_NDP[2] 2
+DR_NDP[3] 3
+DR_NDP[4] 4
+DR_NDP[5] 5
+
+# ----------------------
+# --- Power ------------
+# ----------------------
+N_PWR_RACK 3
+
+N_PWR_PORT[1] 4
+N_PWR_PORT[2] 6
+N_PWR_PORT[3] 6
+
+PWR_SS[1][1] ASP
+PWR_NAME[1][1] ARX
+
+PWR_SS[1][2] ASP
+PWR_NAME[1][2] FEE
+
+PWR_SS[1][4] ASP
+PWR_NAME[1][4] FAN
+
+PWR_SS[2][1] NDP
+PWR_NAME[2][1] FPG
+
+PWR_SS[2][4] NDP
+PWR_NAME[2][4] SYN
+
+PWR_SS[2][5] NDP
+PWR_NAME[2][5] FAN
+
+PWR_SS[3][1] NDP
+PWR_NAME[3][1] MCS
+
+PWR_SS[3][3] NDP
+PWR_NAME[3][3] SVR
+
+PWR_SS[3][4] DR1
+PWR_NAME[3][4] PC
+
+PWR_SS[3][5] DR2
+PWR_NAME[3][5] PC
+
+PWR_SS[3][6] DR3
+PWR_NAME[3][6] PC
+
+# ----------------------
+# --- Configuration ----
+# ----------------------
+
+MCS_CRA 1
+
+DRX_GAIN 6
+
+# ====================
+# === STATUS CODES ===
+# ====================
+# 3 = "OK"
+# 2 = "Suspect; possibly bad (If used, provide warning)"
+# 1 = "Bad (Don't use)"
+# 0 = "Not Installed"

@@ -19,13 +19,7 @@
 #define DTR 0.017453292520 /* pi/180 */
 #define FLAG_VAL (1e+20)
 
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
-#  define MAX_DP_CH 512      /* number of SNAP channel inputs (per NDP ICD) */
-#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-#  define MAX_DP_CH 512      /* number of ROACH channel inputs (per ADP ICD) */
-#else
-#  define MAX_DP_CH 520      /* number of DP1 channel inputs (per DP ICD) */
-#endif
+#define MAX_NDP_CH 512      /* number of SNAP channel inputs (per NDP ICD) */
 
 #define CHK_RES_DEG 1.0
 
@@ -68,19 +62,19 @@ int main ( int narg, char *argv[] ) {
   float fTheta;
   float fPhi;
 
-  float  px[MAX_DP_CH]; /* antenna position x [m] for indicated DP channel (numbered here as 0..519 as opposed to 1..520) */
-  float  py[MAX_DP_CH]; /* antenna position y [m] for indicated DP channel (numbered here as 0..519 as opposed to 1..520) */
-  float  pz[MAX_DP_CH]; /* antenna position z [m] for indicated DP channel (numbered here as 0..519 as opposed to 1..520) */
-  double dg[MAX_DP_CH]; /* geometrical delay [s] for indicated DP channel (numbered here as 0..519 as opposed to 1..520) */ 
-  double dc[MAX_DP_CH]; /* cable delay [s] for indicated DP channel (numbered here as 0..519 as opposed to 1..520) */
-  double d[MAX_DP_CH];  /* total delay [s] for indicated DP channel (numbered here as 0..519 as opposed to 1..520) */
+  float  px[MAX_NDP_CH]; /* antenna position x [m] for indicated NDP channel (numbered here as 0..511 as opposed to 1..512) */
+  float  py[MAX_NDP_CH]; /* antenna position y [m] for indicated NDP channel (numbered here as 0..511 as opposed to 1..512) */
+  float  pz[MAX_NDP_CH]; /* antenna position z [m] for indicated NDP channel (numbered here as 0..511 as opposed to 1..512) */
+  double dg[MAX_NDP_CH]; /* geometrical delay [s] for indicated NDP channel (numbered here as 0..511 as opposed to 1..512) */ 
+  double dc[MAX_NDP_CH]; /* cable delay [s] for indicated NDP channel (numbered here as 0..511 as opposed to 1..512) */
+  double d[MAX_NDP_CH];  /* total delay [s] for indicated NDP channel (numbered here as 0..511 as opposed to 1..512) */
 
   double dmin, dmax, drng;
   int bFlag;
 
   unsigned short int ddc;
   unsigned short int ddf;
-  unsigned short int ddm[MAX_DP_CH];
+  unsigned short int ddm[MAX_NDP_CH];
 
   int bDone=0;
   FILE *fpl;
@@ -144,7 +138,7 @@ int main ( int narg, char *argv[] ) {
   /* note: these are indexed 0..519, per DP ICD channel ordering (0..511 for ADP) */
 
   /* flag all antenna locations to begin, so we can detect if one has been missed */
-  for ( i=0; i<MAX_DP_CH; i++ ) { /* iterating by DP1-input index (per DP ICD) */
+  for ( i=0; i<MAX_NDP_CH; i++ ) { /* iterating by DP1-input index (per DP ICD) */
     px[i] = FLAG_VAL; 
     py[i] = FLAG_VAL; 
     pz[i] = FLAG_VAL; 
@@ -153,7 +147,6 @@ int main ( int narg, char *argv[] ) {
     id[i] = -1;
     }
 
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
   /* figure out antenna positions, indexed by NDP channel */
   for (i=0;i<s.nSnap;i++) { 
     for (k=0;k<s.nSnapCh;k++) { 
@@ -170,52 +163,17 @@ int main ( int narg, char *argv[] ) {
 
       } /* for k */
     } /* for i */
-#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-  /* figure out antenna positions, indexed by ADP channel */
-  for (i=0;i<s.nRoach;i++) { 
-    for (k=0;k<s.nRoachCh;k++) { 
-
-      if (s.iRoachAnt[i][k]!=0) { /* otherwise this Roach input is not connected to an antenna */      
-        ia = s.iRoachAnt[i][k] - 1;
-        px[i*s.nRoachCh+k] = s.fStdLx[ s.iAntStd[ia] - 1 ];
-        py[i*s.nRoachCh+k] = s.fStdLy[ s.iAntStd[ia] - 1 ];
-        pz[i*s.nRoachCh+k] = s.fStdLz[ s.iAntStd[ia] - 1 ];
-        id[ia] = i*s.nRoachCh+k; /* reverse lookup (ADP input channel index given antenna index); simplifies work later */
-        }
-
-      //printf("%d %d | %d | %d %d | %f\n",i,k,i*s.nDP1Ch+k,ia+1,s.iAntStd[ia],px[i*s.nDP1Ch+k]);
-
-      } /* for k */
-    } /* for i */
-#else
-  /* figure out antenna positions, indexed by DP channel */
-  for (i=0;i<s.nDP1;i++) { 
-    for (k=0;k<s.nDP1Ch;k++) { 
-
-      if (s.iDP1Ant[i][k]!=0) { /* otherwise this DP1 input is not connected to an antenna */      
-        ia = s.iDP1Ant[i][k] - 1;
-        px[i*s.nDP1Ch+k] = s.fStdLx[ s.iAntStd[ia] - 1 ];
-        py[i*s.nDP1Ch+k] = s.fStdLy[ s.iAntStd[ia] - 1 ];
-        pz[i*s.nDP1Ch+k] = s.fStdLz[ s.iAntStd[ia] - 1 ];
-        id[ia] = i*s.nDP1Ch+k; /* reverse lookup (DP input channel index given antenna index); simplifies work later */
-        }
-
-      //printf("%d %d | %d | %d %d | %f\n",i,k,i*s.nDP1Ch+k,ia+1,s.iAntStd[ia],px[i*s.nDP1Ch+k]);
-
-      } /* for k */
-    } /* for i */
-#endif
 
   /* check for un-determined stand positions */
-  for ( i=0; i<MAX_DP_CH; i++ ) { /* iterating by DP-input index */
+  for ( i=0; i<MAX_NDP_CH; i++ ) { /* iterating by NDP-input index */
     if (px[i]>(FLAG_VAL/2.0)) { printf("[%d/%d] px[%d] not computed\n",ME_DRANGE,getpid(),i+1); }
     if (py[i]>(FLAG_VAL/2.0)) { printf("[%d/%d] py[%d] not computed\n",ME_DRANGE,getpid(),i+1); }
     if (pz[i]>(FLAG_VAL/2.0)) { printf("[%d/%d] pz[%d] not computed\n",ME_DRANGE,getpid(),i+1); }
     }
-  //printf("[%d/%d] Will continue using only DP input channels 1..%d\n",ME_DRANGE,getpid(),imax);
+  //printf("[%d/%d] Will continue using only NDP input channels 1..%d\n",ME_DRANGE,getpid(),imax);
 
   /* diagnostic readback */  
-  //for ( i=0; i<ME_MAX_NDP1*ME_MAX_NDP1CH; i++ ) { /* iterating by DP-input index */
+  //for ( i=0; i<ME_MAX_NDP1*ME_MAX_NDP1CH; i++ ) { /* iterating by NDP-input index */
   //  m = i/s.nDP1Ch;
   //  p = i%s.nDP1Ch;
   //  printf("i=%3d | p: %7.2f %7.2f %7.2f | s.iDP1Ant[%2d][%2d]=%3d, s.iAntStd[]=%3d\n",i,px[i],py[i],pz[i],m,p,
@@ -230,7 +188,7 @@ int main ( int narg, char *argv[] ) {
   /* note: these are indexed 0..519, per DP ICD channel ordering */
 
   /* flag all delay numbers to begin, so we can detect if one has been missed */
-  for ( i=0; i<MAX_DP_CH; i++ ) { /* iterating by DP1-input index (per DP ICD) */
+  for ( i=0; i<MAX_NDP_CH; i++ ) { /* iterating by DP1-input index (per DP ICD) */
     dc[i] = FLAG_VAL; 
     } 
 
@@ -259,13 +217,13 @@ int main ( int narg, char *argv[] ) {
     } /* for i */
 
   /* check for un-determined cables */
-  for ( i=0; i<MAX_DP_CH; i++ ) { /* iterating by DP-input index */
+  for ( i=0; i<MAX_NDP_CH; i++ ) { /* iterating by DP-input index */
     if (dc[i]>(FLAG_VAL/2.0)) { printf("[%d/%d] dc[%d] not computed\n",ME_DRANGE,getpid(),i+1); }
     }
   //printf("[%d/%d] Will continue using only DP input channels 1..%d\n",ME_DRANGE,getpid(),imax);
 
   /* diagnostic readback */  
-  //for ( i=0; i<ME_MAX_NDP1*ME_MAX_NDP1CH; i++ ) { /* iterating by DP-input index */
+  //for ( i=0; i<ME_MAX_NDP1*ME_MAX_NDP1CH; i++ ) { /* iterating by NDP-input index */
   //  m = i/s.nDP1Ch;
   // p = i%s.nDP1Ch;
   //  printf("i=%3d | s.iDP1Ant[%2d][%2d]=%3d, s.iAntStd[]=%3d length=%5.1f | back-calc length=%5.1f\n",i,m,p,
@@ -315,7 +273,7 @@ int main ( int narg, char *argv[] ) {
 
     // get dg[] from {px[],py[],pz[]} and {fTheta,fPhi}
     // Note this is (more correctly) the time of arrival relative to the time of arrival at origin
-    for ( i=0; i<MAX_DP_CH; i++ ) { /* iterating by DP1-input index (per DP ICD) */
+    for ( i=0; i<MAX_NDP_CH; i++ ) { /* iterating by DP1-input index (per DP ICD) */
       //dg[i] = -( px[i]*cos(fTheta)*sin(fPhi) + py[i]*sin(fTheta)*sin(fPhi) + pz[i]*cos(fTheta) )/c;
       dg[i] = -( px[i]*cos(fPhi)*sin(fTheta) + py[i]*sin(fPhi)*sin(fTheta) + pz[i]*cos(fTheta) )/c;
 
@@ -324,7 +282,7 @@ int main ( int narg, char *argv[] ) {
       } 
 
     // get d[] from dc[]+dg[]; also, find minimum delay
-    for ( i=0; i<MAX_DP_CH; i++ ) { /* iterating by DP1-input index (per DP ICD) */
+    for ( i=0; i<MAX_NDP_CH; i++ ) { /* iterating by DP1-input index (per DP ICD) */
       if ( (px[i]>(FLAG_VAL/2.0)) ||
            (py[i]>(FLAG_VAL/2.0)) ||
            (pz[i]>(FLAG_VAL/2.0)) ||

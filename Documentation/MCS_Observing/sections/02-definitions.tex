@@ -1,0 +1,25 @@
+% 02-definitions.tex - Definitions
+
+\section{Definitions}
+
+A \textit{project} is a collection of activities conducted for a common scientific purpose.  Every project has a single principal investigator (PI).  A project consists of one or more \textit{sessions}.  A \textit{session} is a contiguous block of time during which MCS is conducting observations on behalf of a single project, using a single beam.  A session consists of one or more \textit{observations}.  An \textit{observation} is a single scan using a single mode (defined below).  The following modes of observation are defined:
+
+\begin{description}
+\item[\texttt{TRK\_RADEC}] -- RA/DEC Tracking.  A beam is formed in a specified direction (right ascension and declination) and follows that direction on the sky.
+
+\item[\texttt{TRK\_SOL}] -- Solar Tracking.  A beam is formed in the direction of the Sun and follows the Sun across the sky.
+
+\item[\texttt{TRK\_JOV}] -- Jupiter Tracking.  A beam is formed in the direction of Jupiter and follows Jupiter across the sky.
+
+\item[\texttt{TRK\_LUN}] -- Lunar Tracking.  A beam is formed in the direction of the Moon and follows the Moon across the sky.
+
+\item[\texttt{STEPPED}] -- Stepped Tracking.  A beam is pointed in a sequence of specified directions, with specified dwell times.  Pointing directions can be specified either in equatorial (RA/DEC) or horizontal (azimuth/altitude) coordinates.  The beam pointing is fixed in the specified coordinate system until the next repointing.  One may also fix the pointing for the duration of the entire observation.  In addition, the center frequency of each tuning may be changed at each step.
+
+\item[\texttt{TBT}] -- Transient Buffer -- Triggered.  A dump of the transient buffer of the digital processor (NDP).  The duration is computed automatically from the requested number of samples.
+
+\item[\texttt{TBS}] -- Transient Buffer -- Streaming.  A continuous capture from the transient buffer of NDP.  The duration must be specified by the PI.
+
+\item[\texttt{DIAG1}] -- Diagnostic Mode 1.  In this mode, all parameters other than \texttt{OBS\_MODE} are ignored.  MCS returns the metadata file immediately.  This mode is useful for verifying that MCS and the Executive are operational.
+\end{description}
+
+As an example, consider a project consisting of 10 sessions, where each session consists of 3 observations.  During each session, MCS first forms a beam on a calibrator for 5~minutes (\texttt{TRK\_RADEC}), then tracks a target for 1~hour (\texttt{TRK\_RADEC}), and finally tracks the same calibrator again for 5~minutes (\texttt{TRK\_RADEC}).  All three observations in each session use the same beam, tunings, and bandwidth.  Each session takes place on a different day.

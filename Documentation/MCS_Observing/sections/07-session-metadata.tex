@@ -1,0 +1,34 @@
+% 07-session-metadata.tex - Format of a Session Metadata File
+
+\section{Format of a Session Metadata File}
+\label{ch:session-metadata}
+
+The session metadata file (\texttt{*\_metadata.txt}) is a human-readable text file.  One line is appended at the conclusion of each observation.  Each line has the following format:
+
+\begin{center}
+\texttt{OBS\_ID [OP\_TAG] [BARCODE] OBS\_OUTCOME [MSG]}
+\end{center}
+
+\noindent where the fields are separated by whitespace and bracket-delimited as shown.
+
+\begin{description}
+\item[\texttt{OBS\_ID}] -- The observation identifier, as defined previously.
+
+\item[\texttt{OP\_TAG}] -- The name of the recording, derived from the MJD and a reference number (e.g., \texttt{060123\_000456789}).
+
+\item[\texttt{BARCODE}] -- The barcode of the DRSU (Data Recording Storage Unit) on the data recorder used for this observation.
+
+\item[\texttt{OBS\_OUTCOME}] -- An integer result code.  Defined values are:
+
+\begin{description}
+\item[0 (\texttt{ME\_OC\_OK}):] Concluded successfully with no issues to report.
+\item[1 (\texttt{ME\_OC\_RCVD\_ESF}):] Received a commanded ``end session -- failed'' from inprocessing.
+\item[2 (\texttt{ME\_OC\_MEEI\_STP}):] Session terminated as a result of a \texttt{STP} command.
+\end{description}
+
+\item[\texttt{MSG}] -- Free-form text with additional remarks about the outcome.
+\end{description}
+
+\begin{noteBox}
+If a session fails before any observations complete, or if the session is ended by a failure command, a summary line is written with the \texttt{OP\_TAG} field (without brackets) and no \texttt{BARCODE} field.
+\end{noteBox}

@@ -1,0 +1,30 @@
+% 05-message-types.tex - Section 5: Message Types
+
+\section{Message Types}
+\label{sec:message-types}
+
+Messages from MCS are commands.  Commands can request action, information, or both.  Connected subsystems respond as specified by the message \texttt{TYPE} definition.  The following is a list of message \texttt{TYPE}s that are common to all MCS interfaces.  ICDs between MCS and specific subsystems may specify additional message \texttt{TYPE}s.
+
+\begin{itemize}
+
+\item ``\texttt{PNG}'' = Ping.  The purposes of the command message are (1)~to confirm that a commanded system is functioning, and (2)~to disseminate or confirm time information.  Upon receiving this message, the commanded subsystem (1)~verifies that its local time is consistent with the time given in the received command message, updating if necessary; and (2)~responds with a \cmd{PNG} response message.  The \texttt{DATA} field of the command message is empty, the \texttt{DATA} field of the response message is limited to the standard response indicated below.  See Section~\ref{sec:examples} for an example.
+
+\item ``\texttt{RPT}'' = Report.  The purpose of this message \texttt{TYPE} is to provide a flexible method for reporting subsystem status.  In the command message, the \texttt{DATA} field contains a label corresponding to MIB entry or branch, indicating that the commanded subsystem should respond with the current values of the MIB for that index/branch.  The MIB data is provided as a contiguous block of data, with no delimiters or terminators (this is to avoid difficulties with raw data being interpreted as special characters).  MIB entries that have variable length are sent padded to their maximum length.  MCS shall not send an \cmd{RPT} command that results in a response message whose length exceeds the maximum specified by this ICD.  See Section~\ref{sec:examples} for an example of the use of this command.
+
+Subsystems may also send unsolicited \cmd{RPT} response messages to MCS.  An unsolicited \cmd{RPT} response has the same format as a normal \cmd{RPT} response, but the \texttt{REFERENCE} field is set to 999999999 (the maximum reference number).  The \texttt{DATA} field contains the standard response fields followed by the MIB data for the reported entry or branch.  This mechanism allows subsystems to proactively report status changes without waiting to be polled.
+
+\item ``\texttt{SHT}'' = Shutdown.  The purpose of this command is to direct the system to shut down.  If the \texttt{DATA} field is empty, then the shutdown should be ``orderly''; e.g., tasks which are currently executing may be allowed to complete or be ``gracefully'' terminated.  If the \texttt{DATA} field contains the string ``\texttt{SCRAM}'', then the subsystem should be shutdown as rapidly as possible; e.g., tasks which are currently executing should simply be abandoned.\footnote{The intent of the ``\texttt{SCRAM}'' option is to provide a quicker method for shutting down the station to save time during integration, commissioning, and maintenance activities, when many power-up/power-down cycles may be required and there is no risk of data loss.  (It is anticipated that the option will exist to simply cut power to a subsystem, but that this will be facilitated specifically through station PCD.)}  If the \texttt{DATA} field contains the string ``\texttt{RESTART}'', then the subsystem should immediately restart after shutdown is complete.  The data field ``\texttt{SCRAM RESTART}'' is permitted and has the expected effect.
+
+\end{itemize}
+
+The controlled subsystem shall respond to every message with a matching \texttt{DESTINATION} (or ``\texttt{ALL}'') with a ``response message''.  This is demonstrated by example in Section~\ref{sec:examples}.  The response message shall be transmitted within 3~seconds of receipt of the associated message from MCS.  If the \texttt{DESTINATION} field is not a match (or ``\texttt{ALL}''), then the controlled subsystem shall ignore the message.  The \texttt{DATA} field of a response message has the following structure:
+
+\begin{enumerate}
+
+\item \texttt{R-RESPONSE} [1~byte, ASCII].  This is the character ``\texttt{A}'' to indicate that the command was accepted, or the letter ``\texttt{R}'' to indicate that the command was rejected.
+
+\item \texttt{R-SUMMARY} [7~bytes, ASCII].  This is MIB entry~1.1.
+
+\item \texttt{R-COMMENT} [variable length, ASCII].  The definition of this field depends on \texttt{R-RESPONSE} and the message \texttt{TYPE}.  If \texttt{R-RESPONSE} is ``\texttt{R}'', then this field shall be used to send error codes or log messages, as specified by the subsystem ICD or other subsystem design documents.
+
+\end{enumerate}

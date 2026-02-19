@@ -141,8 +141,8 @@ int main ( int narg, char *argv[] ) {
   int iRPD;
   int iSEP;
   int iARB;
-  int iDP1;
-  int iDP2;
+  int iSNP;
+  int iSVR;
   int iDR;
   int iRack;
   int iPort;
@@ -167,7 +167,7 @@ int main ( int narg, char *argv[] ) {
   signed short int asp_flt_default;
   signed short int asp_at1_default;
   signed short int asp_at2_default;
-  signed short int asp_ats_default;
+  signed short int asp_at3_default;
 
   int c[2*ME_MAX_NSTD];
 

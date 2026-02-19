@@ -1,0 +1,90 @@
+% 05-session-spec.tex - Format of a Session Specification File
+
+\section{Format of a Session Specification File}
+
+The session specification file (\texttt{.ses}) is a packed binary file.  The following format specifiers are used:  \texttt{s$n$} denotes a string of $n$ bytes;  \texttt{i1} and \texttt{i2} denote signed integers of 1 and 2 bytes, respectively, in little-endian byte order;  \texttt{u2}, \texttt{u4}, and \texttt{u8} denote unsigned integers of 2, 4, and 8 bytes, respectively, in little-endian byte order.
+
+Table~\ref{tab:ses-format} shows the format of the session specification file.
+
+\begin{longtable}{|l|l|p{8cm}|}
+\caption{Format of a session specification file.}
+\label{tab:ses-format} \\
+\hline
+\textbf{Format} & \textbf{Field} & \textbf{Description} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Format} & \textbf{Field} & \textbf{Description} \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\texttt{u2} & \texttt{FORMAT\_VERSION}    & Format version of this file. \\
+\hline
+\texttt{s9} & \texttt{PROJECT\_ID}        & Project identifier (null-terminated string). \\
+\hline
+\texttt{u4} & \texttt{SESSION\_ID}        & Session identifier. \\
+\hline
+\texttt{u2} & \texttt{SESSION\_CRA}       & Configuration Request Authority. \\
+\hline
+\texttt{i2} & \texttt{SESSION\_DRX\_BEAM} & DRX beam assignment. \\
+\hline
+\texttt{s32} & \texttt{SESSION\_SPC}      & DR spectrometer configuration (see~[2]). \\
+\hline
+\texttt{u8} & \texttt{SESSION\_START\_MJD} & Session start time, MJD (integer part). \\
+\hline
+\texttt{u8} & \texttt{SESSION\_START\_MPM} & Session start time, milliseconds past midnight. \\
+\hline
+\texttt{u8} & \texttt{SESSION\_DUR}       & Session duration in milliseconds. \\
+\hline
+\texttt{u4} & \texttt{SESSION\_NOBS}      & Number of observations in this session. \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MRP\_ASP}  & MIB recording period for ASP (minutes). \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MRP\_NDP}  & MIB recording period for NDP (minutes). \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MRP\_DR1}  & MIB recording period for DR1 (minutes). \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MRP\_DR2}  & MIB recording period for DR2 (minutes). \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MRP\_DR3}  & MIB recording period for DR3 (minutes). \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MRP\_DR4}  & MIB recording period for DR4 (minutes). \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MRP\_DR5}  & MIB recording period for DR5 (minutes). \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MRP\_SHL}  & MIB recording period for SHL (minutes). \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MRP\_MCS}  & MIB recording period for MCS (minutes). \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MUP\_ASP}  & MIB update period for ASP (minutes). \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MUP\_NDP}  & MIB update period for NDP (minutes). \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MUP\_DR1}  & MIB update period for DR1 (minutes). \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MUP\_DR2}  & MIB update period for DR2 (minutes). \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MUP\_DR3}  & MIB update period for DR3 (minutes). \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MUP\_DR4}  & MIB update period for DR4 (minutes). \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MUP\_DR5}  & MIB update period for DR5 (minutes). \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MUP\_SHL}  & MIB update period for SHL (minutes). \\
+\hline
+\texttt{i2} & \texttt{SESSION\_MUP\_MCS}  & MIB update period for MCS (minutes). \\
+\hline
+\texttt{i1} & \texttt{SESSION\_LOG\_SCH}  & Save Scheduler log (0=no, 1=yes). \\
+\hline
+\texttt{i1} & \texttt{SESSION\_LOG\_EXE}  & Save Executive log (0=no, 1=yes). \\
+\hline
+\texttt{i1} & \texttt{SESSION\_INC\_SMIB} & Include SSMIF (0=no, 1=yes). \\
+\hline
+\texttt{i1} & \texttt{SESSION\_INC\_DES}  & Include design info (0=no, 1=yes). \\
+\hline
+
+\end{longtable}

@@ -1,0 +1,38 @@
+% MCS_Common_ICD.tex - MCS Common Interface Control Document
+% Version 1.0 - April 2009
+%
+% Long Wavelength Array Project
+% MCS Common Interface Control Document
+
+\documentclass{lwa-icd-memo}
+
+% Project-specific configuration
+\input{config/packages}
+\input{config/macros}
+\input{config/metadata}
+
+\begin{document}
+
+% Title page
+\makeICDtitlepage
+
+% Change record
+\input{frontmatter/revisions}
+\clearpage
+
+% Table of contents
+\makeICDtoc
+
+% Main content
+\input{sections/01-introduction}
+\input{sections/02-summary}
+\input{sections/03-mib}
+\input{sections/04-message-structure}
+\input{sections/05-message-types}
+\input{sections/06-examples}
+
+% Appendices
+\appendix
+\input{appendices/appendix-a}
+
+\end{document}

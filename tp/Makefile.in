@@ -5,8 +5,6 @@ CC      ?= @CC
 CFLAGS  ?= -I../common @CFLAGS@
 LDFLAGS ?= @LDFLAGS@ @LIBS@
 
-HAVE_ADP ?= @HAVE_ADP@
-
 TARGETS := \
 	tpss \
 	tptc \

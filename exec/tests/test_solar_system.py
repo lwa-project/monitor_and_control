@@ -10,12 +10,6 @@ from datetime import datetime, timedelta
 from lsl.astro import DJD_OFFSET, MJD_OFFSET
 
 try:
-    import ephem
-    use_ephem = True
-except ImportError:
-    use_ephem = False
-
-try:
     from astropy.coordinates import solar_system, EarthLocation, AltAz
     from astropy.time import Time, TimeDelta
     use_astropy = True
@@ -129,85 +123,6 @@ class SolarSystemTests(unittest.TestCase):
     _ras = (0, 2, 4, 8, 16)
     _decs = (-60, -30, 0, 30, 60, 89)
     
-    def run_ephem_values(self, planet_base, lat=35.0, lng=-108.0, hgt=2000.0):
-        observer = ephem.Observer()
-        observer.lat = str(lat)
-        observer.lon = str(lng)
-        observer.elevation = hgt
-        observer.pressure = 0
-        observer.temp = 0
-        tStart = ephem.Date(TEST_DATE_START)
-        tStop = ephem.Date(TEST_DATE_END)
-        tStep = TEST_DATE_STEP_DAY
-        
-        body = planet_base()
-        
-        t = tStart*1.0
-        values = []
-        while t < tStop:
-            observer.date = t
-            mjd = t+DJD_OFFSET-MJD_OFFSET
-            mpm = int((int(mjd)- mjd)*86400*1000)
-            mjd = int(mjd)
-            
-            body.compute(observer)
-            if planet_base is ephem.Sun:
-                mcs_alt, mcs_az = _call_mcs_sun(mjd, mpm, self._lat, self._lng, self._hgt)
-            elif planet_base is ephem.Jupiter:
-                mcs_alt, mcs_az = _call_mcs_jupiter(mjd, mpm, self._lat, self._lng, self._hgt)
-            else:
-                mcs_alt, mcs_az = _call_mcs_moon(mjd, mpm, self._lat, self._lng, self._hgt)
-                
-            values.append({'mjd': t+DJD_OFFSET-MJD_OFFSET,
-                           'alt': body.alt*180/numpy.pi,
-                           'az':  body.az*180/numpy.pi,
-                           'mcs_alt': mcs_alt,
-                           'mcs_az':  mcs_az})
-            t += tStep
-            
-        return values
-        
-    @unittest.skipUnless(use_ephem, "requires the 'ephem' module")
-    def test_ephem_sun(self):
-        """compare mcs to pyephem for the Sun"""
-        
-        values = self.run_ephem_values(ephem.Sun,
-                                       self._lat, self._lng, self._hgt)
-        
-        for value in values:
-            with self.subTest(mjd=value['mjd']):
-                sep = _separation((value['az'], value['alt']),
-                                  (value['mcs_az'], value['mcs_alt']))
-                self.assertLess(sep, TEST_TOLERANCE_ARCSEC)
-                
-    @unittest.expectedFailure
-    @unittest.skipUnless(use_ephem, "requires the 'ephem' module")
-    def test_ephem_jupiter(self):
-        """compare mcs to pyephem for Jupiter"""
-        
-        values = self.run_ephem_values(ephem.Jupiter,
-                                       self._lat, self._lng, self._hgt)
-        
-        for value in values:
-            with self.subTest(mjd=value['mjd']):
-                sep = _separation((value['az'], value['alt']),
-                                  (value['mcs_az'], value['mcs_alt']))
-                self.assertLess(sep, TEST_TOLERANCE_ARCSEC)
-                
-    @unittest.expectedFailure
-    @unittest.skipUnless(use_ephem, "requires the 'ephem' module")
-    def test_ephem_moon(self):
-        """compare mcs to pyephem for the Moon"""
-        
-        values = self.run_ephem_values(ephem.Moon,
-                                       self._lat, self._lng, self._hgt)
-        
-        for value in values:
-            with self.subTest(mjd=value['mjd']):
-                sep = _separation((value['az'], value['alt']),
-                                  (value['mcs_az'], value['mcs_alt']))
-                self.assertLess(sep, TEST_TOLERANCE_ARCSEC)
-                
     def run_astropy_values(self, planet_name, lat=35.0, lng=-108.0, hgt=2000.0):
         observer = EarthLocation.from_geodetic(lng, lat, height=hgt)
         tStart = Time('%04i-%02i-%02i 00:00:00' % TEST_DATE_START, format='iso', scale='utc')
@@ -221,7 +136,7 @@ class SolarSystemTests(unittest.TestCase):
             frame = AltAz(location=observer, obstime=t,
                           pressure=0, temperature=0, obswl=0)
             mjd = t.mjd
-            mpm = int((int(mjd)- mjd)*86400*1000)
+            mpm = int((mjd - int(mjd))*86400*1000)
             mjd = int(mjd)
             
             obj = body.transform_to(frame)
@@ -314,7 +229,7 @@ class SolarSystemTests(unittest.TestCase):
                     except ValueError:
                         jd, ra, dec, az, alt, dist, _ = line.split(None, 6)
                     mjd = float(jd) - MJD_OFFSET
-                    mpm = int((int(mjd)- mjd)*86400*1000)
+                    mpm = int((mjd - int(mjd))*86400*1000)
                     mjd = int(mjd)
                     
                     if planet_code == 10:

@@ -107,13 +107,7 @@ int LWA_mibupdate_RPT(
 /* Each file contains just one function call, "LWA_mibupdate_XXX()" */ 
 #include "ms_mcic_SHL.c" /* LWA_mibupdate_SHL() */
 #include "ms_mcic_ASP.c" /* LWA_mibupdate_ASP() */
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
 #include "ms_mcic_NDP.c" /* LWA_mibupdate_NDP() */
-#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-#include "ms_mcic_ADP.c" /* LWA_mibupdate_ADP() */
-#else
-#include "ms_mcic_DP_.c" /* LWA_mibupdate_DP_() */
-#endif
 #include "ms_mcic_DR_.c" /* LWA_mibupdate_DR_() */
 
 /* ======================================================================= */
@@ -222,19 +216,9 @@ int mib_update(
               case LWA_SID_ASP:
                 eMIBerror = eMIBerror | LWA_mibupdate_ASP( dbm_ptr, cid, cmdata, r_comment, datalen );                
                 break;
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
               case LWA_SID_NDP:
                 eMIBerror = eMIBerror | LWA_mibupdate_NDP( dbm_ptr, cid, cmdata, r_comment, datalen, ref, sent_tv );                
                 break;
-#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-              case LWA_SID_ADP:
-                eMIBerror = eMIBerror | LWA_mibupdate_ADP( dbm_ptr, cid, cmdata, r_comment, datalen, ref, sent_tv );                
-                break;
-#else
-              case LWA_SID_DP_:
-                eMIBerror = eMIBerror | LWA_mibupdate_DP_( dbm_ptr, cid, cmdata, r_comment, datalen, ref, sent_tv );                
-                break;
-#endif
 
               case LWA_SID_DR1:
               case LWA_SID_DR2:

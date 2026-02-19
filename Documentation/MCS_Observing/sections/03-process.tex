@@ -1,0 +1,48 @@
+% 03-process.tex - Process
+
+\section{Process}
+
+The process for defining, scheduling, and conducting observations is as follows:
+
+\begin{enumerate}
+
+\item The PI creates a session definition file (SDF).  This is a human-readable text file whose format is described in Section~\ref{ch:sdf-format}.  Each SDF defines exactly one session.
+
+\item An operator submits the SDF using the task processor program \texttt{tpss}.  The following occurs:
+
+\begin{enumerate}
+\item The SDF is parsed and checked for errors, and any derived information is displayed to the operator for confirmation.
+
+\item Resources are assigned.  For example, it is at this point that the operator might assign a particular NDP beam output to the session.  Concurrently, \texttt{tpss} is checking for resource conflicts (e.g., making sure the assigned beam is not already allocated at the requested time).  The operator also ensures that a reasonable value is assigned to \texttt{SESSION\_CRA} (see description below), and that this value is consistent with other concurrently-running sessions and the station-level CRA policy.
+
+\item The operator edits the SDF \texttt{REMPO} fields (\texttt{PROJECT\_REMPO} and \texttt{SESSION\_REMPO}) as appropriate.  These are remarks pertaining to review and scheduling that the operator wishes to convey as metadata.  \texttt{tpss} is run at least once so that these comments are included in the version of the SDF that is submitted to MCS/Executive.
+
+\item \texttt{tpss} outputs the following files:\footnote{In the case of \texttt{STEPPED} mode observations, the keywords associated with step definitions are not written into the modified SDF but instead are written directly into the observation specification file.}
+\begin{itemize}
+\item The SDF, now modified as a result of the steps above.  In this version of the SDF, the value assigned to every keyword is explicitly indicated.  The name of this file has the format \texttt{\$\{PROJECT\_ID\}\_\$\{SESSION\_ID\}.txt}.
+\item A \textit{session specification file}, named \texttt{\$\{PROJECT\_ID\}\_\$\{SESSION\_ID\}.ses}.  This is a binary file that specifies parameters that apply session-wide.  These parameters are defined in Section~5.
+\item One \textit{observation specification file} per observation, named \texttt{\$\{PROJECT\_ID\}\_\$\{SESSION\_ID\}\_\$\{OBS\_ID\}.obs}.  These are binary files that completely specify the scheduled observations.  The format of these files is given in Section~6.  It is these files, plus the session specification file, that are the actual input to MCS/Executive for conducting observations.
+\end{itemize}
+\end{enumerate}
+
+\item The session runs at the scheduled time.  Primary NDP output data is captured by MCS-DR.
+
+\item As each observation concludes, MCS creates a modified copy of the observation specification file with filename \texttt{\$\{PROJECT\_ID\}\_\$\{SESSION\_ID\}\_\$\{OBS\_ID\}\_\$\{OBS\_OUTCOME\}.dat}.  \texttt{\$\{OBS\_OUTCOME\}} is an integer which indicates the outcome of the observation, such as whether the observation succeeded or failed (see Section~\ref{ch:session-metadata}).  For parameters in the SDF which were set to ``MCS Decides'', the contents of this file reflect the actual values used.
+
+\item At the conclusion of the session, MCS creates a gzipped tarball named \texttt{\$\{PROJECT\_ID\}\_\$\{SESSION\_ID\}.tgz} containing the following:
+
+\begin{itemize}
+\item The SDF, \texttt{.ses} file, and \texttt{.obs} files.
+\item An \texttt{.ipl} file (``inprocessing log'').
+\item A \texttt{.cs} file (``command script'').
+\item A session metadata file, named \texttt{\$\{PROJECT\_ID\}\_\$\{SESSION\_ID\}\_metadata.txt} (see Section~\ref{ch:session-metadata}).
+\item An \texttt{mcs.host} file containing the hostname of the MCS computer.  This is useful for determining which station produced a given metadata file.
+\item A \texttt{mindelay.txt} file containing minimum beam delay information.  This is useful for correlating data from multiple stations when using the LWA Swarm as an interferometer (see~[6]).
+\item Optionally, the station static MIB (\texttt{ssmif.dat}), if \texttt{SESSION\_INC\_SMIB} was set.  The format of this file is described in~[3].
+\item ASP MIB snapshots taken at the beginning and end of each observation (\texttt{ASP\_begin.gdb} and \texttt{ASP\_end.gdb}).
+\item A ``dynamic'' subdirectory containing \texttt{sdm.dat} (Station Dynamic MIB).  The format of this file is described in~[3].
+\item If \texttt{SESSION\_LOG\_SCH}$= 1$, the MCS/Scheduler log file, \texttt{mselog.txt}, is included; it is edited to cover the time period of the session.
+\item If \texttt{SESSION\_LOG\_EXE}$= 1$, the MCS/Executive log file, \texttt{meelog.txt}, is included in the ``dynamic'' subdirectory; it is edited to cover the time period of the session.
+\end{itemize}
+
+\end{enumerate}

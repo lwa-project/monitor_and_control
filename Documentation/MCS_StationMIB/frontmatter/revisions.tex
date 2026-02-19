@@ -1,0 +1,24 @@
+\changerecordheader
+
+\begin{longtable}{|l|l|p{3.5in}|}
+\hline
+\textbf{Version} & \textbf{Date} & \textbf{Description} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Version} & \textbf{Date} & \textbf{Description} \\
+\hline
+\endhead
+\hline
+\endfoot
+1 & June 16, 2010 & First version. \\
+\hline
+3 & Feb 27, 2011 & \texttt{GEO\_EL} field added; \texttt{RPD\_GAIN[m]} deprecated, replaced by \texttt{RPD\_A0[m]}, \texttt{RPD\_A1[m]}, \texttt{RPD\_FREF[m]}, and \texttt{RPD\_STR[m]}; For many indexed params, added ability to define default value without index; \texttt{MCS\_CRA} field added. \\
+\hline
+4 & March 29, 2011 & Requirements imposed on ordering of keywords in SSMIF; ``Format of the Station Dynamic MIB'' section completely revised (now C struct instead of dbm); Various small revisions and clarifications. \\
+\hline
+5 & April 13, 2011 & For DP, \texttt{PWR\_NAME} values now include DC1, DC2, FAN, SYN, and SWI; ``settings'' structure added to station dynamic MIB; Added example of SSMIF (text) file; Added keywords \texttt{MRP\_sss}, \texttt{MUP\_sss}, \texttt{FEE[]}, \texttt{ASP\_FLT[]}, \texttt{ASP\_AT1[]}, \texttt{ASP\_AT2[]}, \texttt{ASP\_ATS[]}, \texttt{TBN\_GAIN[]}, \texttt{DRX\_GAIN[]} to SSMIF. \\
+\hline
+10 & Feb 2026 & DP1/DP2 boards replaced by SNAP boards and Servers (NDP); \texttt{DR\_DP} renamed to \texttt{DR\_NDP}; \texttt{DR\_SHLF} removed; \texttt{ASP\_ATS} replaced by \texttt{ASP\_AT3}; \texttt{TBN\_GAIN} removed; Added array pointing correction parameters (\texttt{PC\_AXIS\_TH}, \texttt{PC\_AXIS\_PH}, \texttt{PC\_ROT}); \texttt{N\_STD} capped at 256; SDM updated to match (NDP, SNAP, Server status fields); All DP\_ references changed to NDP; Removed incorrect sentinel values from \texttt{FEE\_GAI2} and \texttt{FEE\_ANT2} descriptions. \\
+\hline
+\end{longtable}

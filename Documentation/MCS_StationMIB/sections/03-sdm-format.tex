@@ -1,0 +1,124 @@
+\section{Format of the Station Dynamic MIB}
+
+The station dynamic MIB (SDM) is a file, typically named \texttt{sdm.dat}.
+It can be read and interpreted using the MCS/Task Processor utility \texttt{tprs}.
+The format is defined as a C-language structure:
+
+\begin{lstlisting}[language=C]
+#include <sys/time.h>
+
+/* subsystem status */
+struct subsystem_status_struct {
+  int summary;           /* SUMMARY; one of LWA_SIDSUM_* */
+  char info[256];        /* INFO */
+  struct timeval tv;     /* time SUMMARY and INFO were last updated */
+  };
+
+/* sub-sub-system status */
+/* note: this is the subset of the SSMIF with things that can change */
+struct subsubsystem_status_struct {
+  int    eFEEStat[ME_MAX_NFEE];                /* FEE_STAT[] */
+  int    eRPDStat[ME_MAX_NRPD];                /* RPD_STAT[] */
+  int    eSEPStat[ME_MAX_NSEP];                /* SEP_STAT[] */
+  int    eARBStat[ME_MAX_NARB][ME_MAX_NARBCH]; /* ARB_STAT[][] */
+  int    eSnapStat[ME_MAX_NSNAP][ME_MAX_NSNAPCH]; /* SNAP_STAT[][] */
+  int    eServerStat[ME_MAX_NSERVER];             /* SERVER_STAT[] */
+  int    eDRStat[ME_MAX_NDR];                  /* DR_STAT[] */
+  };
+
+/* this sub-structure is used in both the ssmif and sdm */
+struct station_settings_struct {
+  signed short int mrp_asp; // SESSION_MRP_ASP // MRP_ASP
+  signed short int mrp_ndp; // SESSION_MRP_NDP // MRP_NDP
+  signed short int mrp_dr1; // SESSION_MRP_DR1 // MRP_DR1
+  signed short int mrp_dr2; // SESSION_MRP_DR2 // MRP_DR2
+  signed short int mrp_dr3; // SESSION_MRP_DR3 // MRP_DR3
+  signed short int mrp_dr4; // SESSION_MRP_DR4 // MRP_DR4
+  signed short int mrp_dr5; // SESSION_MRP_DR5 // MRP_DR5
+  signed short int mrp_shl; // SESSION_MRP_SHL // MRP_SHL
+  signed short int mrp_mcs; // SESSION_MRP_MCS // MRP_MCS
+  signed short int mup_asp; // SESSION_MUP_ASP // MUP_ASP
+  signed short int mup_ndp; // SESSION_MUP_NDP // MUP_NDP
+  signed short int mup_dr1; // SESSION_MUP_DR1 // MUP_DR1
+  signed short int mup_dr2; // SESSION_MUP_DR2 // MUP_DR2
+  signed short int mup_dr3; // SESSION_MUP_DR3 // MUP_DR3
+  signed short int mup_dr4; // SESSION_MUP_DR4 // MUP_DR4
+  signed short int mup_dr5; // SESSION_MUP_DR5 // MUP_DR5
+  signed short int mup_shl; // SESSION_MUP_SHL // MUP_SHL
+  signed short int mup_mcs; // SESSION_MUP_MCS // MUP_MCS
+  signed short int fee[LWA_MAX_NSTD];     // OBS_FEE[LWA_MAX_NSTD][2]
+  signed short int asp_flt[LWA_MAX_NSTD]; // OBS_ASP_FLT[LWA_MAX_NSTD]
+  signed short int asp_at1[LWA_MAX_NSTD]; // OBS_ASP_AT1[LWA_MAX_NSTD]
+  signed short int asp_at2[LWA_MAX_NSTD]; // OBS_ASP_AT2[LWA_MAX_NSTD]
+  signed short int asp_at3[LWA_MAX_NSTD]; // OBS_ASP_AT3[LWA_MAX_NSTD]
+  signed short int drx_gain; // OBS_DRX_GAIN // DRX_GAIN
+  };
+
+/* station dynamic MIB (SDM) */
+struct sdm_struct  {
+  struct    subsystem_status_struct station;        /* Station overall status */
+  struct    subsystem_status_struct shl;            /* SHL status */
+  struct    subsystem_status_struct asp;            /* ASP status */
+  struct    subsystem_status_struct ndp;            /* NDP status */
+  struct    subsystem_status_struct dr[ME_MAX_NDR]; /* DR# status (0=DR1,1=DR2,...) */
+  struct subsubsystem_status_struct ssss;  /* correspond to SSMIF "stat" items */
+  int ant_stat[ME_MAX_NSTD][2]; /* corresponds to sc.Stand[i].Ant[k].iSS,
+                                   but dynamically updated */
+  int ndpo_stat[ME_MAX_NDR];    /* corresponds to sc.NDPO[i].iStat,
+                                   but dynamically updated */
+  struct station_settings_struct settings; /* these are the current,
+                                             dynamically-varying settings */
+  };
+
+struct sdm_struct sdm; /* so finally this is the sdm */
+\end{lstlisting}
+
+In the above, the \texttt{int} type is a 4-byte little-endian integer
+and the \texttt{short int} type is a 2-byte little-endian integer.
+
+The fields are interpreted as follows:
+
+\begin{description}[style=nextline]
+
+\item[\texttt{summary}]
+Maps to MCS Common ICD MIB entry 1.1 (\texttt{SUMMARY}).
+Valid values:
+\begin{itemize}
+\item 0 (\texttt{LWA\_SIDSUM\_NULL}) --- Not normally used.
+\item 1 (\texttt{LWA\_SIDSUM\_NORMAL}) --- Normal.
+\item 2 (\texttt{LWA\_SIDSUM\_WARNING}) --- Warning.
+\item 3 (\texttt{LWA\_SIDSUM\_ERROR}) --- Error.
+\item 4 (\texttt{LWA\_SIDSUM\_BOOTING}) --- Booting.
+\item 5 (\texttt{LWA\_SIDSUM\_SHUTDWN}) --- Shutdown.
+\item 6 (\texttt{LWA\_SIDSUM\_UNK}) --- Status unknown.
+\end{itemize}
+
+\item[\texttt{info}]
+Human-readable text explaining \texttt{summary}.
+
+\item[\texttt{tv}]
+Time at which \texttt{SUMMARY} and \texttt{INFO} were last updated,
+represented as the Linux/C \texttt{timeval} type~[2].
+
+\item[\texttt{e...Stat[]}]
+Status codes for individual components.
+The value can only be less than or equal to the corresponding SSMIF value.
+Status codes:
+\begin{itemize}
+\item 0 = Not installed.
+\item 1 = Bad.
+\item 2 = Suspect.
+\item 3 = OK.
+\end{itemize}
+
+\item[\texttt{ant\_stat[][]}]
+Status for the entire path from stand/antenna through SNAP.
+
+\item[\texttt{ndpo\_stat[]}]
+Status for the path from server to the associated DR.
+
+\item[\texttt{settings}]
+Correspond to comparably-named items in MCS0030 and always reflect the current state.
+A value of $-1$ indicates unknown.
+
+\end{description}

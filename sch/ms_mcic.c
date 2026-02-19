@@ -375,7 +375,6 @@ int main ( int narg, char *argv[] ) {
 
       bErr=0;
 
-#if defined(LWA_BACKEND_IS_NDP) && LWA_BACKEND_IS_NDP
       /* In the case of the NDP commands FST, ... , we need to replace the mq_msg.data part */
       /* of message_string with the binary/raw data representation.  However, we want to keep */
       /* the variables "mq_msg.data" and "mq_msg.datalen" as is, for logging purposes. */
@@ -448,157 +447,6 @@ int main ( int narg, char *argv[] ) {
           } /* if (bErr) */
         
         } /* if (mq_msg.sid==LWA_SID_NDP) */
-        
-#elif defined(LWA_BACKEND_IS_ADP) && LWA_BACKEND_IS_ADP
-      /* In the case of the ADP commands FST, ... , we need to replace the mq_msg.data part */
-      /* of message_string with the binary/raw data representation.  However, we want to keep */
-      /* the variables "mq_msg.data" and "mq_msg.datalen" as is, for logging purposes. */
-      if (mq_msg.sid==LWA_SID_ADP)  {
-        switch (mq_msg.cid) {
-
-          case LWA_CMD_FST:
-            /* mesi() passes a string argument containing <INDEX> <cfile> */
-            sscanf(mq_msg.data,"%hd %s",&i2s1,filename);
-            /* load INDEX into first two bytes of "c" (also converting to big-endian) */
-            i2s.i = i2s1; message_string[38]=i2s.b[1]; message_string[39]=i2s.b[0];  
-            /* construct filename for coefficient data */
-            sprintf(full_filename,"%s/%s",MCS_CFILES_PATH,filename); /* construct full filename */
-            /* retrieve COEFF_DATA from the specified .cf file */             
-            fp = fopen(full_filename,"rb");
-            if (!fp) {
-                bErr=1;
-              } else { 
-                fread(&(message_string[40]),1,1024,fp); /* load message_string[40..] with 1024 bytes from file */
-                fclose(fp);
-              }       
-            len=1026; /* 2 + 1024 */
-            //printf("-2- %d %hd %hhd %hhd '%s'\n",bErr,i2s1,message_string[38],message_string[39],full_filename);
-            break;
-
-          case LWA_CMD_BAM:
-            /* mesi() passes a string argument containing <BEAM_ID> <dfile> <gfile> <SUBSLOT> */
-            sscanf(mq_msg.data,"%hu %s %s %hhu %hhu",&i2u1,dfile,gfile,&i1u1,&i1u2);
-            /* load BEAM_ID into first two bytes of "c" (also converting to big-endian) */
-            i2u.i = i2u1; message_string[38]=i2u.b[1]; message_string[39]=i2u.b[0];  
-            /* construct filename for BEAM_DELAY data */
-            sprintf(full_filename,"%s/%s",MCS_DFILES_PATH,dfile); /* construct full filename */
-            /* retrieve BEAM_DELAY from the specified .df file */             
-            fp = fopen(full_filename,"rb");
-            if (!fp) {
-                bErr=1;
-              } else { 
-                fread(&(message_string[40]),1,1024,fp); /* load message_string[40..] with 1024 bytes from file */
-                fclose(fp);
-              }       
-            if (!bErr) {
-              /* construct filename for BEAM_GAIN data */
-              sprintf(full_filename,"%s/%s",MCS_GFILES_PATH,gfile); /* construct full filename */
-              /* retrieve BEAM_GAIN from the specified .gf file */             
-              fp = fopen(full_filename,"rb");
-              if (!fp) {
-                  bErr=1;
-                } else { 
-                  fread(&(message_string[1064]),1,2048,fp); /* load message_string[1064..] with 2048 bytes from file */
-                  fclose(fp);
-                }  
-              /* load the tuning into the next-to-last byte */
-              message_string[3112]=i1u1; 
-              /* load subslot into last byte */
-              message_string[3113]=i1u2; 
-              len=3076; /* 2 + 1024 + 2048 + 1 + 1 */
-              }
-            break;
-
-          } /* switch (mq_msg.cid) */
-
-        /* If something went wrong in getting the coefficients, report it to ms_exec as a "fail" and */
-        /* go no further in processing this message here */
-        if (bErr) {
-              mq_msg.bAccept  = LWA_MSELOG_TP_FAIL_FILE;  /* signal a problem */
-              mq_msg.eSummary = LWA_SIDSUM_NULL;
-              sprintf(mq_msg.data,"Can't open '%s'",full_filename);             /* just something to say */
-              mq_msg.datalen = -1;
-              if ( msgsnd( mqtid, (void *)&mq_msg, LWA_msz(), 0) == -1 ) {
-                printf("[%s/%d] WARNING: Could not msgsnd()\n",ME,getpid());
-                }    
-          } /* if (bErr) */
-        
-        } /* if (mq_msg.sid==LWA_SID_ADP) */
-        
-#else
-      /* In the case of the DP_ commands FST, ... , we need to replace the mq_msg.data part */
-      /* of message_string with the binary/raw data representation.  However, we want to keep */
-      /* the variables "mq_msg.data" and "mq_msg.datalen" as is, for logging purposes. */
-      if (mq_msg.sid==LWA_SID_DP_)  {
-        switch (mq_msg.cid) {
-
-          case LWA_CMD_FST:
-            /* mesi() passes a string argument containing <INDEX> <cfile> */
-            sscanf(mq_msg.data,"%hd %s",&i2s1,filename);
-            /* load INDEX into first two bytes of "c" (also converting to big-endian) */
-            i2s.i = i2s1; message_string[38]=i2s.b[1]; message_string[39]=i2s.b[0];  
-            /* construct filename for coefficient data */
-            sprintf(full_filename,"%s/%s",MCS_CFILES_PATH,filename); /* construct full filename */
-            /* retrieve COEFF_DATA from the specified .cf file */             
-            fp = fopen(full_filename,"rb");
-            if (!fp) {
-                bErr=1;
-              } else { 
-                fread(&(message_string[40]),1,1024,fp); /* load message_string[40..] with 1024 bytes from file */
-                fclose(fp);
-              }       
-            len=1026; /* 2 + 1024 */
-            //printf("-2- %d %hd %hhd %hhd '%s'\n",bErr,i2s1,message_string[38],message_string[39],full_filename);
-            break;
-
-          case LWA_CMD_BAM:
-            /* mesi() passes a string argument containing <BEAM_ID> <dfile> <gfile> <SUBSLOT> */
-            sscanf(mq_msg.data,"%hu %s %s %hhu",&i2u1,dfile,gfile,&i1u1);
-            /* load BEAM_ID into first two bytes of "c" (also converting to big-endian) */
-            i2u.i = i2u1; message_string[38]=i2u.b[1]; message_string[39]=i2u.b[0];  
-            /* construct filename for BEAM_DELAY data */
-            sprintf(full_filename,"%s/%s",MCS_DFILES_PATH,dfile); /* construct full filename */
-            /* retrieve BEAM_DELAY from the specified .df file */             
-            fp = fopen(full_filename,"rb");
-            if (!fp) {
-                bErr=1;
-              } else { 
-                fread(&(message_string[40]),1,1040,fp); /* load message_string[40..] with 1040 bytes from file */
-                fclose(fp);
-              }       
-            if (!bErr) {
-              /* construct filename for BEAM_GAIN data */
-              sprintf(full_filename,"%s/%s",MCS_GFILES_PATH,gfile); /* construct full filename */
-              /* retrieve BEAM_GAIN from the specified .gf file */             
-              fp = fopen(full_filename,"rb");
-              if (!fp) {
-                  bErr=1;
-                } else { 
-                  fread(&(message_string[1080]),1,2080,fp); /* load message_string[1080..] with 2080 bytes from file */
-                  fclose(fp);
-                }  
-              /* load subslot into last byte */
-              message_string[3160]=i1u1; 
-              len=3123; /* 2 + 1040 + 2080 + 1 */
-              }
-            break;
-
-          } /* switch (mq_msg.cid) */
-
-        /* If something went wrong in getting the coefficients, report it to ms_exec as a "fail" and */
-        /* go no further in processing this message here */
-        if (bErr) {
-              mq_msg.bAccept  = LWA_MSELOG_TP_FAIL_FILE;  /* signal a problem */
-              mq_msg.eSummary = LWA_SIDSUM_NULL;
-              sprintf(mq_msg.data,"Can't open '%s'",full_filename);             /* just something to say */
-              mq_msg.datalen = -1;
-              if ( msgsnd( mqtid, (void *)&mq_msg, LWA_msz(), 0) == -1 ) {
-                printf("[%s/%d] WARNING: Could not msgsnd()\n",ME,getpid());
-                }    
-          } /* if (bErr) */
-        
-        } /* if (mq_msg.sid==LWA_SID_DP_) */
-#endif
       
       /* send message to subsystem */
       if (!bErr) {  /* ... but don't if there was an error that's already been handled (see above)  */
@@ -817,10 +665,10 @@ int main ( int narg, char *argv[] ) {
        //printf("[%s/%d] Sending mq_msg.datalen = %d\n",ME,getpid(),mq_msg.datalen);
        //printf("[%s/%d] Sending mq_msg.cid = %d\n",ME,getpid(),mq_msg.cid); 
  
-       /* DP sends back raw binary in R-COMMENT when an RPT command for DP-specific info is accepted ("A"). */
+       /* NDP sends back raw binary in R-COMMENT when an RPT command for NDP-specific info is accepted ("A"). */
        /* (If RPT but not accepted, we get printable text; if not RPT, we get nothing) */
        /* To accomodate this, we convert the data field to a printable representation: */
-       if ( (mq_msg.sid==LWA_SID_DP_) && 
+       if ( (mq_msg.sid==LWA_SID_NDP) && 
             (mq_msg.cid==LWA_CMD_RPT) && 
             (!LWA_isMCSRSVD(cmdata)) &&
             (mq_msg.bAccept!=LWA_MSELOG_TP_FAIL_REJD) ) {

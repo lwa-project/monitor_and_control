@@ -1,0 +1,32 @@
+% 04-message-structure.tex - Section 4: Message Structure
+
+\section{Message Structure}
+\label{sec:message-structure}
+
+Messages are contained entirely within the payload fields of UDP packets.  The maximum size of a message is 8192~bytes.  A message is subdivided into fields as defined below.  All fields are required (except as indicated), contiguous, and must appear in the order indicated and with the number of bytes indicated.  Unless indicated otherwise, data are right-justified in their fields, and padded with the character ``~'' (space).
+
+\begin{enumerate}
+
+\item \texttt{DESTINATION} [3~bytes, ASCII/Alphanumeric].  This is the intended recipient of the message.  Valid values are ``\texttt{ALL}'' (to be interpreted as ``all subsystems receiving this message''), ``\texttt{ASP}'', ``\texttt{NDP}'', and ``\texttt{MCS}''.  \textit{(Other values will be added as necessary.)}  Subsystems shall ignore any message not addressed to either the subsystem or ``\texttt{ALL}''.
+
+\item \texttt{SENDER} [3~bytes, ASCII/Alphanumeric].  This is the subsystem sending the message.  Valid values are the same as for \texttt{DESTINATION}.
+
+\item \texttt{TYPE} [3~bytes, ASCII/Alphanumeric].  This field indicates the type of message.  A list of message types is given in Section~\ref{sec:message-types}.
+
+\item \texttt{REFERENCE} [9~bytes, ASCII/Numeric] (base-10 integer).  MCS assigns reference numbers to messages.  Reference numbers are assigned sequentially station-wide, so connected subsystems should not interpret gaps in the sequence as missed messages.  Responses to MCS command messages use the same reference number appearing in the command message.
+
+\item \texttt{DATALEN} [4~bytes, ASCII/Numeric] (base-10 integer).  This is the number of bytes in the \texttt{DATA} field.
+
+\item \texttt{MJD} [6~bytes, ASCII/Numeric] (base-10 integer).  Integer part of the modified Julian day (MJD).  For example: For Dec~28, 2008~UT this is ``54828''.  See additional information below.
+
+\item \texttt{MPM} [9~bytes, ASCII/Numeric] (base-10 integer).  Milliseconds past UT midnight; see ``MJD''.  (Note that there are 86,400,000 milliseconds in a UT day, except for days with a leap second.)  See additional information below.
+
+\item There is always a space following the \texttt{MPM} field.
+
+\item \texttt{DATA}.  [Variable length, variable format].  The contents of this field depend on the message \texttt{TYPE}; see Section~\ref{sec:message-types}.
+
+\end{enumerate}
+
+The purpose of the \texttt{MJD} and \texttt{MPM} fields is primarily to confirm to the recipient that the sender has a consistent understanding of what time it is, and also to provide a convenient mechanism for keeping or searching logs.  Subsystems may use this information to set local clocks, with the understanding that the accuracy of these times (due to non-deterministic OS- and transmission-related delays) is probably not better than a few milliseconds, and could be intermittently much worse.  Unless explicitly indicated in associated subsystem ICDs, \texttt{MJD} and \texttt{MPM} should not be interpreted as the time at which the command is to take effect, nor should these be interpreted as being precisely the time at which the condition reported in a response was observed.  If it is necessary to convey this information precisely, those times can alternatively be indicated separately as part of the \texttt{DATA} field.  \texttt{MJD}/\texttt{MPM} should reflect the ``best available estimate'' of station time as known to the sender.  A satisfactory ``best available estimate'' can be obtained simply by calling an appropriate time function immediately prior to assembling the message and sending it, and it is expected that this time will represent the time at which the message was actually transmitted to within a few milliseconds.
+
+See Section~\ref{sec:examples} for examples of command and response messages.
