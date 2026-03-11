@@ -9,8 +9,8 @@ import math
 import shlex
 import tempfile
 import subprocess
-from typing import Dict, Tuple, Union
-from datetime import datetime, timedelta, timezone
+from typing import Dict, Tuple, Union, Optional
+from datetime import datetime, timedelta, tzinfo, timezone
 
 from lwa_mcs._mcs import get_current_time
 from lwa_mcs.config import STATION_TZ
@@ -58,7 +58,7 @@ def get_current_mjdmpm() -> Tuple[int, int]:
     return get_current_time()
 
 
-def mjdmpm_to_datetime(mjd, mpm):
+def mjdmpm_to_datetime(mjd, mpm, tz: Optional[tzinfo]=None):
     """
     Convert a MJD, MPM pair to a UTC-aware datetime instance.
     
@@ -66,7 +66,10 @@ def mjdmpm_to_datetime(mjd, mpm):
     """
     
     unix = mjd*86400.0 + mpm/1000.0 - 3506716800.0
-    return datetime.fromtimestamp(unix, tz=timezone.utc)
+    dt = datetime.fromtimestamp(unix, tz=timezone.utc)
+    if tz is not None:
+        dt = dt.astimezone(tz)
+    return dt
 
 
 def datetime_to_mjdmpm(dt: datetime) -> Tuple[int, int]:
@@ -79,6 +82,9 @@ def datetime_to_mjdmpm(dt: datetime) -> Tuple[int, int]:
     From LSL.
     """
     
+    if dt.tzinfo is not None:
+        dt = dt.astimezone(timezone.utc)
+        
     year        = dt.year             
     month       = dt.month      
     day         = dt.day    
@@ -88,9 +94,6 @@ def datetime_to_mjdmpm(dt: datetime) -> Tuple[int, int]:
     second      = dt.second     
     millisecond = dt.microsecond / 1000
     
-    if dt.tzinfo is not None:
-        dt = dt.astimezone(timezone.utc)
-        
     # compute MJD         
     # adapted from http://paste.lisp.org/display/73536
     # can check result using http://www.csgnetwork.com/julianmodifdateconv.html
@@ -186,7 +189,7 @@ def schedule_at_command(execution_time: Union[int, float, datetime], command: st
     # Time conversion
     ## Does the the execution time look like a time stamp?
     if isinstance(execution_time, (int, float)):
-        execution_time = datetime.utcfromtimestamp(execution_time)
+        execution_time = datetime.fromtimestamp(execution_time, tz=timezone.utc)
     ## Has the execution time already had a time zone assigned to it?
     if execution_time.tzinfo is None:
         execution_time = execution_time.replace(tzinfo=timezone.utc)

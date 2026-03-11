@@ -69,9 +69,8 @@ def get_queue(tz: Optional[tzinfo]=None) -> Dict[Tuple[str,int], Tuple[int,datet
     dictionary.  The dictionary is keyed using a two-element tuple of
     (project ID, session ID) and the values are three-element tuples of
     (beam, start datetime, stop datetime).  The datetime instances returned
-    are naive UTC times unless the `tz` keyword is set.  If `tz` is set 
-    then the datetimes are converted to timezone-aware instances in the 
-    specified timezone.
+    are timezone-aware UTC times unless the `tz` keyword is set.  If `tz`
+    is set then the datetimes are converted to the specified timezone.
     """
     
     queue = {}
@@ -97,7 +96,7 @@ def get_queue(tz: Optional[tzinfo]=None) -> Dict[Tuple[str,int], Tuple[int,datet
                 continue
                 
             ## Manipulate the time
-            dStart = mjdmpm_to_datetime(mjd, mpm)
+            dStart = mjdmpm_to_datetime(mjd, mpm, tz=timezone.utc)
             dStop  = dStart + timedelta(seconds=int(dur/1000), microseconds=int((dur*1e3) % 1000000))
             
             ## Pad to deal with session starts and stops
@@ -134,7 +133,7 @@ def cancel_observation(project_id: str, session_id: int, stop_dr: bool=True, rem
         raise RuntimeError("Project %s, sesison %i is not scheduled" % (project_id, session_id))
         
     # It's at least scheduled.  Is it is_active?
-    now = datetime.utcnow()
+    now = datetime.now(tz=timezone.utc)
     beam, start, stop = queue[(project_id, session_id)]
     if now >= start and now < stop:
         is_active = True

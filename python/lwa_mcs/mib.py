@@ -5,7 +5,7 @@ Module for reading data from the MCS MIB.
 import os
 import time
 import struct
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Tuple, Union
 
 from lwa_mcs._mcs import read_mib_ip, read_mib, MCS_TIMEOUT
@@ -56,8 +56,8 @@ def read_from_disk(ss: str, label: str, trim_nulls: bool=True) -> Tuple[Union[st
         try:
             dtype, value, ts = read_mib(ss, label)
             
-            d = datetime.utcfromtimestamp(ts)
-            if datetime.utcnow() - d <= timedelta(seconds=3):
+            d = datetime.fromtimestamp(ts, tz=timezone.utc)
+            if datetime.now(tz=timezone.utc) - d <= timedelta(seconds=3):
                 # unsigned and signed char
                 if dtype[:3] == 'i1u':
                     value, = struct.unpack('B', val[:1])
