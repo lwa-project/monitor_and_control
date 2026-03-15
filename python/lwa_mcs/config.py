@@ -23,8 +23,12 @@ TP_PATH = os.path.join(_BASE_PATH, 'tp')
 # Station time zone for 'at' commands
 ## Default for New Mexico
 tzname = 'America/Denver'
-if os.path.exists('/etc/timezone'):
-    ## Debian/Ubuntu systems
+if os.path.exists('/etc/localtime'):
+    ## Newer Ubuntu systems
+    ltpath = os.path.realpath('/etc/localtime')
+    _, tzname = ltpath.split('zoneinfo/')
+elif os.path.exists('/etc/timezone'):
+    ## Debian/old Ubuntu systems
     with open('/etc/timezone', 'r') as fh:
         tzname = fh.read().rstrip()
 elif os.path.exists('/etc/sysconfig/clock'):
@@ -36,4 +40,3 @@ elif os.path.exists('/etc/sysconfig/clock'):
                 tzname = tzname.replace('"', '').replace("'", '')
                 break
 STATION_TZ = zoneinfo.ZoneInfo(tzname)
-
