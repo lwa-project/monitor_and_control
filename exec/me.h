@@ -176,33 +176,30 @@ int me_log( FILE *fp,                          /* handle to an open log file */
             int i                              /* session queue entry to reference */
             ) {
 
-  char line[ 40+ME_LOG_MAX_MSG_LENGTH ]; 
+  char line[ 40+ME_LOG_MAX_MSG_LENGTH ];
+  int lpos;
   long int mjd,mpm;
-  
+
   LWA_time(&mjd,&mpm);
-  sprintf(line,"%5ld %8ld ",mjd,mpm);
-  #pragma GCC diagnostic ignored "-Wformat-overflow"
+  lpos = sprintf(line,"%5ld %8ld ",mjd,mpm);
   switch (eScope) {
-    case    ME_LOG_SCOPE_SESSION: sprintf(line,"%sS",line); break;
-    default:                      sprintf(line,"%sG",line); break;
+    case    ME_LOG_SCOPE_SESSION: lpos += sprintf(line+lpos,"S"); break;
+    default:                      lpos += sprintf(line+lpos,"G"); break;
     }
-  #pragma GCC diagnostic ignored "-Wformat-overflow"
   switch (eType) {
-    case    ME_LOG_TYPE_SCH_CMD:  sprintf(line,"%sC ",line); break;
-    default:                      sprintf(line,"%sI ",line); break;
+    case    ME_LOG_TYPE_SCH_CMD:  lpos += sprintf(line+lpos,"C "); break;
+    default:                      lpos += sprintf(line+lpos,"I "); break;
     }
   if (eScope==ME_LOG_SCOPE_SESSION) {
-    #pragma GCC diagnostic ignored "-Wformat-overflow"
-    sprintf(line,"%s %8s %4u %1d %4d",line,
+    lpos += sprintf(line+lpos," %8s %4u %1d %4d",
                      sq->ssf[i].PROJECT_ID,
                          sq->ssf[i].SESSION_ID,
                              sq->eState[i],
                                  sq->iCurrentObs[i]);
     } else {
-    sprintf(line,"%s                     ",line);
+    lpos += sprintf(line+lpos,"                     ");
     }
-  #pragma GCC diagnostic ignored "-Wformat-overflow"
-  sprintf(line,"%s %s",line,msg);
+  sprintf(line+lpos," %s",msg);
   fprintf(fp,"%s\n",line);
 
   fflush(fp);

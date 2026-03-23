@@ -72,8 +72,13 @@ int tp_xfer( char *mepath,   /* relative path for file on MCS/Exec */
       break;
     }
  
-  if (!bVerbose) sprintf(cmd, "%s 2> /dev/null",cmd);
-  if (!bVerbose) sprintf(cmd2,"%s 2> /dev/null",cmd2);
+    if (!bVerbose) {
+      char tmp[ME_MAX_COMMAND_LINE_LENGTH];
+      snprintf(tmp, sizeof(tmp), "%s 2> /dev/null", cmd);
+      strncpy(cmd, tmp, sizeof(cmd)-1); cmd[sizeof(cmd)-1] = '\0';
+      snprintf(tmp, sizeof(tmp), "%s 2> /dev/null", cmd2);
+      strncpy(cmd2, tmp, sizeof(cmd2)-1); cmd2[sizeof(cmd2)-1] = '\0';
+      }
 
   /* do it */
   if (bVerbose)  printf("'%s'\n",cmd);

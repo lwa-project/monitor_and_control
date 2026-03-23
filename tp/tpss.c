@@ -855,23 +855,18 @@ int main ( int narg, char *argv[] ) {
     }
   printf("[%d/%d] Moved SDF, SSF, and OSFs to directory '%s'\n",MT_TPSS,getpid(),mbox);   
 
-  strcpy(data,"");
-
-  //sprintf(data,"%s%s",data,sdfname);
-  //sprintf(data,"%s\n%s",data,ssfname);
-
-  #pragma GCC diagnostic ignored "-Wformat-overflow"
-  sprintf(data,"%s%s %4u %4d %s",data,PROJECT_ID,SESSION_ID,-1,sdfname);
-  #pragma GCC diagnostic ignored "-Wformat-overflow"
-  sprintf(data,"%s\n%s %4u %4d %s",data,PROJECT_ID,SESSION_ID,0,ssfname);
+  snprintf(cmd, sizeof(cmd), "%s/manifest.dat", mbox);
+  fp = fopen(cmd, "a");
+  if (fp == NULL) {
+    printf("[%d/%d] FATAL: Failed to open '%s' for appending\n",MT_TPSS,getpid(),cmd);
+    exit(EXIT_FAILURE);
+    }
+  fprintf(fp, "%s %4u %4d %s\n", PROJECT_ID, SESSION_ID, -1, sdfname);
+  fprintf(fp, "%s %4u %4d %s\n", PROJECT_ID, SESSION_ID, 0, ssfname);
   for (n=1;n<=nobs;n++) {
-    #pragma GCC diagnostic ignored "-Wformat-overflow"
-    sprintf(data,"%s\n%s %4u %4d %s_%04d_%04d.obs",data,PROJECT_ID,SESSION_ID,n,PROJECT_ID,SESSION_ID,n);
+    fprintf(fp, "%s %4u %4d %s_%04d_%04d.obs\n", PROJECT_ID, SESSION_ID, n, PROJECT_ID, SESSION_ID, n);
   }
-
-  //printf("<%s>\n",data);
-  sprintf(cmd,"echo \"%s\" > manifest_add.dat",data); system(cmd);
-  sprintf(cmd,"cat manifest_add.dat >> %s/manifest.dat",mbox); system(cmd);
+  fclose(fp);
   printf("[%d/%d] Updated %s/manifest.dat\n",MT_TPSS,getpid(),mbox);
 
   printf("[%d/%d] Phase 5: OK\n",MT_TPSS,getpid());

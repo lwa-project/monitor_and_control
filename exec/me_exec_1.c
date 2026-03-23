@@ -28,7 +28,7 @@ void me_action_cmd_msg( char *msg,
   //printf("action->len=%d, eDataFormat=%d\n",action->len,eDataFormat);
   switch (eDataFormat) {
     case 1: /* show entire thing as a string in the same line */
-      sprintf(msg,"%s '%s'",msg,data);
+      sprintf(msg+strlen(msg)," '%s'",data);
       break;
     default: /* includes 0 */
       break;
