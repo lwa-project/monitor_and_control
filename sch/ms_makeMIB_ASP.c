@@ -124,7 +124,8 @@ int main ( int narg, char *argv[] ) {
     fprintf(fp,"B 5.%d    \tFEEPWR_%d		NUL 	NUL 	NUL\n",i+1,i+1);
     fprintf(fp,"V 5.%d.1  \tFEEPOL1PWR_%d		UNK 	a3 	a3\n",i+1,i+1);
     fprintf(fp,"V 5.%d.2  \tFEEPOL2PWR_%d		UNK 	a3 	a3\n",i+1,i+1);
-    }  
+    }
+  fprintf(fp,"V 5.257    \tFEEPOLCUR_ALL		NUL 	r1024 	r1024\n",i+1,i+1);
    
   /* ASP-TEMP */
   fprintf(fp,"B 6 		ASP-TEMP 		NUL 	NUL 	NUL\n");
