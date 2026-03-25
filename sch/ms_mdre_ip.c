@@ -61,6 +61,7 @@ int main ( int narg, char *argv[] ) {
 
   char label[MIB_LABEL_FIELD_LENGTH];     /* this is the key for dbm */
   char key[MIB_LABEL_FIELD_LENGTH];
+  int allow_raw_return = 0;
 
   union {
     unsigned char i;
@@ -202,6 +203,11 @@ int main ( int narg, char *argv[] ) {
       /* figure out what we need from this */
       sprintf(dbm_filename,"%s.gdb",c.ss); /* dbm_filename is the TLA-subsystem identifier */
       sprintf(label,"%s",c.label);     /* and the label is the label... */
+      char *raw_requested = strstr(label, "@raw");
+      if (raw_requested != NULL && raw_requested[4] == '\0') {
+        allow_raw_return = 1;
+        *raw_requested = '\0';
+        }
 
       //printf("> dbm_filename='%s'\n",dbm_filename);
       //printf("> label='%s'\n",label);   
@@ -249,7 +255,12 @@ int main ( int narg, char *argv[] ) {
                                                  /* do nothing; fine the way it is */
           }    
         if (!strncmp(record.type_dbm,"r",1)) {   /* if the field is not printable... */
-          strcpy(record.val,"@...");           /* just print "@" instead */
+          if (allow_raw_return) {
+                                                 /* do nothing; fine the way it is */
+            }
+          else {
+            strcpy(record.val,"@...");           /* just print "@" instead */
+            }
           }
         if (!strncmp(record.type_dbm,"i1u",3)) {  /* if the format is "i1u" */
           i1u.b[0]=record.val[0];           /* unpack the bytes into a union structure */
