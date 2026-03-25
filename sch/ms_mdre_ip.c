@@ -371,8 +371,12 @@ int main ( int narg, char *argv[] ) {
 
         /* note the things we need to send back */
         //memset( &c, '\0', sizeof(struct LWA_mib_entry) );
-        //memcpy( c.val, record.val, MIB_VAL_FIELD_LENGTH );
-        sprintf(c.val,"%s",record.val);
+        if (allow_raw_return) {
+          memcpy( c.val, record.val, MIB_VAL_FIELD_LENGTH );
+          }
+        else {
+          sprintf(c.val,"%s",record.val);
+          }
         memcpy( &(c.last_change), &(record.last_change), sizeof(struct timeval) );
         //c.last_change = record.last_change;
 
