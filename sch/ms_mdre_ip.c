@@ -256,7 +256,7 @@ int main ( int narg, char *argv[] ) {
           }    
         if (!strncmp(record.type_dbm,"r",1)) {   /* if the field is not printable... */
           if (allow_raw_return) {
-                                                 /* do nothing; fine the way it is */
+              allow_raw_return = 2;              /* do nothing; fine the way it is */
             }
           else {
             strcpy(record.val,"@...");           /* just print "@" instead */
@@ -371,7 +371,7 @@ int main ( int narg, char *argv[] ) {
 
         /* note the things we need to send back */
         //memset( &c, '\0', sizeof(struct LWA_mib_entry) );
-        if (allow_raw_return) {
+        if (allow_raw_return == 2) {
           memcpy( c.val, record.val, MIB_VAL_FIELD_LENGTH );
           }
         else {
