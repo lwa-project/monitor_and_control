@@ -35,10 +35,12 @@ int LWA_mibupdate_ASP(
 
     case LWA_CMD_INI:
 
+      /* disabled 2026 May 6 */ 
+      
       /* parse the DATA field of the command message */
-      sscanf(cmdata,"%d",&nBoards);      
-      sprintf(snBoards,"%02d",nBoards);
-      eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, "N-BOARDS", snBoards, strlen(snBoards) );
+      //sscanf(cmdata,"%d",&nBoards);      
+      //sprintf(snBoards,"%02d",nBoards);
+      //eMIBerror = eMIBerror | LWA_mibupdate_RPT( dbm_ptr, "N-BOARDS", snBoards, strlen(snBoards) );
       break;
 
     case LWA_CMD_FIL:
