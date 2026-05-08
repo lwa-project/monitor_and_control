@@ -2463,7 +2463,7 @@
     } /* for ( iFEE */
 
   /* reading ASP_FLT (no brackets) */
-  sprintf(keyword,"ASP_FLT"); 
+  sprintf(keyword,"ASP_FLT"); asp_flt_default = -1;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
   switch (i) {
     case MERS_PL_KEYWORD_MATCH: 
@@ -2474,7 +2474,7 @@
     case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
     case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
     }        
-  if ((asp_flt_default<0) || (asp_flt_default>3) ) {
+  if ((asp_flt_default<-1) || (asp_flt_default>8) ) {
     printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,asp_flt_default);
     exit(EXIT_FAILURE);
     }   
@@ -2494,7 +2494,7 @@
       case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
       case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
       }       
-  if ( (s.settings.asp_flt[iStd]<0) || (s.settings.asp_flt[iStd]>3) ) {
+  if ( (s.settings.asp_flt[iStd]<-1) || (s.settings.asp_flt[iStd]>8) ) {
       printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.settings.asp_flt[iStd]);
       exit(EXIT_FAILURE);
       } 
@@ -2503,7 +2503,7 @@
     } /* for ( iStd */
 
   /* reading ASP_AT1 (no brackets) */
-  sprintf(keyword,"ASP_AT1"); 
+  sprintf(keyword,"ASP_AT1"); asp_at1_default = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
   switch (i) {
     case MERS_PL_KEYWORD_MATCH: 
@@ -2543,7 +2543,7 @@
     } /* for ( iStd */
 
   /* reading ASP_AT2 (no brackets) */
-  sprintf(keyword,"ASP_AT2"); 
+  sprintf(keyword,"ASP_AT2"); asp_at2_default = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
   switch (i) {
     case MERS_PL_KEYWORD_MATCH: 
@@ -2583,7 +2583,7 @@
     } /* for ( iStd */
 
   /* reading ASP_AT3 (no brackets) */
-  sprintf(keyword,"ASP_AT3"); 
+  sprintf(keyword,"ASP_AT3"); asp_at3_default = 0;
   while( (i=mers_parse_line(fp, keyword, data, MERS_VERBOSE)) == MERS_PL_BC_LINE ) { }
   switch (i) {
     case MERS_PL_KEYWORD_MATCH: 
