@@ -327,11 +327,10 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
          sscanf(data,"%lf %hhu", &freq, &ebw);
          /* flipping endian-ness of freq: */
          f8.f  = freq;
-         c.data[7]= f8.b[0]; c.data[6]= f8.b[1]; c.data[5]= f8.b[2]; c.data[4]= f4.b[3];
-         c.data[3]= f8.b[4]; c.data[2]= f8.b[5]; c.data[1]= f8.b[6]; c.data[0]= f4.b[7];
+         c.data[7]= f8.b[0]; c.data[6]= f8.b[1]; c.data[5]= f8.b[2]; c.data[4]= f8.b[3];
+         c.data[3]= f8.b[4]; c.data[2]= f8.b[5]; c.data[1]= f8.b[6]; c.data[0]= f8.b[7];
 
          memcpy( &(c.data[8]), &ebw,      1 );
-
          f8.b[7] = c.data[0]; f8.b[6] = c.data[1]; f8.b[5] = c.data[2]; f8.b[4] = c.data[3];
          f8.b[3] = c.data[4]; f8.b[2] = c.data[5]; f8.b[1] = c.data[6]; f8.b[0] = c.data[7]; 
          freq = f8.f;  
