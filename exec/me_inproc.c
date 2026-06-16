@@ -1661,10 +1661,21 @@ int main ( int narg, char *argv[] ) {
 
         /* final command to tell me_exec that we're done */
         if (eD>=0) {
-          /* Shut down the beams if we are done with them */
-          /* Updated: 2015 Aug 31                         */
+          /* Shut down TBS and the beams if we are done with them */
+          /* Updated: 2026 Jun 16                         */
           esnTimeAdjust = 0;
           switch( osf.OBS_MODE ) {
+              case LWA_OM_TBS:
+                 cs[ncs].action.tv.tv_sec  = cs[ncs-1].action.tv.tv_sec;
+                 cs[ncs].action.tv.tv_usec  = cs[ncs-1].action.tv.tv_usec + 20000;
+                 cs[ncs].action.sid = LWA_SID_NDP;
+                 cs[ncs].action.cid = LWA_CMD_STP;
+                 sprintf( cs[ncs].data, "TBS");
+                 cs[ncs].action.len = strlen(cs[ncs].data)+1;
+                 me_inproc_cmd_log( fpl, &(cs[ncs]), 1 ); /* write log msg explaining command */
+                 ncs++;
+                 esnTimeAdjust += 20000;
+                 break;
               case LWA_OM_TRK_RADEC:
               case LWA_OM_TRK_SOL:
               case LWA_OM_TRK_JOV:
