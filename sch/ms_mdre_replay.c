@@ -70,6 +70,10 @@ int main ( int narg, char *argv[] ) {
   int client_sockfd;   
   struct sockaddr_in server_address; /* for network sockets */
   struct sockaddr_in client_address; /* for network sockets */
+  struct timeval client_timeout;
+  client_timeout.tv_sec = 2*LWA_PTQ_TIMEOUT;
+  client_timeout.tv_usec = 0;
+  ssize_t client_recvd;
   int flags; /* used as part of scheme for changing accept()'s blocking behavior */
 
   //struct LWA_cmd_struct c;
@@ -186,8 +190,17 @@ int main ( int narg, char *argv[] ) {
       eError=0;
       //printf("Ow! Quit it...\n");
 
+      /* make sure we don't block forever */
+      setsockopt(client_sockfd, SOL_SOCKET, SO_RCVTIMEO, &client_timeout, sizeof(client_timeout));
+      setsockopt(client_sockfd, SOL_SOCKET, SO_SNDTIMEO, &client_timeout, sizeof(client_timeout));
+
       /* read it into a LWA_mib_entry structure */
-      read(client_sockfd,&c,sizeof(struct LWA_mib_entry));
+      client_recvd = read(client_sockfd,&c,sizeof(struct LWA_mib_entry));
+      if (client_recvd<(ssize_t)sizeof(struct LWA_mib_entry)) {
+        //printf("Received only %d B\n",client_recvd);
+        close(client_sockfd);
+        continue;
+        }
 
       /* figure out what we need from this */
       sid = LWA_getsid(c.ss);
