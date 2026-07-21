@@ -46,7 +46,7 @@ int main ( int narg, char *argv[] ) {
   struct sockaddr_in server_address; /* for network sockets */
   struct sockaddr_in client_address; /* for network sockets */
   struct timeval client_timeout;
-  client_timeout.tv_sec = 2*LWA_PTQ_TIMEOUT;
+  client_timeout.tv_sec = LWA_PTQ_TIMEOUT;
   client_timeout.tv_usec = 0;
   ssize_t client_recvd;
   int flags; /* used as part of scheme for changing accept()'s blocking behavior */

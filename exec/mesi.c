@@ -83,7 +83,7 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
   int sockfd;
   struct sockaddr_in address; /* for network sockets */
   struct timeval timeout;
-  timeout.tv_sec = 2*LWA_PTQ_TIMEOUT;
+  timeout.tv_sec = LWA_PTQ_TIMEOUT;
   timeout.tv_usec = 0;
   ssize_t recvd;
   int bCloseSocketOnExit;

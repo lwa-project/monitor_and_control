@@ -33,7 +33,7 @@ int memdre( char *ss,    /* (input) Three-character subsystem designator */
   int sockfd;                 /* socket file discriptor */
   struct sockaddr_in address; /* for network sockets */
   struct timeval timeout;
-  timeout.tv_sec = 2*LWA_PTQ_TIMEOUT;
+  timeout.tv_sec = LWA_PTQ_TIMEOUT;
   timeout.tv_usec = 0;
   ssize_t recvd;
 
