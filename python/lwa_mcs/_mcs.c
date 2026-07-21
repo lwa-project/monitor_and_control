@@ -47,6 +47,7 @@ static PyObject *send_sch_command(PyObject *self, PyObject *args, PyObject *kwds
     struct timeval timeout;      
     timeout.tv_sec = LWA_PTQ_TIMEOUT;
     timeout.tv_usec = 0;
+    ssize_t recvd;
     
     sockfd = socket(             /* create socket */
                     AF_INET,     /* domain; network sockets */
@@ -80,8 +81,17 @@ static PyObject *send_sch_command(PyObject *self, PyObject *args, PyObject *kwds
     gettimeofday(&cmd.tv, &tz);
     strcpy(cmd.data, data); /* changed in reply */
     cmd.datalen = -1;
-    write(sockfd, &cmd, sizeof(struct LWA_cmd_struct));
-    read(sockfd, &cmd, sizeof(struct LWA_cmd_struct));
+    recvd = write(sockfd, &cmd, sizeof(struct LWA_cmd_struct));
+    if ( recvd != -1 ) {
+        recvd = read(sockfd, &cmd, sizeof(struct LWA_cmd_struct));
+        if( recvd != (ssize_t) sizeof(struct LWA_cmd_struct)) {
+          cmd.ref = 0;
+          cmd.bAccept = 0;
+        }
+    } else {
+        cmd.ref = 0;
+        cmd.bAccept = 0;
+    }
     
     output = Py_BuildValue("(ii)", cmd.ref, cmd.bAccept);
     close(sockfd);
@@ -116,6 +126,7 @@ static PyObject *read_mib_ip(
     struct timeval timeout;      
     timeout.tv_sec = LWA_PTQ_TIMEOUT;
     timeout.tv_usec = 0;
+    ssize_t recvd;
     
     sockfd = socket(             /* create socket */
                     AF_INET,     /* domain; network sockets */
@@ -138,8 +149,19 @@ static PyObject *read_mib_ip(
     memset(&record, 0, sizeof(struct LWA_mib_entry));
     strcpy(record.ss, subsystem);
     strcpy(record.label, label);
-    write(sockfd, &record, sizeof(struct LWA_mib_entry));
-    read(sockfd, &record, sizeof(struct LWA_mib_entry));
+    recvd = write(sockfd, &record, sizeof(struct LWA_mib_entry));
+    if ( recvd != -1 ) {
+        recvd = read(sockfd, &record, sizeof(struct LWA_mib_entry));
+        if ( recvd != (ssize_t) sizeof(struct LWA_mib_entry)) {
+            close(sockfd);
+            PyErr_Format(PyExc_RuntimeError, "MCS/sch - failed to read MIB value");
+            goto fail;
+        }
+    } else {
+        close(sockfd);
+        PyErr_Format(PyExc_RuntimeError, "MCS/sch - failed to request MIB value");
+        goto fail;
+    }
     
     tv = record.last_change;
     ts = tv.tv_sec + tv.tv_usec/1e6;
@@ -237,6 +259,7 @@ static PyObject *send_exec_command(PyObject *self, PyObject *args, PyObject *kwd
     struct timeval timeout;      
     timeout.tv_sec = LWA_PTQ_TIMEOUT;
     timeout.tv_usec = 0;
+    ssize_t recvd;
     
     sockfd = socket(             /* create socket */
                     AF_INET,     /* domain; network sockets */
@@ -269,8 +292,15 @@ static PyObject *send_exec_command(PyObject *self, PyObject *args, PyObject *kwd
         goto fail;
     }
     strcpy(cmd.args, data);
-    write(sockfd, &cmd, sizeof(struct me_cmd_struct));
-    read(sockfd, &cmd, sizeof(struct me_cmd_struct));
+    recvd = write(sockfd, &cmd, sizeof(struct me_cmd_struct));
+    if ( recvd != -1 ) {
+        recvd = read(sockfd, &cmd, sizeof(struct me_cmd_struct));
+        if ( recvd != (ssize_t) sizeof(struct me_cmd_struct) ) {
+            cmd.cmd = -1;
+        }
+    } else {
+        cmd.cmd = -1;
+    }
     
     status = 1;
     if( cmd.cmd < ME_CMD_NUL ) {

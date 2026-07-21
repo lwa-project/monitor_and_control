@@ -21,7 +21,7 @@ ExtensionModules = [Extension('_mcs', ['lwa_mcs/_mcs.c',],
 
 setup(
     name                 = "lwa-mcs",
-    version              = "0.4",
+    version              = "0.4.1",
     description          = "LWA MCS interface module", 
     long_description     = "Module for interacting with the LWA MCS softare",
     url                  = "https://github.com/lwa-project/monitor_and_control/", 
