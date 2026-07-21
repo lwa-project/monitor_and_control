@@ -42,6 +42,10 @@ int main ( int narg, char *argv[] ) {
 
   int sockfd;                 /* socket file discriptor */
   struct sockaddr_in address; /* for network sockets */
+  struct timeval timeout;
+  timeout.tv_sec = 2*LWA_PTQ_TIMEOUT;
+  timeout.tv_usec = 0;
+  ssize_t recvd;
 
   //int len;
   int result;
@@ -298,8 +302,23 @@ int main ( int narg, char *argv[] ) {
     exit(EXIT_FAILURE);
     }
 
-  write(sockfd, &c, sizeof(struct LWA_cmd_struct));
-  read(sockfd,&c,sizeof(struct LWA_cmd_struct));
+  setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+  setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+
+  recvd = write(sockfd, &c, sizeof(struct LWA_cmd_struct));
+  if (recvd!=-1) {
+    recvd = read(sockfd,&c,sizeof(struct LWA_cmd_struct));
+    if (recvd!=(ssize_t)sizeof(struct LWA_cmd_struct)) {
+      fprintf(stderr, "msei: expected %zu B but received %zd B\n", sizeof(struct LWA_cmd_struct), recvd);
+      close(sockfd);
+      exit(EXIT_FAILURE);
+      }
+    }
+  else {
+    perror("msei");
+    close(sockfd);
+    exit(EXIT_FAILURE);
+    }
   //printf("saw %d %d %d\n",c.sid,c.cid,c.ref);
   printf("[%s] ref=%ld, bAccept=%d, eSummary=%d, data=<%s>\n",ME,c.ref,c.bAccept,c.eSummary,c.data);
 

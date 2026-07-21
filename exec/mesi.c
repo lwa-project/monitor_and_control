@@ -82,6 +82,10 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 
   int sockfd;
   struct sockaddr_in address; /* for network sockets */
+  struct timeval timeout;
+  timeout.tv_sec = 2*LWA_PTQ_TIMEOUT;
+  timeout.tv_usec = 0;
+  ssize_t recvd;
   int bCloseSocketOnExit;
 
   struct LWA_cmd_struct c;    /* This structure defined in mcs.h */
@@ -411,9 +415,23 @@ int mesi( int *sockfd_ptr, /* (input) existing/open socket to MCS/Sch. Use NULL 
 
     } /* if (sockfd==NULL) */
 
-  write(sockfd, &c, sizeof(struct LWA_cmd_struct));
-  read( sockfd, &c, sizeof(struct LWA_cmd_struct));
+  setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+  setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
 
+  recvd = write(sockfd, &c, sizeof(struct LWA_cmd_struct));
+  if (recvd!=-1) {
+    recvd = read( sockfd, &c, sizeof(struct LWA_cmd_struct));
+    if (recvd!=(ssize_t)sizeof(struct LWA_cmd_struct)) {
+      fprintf(stderr, "msei: expected %zu B but received %zd B\n", sizeof(struct LWA_cmd_struct), recvd);
+      close(sockfd);
+      eResult += MESI_ERR_CONNECT;
+      }
+    }
+  else {
+    perror("mesi");
+    close(sockfd);
+    eResult += MESI_ERR_CONNECT;
+    }
   //printf("[%d/%d] ref=%ld, bAccept=%d, eSummary=%d, data=<%s>\n",ME_MESI,getpid(),c.ref,c.bAccept,c.eSummary,c.data);
 
   if (bCloseSocketOnExit) close(sockfd); 

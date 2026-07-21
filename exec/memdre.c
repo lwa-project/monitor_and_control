@@ -32,6 +32,10 @@ int memdre( char *ss,    /* (input) Three-character subsystem designator */
 
   int sockfd;                 /* socket file discriptor */
   struct sockaddr_in address; /* for network sockets */
+  struct timeval timeout;
+  timeout.tv_sec = 2*LWA_PTQ_TIMEOUT;
+  timeout.tv_usec = 0;
+  ssize_t recvd;
 
   //struct LWA_cmd_struct c;    /* This structure defined in me.h */
   struct LWA_mib_entry c;
@@ -65,8 +69,19 @@ int memdre( char *ss,    /* (input) Three-character subsystem designator */
     return eResult;
     }
 
-  write(sockfd, &c, sizeof(struct LWA_mib_entry));
-  read(sockfd,&c,sizeof(struct LWA_mib_entry));
+  setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+  setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+
+  recvd = write(sockfd, &c, sizeof(struct LWA_mib_entry));
+  if (recvd!=-1) {
+    recvd = read(sockfd,&c,sizeof(struct LWA_mib_entry));
+    if (recvd!=(ssize_t)sizeof(struct LWA_mib_entry)) {
+      sprintf(c.val,"Err:received invalid number of bytes from socket");
+      }
+    }
+  else {
+    sprintf(c.val,"Err:failed to write to socket");
+    }
 
   close(sockfd); 
 
@@ -124,4 +139,3 @@ int memdre( char *ss,    /* (input) Three-character subsystem designator */
 //==================================================================================
 //=== BELOW THIS LINE IS SCRATCH ===================================================
 //==================================================================================
-

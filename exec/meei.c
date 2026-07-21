@@ -30,6 +30,10 @@ int meei( char *cmd, char *args ) {
 
   int sockfd;                 /* socket file discriptor */
   struct sockaddr_in address; /* for network sockets */
+  struct timeval timeout;
+  timeout.tv_sec = 2*LWA_PTQ_TIMEOUT;
+  timeout.tv_usec = 0;
+  ssize_t recvd;
 
   struct me_cmd_struct c;
 
@@ -76,8 +80,23 @@ int meei( char *cmd, char *args ) {
     return eResult;
     }
 
-  write(sockfd, &c, sizeof(struct me_cmd_struct) );
-  read( sockfd, &c, sizeof(struct me_cmd_struct) );
+  setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+  setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+
+  recvd = write(sockfd, &c, sizeof(struct me_cmd_struct) );
+  if (recvd!=-1) {
+    recvd = read( sockfd, &c, sizeof(struct me_cmd_struct) );
+    if (recvd!=(ssize_t)sizeof(struct me_cmd_struct)) {
+      fprintf(stderr, "meei: expected %zu B but received %zd B\n", sizeof(struct me_cmd_struct), recvd);
+      close(sockfd);
+      eResult += MEEI_ERR_CONNECT;
+      }
+    }
+  else {
+    perror("meei");
+    close(sockfd);
+    eResult += MEEI_ERR_CONNECT;
+    }
 
   close(sockfd); 
 
