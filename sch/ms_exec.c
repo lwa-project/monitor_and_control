@@ -71,6 +71,10 @@ int main ( int narg, char *argv[] ) {
   int client_sockfd;   
   struct sockaddr_in server_address; /* for network sockets */
   struct sockaddr_in client_address; /* for network sockets */
+  struct timeval client_timeout;
+  client_timeout.tv_sec = 2*LWA_PTQ_TIMEOUT;
+  client_timeout.tv_usec = 0;
+  ssize_t client_recvd;
 
   int flags; /* used as part of scheme for changing accept()'s blocking behavior */
 
@@ -397,10 +401,18 @@ int main ( int narg, char *argv[] ) {
                             (struct sockaddr *) &client_address, 
                             &client_len );  
 
-    if (!(client_sockfd==-1)) { /* we have a connection... */                          
+    if (!(client_sockfd==-1)) { /* we have a connection... */
+      /* make sure we don't block forever */
+      setsockopt(client_sockfd, SOL_SOCKET, SO_RCVTIMEO, &client_timeout, sizeof(client_timeout));
+      setsockopt(client_sockfd, SOL_SOCKET, SO_SNDTIMEO, &client_timeout, sizeof(client_timeout));
 
       /* read it into a LWA_cmd_struct structure */
-      read(client_sockfd,&c,sizeof(struct LWA_cmd_struct));
+      client_recvd = read(client_sockfd,&c,sizeof(struct LWA_cmd_struct));
+      if (client_recvd<(ssize_t)sizeof(struct LWA_cmd_struct)) {
+        //printf("[%s] Receive failed with only %d B\n",ME,client_recvd);
+        close(client_sockfd);
+        continue;
+        }
       //printf("saw %d %d\n",c.sid,c.cid);
 
       /* Determine if this is for a valid subsystem */
