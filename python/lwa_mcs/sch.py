@@ -49,6 +49,8 @@ def is_replay() -> bool:
     pids = []
     for line in output:
         fields = line.split(None, 10)
+        if len(fields) != 11:
+            continue
         if fields[-1].find('ms_exec_replay') != -1 \
            or fields[-1].find('ms_mdre_replay') != -1:
             pids.append(int(fields[1], 10))
