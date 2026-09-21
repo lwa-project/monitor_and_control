@@ -477,9 +477,15 @@ int main ( int narg, char *argv[] ) {
       err = mesi(NULL,"SHL","RPT","SUMMARY",    "today","+4",  &reference);
       err = mesi(NULL,"SHL","RPT","INFO",       "today","+5",  &reference);
       err = mesi(NULL,"SHL","RPT","CURRENT-R1", "today","+6",  &reference);
-      err = mesi(NULL,"SHL","RPT","CURRENT-R2", "today","+7",  &reference);
-      err = mesi(NULL,"SHL","RPT","CURRENT-R3", "today","+8",  &reference);
-      err = mesi(NULL,"SHL","RPT","CURRENT-R4", "today","+9",  &reference);
+      if (s.nPwrRack > 1) {
+        err = mesi(NULL,"SHL","RPT","CURRENT-R2", "today","+7",  &reference);
+        }
+      if (s.nPwrRack > 2) {
+        err = mesi(NULL,"SHL","RPT","CURRENT-R3", "today","+8",  &reference);
+        }
+      if (s.nPwrRack > 3) {
+        err = mesi(NULL,"SHL","RPT","CURRENT-R4", "today","+9",  &reference);
+        }
       err = mesi(NULL,"SHL","RPT","TEMPERATURE","today","+10",  &reference);
 
       err = mesi(NULL,"DR1","RPT","SUMMARY",    "today","+20",  &reference);
