@@ -780,6 +780,7 @@ int main ( int narg, char *argv[] ) {
     for (m=1;m<=LWA_MAX_NSTD;m++) { osf2.OBS_ASP_AT1[m-1] = obs[n].OBS_ASP_AT1[m]; }
     for (m=1;m<=LWA_MAX_NSTD;m++) { osf2.OBS_ASP_AT2[m-1] = obs[n].OBS_ASP_AT2[m]; }
     for (m=1;m<=LWA_MAX_NSTD;m++) { osf2.OBS_ASP_AT3[m-1] = obs[n].OBS_ASP_AT3[m]; }
+    osf2.OBS_TBT_SAMPLES     = obs[n].OBS_TBT_SAMPLES;
     osf2.OBS_DRX_GAIN        = obs[n].OBS_DRX_GAIN;
 
     fwrite(&osf2,sizeof(struct osf2_struct),1,fp);
