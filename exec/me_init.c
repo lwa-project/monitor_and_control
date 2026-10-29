@@ -33,6 +33,7 @@ int main ( int narg, char *argv[] ) {
   int err;
   pid_t me_exec_pid;  /* PID for me_exec process */
   pid_t me_tpcom_pid; /* PID for me_tpcom process */
+  pid_t me_sscom_pid; /* PID for me_tpcom process */
   pid_t me_inproc_pid; /* PID for me_inproc process */
 
   char sFlagset[256];
@@ -72,6 +73,7 @@ int main ( int narg, char *argv[] ) {
   /*=== Killing zombies ===*/
   /*=======================*/
   printf("[%d/%d] Killing zombies...\n",ME_INIT,getpid());
+  system("killall -v ms_sscom 2> /dev/null");
   system("killall -v me_tpcom 2> /dev/null");
   system("killall -v me_inproc 2> /dev/null");
   system("killall -v me_exec 2> /dev/null");
@@ -183,6 +185,33 @@ int main ( int narg, char *argv[] ) {
     printf("[%d/%d] me_init: WARNING: failed to set station minimum beamformer delay\n",ME_INIT,getpid());
     me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: WARNING: failed to set station minimum beamformer delay", sq_ptr, 0 );
     }
+
+  /*==========================*/
+  /*=== Launching me_sscom ===*/
+  /*==========================*/
+  printf("[%d/%d] me_init: Launching ./me_sscom...\n",ME_INIT,getpid());
+  me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: Launching ./me_sscom...", sq_ptr, 0 );
+
+  /* Launch me_sscom */
+  me_sscom_pid = fork();  /* create duplicate process */
+  switch (me_sscom_pid) {
+    case -1: /* error */
+      printf("[%d/%d] me_init: FATAL: fork for ./me_sscom failed\n",ME_INIT,getpid());
+      me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: FATAL: fork for ./me_sscom failed", sq_ptr, 0 );
+      return 1;
+      break;
+    case 0: /* fork() succeeded; we are now in the child process */
+      err = execl("./me_sscom","me_sscom",NULL); /* launch me_sscom */
+      /* if we get to this point then we failed to launch */
+      if (err==-1) {
+        printf("[%d/%d] me_init: FATAL: failed to execl() ./me_sscom\n",ME_INIT,getpid()); 
+        me_log( fpl, ME_LOG_SCOPE_NONSPECIFIC, ME_LOG_TYPE_INFO, "me_init: FATAL: failed to execl() ./me_sscom", sq_ptr, 0 );
+        }     
+      return 2;
+      break; 
+    default: /* fork() succeeded; we are now in the parent process */
+      break;
+    } /* switch (me_sscom_pid) */
 
   /*==========================*/
   /*=== Launching me_tpcom ===*/
