@@ -13,8 +13,9 @@ python/config.py
 share/lwa_mcs.pc
 common/config.h
 
-# Object files
+# Generated/object files
 *.o
+exec/ms_sscom.h
 
 # Libraries
 sofa/src/libsofa_c.a
@@ -57,6 +58,7 @@ exec/me_mon
 exec/me_point_corr_x
 exec/me_precess_x
 exec/me_tpcom
+exec/me_sscom
 exec/mecfg
 exec/medfg
 exec/medrange
@@ -86,3 +88,4 @@ python/lwa_mcs.egg-info/
 
 # State directories
 exec/state
+tp/mbox
