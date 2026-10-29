@@ -16,6 +16,7 @@ TARGETS :=  \
 	meeix \
 	me_init \
 	me_tpcom \
+	me_sscom \
 	me_inproc \
 	me_mon \
 	mefsdfg \
@@ -59,6 +60,15 @@ me_init: me_init.c me.h ../common/mcs.h
 
 me_tpcom: me_tpcom.c me.h ../common/mcs.h
 	$(CC) $(CFLAGS) -o me_tpcom me_tpcom.c $(LDFLAGS)
+
+me_sscom.h: ../common/mcs.h
+	awk '/^#define ME_SSMIF_/ { gsub(/"/, "\\\""); print "\"" $$0 "\\n\"" > "me_sscom.h" }' ../common/mcs.h
+	awk '/^#define ME_MAX_/ { gsub(/"/, "\\\""); print "\"" $$0 "\\n\"" >> "me_sscom.h" }' ../common/mcs.h
+	awk '/^struct station_settings_struct \{/,/\};/ { gsub(/"/, "\\\""); print "\"" $$0 "\\n\"" >> "me_sscom.h" }' ../common/mcs.h
+	awk '/^struct ssmif_struct \{/,/\};/ { gsub(/"/, "\\\""); print "\"" $$0 "\\n\"" >> "me_sscom.h" }' ../common/mcs.h
+
+me_sscom: me_sscom.c me_sscom.h me.h ../common/mcs.h
+	$(CC) $(CFLAGS) -o me_sscom me_sscom.c $(LDFLAGS)
 
 me_mon: me_mon.c me.h ../common/mcs.h
 	$(CC) $(CFLAGS) -o me_mon me_mon.c $(LDFLAGS)

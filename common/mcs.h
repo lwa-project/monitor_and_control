@@ -59,6 +59,7 @@ extern "C" {
 #define LWA_PORT_MSE  9734 /* port for MCS Scheduler "ms_exec" process */
 #define LWA_PORT_MSE2 9735 /* port for MCS Scheduler "ms_mdre_ip" process */
 #define LWA_PORT_MEE  9736 /* port for MCS Scheduler "ms_exec" process */
+#define LWA_PORT_MES  9737 /* port for MCS Executive "me_sscom" process */
 
 /* =============================================== */
 /* === END: IP addresses, sockets, directories === */
