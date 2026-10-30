@@ -34,7 +34,11 @@ int main ( int narg, char *argv[] ) {
 ;
 
   struct timeval tv;
-  char cmd[1024];
+  char cmd[128];
+  void *resp = NULL;
+  size_t resp_size = 0;
+  size_t resp_sent = 0;
+  size_t byte_sent = 0;
   
   /***************************************/
   /*** Setting up SSMIF-related things ***/
@@ -125,28 +129,49 @@ int main ( int narg, char *argv[] ) {
       /* process the command and report back to requester*/
       if (strcmp(cmd,"MODIFIED")==0) {
         sprintf(cmd,"%ld",(long) ssmif_stat.st_mtime);
-        write(client_sockfd,cmd,strlen(cmd));
+        resp = (void *) cmd;
+        resp_size = strlen(cmd);
         }
         
       else if (strcmp(cmd,"SIZE")==0) {
         sprintf(cmd,"%ld",(long) sizeof(struct ssmif_struct));
-        write(client_sockfd,cmd,strlen(cmd));
+        resp = (void *) cmd;
+        resp_size = strlen(cmd);
         }
         
       else if (strcmp(cmd,"FORMAT")==0) {
-        write(client_sockfd,ssmif_format,strlen(ssmif_format));
+        resp = (void *) ssmif_format;
+        resp_size = strlen(ssmif_format);
         }
         
       else if (strcmp(cmd,"GET")==0) {
-        write(client_sockfd,&s,sizeof(struct ssmif_struct));
+        resp = (void *) &s;
+        resp_size = sizeof(struct ssmif_struct);
         }
         
       else {
         sprintf(cmd,"Unknown command");
-        write(client_sockfd,&cmd,strlen(cmd));
+        resp = (void *) cmd;
+        resp_size = strlen(cmd);
         }
         
-      /* close the connection */
+      /* reply and close the connection */
+      if ((resp!=NULL) && (resp_size>0)) {
+        resp_sent = 0;
+        while (resp_sent < resp_size) {
+          byte_sent = write(client_sockfd,resp,resp_size);
+          if (byte_sent!=-1) {
+            resp_sent += byte_sent;
+            resp_size -= byte_sent;
+            resp += byte_sent;
+            }
+          else {
+            break;
+            }
+          }
+        resp = NULL;
+        resp_size = 0;
+        }
       close(client_sockfd);
 
       } /* if (!(client_sockfd==-1)) {   ...we have a connection... */  
