@@ -390,6 +390,8 @@ int main ( int narg, char *argv[] ) {
 //==================================================================================
 //=== HISTORY ======================================================================
 //==================================================================================
+// me_init.c: J. Dowell, UNM, 2026 Oct 29
+//   .1 Added in a start of me_sscom
 // me_init.c: J. Dowell, UNM, 2021 Jan 25
 //   .1 Updated to call medrange as part of the setup
 // me_init.c: J. Dowell, UNM, 2018 Feb 22
