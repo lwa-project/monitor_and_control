@@ -187,7 +187,7 @@ int main ( int narg, char *argv[] ) {
          if (narg>5) { sscanf(argv[5],"%ld",&i8s1); } else {bError=1;}
          if (bError) {
            printf("[%s] FATAL: %s/%s args are:\n TBT_TRIG_TIME (samples, uint64)\n TBT_SAMPLES (samples, int32)\n TBT_TUNING_MASK (mask, int64)\n",ME,dest,cmd);
-           return;
+           exit(EXIT_FAILURE);
            }
          //printf("[%s] %lu %i %ld\n",ME,lu,i4s2,i8s1); return;
          i8u.i = i8u1; c.data[ 0]=i8u.b[7]; c.data[ 1]=i8u.b[6]; c.data[ 2]=i8u.b[5]; c.data[ 3]=i8u.b[4];
@@ -227,7 +227,7 @@ int main ( int narg, char *argv[] ) {
          if (narg>6) { sscanf(argv[6],"%hu",&i2u3); } else {bError=1;}
          if (bError) {
            printf("[%s] FATAL: %s/%s args are:\n COR_NAVG (Number, int32)\n DRX_TUNING_MASK (mask, uint64)\n COR_GAIN {0..15}\n sub_slot {0..99}",ME,dest,cmd);
-           return;
+           exit(EXIT_FAILURE);
            }
          //printf("[%s] %hu %u %u\n",ME,i2u1,i4u1,i4u2); return;
          i4s.i = i4s1; c.data[ 0]=i4s.b[3]; c.data[ 1]=i4s.b[2]; c.data[ 2]=i4s.b[1]; c.data[ 3]=i4s.b[0];
@@ -244,7 +244,7 @@ int main ( int narg, char *argv[] ) {
          if (narg>3) { sscanf(argv[3],"%u",&i4u1); } else {bError=1;}
          if (bError) {
            printf("[%s] FATAL: %s/%s arg is CLK_SET_TIME (uint32)\n",ME,dest,cmd);
-           return;
+           exit(EXIT_FAILURE);
            }
          i4u.i = i4u1; c.data[0]=i4u.b[3]; c.data[1]=i4u.b[2]; c.data[2]=i4u.b[1]; c.data[3]=i4u.b[0];
          c.datalen=4;
@@ -264,14 +264,14 @@ int main ( int narg, char *argv[] ) {
          } else {bError=1;}
          if (bError) {
            printf("[%s] FATAL: %s/%s arg is one of TBS|BEAM#|COR (string)\n",ME,dest,cmd);
-           return;
+           exit(EXIT_FAILURE);
            }
          c.datalen=-1;
          break;
  
        default:
          printf("[%s] FATAL: cmd <%s> not recognized as valid for NDP\n",ME,cmd);
-         return;
+         exit(EXIT_FAILURE);
          break;
 
        } /* switch (c.cid) */
