@@ -1474,13 +1474,13 @@
       sscanf(data,"%d",&(s.nSnap));     
       strcpy(data,"");  
       break;
-    case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
-    case MERS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: MERS_PL_KEYWORD_MISMATCH\n",MT_TPRS,getpid()); return; break;
-    case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+    case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
+    case MERS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: MERS_PL_KEYWORD_MISMATCH\n",MT_TPRS,getpid()); exit(EXIT_FAILURE); break;
+    case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
     }       
   if ((s.nSnap<0) || (s.nSnap>ME_MAX_NSNAP)) {
     printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.nSnap);
-    return;
+    exit(EXIT_FAILURE);
     } 
   printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.nSnap); 
 
@@ -1492,13 +1492,13 @@
       sscanf(data,"%d",&(s.nSnapCh));     
       strcpy(data,"");  
       break;
-    case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
-    case MERS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: MERS_PL_KEYWORD_MISMATCH\n",MT_TPRS,getpid()); return; break;
-    case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+    case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
+    case MERS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: MERS_PL_KEYWORD_MISMATCH\n",MT_TPRS,getpid()); exit(EXIT_FAILURE); break;
+    case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
     }       
   if ((s.nSnapCh<0) || (s.nSnapCh>ME_MAX_NSNAPCH)) {
     printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.nSnapCh);
-    return;
+    exit(EXIT_FAILURE);
     } 
   printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.nSnapCh); 
 
@@ -1512,14 +1512,14 @@
         if (strlen(data)>ME_MAX_SNAPID_LENGTH) {
           printf("[%d/%d] FATAL: SNAP_ID[%d]='%s' is greater than %d characters\n",
             MT_TPRS,getpid(),iSNP,data,ME_MAX_SNAPID_LENGTH);   
-          return;
+          exit(EXIT_FAILURE);
           }
         sprintf(s.sSnapID[iSNP],"%s",data);     
         strcpy(data,"");  
         break;
-      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
-      case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
+      case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
+      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
       }        
     printf("[%d/%d] %s='%s'\n",MT_TPRS,getpid(),keyword,s.sSnapID[iSNP]);   
  
@@ -1535,14 +1535,14 @@
         if (strlen(data)>ME_MAX_SNAPID_LENGTH) {
           printf("[%d/%d] FATAL: SNAP_SLOT[%d]='%s' is greater than %d characters\n",
             MT_TPRS,getpid(),iSNP,data,ME_MAX_SNAPID_LENGTH);   
-          return;
+          exit(EXIT_FAILURE);
           }
         sprintf(s.sSnapSlot[iSNP],"%s",data);     
         strcpy(data,"");  
         break;
-      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
-      case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
+      case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
+      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
       }        
     printf("[%d/%d] %s='%s'\n",MT_TPRS,getpid(),keyword,s.sSnapSlot[iSNP]);   
  
@@ -1558,13 +1558,13 @@
         sscanf(data,"%d",&(s.eSnapDesi[iSNP]));     
         strcpy(data,"");  
         break;
-      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
-      case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
+      case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
+      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
       }       
     if (s.eSnapDesi[iSNP]<0) {
       printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.eSnapDesi[iSNP]);
-      return;
+      exit(EXIT_FAILURE);
       } 
     printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.eSnapDesi[iSNP]);    
 
@@ -1581,13 +1581,13 @@
           sscanf(data,"%d",&(s.eSnapStat[iSNP][k]));  
           strcpy(data,"");  
           break;
-        case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
-        case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
-        case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+        case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
+        case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
+        case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
         }        
       if ( (s.eSnapStat[iSNP][k]<0) || (s.eSnapStat[iSNP][k]>3) ) {
         printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.eSnapStat[iSNP][k]);
-        return;
+        exit(EXIT_FAILURE);
         }   
       printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.eSnapStat[iSNP][k]);    
 
@@ -1605,14 +1605,14 @@
           if (strlen(data)>ME_MAX_SNAPID_LENGTH) {
             printf("[%d/%d] FATAL: SNAP_INR[%d]='%s' is greater than %d characters\n",
               MT_TPRS,getpid(),iSNP,data,ME_MAX_SNAPID_LENGTH);   
-            return;
+            exit(EXIT_FAILURE);
             }
           sprintf(s.sSnapINR[iSNP][k],"%s",data);     
           strcpy(data,"");  
           break;
-        case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
-        case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
-        case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+        case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
+        case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
+        case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
         }        
       printf("[%d/%d] %s='%s'\n",MT_TPRS,getpid(),keyword,s.sSnapINR[iSNP][k]);   
  
@@ -1630,14 +1630,14 @@
           if (strlen(data)>ME_MAX_SNAPID_LENGTH) {
             printf("[%d/%d] FATAL: SNAP_INC[%d]='%s' is greater than %d characters\n",
               MT_TPRS,getpid(),iSNP,data,ME_MAX_SNAPID_LENGTH);   
-            return;
+            exit(EXIT_FAILURE);
             }
           sprintf(s.sSnapINC[iSNP][k],"%s",data);     
           strcpy(data,"");  
           break;
-        case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
-        case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
-        case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+        case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
+        case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
+        case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
         }        
       printf("[%d/%d] %s='%s'\n",MT_TPRS,getpid(),keyword,s.sSnapINC[iSNP][k]);   
  
@@ -1655,13 +1655,13 @@
           sscanf(data,"%d",&(s.iSnapAnt[iSNP][k]));
           if ( (s.iSnapAnt[iSNP][k]<0) || (s.iSnapAnt[iSNP][k]>2*s.nStd) ) {
             printf("[%d/%d] FATAL: SNAP_ANT[%d][%d]=%d is invalid\n",MT_TPRS,getpid(),iSNP+1,k+1,s.iSnapAnt[iSNP][k]);   
-            return; 
+            exit(EXIT_FAILURE); 
             }     
           strcpy(data,"");  
           break;
-        case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
-        case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
-        case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+        case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
+        case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
+        case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
         }       
       printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.iSnapAnt[iSNP][k]);   
  
@@ -1676,13 +1676,13 @@
       sscanf(data,"%d",&(s.nServer));     
       strcpy(data,"");  
       break;
-    case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
-    case MERS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: MERS_PL_KEYWORD_MISMATCH\n",MT_TPRS,getpid()); return; break;
-    case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+    case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
+    case MERS_PL_KEYWORD_MISMATCH: printf("[%d/%d] FATAL: MERS_PL_KEYWORD_MISMATCH\n",MT_TPRS,getpid()); exit(EXIT_FAILURE); break;
+    case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
     }       
   if ((s.nServer<0) || (s.nServer>ME_MAX_NSERVER)) {
     printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.nServer);
-    return;
+    exit(EXIT_FAILURE);
     } 
   printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.nServer); 
 
@@ -1696,14 +1696,14 @@
         if (strlen(data)>ME_MAX_SERVERID_LENGTH) {
           printf("[%d/%d] FATAL: SERVER_ID[%d]='%s' is greater than %d characters\n",
             MT_TPRS,getpid(),iSVR+1,data,ME_MAX_SERVERID_LENGTH);   
-          return;
+          exit(EXIT_FAILURE);
           }
         sprintf(s.sServerID[iSVR],"%s",data);     
         strcpy(data,"");  
         break;
-      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
-      case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
+      case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
+      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
       }        
     printf("[%d/%d] %s='%s'\n",MT_TPRS,getpid(),keyword,s.sServerID[iSVR]);   
  
@@ -1719,14 +1719,14 @@
         if (strlen(data)>ME_MAX_SERVERID_LENGTH) {
           printf("[%d/%d] FATAL: SERVER_SLOT[%d]='%s' is greater than %d characters\n",
             MT_TPRS,getpid(),iSVR+1,data,ME_MAX_SERVERID_LENGTH);   
-          return;
+          exit(EXIT_FAILURE);
           }
         sprintf(s.sServerSlot[iSVR],"%s",data);     
         strcpy(data,"");  
         break;
-      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
-      case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
+      case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
+      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
       }        
     printf("[%d/%d] %s='%s'\n",MT_TPRS,getpid(),keyword,s.sServerSlot[iSVR]);   
  
@@ -1742,13 +1742,13 @@
         sscanf(data,"%d",&(s.eServerStat[iSVR]));  
         strcpy(data,"");  
         break;
-      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
-      case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
+      case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
+      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
       }        
     if ( (s.eServerStat[iSVR]<0) || (s.eServerStat[iSVR]>3) ) {
       printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.eServerStat[iSVR]);
-      return;
+      exit(EXIT_FAILURE);
       }   
     printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.eServerStat[iSVR]);    
 
@@ -1764,13 +1764,13 @@
         sscanf(data,"%d",&(s.eServerDesi[iSVR]));     
         strcpy(data,"");  
         break;
-      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   return; break;
-      case MERS_PL_KEYWORD_MISMATCH:                                                                               break;
-      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    return; break;
+      case MERS_PL_EOF:              printf("[%d/%d] FATAL: Unexpected MERS_PL_EOF\n",MT_TPRS,getpid());   exit(EXIT_FAILURE); break;
+      case MERS_PL_KEYWORD_MISMATCH:                                                                                           break;
+      case MERS_PL_OVERLONG_LINE:    printf("[%d/%d] FATAL: MERS_PL_OVERLONG_LINE\n",MT_TPRS,getpid());    exit(EXIT_FAILURE); break;
       }       
     if (s.eServerDesi[iSVR]<0) {
       printf("[%d/%d] FATAL: %s=%d is invalid\n",MT_TPRS,getpid(),keyword,s.eServerDesi[iSVR]);
-      return;
+      exit(EXIT_FAILURE);
       } 
     printf("[%d/%d] %s=%d\n",MT_TPRS,getpid(),keyword,s.eServerDesi[iSVR]);    
 
