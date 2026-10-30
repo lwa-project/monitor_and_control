@@ -86,3 +86,7 @@ python/lwa_mcs.egg-info/
 
 # State directories
 exec/state
+exec/sinbox
+exec/soutbox
+exec/tpcom
+tp/mbox
