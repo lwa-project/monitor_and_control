@@ -1089,14 +1089,14 @@ int main ( int narg, char *argv[] ) {
             switch (osf.OBS_MODE) {
               case LWA_OM_TBT:
                 /* TBT trigger time is an NDP time tag */
-                LWA_time2tv(&tbt_trigger, ndp_cmd_mjd, ndp_cmd_mpm);
+                LWA_time2tv(&tbt_trigger, osf.OBS_START_MJD, osf.OBS_START_MPM);
                 u8 = tbt_trigger.tv_sec * 196000000 + tbt_trigger.tv_usec * 196;
                 
                 /* Define the tuning mask to use */
                 signed_tuning_mask = (long int) 65535;
                 
                 /* Build up the TBT command */
-                LWA_time2tv( &(cs[ncs].action.tv), ndp_cmd_mjd, ndp_cmd_mpm+2000 );	// TBT needs a bit for the NDP buffers to flush
+                LWA_time2tv( &(cs[ncs].action.tv), ndp_cmd_mjd, ndp_cmd_mpm+1000 );	// TBT needs a bit for the NDP buffers to flush
                 cs[ncs].action.bASAP = 0;                   
                 cs[ncs].action.sid = LWA_SID_NDP;  
                 cs[ncs].action.cid = LWA_CMD_TBT;  
