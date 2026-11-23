@@ -927,13 +927,16 @@ int me_init_sdm( struct ssmif_struct s,
 /*** me_make_gf() *************************************************/
 /*******************************************************************/
 /* construct default beam "gains" file (default.gf) from state/default.gft, masking out bad dipoles */
+/* note: line i of default.gft is DP input pair i (DP inputs 2i and 2i+1), not stand i+1 */
 
 int me_make_gf( struct ssmif_struct s
               ) {
 
   int stdmask[ME_MAX_NSTD];
   int stdmask_count=0;
-  int i;
+  int i, j;
+
+  int id[2*ME_MAX_NSTD];
 
   FILE *fpi;
   float gi[2][2];
@@ -942,7 +945,20 @@ int me_make_gf( struct ssmif_struct s
 
   char cmd[256];
 
-  /* Make a list of stands to "mask" (mark out of service) */
+  /* Create a mapping from digital input -> antenna */
+  for ( i=0; i<2*ME_MAX_NSTD; i++) {
+    id[i] = -1;
+    }
+  for (i=0;i<s.nSnap;i++) {
+    for (j=0;j<s.nSnapCh;j++) {
+      if (s.iSnapAnt[i][j]!=0) { /* otherwise this Snap input is not connected to an antenna */
+        id[i*s.nSnapCh+j] = s.iSnapAnt[i][j] - 1; /* antenna index given NDP input channel index */
+        }
+      }
+    }
+
+  /* Make a list of digital stands (input pairs) to "mask" (mark out of service) */
+  /* note: stdmask[i] is for DP inputs 2i and 2i+1, i.e., it is in input order */
   for ( i=0; i<ME_MAX_NSTD; i++ ) {
     printf("me_make_gf(): i=%d ",i);
     stdmask[i]=0;
@@ -952,19 +968,17 @@ int me_make_gf( struct ssmif_struct s
       } else {
         /* should be within range of stands specified by s.nStd */
         /* note: iAntStat[1..520(nominally)]; i.e., is not zero-based */
-        //printf("iAntStat[%3d]=%d, iAntStat[%3d]=%d, ",2*i+1,s.iAntStat[2*i+0], 
-        //                                              2*i+2,s.iAntStat[2*i+1]);
-        if ( (s.iAntStat[2*i+0]>2) && (s.iAntStat[2*i+1]>2) ) {
+        if ( (s.iAntStat[id[2*i+0]]>2) && (s.iAntStat[id[2*i+1]]>2) ) {
           stdmask[i]=1;
           }
-        printf("stdmask[%d]=%d\n",i,stdmask[i]);
+        printf("stdmask[%d]=%d (stand %d)\n",i,stdmask[i],s.iAntStd[id[2*i+0]]);
       } /* if (i>=s.nStd) */
     } /* for ( i=0 */
-  
+
   /* Report findings */
   stdmask_count = 0;
   printf("me_make_gf(): Stands marked out:");
-  for ( i=0; i<s.nStd; i++ ) {  
+  for ( i=0; i<s.nStd; i++ ) {
     if (!stdmask[i]) {
       printf(" %d",i+1);
       stdmask_count++;
@@ -981,7 +995,7 @@ int me_make_gf( struct ssmif_struct s
     }
   fpo = fopen("state/default_m.gft","w");
   i=0;
-  while ( fscanf(fpi,"%f %f %f %f",&gi[0][0],&gi[0][1],&gi[1][0],&gi[1][1]) >0) {
+  while ( (i<ME_MAX_NSTD) && (fscanf(fpi,"%f %f %f %f",&gi[0][0],&gi[0][1],&gi[1][0],&gi[1][1]) >0) ) {
     //printf("me_make_gf(): i=%d %4.2f %4.2f %4.2f %4.2f\n",i,gi[0][0],gi[0][1],gi[1][0],gi[1][1]);
     fprintf(fpo,"%7.3f %7.3f %7.3f %7.3f\n",gi[0][0]*stdmask[i],gi[0][1]*stdmask[i],gi[1][0]*stdmask[i],gi[1][1]*stdmask[i]);
     i++;
