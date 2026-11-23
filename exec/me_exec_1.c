@@ -937,6 +937,7 @@ int me_make_gf( struct ssmif_struct s
   int i, j;
 
   int id[2*ME_MAX_NSTD];
+  int feestat[2*ME_MAX_NSTD];
 
   FILE *fpi;
   float gi[2][2];
@@ -957,6 +958,15 @@ int me_make_gf( struct ssmif_struct s
       }
     }
 
+  /* Create a mapping from antenna -> FEE status */
+  for ( i=0; i<2*ME_MAX_NSTD; i++) {
+    feestat[i] = 3; /* antennas without an FEE listed are not masked on this basis */
+    }
+  for (i=0;i<s.nFEE;i++) {
+    feestat[s.iFEEAnt1[i]-1] = s.iFEEStat[i];
+    feestat[s.iFEEAnt2[i]-1] = s.iFEEStat[i];
+    }
+
   /* Make a list of digital stands (input pairs) to "mask" (mark out of service) */
   /* note: stdmask[i] is for DP inputs 2i and 2i+1, i.e., it is in input order */
   for ( i=0; i<ME_MAX_NSTD; i++ ) {
@@ -968,7 +978,8 @@ int me_make_gf( struct ssmif_struct s
       } else {
         /* should be within range of stands specified by s.nStd */
         /* note: iAntStat[1..520(nominally)]; i.e., is not zero-based */
-        if ( (s.iAntStat[id[2*i+0]]>2) && (s.iAntStat[id[2*i+1]]>2) ) {
+        if ( (s.iAntStat[id[2*i+0]]>2) && (s.iAntStat[id[2*i+1]]>2) &&
+             (  feestat[id[2*i+0]]>2) && (  feestat[id[2*i+1]]>2) ) {
           stdmask[i]=1;
           }
         printf("stdmask[%d]=%d (stand %d)\n",i,stdmask[i],s.iAntStd[id[2*i+0]]);
