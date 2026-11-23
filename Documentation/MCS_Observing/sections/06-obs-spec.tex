@@ -160,23 +160,23 @@ A beam definition block is present within a step definition block only when \tex
 \hline
 \endfoot
 
-\texttt{u2} & \texttt{OBS\_BEAM\_DELAY[$n$][1]}       & Beam delay, antenna 1. \\
+\texttt{u2} & \texttt{OBS\_BEAM\_DELAY[$n$][1]}       & Beam delay, NDP input 1. \\
 \hline
              & $\vdots$                                & \\
 \hline
-\texttt{u2} & \texttt{OBS\_BEAM\_DELAY[$n$][512]}     & Beam delay, antenna 512. \\
+\texttt{u2} & \texttt{OBS\_BEAM\_DELAY[$n$][512]}     & Beam delay, NDP input 512. \\
 \hline
-\texttt{i2} & \texttt{BEAM\_GAIN[$n$][1][1][1]}       & Beam gain, stand 1, pol 1$\times$1. \\
+\texttt{i2} & \texttt{BEAM\_GAIN[$n$][1][1][1]}       & Beam gain, digital stand 1, pol 1$\times$1. \\
 \hline
              & $\vdots$                                & \\
 \hline
-\texttt{i2} & \texttt{BEAM\_GAIN[$n$][256][2][2]}     & Beam gain, stand 256, pol 2$\times$2. \\
+\texttt{i2} & \texttt{BEAM\_GAIN[$n$][256][2][2]}     & Beam gain, digital stand 256, pol 2$\times$2. \\
 \hline
 
 \end{longtable}
 
 \begin{noteBox}
-Note 1: The beam delay array has $2 \times 256 = 512$ entries (one per antenna, i.e., two per stand), while the beam gain array has $256 \times 2 \times 2 = 1024$ entries (a $2\times 2$ Jones matrix per stand).
+Note 1: The beam delay array has $2 \times 256 = 512$ entries (one per NDP input), while the beam gain array has $256 \times 2 \times 2 = 1024$ entries (a $2\times 2$ Jones matrix per digital stand; see Section~\ref{sec:definitions}).
 \end{noteBox}
 
 \begin{noteBox}

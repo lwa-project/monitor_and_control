@@ -104,7 +104,7 @@ Each observation within a session is defined by the following keywords.  Multipl
 
 \item[\texttt{OBS\_MODE}] -- Observing mode.  One of: \texttt{TRK\_RADEC}, \texttt{TRK\_SOL}, \texttt{TRK\_JOV}, \texttt{TRK\_LUN}, \texttt{STEPPED}, \texttt{TBT}, \texttt{TBS}, or \texttt{DIAG1}.
 
-\item[\texttt{OBS\_BDM}] -- Beam-dipole mode.  When specified, MCS constructs a custom gain file that forms a beam using all stands in one polarization output while routing a single specified stand (the ``dipole'') to the other polarization output.  The format of this string is ``\texttt{std gb gd pol}'', where \texttt{std} is the stand number for the dipole ($1 \le \texttt{std} \le 256$), \texttt{gb} is the gain applied to all other stands (the beam component), \texttt{gd} is the gain applied to the dipole stand, and \texttt{pol} is the polarization (\texttt{X} or \texttt{Y}).  If not specified, the observation runs in normal beam-beam mode.  A free-form string of up to 31 characters.  Optional.
+\item[\texttt{OBS\_BDM}] -- Beam-dipole mode.  When specified, MCS constructs a custom gain file that forms a beam using all stands in one polarization output while routing a single specified stand (the ``dipole'') to the other polarization output.  The format of this string is ``\texttt{std gb gd pol}'', where \texttt{std} is the digital stand number (see Section~\ref{sec:definitions}) for the dipole ($1 \le \texttt{std} \le 256$), \texttt{gb} is the gain applied to all other stands (the beam component), \texttt{gd} is the gain applied to the dipole stand, and \texttt{pol} is the polarization (\texttt{X} or \texttt{Y}).  If not specified, the observation runs in normal beam-beam mode.  A free-form string of up to 31 characters.  Optional.
 
 \item[\texttt{OBS\_RA}] -- Right ascension in decimal hours, epoch J2000.  Required only for \texttt{TRK\_RADEC} mode.
 
@@ -116,7 +116,7 @@ Each observation within a session is defined by the following keywords.  Multipl
 \begin{description}
 \item[\texttt{OBS\_B}] -- Beam type.  Meaningful only if \texttt{OBS\_MODE} = \texttt{TRK\_RADEC}, \texttt{TRK\_SOL}, \texttt{TRK\_JOV}, \texttt{TRK\_LUN}, or \texttt{STEPPED}; should not appear otherwise.  Options are:
 \begin{itemize}
-\item \texttt{SIMPLE}.  Beamforming is by equalizing geometrical delays implied by the pointing direction and array geometry.  MCS attempts to account for instrumental delays, gains, and phases through the system.
+\item \texttt{SIMPLE}.  Beamforming is by equalizing geometrical delays implied by the pointing direction and array geometry.  MCS attempts to account for instrumental delays, gains, and phases through the system.  MCS excludes a stand from the beam if either of its antennas has \texttt{ANT\_STAT} $\le 2$, or either of their FEEs has \texttt{FEE\_STAT} $\le 2$, in the SSMIF.
 \item \texttt{HIGH\_DR}.  Beamforming uses the same delay computation as \texttt{SIMPLE}, but the output data uses a higher bit depth to provide greater dynamic range.
 \end{itemize}
 If not specified, \texttt{OBS\_B} will be set to \texttt{SIMPLE}.  Note: \texttt{SPEC\_DELAYS\_GAINS} is valid only in step definitions (see \texttt{OBS\_STP\_B} below), not as an observation-level beam type.
@@ -164,9 +164,9 @@ The following keywords are required only for \texttt{STEPPED} mode observations:
 \item \texttt{SPEC\_DELAYS\_GAINS}.  Beamforming is by applying user-specified delays and gains.  The delays and gains are specified by the parameters \texttt{OBS\_BEAM\_DELAY[][]} and \texttt{BEAM\_GAIN[][][][]}.  MCS makes no attempt to account for instrumental delays and gains through the system.
 \end{itemize}
 
-\item[\texttt{OBS\_BEAM\_DELAY[$n$][$p$]}] -- Corresponds to \texttt{BEAM\_DELAY[$p$]} in~[1]; this is the value during step $n$.  Meaningful only when \texttt{OBS\_STP\_B[$n$]} = \texttt{SPEC\_DELAYS\_GAINS}, and must be specified in this case; otherwise optional.  $1 \le n \le \texttt{OBS\_STP\_N}$, $1 \le p \le 512$ (one per antenna, i.e., two per stand).  Keywords must appear in sequential order by $p$.
+\item[\texttt{OBS\_BEAM\_DELAY[$n$][$p$]}] -- Corresponds to \texttt{BEAM\_DELAY[$p$]} in~[1]; this is the value during step $n$.  Meaningful only when \texttt{OBS\_STP\_B[$n$]} = \texttt{SPEC\_DELAYS\_GAINS}, and must be specified in this case; otherwise optional.  $1 \le n \le \texttt{OBS\_STP\_N}$, $1 \le p \le 512$ (one per NDP input, in NDP input order).  Keywords must appear in sequential order by $p$.
 
-\item[\texttt{BEAM\_GAIN[$n$][$p$][$q$][$r$]}] -- Corresponds to \texttt{BEAM\_GAIN[$p$][$q$][$r$]} in~[1]; this is the value during step $n$.  Meaningful only when \texttt{OBS\_STP\_B[$n$]} = \texttt{SPEC\_DELAYS\_GAINS}, and must be specified in this case; otherwise optional.  $1 \le n \le \texttt{OBS\_STP\_N}$, $1 \le p \le 256$, $1 \le q, r \le 2$.  Keywords must appear in sequential order by $p$, then $q$, then $r$.
+\item[\texttt{BEAM\_GAIN[$n$][$p$][$q$][$r$]}] -- Corresponds to \texttt{BEAM\_GAIN[$p$][$q$][$r$]} in~[1]; this is the value during step $n$.  Meaningful only when \texttt{OBS\_STP\_B[$n$]} = \texttt{SPEC\_DELAYS\_GAINS}, and must be specified in this case; otherwise optional.  $1 \le n \le \texttt{OBS\_STP\_N}$, $1 \le p \le 256$ (digital stand number; see Section~\ref{sec:definitions}), $1 \le q, r \le 2$.  Keywords must appear in sequential order by $p$, then $q$, then $r$.
 \end{description}
 
 \begin{calloutBox}{Implementation Note}{blue}

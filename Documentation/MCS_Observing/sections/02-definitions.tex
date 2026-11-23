@@ -1,6 +1,7 @@
 % 02-definitions.tex - Definitions
 
 \section{Definitions}
+\label{sec:definitions}
 
 A \textit{project} is a collection of activities conducted for a common scientific purpose.  Every project has a single principal investigator (PI).  A project consists of one or more \textit{sessions}.  A \textit{session} is a contiguous block of time during which MCS is conducting observations on behalf of a single project, using a single beam.  A session consists of one or more \textit{observations}.  An \textit{observation} is a single scan using a single mode (defined below).  The following modes of observation are defined:
 
@@ -21,5 +22,7 @@ A \textit{project} is a collection of activities conducted for a common scientif
 
 \item[\texttt{DIAG1}] -- Diagnostic Mode 1.  In this mode, all parameters other than \texttt{OBS\_MODE} are ignored.  MCS returns the metadata file immediately.  This mode is useful for verifying that MCS and the Executive are operational.
 \end{description}
+
+A \textit{physical stand} is a dual-polarization antenna stand in the array, numbered as in the SSMIF (\texttt{ANT\_STD}).  A \textit{digital stand} is a pair of consecutive NDP inputs: digital stand $n$ ($1 \le n \le 256$) is NDP inputs $2n-1$ and $2n$.  NDP applies beamformer gains per digital stand.  At some stations, notably LWA1, digital stand $n$ is generally not physical stand $n$; the two are related through the SSMIF \texttt{SNAP\_ANT} mapping.
 
 As an example, consider a project consisting of 10 sessions, where each session consists of 3 observations.  During each session, MCS first forms a beam on a calibrator for 5~minutes (\texttt{TRK\_RADEC}), then tracks a target for 1~hour (\texttt{TRK\_RADEC}), and finally tracks the same calibrator again for 5~minutes (\texttt{TRK\_RADEC}).  All three observations in each session use the same beam, tunings, and bandwidth.  Each session takes place on a different day.
