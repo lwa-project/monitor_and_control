@@ -38,7 +38,7 @@
 #define MAX_MJD_SCHEDULE_AHEAD 30   /* max number of days in the future allowed to schedule */
 #define MAX_STP_N 1024              /* max number of steps in a stepped-mode observation */
 #define MAX_BEAM_DELAY 65535        /* max value that OBS_BEAM_DELAY[][] can have */
-#define TBT_INVERSE_DUTY_CYCLE  150 /* assumed ratio of TBT read-out time to TBT dump time */
+#define TBT_INVERSE_DUTY_CYCLE  425 /* assumed ratio of TBT read-out time to TBT dump time */
 #define MIN_OBS_STEP_LENGTH 5       /* minimum number of milliseconds in an observation step */
 
 
